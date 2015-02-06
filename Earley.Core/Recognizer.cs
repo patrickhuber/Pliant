@@ -27,24 +27,20 @@ namespace Earley
                 for (int c = 0; c < chart[origin].Count; c++)
                 {
                     var state = chart[origin][c];
-                    Console.Write("{0}\t{1}", origin, state);
                     if (!state.IsComplete())
                     {
                         if (state.CurrentSymbol().SymbolType == SymbolType.NonTerminal)
                         {
                             Predict(state, origin, chart);
-                            Console.WriteLine("\t # Predict");
                         }
                         else
                         {
                             Scan(state, origin, chart, token);
-                            Console.WriteLine("\t # Scan {0}", token);
                         }
                     }
                     else
                     {
                         Complete(state, origin, chart);
-                        Console.WriteLine("\t # Complete");
                     }
                 }
                 origin++;
@@ -55,11 +51,12 @@ namespace Earley
         private void Predict(IState predict, int j, Chart chart)
         {
             var currentSymbol = predict.CurrentSymbol();
-            var addedProductions = new List<IProduction>();
             foreach (var production in _grammar.RulesFor(currentSymbol))
             {
                 var state = new State(production, 0, j);
                 chart.EnqueueAt(j, state);
+                Console.Write("{0}\t{1}", j, state);
+                Console.WriteLine("\t # Predict");
             }
         }
 
@@ -68,13 +65,15 @@ namespace Earley
             int i = scan.Origin;
             foreach (var state in chart[j])
             {
-                if(!state.IsComplete() && scan.CurrentSymbol().Value == token.ToString())
+                if(!state.IsComplete() && state.CurrentSymbol().Value == token.ToString())
                 {
-                    var production = new Production(
-                        state.Production.LeftHandSide, 
-                        new Symbol(SymbolType.Terminal, token.ToString()));
-                    var scanState = new State(production, 1, i);
+                    var scanState = new State(
+                        state.Production, 
+                        state.Position + 1, 
+                        i);
                     chart.EnqueueAt(j + 1, scanState);
+                    Console.Write("{0}\t{1}", j, scanState);
+                    Console.WriteLine("\t # Scan {0}", token);
                 }
             }
         }
@@ -90,6 +89,8 @@ namespace Earley
                     int i = state.Origin;
                     var nextState = new State(state.Production,  state.Position + 1, i);
                     chart.EnqueueAt(k, nextState);
+                    Console.Write("{0}\t{1}", k, nextState);
+                    Console.WriteLine("\t # Complete");
                 }
             }
         }

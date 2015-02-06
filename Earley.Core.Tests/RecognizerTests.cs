@@ -36,9 +36,37 @@ namespace Earley.Core.Tests
                 new Terminal("c")));
 
         [TestMethod]
-        public void Test_Recognizer_That_A_B_C_Grammar_Parses_bc()
+        public void Test_Recognizer_That_Scan_Moves_Items_To_Next_Tree()
         {
-            
+            var recognizer = new Recognizer(expressionGrammar);
+            var privateObject = new PrivateObject(recognizer);
+            var scanState = new State(expressionGrammar.Productions[5], 0, 0);
+            var chart = new Chart(expressionGrammar);
+            for (int i = 0; i < expressionGrammar.Productions.Count;i++)
+                chart.EnqueueAt(0, new State(expressionGrammar.Productions[i], 0, 0));
+            var j = 0;
+            privateObject.Invoke("Scan", scanState, j, chart, '2');
+            Assert.AreEqual(1, chart[1].Count);
+        }
+
+        [TestMethod]
+        public void Test_Recognizer_That_Complete_Only_Adds_States_Related_To_Completed_State()
+        {
+            var recognizer = new Recognizer(expressionGrammar);
+            var privateObject = new PrivateObject(recognizer);
+            var completeState = new State(expressionGrammar.Productions[5], 1, 0);
+            var chart = new Chart(expressionGrammar);
+            for (int i = 0; i < expressionGrammar.Productions.Count; i++)
+                chart.EnqueueAt(0, new State(expressionGrammar.Productions[i], 0, 0));
+            chart.EnqueueAt(1, completeState);
+            var k = 1;
+            privateObject.Invoke("Complete", completeState, k, chart);
+            Assert.Fail();
+        }
+
+        [TestMethod]
+        public void Test_Recognizer_That_A_B_C_Grammar_Parses_bc()
+        {            
             var recognizer = new Recognizer(abcGrammar);
             var stringBuilder = new StringBuilder("bc");
             var stringBuilderEnumerable = new StringBuilderEnumerable(stringBuilder);
@@ -55,7 +83,7 @@ namespace Earley.Core.Tests
             var tokens = new StringBuilderEnumerable(stringBuilder);
             var chart = recognizer.Parse(tokens);
             Assert.IsNotNull(chart);
-            Assert.AreEqual(4, chart.Count);
+            Assert.AreEqual(6, chart.Count);
         }
     }
 }
