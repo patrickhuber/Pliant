@@ -49,5 +49,16 @@ namespace Earley
                 hashCode ^= symbol.GetHashCode();
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendFormat("{0} ->", LeftHandSide.Value);
+            for (int p = 0; p < RightHandSide.Count; p++)
+            {
+                stringBuilder.AppendFormat(" {0}", RightHandSide[p].Value);
+            }
+            return stringBuilder.ToString();
+        }
     }
 }

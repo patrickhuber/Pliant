@@ -52,6 +52,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RecognizerTests.cs" />
+    <Compile Include="ProductionTests.cs" />
+    <Compile Include="StateTests.cs" />
+    <Compile Include="GrammarTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Earley.Core\Earley.Core.csproj">

@@ -63,5 +63,25 @@ namespace Earley
                 ^ Origin.GetHashCode()
                 ^ Production.GetHashCode();
         }
+
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder()
+                .AppendFormat("{0} ->", Production.LeftHandSide.Value);
+            
+            int p = 0;
+            for (p=0; p < Production.RightHandSide.Count; p++)
+            {       
+                stringBuilder.AppendFormat(
+                    "{0}{1}", 
+                    p == Position ? "." : " " , 
+                    Production.RightHandSide[p].Value);
+            }
+            
+            if (Position == Production.RightHandSide.Count)
+                stringBuilder.Append(".");
+
+            return stringBuilder.ToString();
+        }
     }
 }
