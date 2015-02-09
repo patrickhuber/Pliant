@@ -19,8 +19,12 @@ namespace Earley
         public Chart Parse(IEnumerable<char> tokens)
         {
             var chart = new Chart(_grammar);
-            chart.EnqueueAt(0, new State(_grammar.Productions[0], 0, 0));
-            
+            var startState = new State(_grammar.Productions[0], 0, 0);
+            chart.EnqueueAt(0, startState);
+
+            Console.Write("{0}\t{1}", 0, startState);
+            Console.WriteLine("\t # Start");
+
             int origin = 0;
             foreach (var token in tokens)
             {                 
@@ -63,13 +67,14 @@ namespace Earley
         private void Scan(IState scan, int j, Chart chart, char token)
         {
             int i = scan.Origin;
-            foreach (var state in chart[j])
+            for (var s = 0; s < chart[j].Count;s++)
             {
-                if(!state.IsComplete() && state.CurrentSymbol().Value == token.ToString())
+                var state = chart[j][s];
+                if (!state.IsComplete() && state.CurrentSymbol().Value == token.ToString())
                 {
                     var scanState = new State(
-                        state.Production, 
-                        state.Position + 1, 
+                        state.Production,
+                        state.Position + 1,
                         i);
                     chart.EnqueueAt(j + 1, scanState);
                     Console.Write("{0}\t{1}", j, scanState);
@@ -81,13 +86,14 @@ namespace Earley
         private void Complete(IState completed, int k, Chart chart)
         {
             int j = completed.Origin;
-            foreach (var state in chart[j])
-            {   
+            for (int s = 0; s < chart[j].Count; s++)
+            {
+                var state = chart[j][s];
                 var stateSymbol = state.CurrentSymbol();
                 if (stateSymbol != null && stateSymbol.Value == completed.Production.LeftHandSide.Value)
                 {
                     int i = state.Origin;
-                    var nextState = new State(state.Production,  state.Position + 1, i);
+                    var nextState = new State(state.Production, state.Position + 1, i);
                     chart.EnqueueAt(k, nextState);
                     Console.Write("{0}\t{1}", k, nextState);
                     Console.WriteLine("\t # Complete");
