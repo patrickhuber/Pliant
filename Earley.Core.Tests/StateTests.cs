@@ -12,7 +12,7 @@ namespace Earley.Core.Tests
             var state = new State(
                 new Production("A", new NonTerminal("B"), new NonTerminal("C")),
                 1,0);
-            Assert.AreEqual("A -> B.C", state.ToString());
+            Assert.AreEqual("A -> B.C\t\t(0)", state.ToString());
         }
     }
 }

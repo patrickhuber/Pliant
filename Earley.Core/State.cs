@@ -54,7 +54,7 @@ namespace Earley
                 return false;
             return Position == state.Position
                 && Origin == state.Origin
-                && Production == state.Production;
+                && Production.Equals(state.Production);
         }
 
         public override int GetHashCode()
@@ -81,6 +81,7 @@ namespace Earley
             if (Position == Production.RightHandSide.Count)
                 stringBuilder.Append(".");
 
+            stringBuilder.AppendFormat("\t\t({0})", Origin);
             return stringBuilder.ToString();
         }
     }

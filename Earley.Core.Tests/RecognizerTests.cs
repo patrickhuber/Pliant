@@ -61,7 +61,8 @@ namespace Earley.Core.Tests
             chart.EnqueueAt(1, completeState);
             var k = 1;
             privateObject.Invoke("Complete", completeState, k, chart);
-            Assert.Fail();
+            Assert.AreEqual(2, chart.Count);
+            Assert.AreEqual(2, chart[1].Count);
         }
 
         [TestMethod]
@@ -84,6 +85,37 @@ namespace Earley.Core.Tests
             var chart = recognizer.Parse(tokens);
             Assert.IsNotNull(chart);
             Assert.AreEqual(6, chart.Count);
+        }
+
+        [TestMethod]
+        public void Test_Recognizer_That_Right_Recursion_Is_Not_O_N_3()
+        {
+            var grammar = new Grammar(
+                new Production("A", new Terminal("a"), new NonTerminal("A")),
+                new Production("A"));
+            var recognizer = new Recognizer(grammar);
+            var stringBuilder = new StringBuilder("aaaaa");
+            var tokens = new StringBuilderEnumerable(stringBuilder);
+            var chart = recognizer.Parse(tokens);
+
+            var matchState = new State(
+                new Production("A", 
+                    new Terminal("a"), 
+                    new NonTerminal("A")),
+                    2, 4);
+
+            // we know the leo completion is working if the 
+            // 4th index contains one state that matches the 
+            // match state.
+            var matchCount = 0;
+            for (var s = 0; s < chart[4].Count; s++)
+            {
+                var state = chart[4][s];
+                if(matchState.Production.Equals(state.Production))
+                    if(matchState.Position == state.Position)
+                        matchCount++;
+            }
+            Assert.AreEqual(1, matchCount);
         }
     }
 }

@@ -11,5 +11,18 @@ namespace Earley
         public NonTerminal(string value)
             : base(SymbolType.NonTerminal, value)
         { }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var nonTerminal = obj as NonTerminal;
+            if (nonTerminal == null)
+                return false;
+            return base.Equals(obj);
+        }
     }
 }
