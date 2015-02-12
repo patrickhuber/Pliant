@@ -26,6 +26,13 @@ namespace Earley
             Console.WriteLine("\t # Start");
 
             int origin = 0;
+            // TODO:
+            // Update algorithm to follow these steps from :
+            // https://github.com/jeffreykegler/kollos/blob/master/notes/misc/leo2.md
+            // * you first perform all scans;
+            // * then all completions;
+            // * then all predictions;
+            // * and finally do post-processing, including eager computation of Leo items.
             foreach (var token in tokens)
             {                 
                 for (int c = 0; c < chart[origin].Count; c++)
