@@ -38,6 +38,8 @@ namespace Earley
                 for (int c = 0; c < chart[origin].Count; c++)
                 {
                     var state = chart[origin][c];
+                    if (state.StateType == StateType.Transitive)
+                        continue;
                     if (!state.IsComplete())
                     {
                         if (state.CurrentSymbol().SymbolType == SymbolType.NonTerminal)
@@ -74,9 +76,11 @@ namespace Earley
         private void Scan(IState scan, int j, Chart chart, char token)
         {
             int i = scan.Origin;
-            for (var s = 0; s < chart[j].Count;s++)
+            for (var s = 0; s < chart[j].Count; s++)
             {
                 var state = chart[j][s];
+                if (state.StateType == StateType.Transitive)
+                    continue;
                 if (!state.IsComplete() && state.CurrentSymbol().Value == token.ToString())
                 {
                     var scanState = new State(
@@ -92,12 +96,12 @@ namespace Earley
 
         private void Complete(IState completed, int k, Chart chart)
         {
+            // TODO: Do Leo Optimization Step Here
             int j = completed.Origin;
             for (int s = 0; s < chart[j].Count; s++)
             {
                 var state = chart[j][s];
-                var stateSymbol = state.CurrentSymbol();
-                if (stateSymbol != null && stateSymbol.Value == completed.Production.LeftHandSide.Value)
+                if (IsDerivedState(completed, state))
                 {
                     int i = state.Origin;
                     var nextState = new State(state.Production, state.Position + 1, i);
@@ -106,6 +110,38 @@ namespace Earley
                     Console.WriteLine("\t # Complete");
                 }
             }
+        }
+
+        IState GetTopOfDeterministicReductionPath(IState completed, int k, Chart chart)
+        {
+            int derivedItemCount = 0;
+            IState derivedItem = null;
+            for (int s = 0; s < chart[k].Count; s++)
+            {
+                var state = chart[k][s];
+                if (IsDerivedState(completed, state))
+                {
+                    if (derivedItemCount > 0)
+                        return null;
+                    derivedItemCount++;
+                    derivedItem = state;
+                }
+            }
+            if (derivedItemCount == 1)
+            {
+                // check if derivedState.Origin == 0 ?
+                if (derivedItem.Origin == 0)
+                    return derivedItem;
+                return GetTopOfDeterministicReductionPath(derivedItem, derivedItem.Origin, chart);
+            }
+            return null;
+        }
+
+        private bool IsDerivedState(IState completed, IState state)
+        {
+            if (state.IsComplete())
+                return false;
+            return state.CurrentSymbol().Equals(completed.Production.LeftHandSide);
         }
     }
 }

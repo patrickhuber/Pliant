@@ -54,11 +54,13 @@
     <Compile Include="ReadOnlyList.cs" />
     <Compile Include="Recognizer.cs" />
     <Compile Include="State.cs" />
+    <Compile Include="StateType.cs" />
     <Compile Include="StringBuilderEnumerable.cs" />
     <Compile Include="StringBuilderEnumerator.cs" />
     <Compile Include="SymbolType.cs" />
     <Compile Include="Symbol.cs" />
     <Compile Include="Terminal.cs" />
+    <Compile Include="TransitionState.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

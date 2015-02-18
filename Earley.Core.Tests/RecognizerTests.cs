@@ -35,6 +35,16 @@ namespace Earley.Core.Tests
                 "C",
                 new Terminal("c")));
 
+        // A -> Aa
+        // A -> 
+        private readonly Grammar simpleRightRecursive = new Grammar(
+            new Production(
+                "A",
+                new NonTerminal("A"),
+                new Terminal("a")),
+            new Production(
+                "A"));
+
         [TestMethod]
         public void Test_Recognizer_That_Scan_Moves_Items_To_Next_Tree()
         {
@@ -90,9 +100,7 @@ namespace Earley.Core.Tests
         [TestMethod]
         public void Test_Recognizer_That_Right_Recursion_Is_Not_O_N_3()
         {
-            var grammar = new Grammar(
-                new Production("A", new Terminal("a"), new NonTerminal("A")),
-                new Production("A"));
+            var grammar = simpleRightRecursive;
             var recognizer = new Recognizer(grammar);
             var stringBuilder = new StringBuilder("aaaaa");
             var tokens = new StringBuilderEnumerable(stringBuilder);

@@ -10,23 +10,68 @@ namespace Earley
     {
         private Chart _chart;
         private int _position;
-        private Production _rule;
+        private IState _rule;
 
-        public LeoReducer(Chart chart, int position, Production rule)
+        public LeoReducer(Chart chart)
         {
             _chart = chart;
-            _position = position;
-            _rule = rule;
         }
 
-        public void Update()
+        public void Update(int i, IState state)
         {
-            
+            var transitiveItem = _chart[i]
+                .FirstOrDefault(x => 
+                    x.StateType == StateType.Transitive
+                    && (x as TransitionState).Recognized.Equals(state.Production.LeftHandSide));
+            bool containsTransitiveItem = transitiveItem != null;
+            if (containsTransitiveItem)
+            {
+                _rule = transitiveItem;
+                _position = transitiveItem.Origin;
+            }
+            else
+            {
+                var derivedItem = GetDerivedItemIfExactlyOneExists(i, state);
+                if (derivedItem != null)
+                {
+                    _rule = state;
+                    _position = state.Origin;
+                    Update(derivedItem.Origin, derivedItem);
+                    var transitionState = new TransitionState(
+                        state.Production.LeftHandSide,
+                        _rule.Production,
+                        _rule.Position,
+                        _position);
+                    _chart.EnqueueAt(i, transitionState);
+                }
+            }
         }
 
-        private bool ContainsTransitiveItem(IReadOnlyCollection<IState> _states, IProduction production)
+        private IState GetDerivedItemIfExactlyOneExists(int i, IState state)
         {
- 
+            int derivedItemCount = 0;
+            IState derivedItem = null;
+            foreach (var item in _chart[i])
+            {
+                bool isDerivedITem = !item.IsComplete()
+                    && item.CurrentSymbol().Equals(state.Production.LeftHandSide);
+                if (isDerivedITem)
+                {
+                    if (derivedItemCount > 1)
+                    {
+                        derivedItem = null;
+                        break;
+                    }
+                    derivedItemCount++;
+                    derivedItem = item;
+                }
+            }
+            return derivedItem;
+        }
+
+        IState GetTopMostItem(int i, IState state)
+        {
+            return null;
         }
     }
 }

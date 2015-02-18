@@ -84,5 +84,7 @@ namespace Earley
             stringBuilder.AppendFormat("\t\t({0})", Origin);
             return stringBuilder.ToString();
         }
+
+        public virtual StateType StateType { get { return Earley.StateType.Normal; } }
     }
 }

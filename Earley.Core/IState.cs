@@ -8,5 +8,6 @@ namespace Earley
         int Origin { get; }
         ISymbol CurrentSymbol();
         bool IsComplete();
+        StateType StateType { get; }
     }
 }

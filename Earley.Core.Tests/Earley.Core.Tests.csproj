@@ -55,6 +55,7 @@
     <Compile Include="ProductionTests.cs" />
     <Compile Include="StateTests.cs" />
     <Compile Include="GrammarTests.cs" />
+    <Compile Include="LeoAlgorithmTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Earley.Core\Earley.Core.csproj">
