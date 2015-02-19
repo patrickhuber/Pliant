@@ -112,36 +112,83 @@ namespace Earley
             }
         }
 
-        IState GetTopOfDeterministicReductionPath(IState completed, int k, Chart chart)
+        void OptimizeReductionPath(IState state, int k, Chart chart)
         {
-            int derivedItemCount = 0;
-            IState derivedItem = null;
-            for (int s = 0; s < chart[k].Count; s++)
+            IState t_rule = null;
+            OptimizeReductionPathRecursive(state, k, chart, ref t_rule);
+        }
+
+        void OptimizeReductionPathRecursive(IState completed, int k, Chart chart, ref IState t_rule)
+        {
+            var list = chart[k];
+            var transitiveState = FindTransitiveState(list, completed);
+            if (transitiveState != null)
             {
-                var state = chart[k][s];
-                if (IsDerivedState(completed, state))
+                t_rule = transitiveState;
+            }
+            else 
+            {
+                var derivedState = FindDerivedState(list, completed);
+                if (derivedState != null)
                 {
-                    if (derivedItemCount > 0)
+                    t_rule = derivedState;
+                    OptimizeReductionPathRecursive(derivedState, derivedState.Origin, chart, ref t_rule);
+                    if (t_rule != null)
+                    {
+                        var transitionItem = new TransitionState(
+                            completed.Production.LeftHandSide,
+                            t_rule.Production,
+                            t_rule.Production.RightHandSide.Count,
+                            t_rule.Origin);
+                        chart.EnqueueAt(k, transitionItem);
+                    }
+                }
+            }
+        }
+
+        IState FindDerivedState(IReadOnlyList<IState> list, IState currentState)
+        {
+            var derivedItemCount = 0;
+            IState derivedItem = null;
+            for (int s = 0; s < list.Count; s++)
+            {
+                var state = list[s];
+                if (IsDerivedState(currentState, state))
+                {
+                    bool moreThanOneDerivedItemExists = derivedItemCount > 0;
+                    if (moreThanOneDerivedItemExists)
                         return null;
                     derivedItemCount++;
                     derivedItem = state;
                 }
             }
-            if (derivedItemCount == 1)
-            {
-                // check if derivedState.Origin == 0 ?
-                if (derivedItem.Origin == 0)
-                    return derivedItem;
-                return GetTopOfDeterministicReductionPath(derivedItem, derivedItem.Origin, chart);
-            }
-            return null;
+            return derivedItem;
         }
-
+        
         private bool IsDerivedState(IState completed, IState state)
         {
             if (state.IsComplete())
                 return false;
             return state.CurrentSymbol().Equals(completed.Production.LeftHandSide);
+        }
+
+        private IState FindTransitiveState(IReadOnlyList<IState> list, IState source)
+        {
+            for (int s = 0; s < list.Count; s++)
+            {
+                var state = list[s];
+                if (IsTransitiveState(source, state))
+                    return state;
+            }
+            return null;
+        }
+
+        private bool IsTransitiveState(IState completed, IState state)
+        {
+            if (state.StateType != StateType.Transitive)
+                return false;
+            var transitiveState = state as TransitionState;
+            return transitiveState.Recognized.Equals(completed.Production.LeftHandSide);
         }
     }
 }

@@ -47,7 +47,6 @@
     <Compile Include="IReadOnlyList.cs" />
     <Compile Include="IState.cs" />
     <Compile Include="ISymbol.cs" />
-    <Compile Include="LeoReducer.cs" />
     <Compile Include="NonTerminal.cs" />
     <Compile Include="Production.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

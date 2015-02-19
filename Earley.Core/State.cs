@@ -16,14 +16,14 @@ namespace Earley
         
         public int Origin { get; private set; }
 
-        public State(IProduction production, int position, int start)
+        public State(IProduction production, int position, int origin)
         {
             Assert.IsNotNull(production, "production");
             Assert.IsGreaterThanZero(position, "position");
-            Assert.IsGreaterThanZero(start, "start");
+            Assert.IsGreaterThanZero(origin, "origin");
             Production = production;
             Position = position;
-            Origin = start;
+            Origin = origin;
         }
         public bool IsComplete()
         {

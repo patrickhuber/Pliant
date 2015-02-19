@@ -10,8 +10,8 @@ namespace Earley
     {
         public ISymbol Recognized { get; private set; }
 
-        public TransitionState(ISymbol recognized, IProduction production, int position, int start)
-            : base(production, position, start)
+        public TransitionState(ISymbol recognized, IProduction production, int position, int origin)
+            : base(production, position, origin)
         {
             Recognized = recognized;
         }

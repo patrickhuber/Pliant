@@ -10,7 +10,7 @@ namespace Earley.Core.Tests
         private IProduction A_ = new Production("A");
         
         [TestMethod]
-        public void Test_LeoReducer_Update_Creates_Transition_Item_When_Reduction_Path_Exists()
+        public void Test_LeoAlgorithm_That_OptimizeReductionPath_Returns_TopMost_Item_From_Third_Quadrant()
         {
             var grammar = CreateGrammar();
             var chart = CreateChart(grammar);
@@ -18,8 +18,8 @@ namespace Earley.Core.Tests
 
             var recognizer = new Recognizer(grammar);
             var invoker = new PrivateObject(recognizer);
-            var topmostState = invoker.Invoke("GetTopOfDeterministicReductionPath", completedState, 3, chart);
-            Assert.IsNotNull(topmostState);
+            invoker.Invoke("OptimizeReductionPath", completedState, 3, chart);
+            
         }
 
         private Grammar CreateGrammar()
@@ -30,9 +30,8 @@ namespace Earley.Core.Tests
         }
 
         private Chart CreateChart(Grammar grammar)
-        {
-            
-            Chart chart = new Chart(grammar);
+        {            
+            var chart = new Chart(grammar);
 
             // === 0 ===
             // A -> . 'a' A (0)
