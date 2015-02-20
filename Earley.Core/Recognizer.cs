@@ -96,29 +96,38 @@ namespace Earley
 
         private void Complete(IState completed, int k, Chart chart)
         {
-            // TODO: Do Leo Optimization Step Here
-            int j = completed.Origin;
-            for (int s = 0; s < chart[j].Count; s++)
+            OptimizeReductionPath(completed, k, chart);
+            var transitiveState = FindTransitiveState(chart[k], completed);
+            if (transitiveState != null)
             {
-                var state = chart[j][s];
-                if (IsDerivedState(completed, state))
+                var topmostItem = new State(transitiveState.Production, transitiveState.Position, transitiveState.Origin);
+                chart.EnqueueAt(k, topmostItem);
+            }
+            else
+            {
+                int j = completed.Origin;
+                for (int s = 0; s < chart[j].Count; s++)
                 {
-                    int i = state.Origin;
-                    var nextState = new State(state.Production, state.Position + 1, i);
-                    chart.EnqueueAt(k, nextState);
-                    Console.Write("{0}\t{1}", k, nextState);
-                    Console.WriteLine("\t # Complete");
+                    var state = chart[j][s];
+                    if (IsDerivedState(completed, state))
+                    {
+                        int i = state.Origin;
+                        var nextState = new State(state.Production, state.Position + 1, i);
+                        chart.EnqueueAt(k, nextState);
+                        Console.Write("{0}\t{1}", k, nextState);
+                        Console.WriteLine("\t # Complete");
+                    }
                 }
             }
         }
 
-        void OptimizeReductionPath(IState state, int k, Chart chart)
+        private void OptimizeReductionPath(IState state, int k, Chart chart)
         {
             IState t_rule = null;
             OptimizeReductionPathRecursive(state, k, chart, ref t_rule);
         }
 
-        void OptimizeReductionPathRecursive(IState completed, int k, Chart chart, ref IState t_rule)
+        private void OptimizeReductionPathRecursive(IState completed, int k, Chart chart, ref IState t_rule)
         {
             var list = chart[k];
             var transitiveState = FindTransitiveState(list, completed);
