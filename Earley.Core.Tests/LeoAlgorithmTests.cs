@@ -18,7 +18,7 @@ namespace Earley.Core.Tests
 
             var recognizer = new Recognizer(grammar);
             var invoker = new PrivateObject(recognizer);
-            invoker.Invoke("OptimizeReductionPath", completedState, 3, chart);            
+            invoker.Invoke("OptimizeReductionPath", completedState.Production.LeftHandSide, 3, chart);            
         }
 
         private Grammar CreateGrammar()

@@ -19,11 +19,15 @@ namespace Earley
         public Chart Parse(IEnumerable<char> tokens)
         {
             var chart = new Chart(_grammar);
-            var startState = new State(_grammar.Productions[0], 0, 0);
-            chart.EnqueueAt(0, startState);
+            var firstProduction = _grammar.Productions[0];
+            var startProductions = _grammar.Productions.Where(p => p.LeftHandSide.Equals(firstProduction.LeftHandSide));
 
-            Console.Write("{0}\t{1}", 0, startState);
-            Console.WriteLine("\t # Start");
+            foreach (var startProduction in startProductions)
+            {
+                var startState = new State(startProduction, 0, 0);
+                chart.EnqueueAt(0, startState);
+                Console.WriteLine("{0}\t{1}\t # Start", 0, startState);
+            }
 
             int origin = 0;
             // TODO:
@@ -68,8 +72,7 @@ namespace Earley
             {
                 var state = new State(production, 0, j);
                 chart.EnqueueAt(j, state);
-                Console.Write("{0}\t{1}", j, state);
-                Console.WriteLine("\t # Predict");
+                Log("Predict", j, state);
             }
         }
 
@@ -88,16 +91,28 @@ namespace Earley
                         state.Position + 1,
                         i);
                     chart.EnqueueAt(j + 1, scanState);
-                    Console.Write("{0}\t{1}", j, scanState);
-                    Console.WriteLine("\t # Scan {0}", token);
+                    LogScan(j+1, scanState, token);
                 }
             }
         }
 
+        private void LogScan(int origin, IState state, char token)
+        {
+            Console.Write("{0}\t{1}", origin, state);
+            Console.WriteLine("\t # Scan {0}", token);
+        }
+
+        private void Log(string operation, int origin, IState state)
+        {
+            Console.Write("{0}\t{1}", origin, state);
+            Console.WriteLine("\t # {0}", operation);
+        }
+
         private void Complete(IState completed, int k, Chart chart)
         {
-            OptimizeReductionPath(completed, k, chart);
-            var transitiveState = FindTransitiveState(chart[k], completed);
+            var searchSymbol = completed.Production.LeftHandSide;
+            OptimizeReductionPath(searchSymbol, k, chart);
+            var transitiveState = FindTransitiveState(chart[k], searchSymbol);
             if (transitiveState != null)
             {
                 var topmostItem = new State(transitiveState.Production, transitiveState.Position, transitiveState.Origin);
@@ -109,43 +124,45 @@ namespace Earley
                 for (int s = 0; s < chart[j].Count; s++)
                 {
                     var state = chart[j][s];
-                    if (IsDerivedState(completed, state))
+                    if (IsDerivedState(completed.Production.LeftHandSide, state))
                     {
                         int i = state.Origin;
                         var nextState = new State(state.Production, state.Position + 1, i);
                         chart.EnqueueAt(k, nextState);
-                        Console.Write("{0}\t{1}", k, nextState);
-                        Console.WriteLine("\t # Complete");
+                        Log("Complete", k, nextState);
                     }
                 }
             }
         }
 
-        private void OptimizeReductionPath(IState state, int k, Chart chart)
+        private void OptimizeReductionPath(ISymbol searchSymbol, int k, Chart chart)
         {
             IState t_rule = null;
-            OptimizeReductionPathRecursive(state, k, chart, ref t_rule);
+            OptimizeReductionPathRecursive(searchSymbol, k, chart, ref t_rule);
         }
 
-        private void OptimizeReductionPathRecursive(IState completed, int k, Chart chart, ref IState t_rule)
+        private void OptimizeReductionPathRecursive(ISymbol searchSymbol, int k, Chart chart, ref IState t_rule)
         {
             var list = chart[k];
-            var transitiveState = FindTransitiveState(list, completed);
+            var transitiveState = FindTransitiveState(list, searchSymbol);
             if (transitiveState != null)
             {
                 t_rule = transitiveState;
             }
             else 
             {
-                var derivedState = FindDerivedState(list, completed);
+                var derivedState = FindDerivedState(list, searchSymbol);
                 if (derivedState != null)
                 {
-                    t_rule = derivedState;
-                    OptimizeReductionPathRecursive(derivedState, derivedState.Origin, chart, ref t_rule);
+                    Console.WriteLine("Found {0}", derivedState);
+                    t_rule = derivedState.IsComplete() 
+                        ? derivedState
+                        : new State(derivedState.Production, derivedState.Position + 1, derivedState.Origin);
+                    OptimizeReductionPathRecursive(derivedState.Production.LeftHandSide, derivedState.Origin, chart, ref t_rule);
                     if (t_rule != null)
                     {
                         var transitionItem = new TransitionState(
-                            completed.Production.LeftHandSide,
+                            searchSymbol,
                             t_rule.Production,
                             t_rule.Production.RightHandSide.Count,
                             t_rule.Origin);
@@ -155,14 +172,14 @@ namespace Earley
             }
         }
 
-        IState FindDerivedState(IReadOnlyList<IState> list, IState currentState)
+        IState FindDerivedState(IReadOnlyList<IState> list, ISymbol searchSymbol)
         {
             var derivedItemCount = 0;
             IState derivedItem = null;
             for (int s = 0; s < list.Count; s++)
             {
                 var state = list[s];
-                if (IsDerivedState(currentState, state))
+                if (IsDerivedState(searchSymbol, state))
                 {
                     bool moreThanOneDerivedItemExists = derivedItemCount > 0;
                     if (moreThanOneDerivedItemExists)
@@ -174,30 +191,30 @@ namespace Earley
             return derivedItem;
         }
         
-        private bool IsDerivedState(IState completed, IState state)
+        private bool IsDerivedState(ISymbol searchSymbol, IState state)
         {
             if (state.IsComplete())
                 return false;
-            return state.CurrentSymbol().Equals(completed.Production.LeftHandSide);
+            return state.CurrentSymbol().Equals(searchSymbol);
         }
 
-        private IState FindTransitiveState(IReadOnlyList<IState> list, IState source)
+        private IState FindTransitiveState(IReadOnlyList<IState> list, ISymbol searchSymbol)
         {
             for (int s = 0; s < list.Count; s++)
             {
                 var state = list[s];
-                if (IsTransitiveState(source, state))
+                if (IsTransitiveState(searchSymbol, state))
                     return state;
             }
             return null;
         }
 
-        private bool IsTransitiveState(IState completed, IState state)
+        private bool IsTransitiveState(ISymbol searchSymbol, IState state)
         {
             if (state.StateType != StateType.Transitive)
                 return false;
             var transitiveState = state as TransitionState;
-            return transitiveState.Recognized.Equals(completed.Production.LeftHandSide);
+            return transitiveState.Recognized.Equals(searchSymbol);
         }
     }
 }

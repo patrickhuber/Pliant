@@ -40,8 +40,8 @@ namespace Earley.Core.Tests
         private readonly Grammar simpleRightRecursive = new Grammar(
             new Production(
                 "A",
-                new NonTerminal("A"),
-                new Terminal("a")),
+                new Terminal("a"),
+                new NonTerminal("A")),
             new Production(
                 "A"));
 
@@ -119,9 +119,10 @@ namespace Earley.Core.Tests
             for (var s = 0; s < chart[4].Count; s++)
             {
                 var state = chart[4][s];
-                if(matchState.Production.Equals(state.Production))
-                    if(matchState.Position == state.Position)
-                        matchCount++;
+                if(matchState.StateType == state.StateType)
+                    if(matchState.Production.Equals(state.Production))
+                        if(matchState.Position == state.Position)
+                            matchCount++;
             }
             Assert.AreEqual(1, matchCount);
         }
