@@ -8,7 +8,7 @@ namespace Earley.Core.Tests
     public class GrammarTests
     {
         [TestMethod]
-        public void Test_Grammar_RulesFor_That_Returns_Rules_When_Production_Matches()
+        public void Test_Grammar_That_RulesFor_Returns_Rules_When_Production_Matches()
         {
             var B = new NonTerminal("B");
             var A = new NonTerminal("A");

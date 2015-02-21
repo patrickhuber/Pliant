@@ -30,7 +30,12 @@ namespace Earley
         
         public IReadOnlyList<IState> this[int index]
         {
-            get{return new ReadOnlyList<IState>(_body[index]);}
+            get
+            {
+                if(index < _body.Count )
+                    return new ReadOnlyList<IState>(_body[index]);
+                return new ReadOnlyList<IState>(new List<IState>());
+            }
         }
 
         public int Count

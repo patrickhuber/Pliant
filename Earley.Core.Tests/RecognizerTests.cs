@@ -125,5 +125,13 @@ namespace Earley.Core.Tests
             }
             Assert.AreEqual(1, matchCount);
         }
+
+        [TestMethod]
+        public void Test_Recognizer_That_Invalid_Input_Exists_Parse()
+        {
+            var recognizer = new Recognizer(expressionGrammar);
+            var chart = recognizer.Parse(new StringReader("1+b*3"));
+            Assert.IsNotNull(chart);
+        }
     }
 }
