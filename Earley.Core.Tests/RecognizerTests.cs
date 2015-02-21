@@ -115,6 +115,7 @@ namespace Earley.Core.Tests
             // we know the leo completion is working if the 
             // 4th index contains one state that matches the 
             // match state.
+            // also there should be leo items in the chart for 1 - 5
             var matchCount = 0;
             for (var s = 0; s < chart[4].Count; s++)
             {
