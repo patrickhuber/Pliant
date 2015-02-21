@@ -25,6 +25,7 @@ namespace Earley
             Position = position;
             Origin = origin;
         }
+
         public bool IsComplete()
         {
             // cache the count because productions are immutable
@@ -39,14 +40,7 @@ namespace Earley
                 return null;
             return Production.RightHandSide[Position];
         }
-
-        public ISymbol CompletedSymbol()
-        {
-            if (Position == 0)
-                return null;
-            return Production.RightHandSide[Position - 1];
-        }
-
+        
         public override bool Equals(object obj)
         {
             var state = obj as State;

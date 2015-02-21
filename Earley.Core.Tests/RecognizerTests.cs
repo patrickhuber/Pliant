@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
+using System.IO;
 
 namespace Earley.Core.Tests
 {
@@ -79,9 +80,8 @@ namespace Earley.Core.Tests
         public void Test_Recognizer_That_A_B_C_Grammar_Parses_bc()
         {            
             var recognizer = new Recognizer(abcGrammar);
-            var stringBuilder = new StringBuilder("bc");
-            var stringBuilderEnumerable = new StringBuilderEnumerable(stringBuilder);
-            var chart = recognizer.Parse(stringBuilderEnumerable);
+            var stringReader = new StringReader("bc");
+            var chart = recognizer.Parse(stringReader);
             Assert.IsNotNull(chart);
             Assert.AreEqual(3, chart.Count);
         }
@@ -90,9 +90,8 @@ namespace Earley.Core.Tests
         public void Test_Recognizer_That_S_M_T_Grammar_Parses_2_sum_3_mul_4()
         {
             var recognizer = new Recognizer(expressionGrammar);
-            var stringBuilder = new StringBuilder("2+3*4");
-            var tokens = new StringBuilderEnumerable(stringBuilder);
-            var chart = recognizer.Parse(tokens);
+            var stringReader = new StringReader("2+3*4");
+            var chart = recognizer.Parse(stringReader);
             Assert.IsNotNull(chart);
             Assert.AreEqual(6, chart.Count);
         }
@@ -102,9 +101,8 @@ namespace Earley.Core.Tests
         {
             var grammar = simpleRightRecursive;
             var recognizer = new Recognizer(grammar);
-            var stringBuilder = new StringBuilder("aaaaa");
-            var tokens = new StringBuilderEnumerable(stringBuilder);
-            var chart = recognizer.Parse(tokens);
+            var stringReader = new StringReader("aaaaa");
+            var chart = recognizer.Parse(stringReader);
 
             var matchState = new State(
                 new Production("A", 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Earley
             _grammar = grammar;
         }
 
-        public Chart Parse(IEnumerable<char> tokens)
+        public Chart Parse(TextReader textReader)
         {
             var chart = new Chart(_grammar);
             var firstProduction = _grammar.Productions[0];
@@ -37,8 +38,9 @@ namespace Earley
             // * then all completions;
             // * then all predictions;
             // * and finally do post-processing, including eager computation of Leo items.
-            foreach (var token in tokens)
-            {                 
+            while(textReader.Peek() > 0)
+            { 
+                var token = (char)textReader.Read();
                 for (int c = 0; c < chart[origin].Count; c++)
                 {
                     var state = chart[origin][c];
