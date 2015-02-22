@@ -2,35 +2,39 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Earley
 {
-    public class ProductionBuilder
+    public class ProductionBuilder : Earley.IProductionBuilder
     {
-        private string _name;
-        private IList<ISymbol> _symbols;
+        private IList<IProduction> _productions;
+
+        public ProductionBuilder() 
+        {
+            _productions = new List<IProduction>();
+        }
         
-        public ProductionBuilder(string name)
+        public IProductionBuilder Production(string name, Action<IRuleBuilder> rules)
         {
-            _name = name;
-            _symbols = new List<ISymbol>();
-        }
-
-        public ProductionBuilder Terminal(char value)
-        {
-            _symbols.Add(new Terminal(value.ToString()));
+            if (rules == null)
+                _productions.Add(new Production(name));
+            else
+            {
+                var ruleBuilder = new RuleBuilder();
+                rules(ruleBuilder);
+                foreach (var rule in ruleBuilder.GetRules())
+                {
+                    var production = new Production(name, rule.ToArray());
+                    _productions.Add(production);
+                }
+            }
             return this;
         }
 
-        public ProductionBuilder NonTerminal(string name)
+        public IList<IProduction> GetProductions()
         {
-            _symbols.Add(new NonTerminal(name));
-            return this;
-        }
-
-        public IProduction GetProduction()
-        {
-            return new Production(_name, _symbols.ToArray());
+            return _productions;
         }
     }
 }

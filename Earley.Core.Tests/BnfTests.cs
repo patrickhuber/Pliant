@@ -69,23 +69,40 @@ namespace Earley.Core.Tests
              *  identifier      ->  letter { letter | digit }
              *  quoted_symbol   ->  '"' { any_character } '"'
              */
-            var grammarBuilder = new GrammarBuilder()
-                .Production("syntax", 
-                    p => p.NonTerminal("syntax").NonTerminal("rule"),
-                    null)
-                .Production("syntax")
-                .Production("rule", 
-                    p => p.NonTerminal("identifier").Terminal('-').Terminal('>').NonTerminal("expression"))
-                .Production("expression", 
-                    p=>p.NonTerminal("term"),
-                    p=>p.NonTerminal("term").NonTerminal("expression").Terminal('|').NonTerminal("term"))
-                .Production("term", 
-                    p=>p.NonTerminal("factor"),
-                    p=>p.NonTerminal("term").NonTerminal("factor"))
-                .Production("factor",
-                    p=>p.NonTerminal("identifier"),
-                    p=>p.Terminal('(').NonTerminal("expression").Terminal(')'));
+            var objarr = new object[] { "a", 'b' };
+            var grammarBuilder = new GrammarBuilder();
+            grammarBuilder
+                .Production("syntax", p=>p
+                    .Rule("syntax", "rule")
+                    .Rule())
+                .Production("rule", p=>p
+                    .Rule("identifier", '-', '>', "expression"))
+                .Production("expression", p=>p
+                    .Rule("term")
+                    .Rule("term", "expression", '|', "term"))
+                .Production("term", p=>p
+                    .Rule("factor")
+                    .Rule("factor", "term", "factor"))
+                .Production("factor", p=>p
+                    .Rule("identifier")
+                    .Rule('(', "identifier", ')')
+                    .Rule('[', "identifier", ']')
+                    .Rule('{', "identifier", '}'))
+                .Production("identifier", p=>p
+                    .Rule("letter")
+                    .Rule("letter", "identifier", "letterOrDigit"))
+                .Production("letterOrDigit", p=>p
+                    .Rule("letter")
+                    .Rule("digit"));
+            for(char c = 'a';c<'z';c++)
+                grammarBuilder.Production("letter", p=>p.Rule(c));
+            for(char c = 'A';c<'Z';c++)
+                grammarBuilder.Production("letter", p => p.Rule(c));
+            for(char d = '0';d<'9';d++)
+                grammarBuilder.Production("digit", p => p.Rule(d));
+
             var grammar = grammarBuilder.GetGrammar();
+            Assert.IsNotNull(grammar);
         }
     }
 }
