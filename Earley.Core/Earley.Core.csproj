@@ -41,19 +41,21 @@
   <ItemGroup>
     <Compile Include="Assert.cs" />
     <Compile Include="Chart.cs" />
+    <Compile Include="DelegateCharacterClass.cs" />
     <Compile Include="Grammar.cs" />
     <Compile Include="GrammarBuilder.cs" />
     <Compile Include="IGrammar.cs" />
     <Compile Include="IGrammarBuilder.cs" />
+    <Compile Include="ICharacterClass.cs" />
+    <Compile Include="ICharacterClassBuilder.cs" />
     <Compile Include="IProduction.cs" />
-    <Compile Include="IProductionBuilder.cs" />
     <Compile Include="IReadOnlyList.cs" />
     <Compile Include="IRuleBuilder.cs" />
     <Compile Include="IState.cs" />
     <Compile Include="ISymbol.cs" />
+    <Compile Include="CharacterClassBuilder.cs" />
     <Compile Include="NonTerminal.cs" />
     <Compile Include="Production.cs" />
-    <Compile Include="ProductionBuilder.cs" />
     <Compile Include="RuleBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadOnlyList.cs" />

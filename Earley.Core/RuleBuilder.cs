@@ -40,6 +40,11 @@ namespace Earley
             return this;
         }
 
+        public IRuleBuilder Lambda()
+        {
+            return Rule();
+        }
+
         public IList<IList<ISymbol>> GetRules()
         {
             return _rules.ToArray();

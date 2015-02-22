@@ -11,34 +11,7 @@ namespace Earley.Core.Tests
     [TestClass]
     public class BnfTests
     {
-        public BnfTests()
-        {
-           
-        }
-
         public TestContext TestContext { get; set; }
-
-        #region Additional test attributes
-        //
-        // You can use the following additional attributes as you write your tests:
-        //
-        // Use ClassInitialize to run code before running the first test in the class
-        // [ClassInitialize()]
-        // public static void MyClassInitialize(TestContext testContext) { }
-        //
-        // Use ClassCleanup to run code after all tests in a class have run
-        // [ClassCleanup()]
-        // public static void MyClassCleanup() { }
-        //
-        // Use TestInitialize to run code before running each test 
-        // [TestInitialize()]
-        // public void MyTestInitialize() { }
-        //
-        // Use TestCleanup to run code after each test has run
-        // [TestCleanup()]
-        // public void MyTestCleanup() { }
-        //
-        #endregion
 
         [TestMethod]
         public void Test_Bnf_That_Parse_Produces_Bnf_Grammar()
@@ -69,12 +42,10 @@ namespace Earley.Core.Tests
              *  identifier      ->  letter { letter | digit }
              *  quoted_symbol   ->  '"' { any_character } '"'
              */
-            var objarr = new object[] { "a", 'b' };
-            var grammarBuilder = new GrammarBuilder();
-            grammarBuilder
+            var grammarBuilder = new GrammarBuilder(g=>g
                 .Production("syntax", p=>p
                     .Rule("syntax", "rule")
-                    .Rule())
+                    .Lambda())
                 .Production("rule", p=>p
                     .Rule("identifier", '-', '>', "expression"))
                 .Production("expression", p=>p
@@ -93,13 +64,12 @@ namespace Earley.Core.Tests
                     .Rule("letter", "identifier", "letterOrDigit"))
                 .Production("letterOrDigit", p=>p
                     .Rule("letter")
-                    .Rule("digit"));
-            for(char c = 'a';c<'z';c++)
-                grammarBuilder.Production("letter", p=>p.Rule(c));
-            for(char c = 'A';c<'Z';c++)
-                grammarBuilder.Production("letter", p => p.Rule(c));
-            for(char d = '0';d<'9';d++)
-                grammarBuilder.Production("digit", p => p.Rule(d));
+                    .Rule("digit"))
+                .CharacterClass("letter", l => l
+                    .Range('a', 'z')
+                    .Range('A', 'Z'))
+                .CharacterClass("digit", l => l.Digit())
+                .CharacterClass("whitespace", l=> l.Whitespace()));
 
             var grammar = grammarBuilder.GetGrammar();
             Assert.IsNotNull(grammar);
