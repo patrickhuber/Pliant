@@ -6,7 +6,7 @@ namespace Earley.Core.Tests
     [TestClass]
     public class LeoAlgorithmTests
     {
-        private IProduction A_Aa = new Production("A", new Terminal("a"), new NonTerminal("A"));
+        private IProduction A_Aa = new Production("A", new Terminal('a'), new NonTerminal("A"));
         private IProduction A_ = new Production("A");
         
         [TestMethod]

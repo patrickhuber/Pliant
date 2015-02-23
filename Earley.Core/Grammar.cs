@@ -17,7 +17,7 @@ namespace Earley
             _productions = new ReadOnlyList<IProduction>(productions);
         }
 
-        public IEnumerable<IProduction> RulesFor(ISymbol symbol)
+        public IEnumerable<IProduction> RulesFor(INonTerminal symbol)
         {
             foreach (var production in _productions)
             {

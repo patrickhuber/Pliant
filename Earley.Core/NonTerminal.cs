@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 namespace Earley
 {
-    public class NonTerminal : Symbol
+    public class NonTerminal : Symbol, INonTerminal
     {
         public NonTerminal(string value)
-            : base(SymbolType.NonTerminal, value)
-        { }
+            : base(SymbolType.NonTerminal)
+        {
+            Value = value;
+        }
+        
+        public string Value { get; private set; }
 
         public override int GetHashCode()
         {
@@ -22,7 +26,12 @@ namespace Earley
             var nonTerminal = obj as NonTerminal;
             if (nonTerminal == null)
                 return false;
-            return base.Equals(obj);
+            return Value.Equals(nonTerminal.Value);
+        }
+
+        public override string ToString()
+        {
+            return Value;
         }
     }
 }

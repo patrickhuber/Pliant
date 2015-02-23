@@ -9,11 +9,12 @@ namespace Earley
     public class GrammarBuilder : Earley.IGrammarBuilder
     {
         private IList<IProduction> _productions;
-        private IList<ICharacterClass> _characterClasses;
+        private IList<ITerminal> _characterClasses;
 
         public GrammarBuilder()
         {
             _productions = new List<IProduction>();
+            _characterClasses = new List<ITerminal>();
         }
 
         public GrammarBuilder(Action<IGrammarBuilder> grammar)
@@ -41,10 +42,12 @@ namespace Earley
             return this;
         }
         
-        public IGrammarBuilder CharacterClass(string name, Action<ICharacterClassBuilder> lexeme)
+        public IGrammarBuilder CharacterClass(string name, Action<ITerminalBuilder> terminals)
         {
-            var lexemeBuilder = new CharacterClassBuilder();
-            lexeme(lexemeBuilder);
+            var terminalBuilder = new TerminalBuilder();
+            terminals(terminalBuilder);
+            foreach (var terminal in terminalBuilder.GetTerminals())
+                _characterClasses.Add(terminal);
             return this;
         }
 
@@ -58,7 +61,7 @@ namespace Earley
             return _productions;
         }
 
-        internal IList<ICharacterClass> GetCharacterClasses()
+        internal IList<ITerminal> GetCharacterClasses()
         {
             return _characterClasses;
         }

@@ -11,40 +11,39 @@ namespace Earley.Core.Tests
         // S -> S + M | M
         // M -> M * T | T
         // T -> 1 | 2 | 3 | 4
-        private readonly Grammar expressionGrammar = new Grammar(
-                new Production("S", new NonTerminal("S"), new Terminal("+"), new NonTerminal("M")),
-                new Production("S", new NonTerminal("M")),
-                new Production("M", new NonTerminal("M"), new Terminal("*"), new NonTerminal("T")),
-                new Production("M", new NonTerminal("T")),
-                new Production("T", new Terminal("1")),
-                new Production("T", new Terminal("2")),
-                new Production("T", new Terminal("3")),
-                new Production("T", new Terminal("4")));
+        private readonly Grammar expressionGrammar = new GrammarBuilder(g=>g
+                .Production("S", p=>p
+                    .Rule("S", '+', "M")
+                    .Rule("M"))
+                .Production("M", p=>p
+                    .Rule("M", '*', "T")
+                    .Rule("T"))
+                .Production("T", p=>p
+                    .Rule('1')
+                    .Rule('2')
+                    .Rule('3')
+                    .Rule('4')))
+            .GetGrammar();
 
         // A -> B C
         // B -> b
         // C -> c
-        private readonly Grammar abcGrammar = new Grammar(
-            new Production(
-                "A",
-                new NonTerminal("B"),
-                new NonTerminal("C")),
-            new Production(
-                "B",
-                new Terminal("b")),
-            new Production(
-                "C",
-                new Terminal("c")));
+        private readonly Grammar abcGrammar = new GrammarBuilder(g => g
+                .Production("A", p=>p
+                    .Rule("B", "C"))
+                .Production("B", p=>p
+                    .Rule('b'))
+                .Production("C", p=>p
+                    .Rule('c')))
+            .GetGrammar();
 
         // A -> Aa
         // A -> 
-        private readonly Grammar simpleRightRecursive = new Grammar(
-            new Production(
-                "A",
-                new Terminal("a"),
-                new NonTerminal("A")),
-            new Production(
-                "A"));
+        private readonly Grammar simpleRightRecursive = new GrammarBuilder(g => g
+                .Production("A", p => p
+                    .Rule('a', "A")
+                    .Lambda()))
+            .GetGrammar();
 
         [TestMethod]
         public void Test_Recognizer_That_Scan_Moves_Items_To_Next_Tree()
@@ -106,7 +105,7 @@ namespace Earley.Core.Tests
 
             var matchState = new State(
                 new Production("A", 
-                    new Terminal("a"), 
+                    new Terminal('a'), 
                     new NonTerminal("A")),
                     2, 4);
 

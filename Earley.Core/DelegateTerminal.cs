@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 
 namespace Earley
 {
-    public class DelegateCharacterClass : ICharacterClass
+    public class DelegateTerminal : Symbol, ITerminal
     {
         private Func<char, bool> _isMatch;
 
-        public DelegateCharacterClass(Func<char, bool> isMatch)
-        { 
+        public DelegateTerminal(Func<char, bool> isMatch)
+            : base(SymbolType.Terminal)
+        {
+            _isMatch = isMatch;
         }
 
         public bool IsMatch(char character)

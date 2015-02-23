@@ -8,6 +8,5 @@ namespace Earley
     public interface ISymbol
     {
         SymbolType SymbolType { get; }
-        string Value { get; }
     }
 }

@@ -8,13 +8,13 @@ namespace Earley
 {
     public class Production : Earley.IProduction
     {
-        public ISymbol LeftHandSide { get; private set; }
+        public INonTerminal LeftHandSide { get; private set; }
 
         private ReadOnlyList<ISymbol> _rightHandSide;
 
         public IReadOnlyList<ISymbol> RightHandSide { get { return _rightHandSide; } }
 
-        public Production(ISymbol leftHandSide, params ISymbol[] rightHandSide)
+        public Production(INonTerminal leftHandSide, params ISymbol[] rightHandSide)
         {
             Assert.IsNotNull(leftHandSide, "leftHandSide");
             Assert.IsNotNull(rightHandSide, "rightHandSide");
@@ -56,7 +56,8 @@ namespace Earley
             stringBuilder.AppendFormat("{0} ->", LeftHandSide.Value);
             for (int p = 0; p < RightHandSide.Count; p++)
             {
-                stringBuilder.AppendFormat(" {0}", RightHandSide[p].Value);
+                var symbol = RightHandSide[p];
+                stringBuilder.AppendFormat(" {0}", symbol);
             }
             return stringBuilder.ToString();
         }

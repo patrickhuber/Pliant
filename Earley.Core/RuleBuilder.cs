@@ -23,7 +23,7 @@ namespace Earley
                 {
                     if (symbol is char)
                     {
-                        var terminal = new Terminal(symbol.ToString());
+                        var terminal = new Terminal((char)symbol);
                         symbolList.Add(terminal);
                     }
                     else if (symbol is string)

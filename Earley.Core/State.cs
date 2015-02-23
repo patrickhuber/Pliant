@@ -69,7 +69,7 @@ namespace Earley
                 stringBuilder.AppendFormat(
                     "{0}{1}", 
                     p == Position ? "." : " " , 
-                    Production.RightHandSide[p].Value);
+                    Production.RightHandSide[p]);
             }
             
             if (Position == Production.RightHandSide.Count)

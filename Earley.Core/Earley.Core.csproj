@@ -41,19 +41,19 @@
   <ItemGroup>
     <Compile Include="Assert.cs" />
     <Compile Include="Chart.cs" />
-    <Compile Include="DelegateCharacterClass.cs" />
+    <Compile Include="DelegateTerminal.cs" />
     <Compile Include="Grammar.cs" />
     <Compile Include="GrammarBuilder.cs" />
     <Compile Include="IGrammar.cs" />
     <Compile Include="IGrammarBuilder.cs" />
-    <Compile Include="ICharacterClass.cs" />
-    <Compile Include="ICharacterClassBuilder.cs" />
+    <Compile Include="INonTerminal.cs" />
     <Compile Include="IProduction.cs" />
     <Compile Include="IReadOnlyList.cs" />
     <Compile Include="IRuleBuilder.cs" />
     <Compile Include="IState.cs" />
     <Compile Include="ISymbol.cs" />
-    <Compile Include="CharacterClassBuilder.cs" />
+    <Compile Include="ITerminal.cs" />
+    <Compile Include="ITerminalBuilder.cs" />
     <Compile Include="NonTerminal.cs" />
     <Compile Include="Production.cs" />
     <Compile Include="RuleBuilder.cs" />
@@ -62,11 +62,10 @@
     <Compile Include="Recognizer.cs" />
     <Compile Include="State.cs" />
     <Compile Include="StateType.cs" />
-    <Compile Include="StringBuilderEnumerable.cs" />
-    <Compile Include="StringBuilderEnumerator.cs" />
     <Compile Include="SymbolType.cs" />
     <Compile Include="Symbol.cs" />
     <Compile Include="Terminal.cs" />
+    <Compile Include="TerminalBuilder.cs" />
     <Compile Include="TransitionState.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

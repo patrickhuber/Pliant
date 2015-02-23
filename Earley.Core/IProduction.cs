@@ -4,7 +4,7 @@ namespace Earley
 {
     public interface IProduction
     {
-        ISymbol LeftHandSide { get; }
+        INonTerminal LeftHandSide { get; }
         IReadOnlyList<ISymbol> RightHandSide { get; }
     }
 }

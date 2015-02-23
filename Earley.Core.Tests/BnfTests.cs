@@ -65,11 +65,11 @@ namespace Earley.Core.Tests
                 .Production("letterOrDigit", p=>p
                     .Rule("letter")
                     .Rule("digit"))
-                .CharacterClass("letter", l => l
+                .CharacterClass("letter", l=>l
                     .Range('a', 'z')
                     .Range('A', 'Z'))
                 .CharacterClass("digit", l => l.Digit())
-                .CharacterClass("whitespace", l=> l.Whitespace()));
+                .CharacterClass("whitespace", l=> l.WhiteSpace()));
 
             var grammar = grammarBuilder.GetGrammar();
             Assert.IsNotNull(grammar);

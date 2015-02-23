@@ -16,8 +16,8 @@ namespace Earley.Core.Tests
             var grammar = new Grammar(
                 new Production(S, B),
                 new Production(S, A),
-                new Production(B, new Terminal("b")),
-                new Production(A, new Terminal("a")));
+                new Production(B, new Terminal('b')),
+                new Production(A, new Terminal('a')));
             var rules = grammar.RulesFor(A).ToList();
             Assert.AreEqual(1, rules.Count);
             Assert.AreEqual("A", rules[0].LeftHandSide.Value);

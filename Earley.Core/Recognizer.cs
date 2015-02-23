@@ -48,9 +48,10 @@ namespace Earley
                         continue;
                     if (!state.IsComplete())
                     {
-                        if (state.CurrentSymbol().SymbolType == SymbolType.NonTerminal)
+                        var currentSymbol = state.CurrentSymbol();
+                        if (currentSymbol.SymbolType == SymbolType.NonTerminal)
                         {
-                            Predict(state, origin, chart);
+                            Predict(currentSymbol as INonTerminal, origin, chart);
                         }
                         else
                         {
@@ -67,10 +68,9 @@ namespace Earley
             return chart;
         }
 
-        private void Predict(IState predict, int j, Chart chart)
+        private void Predict(INonTerminal nonTerminal, int j, Chart chart)
         {
-            var currentSymbol = predict.CurrentSymbol();
-            foreach (var production in _grammar.RulesFor(currentSymbol))
+            foreach (var production in _grammar.RulesFor(nonTerminal))
             {
                 var state = new State(production, 0, j);
                 chart.EnqueueAt(j, state);
@@ -86,14 +86,22 @@ namespace Earley
                 var state = chart[j][s];
                 if (state.StateType == StateType.Transitive)
                     continue;
-                if (!state.IsComplete() && state.CurrentSymbol().Value == token.ToString())
+                if (!state.IsComplete() )
                 {
-                    var scanState = new State(
-                        state.Production,
-                        state.Position + 1,
-                        i);
-                    chart.EnqueueAt(j + 1, scanState);
-                    LogScan(j+1, scanState, token);
+                    var currentSymbol = state.CurrentSymbol();
+                    if (currentSymbol.SymbolType == SymbolType.Terminal)
+                    {
+                        var terminal = currentSymbol as Terminal;
+                        if (terminal.IsMatch(token))
+                        {
+                            var scanState = new State(
+                                state.Production,
+                                state.Position + 1,
+                                i);
+                            chart.EnqueueAt(j + 1, scanState);
+                            LogScan(j + 1, scanState, token);
+                        }
+                    }
                 }
             }
         }

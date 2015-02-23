@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Earley
 {
-    public interface ICharacterClass
+    public interface INonTerminal : ISymbol
     {
-        bool IsMatch(char character);
+        string Value { get; }
     }
 }
