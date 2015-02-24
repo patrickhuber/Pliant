@@ -26,7 +26,7 @@ namespace Earley
         }
                 
         public IGrammarBuilder Production(string name, Action<IRuleBuilder> rules=null)
-        {;
+        {
             if (rules == null)
                 _productions.Add(new Production(name));
             else
