@@ -7,8 +7,8 @@
     <ProjectGuid>{5C23805F-0FFC-4039-B853-E5ACBE63A3C0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Earley</RootNamespace>
-    <AssemblyName>Earley.Core</AssemblyName>
+    <RootNamespace>Pliant</RootNamespace>
+    <AssemblyName>Pliant</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

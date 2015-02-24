@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Earley
+namespace Pliant
 {
     public interface IRuleBuilder
     {

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Earley
+namespace Pliant
 {
-    public class Terminal : Symbol, Earley.ITerminal
+    public class Terminal : Symbol, ITerminal
     {
         private char _character;
 

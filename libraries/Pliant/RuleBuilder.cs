@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Earley
+namespace Pliant
 {
-    public class RuleBuilder : Earley.IRuleBuilder
+    public class RuleBuilder : IRuleBuilder
     {
         private IList<IList<ISymbol>> _rules;
         

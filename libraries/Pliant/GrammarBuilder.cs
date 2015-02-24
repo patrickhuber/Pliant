@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Earley
+namespace Pliant
 {
-    public class GrammarBuilder : Earley.IGrammarBuilder
+    public class GrammarBuilder : IGrammarBuilder
     {
         private IList<IProduction> _productions;
         private IList<ITerminal> _characterClasses;

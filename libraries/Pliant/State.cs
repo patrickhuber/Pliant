@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Earley
+namespace Pliant
 {
-    public class State : Earley.IState
+    public class State : IState
     {
         private int _count = -1;
 
@@ -79,6 +79,6 @@ namespace Earley
             return stringBuilder.ToString();
         }
 
-        public virtual StateType StateType { get { return Earley.StateType.Normal; } }
+        public virtual StateType StateType { get { return StateType.Normal; } }
     }
 }

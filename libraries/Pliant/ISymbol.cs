@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Earley
+namespace Pliant
 {
     public interface ISymbol
     {

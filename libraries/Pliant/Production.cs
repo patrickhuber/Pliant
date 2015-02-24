@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Earley
+namespace Pliant
 {
-    public class Production : Earley.IProduction
+    public class Production : IProduction
     {
         public INonTerminal LeftHandSide { get; private set; }
 

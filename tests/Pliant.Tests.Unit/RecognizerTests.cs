@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using System.IO;
 
-namespace Earley.Core.Tests
+namespace Pliant.Tests.Unit
 {
     [TestClass]
     public class RecognizerTests

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Earley
+namespace Pliant
 {
     public class TransitionState : State
     {
@@ -34,6 +34,6 @@ namespace Earley
             return string.Format("{0} : {1}", Recognized, base.ToString());
         }
 
-        public override StateType StateType { get { return Earley.StateType.Transitive; } }
+        public override StateType StateType { get { return StateType.Transitive; } }
     }
 }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Earley
+namespace Pliant
 {
-    public class Grammar : Earley.IGrammar
+    public class Grammar : IGrammar
     {
         private ReadOnlyList<IProduction> _productions;
         public IReadOnlyList<IProduction> Productions { get { return _productions; } }

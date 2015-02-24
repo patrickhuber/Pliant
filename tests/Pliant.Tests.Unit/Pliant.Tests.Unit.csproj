@@ -6,8 +6,8 @@
     <ProjectGuid>{81B4D87F-7277-4F43-A275-9E979B54DF39}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Earley.Core.Tests</RootNamespace>
-    <AssemblyName>Earley.Core.Tests</AssemblyName>
+    <RootNamespace>Pliant.Tests.Unit</RootNamespace>
+    <AssemblyName>Pliant.Tests.Unit</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -60,7 +60,7 @@
     <Compile Include="LeoAlgorithmTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Earley.Core\Pliant.csproj">
+    <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj">
       <Project>{5c23805f-0ffc-4039-b853-e5acbe63a3c0}</Project>
       <Name>Pliant</Name>
     </ProjectReference>

@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Earley.Core.Tests
+namespace Pliant.Tests.Unit
 {
     [TestClass]
     public class GrammarBuilderTests

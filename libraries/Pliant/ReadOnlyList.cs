@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Earley
+namespace Pliant
 {
     public class ReadOnlyList<T> : ReadOnlyCollection<T>,  IReadOnlyList<T>
     {

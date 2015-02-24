@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Earley.Core.Tests
+namespace Pliant.Tests.Unit
 {
     [TestClass]
     public class GrammarTests
