@@ -2,7 +2,7 @@
 Implementation of a modified Earley parser in C# inspired by the Marpa Parser project.
 
 ## Description
-Pliant is a table driven parser that implements the Earley algorithm to do its parsing. 
+Pliant is a table driven parser that implements the Earley algorithm with optimizations from joop leo to efficiently handle right recursions. 
 
 ## References
 
@@ -12,5 +12,6 @@ Pliant is a table driven parser that implements the Earley algorithm to do its p
 * [wikipedia](http://en.wikipedia.org/wiki/Earley_parser)
 * [optimizing right recursion](http://loup-vaillant.fr/tutorials/earley-parsing/right-recursion)
 * [mapra parser](http://jeffreykegler.github.io/Ocean-of-Awareness-blog/)
-* [leo joop - optimizing right recursions](http://www.sciencedirect.com/science/article/pii/030439759190180A)
+* [joop leo - optimizing right recursions](http://www.sciencedirect.com/science/article/pii/030439759190180A)
 * [parsing techniques - a practical guide](http://amzn.com/B0017AMLL8)
+* [practical earley parsing](http://webhome.cs.uvic.ca/~nigelh/Publications/PracticalEarleyParsing.pdf)

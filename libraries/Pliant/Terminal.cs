@@ -18,7 +18,7 @@ namespace Pliant
         
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return base.GetHashCode() ^ _character.GetHashCode();
         }
 
         public override bool Equals(object obj)
