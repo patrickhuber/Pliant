@@ -60,9 +60,9 @@
     <Compile Include="LeoAlgorithmTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Earley.Core\Earley.Core.csproj">
+    <ProjectReference Include="..\Earley.Core\Pliant.csproj">
       <Project>{5c23805f-0ffc-4039-b853-e5acbe63a3c0}</Project>
-      <Name>Earley.Core</Name>
+      <Name>Pliant</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
