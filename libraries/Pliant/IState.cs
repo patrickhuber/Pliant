@@ -9,5 +9,6 @@ namespace Pliant
         ISymbol CurrentSymbol();
         bool IsComplete();
         StateType StateType { get; }
+        IState NextState();
     }
 }

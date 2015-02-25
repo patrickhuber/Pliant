@@ -18,14 +18,16 @@ namespace Pliant
             _body = new Dictionary<int, List<IState>>();
         }
 
-        public void EnqueueAt(int index, IState state)
+        public bool EnqueueAt(int index, IState state)
         {
             if (!_body.ContainsKey(index))
                 _body.Add(index, new List<IState>());
             var list = _body[index];
-            if (list.Any(x => x.Equals(state)))
-                return;
+            if (list.Any(x => x.Equals(state) 
+                && x.StateType == state.StateType))
+                return false;
             list.Add(state);
+            return true;
         }
         
         public IReadOnlyList<IState> this[int index]

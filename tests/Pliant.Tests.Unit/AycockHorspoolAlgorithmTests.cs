@@ -22,10 +22,14 @@ namespace Pliant.Tests.Unit
             var chart = recognizer.Parse(new StringReader("a"));
             Assert.IsNotNull(chart);
             Assert.AreEqual(2, chart.Count);
+
+            // a match would has a start state 
+            // of origin 0 in the last column 
             var completedStates =
                 from state in chart[1]
                 where state.IsComplete()
                     && state.Origin == 0
+                    && state.Production.LeftHandSide.Value.Equals("S'")
                 select state;
             var s1CompletedState = completedStates.FirstOrDefault();
             Assert.IsNotNull(s1CompletedState);

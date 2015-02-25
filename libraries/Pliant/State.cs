@@ -80,5 +80,13 @@ namespace Pliant
         }
 
         public virtual StateType StateType { get { return StateType.Normal; } }
+
+
+        public IState NextState()
+        {
+            if (IsComplete())
+                return null;
+            return new State(Production, Position + 1, Origin);
+        }
     }
 }

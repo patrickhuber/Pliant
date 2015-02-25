@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using System.IO;
+using System.Linq;
 
 namespace Pliant.Tests.Unit
 {
@@ -98,31 +99,35 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_Recognizer_That_Right_Recursion_Is_Not_O_N_3()
         {
+            const string input = "aaaaa";
             var grammar = simpleRightRecursive;
             var recognizer = new Recognizer(grammar);
-            var stringReader = new StringReader("aaaaa");
+            var stringReader = new StringReader(input);
+
             var chart = recognizer.Parse(stringReader);
+            // -- 0 --
+            // A ->.a A		    (0)	 # Start
+            // A ->.			(0)	 # Start
+            //
+            // ...
+            // -- n --
+            // n	A -> a.A		(n-1)	 # Scan a
+            // n	A ->.a A		(n)	 # Predict
+            // n	A ->.			(n)	 # Predict
+            // n	A -> a A.		(n)	 # Predict
+            // n	A : A -> a A.	(0)	 # Transition
+            // n	A -> a A.		(0)	 # Complete
+            Assert.AreEqual(input.Length + 1, chart.Count);
 
-            var matchState = new State(
-                new Production("A", 
-                    new Terminal('a'), 
-                    new NonTerminal("A")),
-                    2, 4);
-
-            // we know the leo completion is working if the 
-            // 4th index contains one state that matches the 
-            // match state.
-            // also there should be leo items in the chart for 1 - 5
-            var matchCount = 0;
-            for (var s = 0; s < chart[4].Count; s++)
-            {
-                var state = chart[4][s];
-                if(matchState.StateType == state.StateType)
-                    if(matchState.Production.Equals(state.Production))
-                        if(matchState.Position == state.Position)
-                            matchCount++;
-            }
-            Assert.AreEqual(1, matchCount);
+            var lastColumn = chart[input.Length];
+            Assert.IsNotNull(lastColumn);
+            Assert.AreEqual(6, lastColumn.Count);
+            Assert.IsTrue(IsRecognized(chart, "A"));
+        }
+        private bool IsRecognized(Chart chart, string startStateSymbol)
+        {
+            var lastColumn = chart[chart.Count - 1];
+            return lastColumn.Any(x => x.IsComplete() && x.Origin == 0 && x.Production.LeftHandSide.Value == startStateSymbol);
         }
 
         [TestMethod]
@@ -131,6 +136,24 @@ namespace Pliant.Tests.Unit
             var recognizer = new Recognizer(expressionGrammar);
             var chart = recognizer.Parse(new StringReader("1+b*3"));
             Assert.IsNotNull(chart);
+            Assert.AreEqual(3, chart.Count);
+        }
+
+        [TestMethod]
+        public void Test_Recognizer_That_Unmarked_Middle_Recursion_Parses()
+        {
+            const string input = "aaaaaaaaa";
+            var grammar = new GrammarBuilder(g=>g
+                    .Production("S", p=>p
+                        .Rule('a', "S", 'a')
+                        .Rule('a')))
+                .GetGrammar();
+            var recognizer = new Recognizer(grammar);
+            var chart = recognizer.Parse(new StringReader(input));
+            Assert.IsNotNull(chart);
+            Assert.AreEqual(input.Length + 1, chart.Count);
+            var lastColumn = chart[input.Length];
+            Assert.IsTrue(IsRecognized(chart, "S"));
         }
     }
 }
