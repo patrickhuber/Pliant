@@ -25,14 +25,11 @@ namespace Pliant.Tests.Unit
 
             // a match would has a start state 
             // of origin 0 in the last column 
-            var completedStates =
-                from state in chart[1]
-                where state.IsComplete()
+            var stringIsRecognized = chart[1].Any(state =>
+                    state.IsComplete()
                     && state.Origin == 0
-                    && state.Production.LeftHandSide.Value.Equals("S'")
-                select state;
-            var s1CompletedState = completedStates.FirstOrDefault();
-            Assert.IsNotNull(s1CompletedState);
+                    && state.Production.LeftHandSide.Value.Equals("S'"));
+            Assert.IsTrue(stringIsRecognized);
         }
     }
 }
