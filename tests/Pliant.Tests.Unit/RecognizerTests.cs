@@ -84,6 +84,7 @@ namespace Pliant.Tests.Unit
             var chart = recognizer.Parse(stringReader);
             Assert.IsNotNull(chart);
             Assert.AreEqual(3, chart.Count);
+            Assert.IsTrue(IsRecognized(chart, "A"));
         }
 
         [TestMethod]
@@ -94,6 +95,7 @@ namespace Pliant.Tests.Unit
             var chart = recognizer.Parse(stringReader);
             Assert.IsNotNull(chart);
             Assert.AreEqual(6, chart.Count);
+            Assert.IsTrue(IsRecognized(chart, "S"));
         }
 
         [TestMethod]
