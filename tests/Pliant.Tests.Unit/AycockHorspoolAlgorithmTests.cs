@@ -9,10 +9,10 @@ namespace Pliant.Tests.Unit
     public class AycockHorspoolAlgorithmTests
     {
         private Grammar _grammar = new GrammarBuilder(g => g
-                .Production("S'", p=>p.Rule("S"))
-                .Production("S", p=>p.Rule("A", "A", "A", "A"))
-                .Production("A", p=>p.Rule('a').Rule("E"))
-                .Production("E", p=> p.Lambda()))
+                .Production("S'", p => p.Rule("S"))
+                .Production("S", p => p.Rule("A", "A", "A", "A"))
+                .Production("A", p => p.Rule('a').Rule("E"))
+                .Production("E", p => p.Lambda()))
             .GetGrammar();
 
         [TestMethod]
