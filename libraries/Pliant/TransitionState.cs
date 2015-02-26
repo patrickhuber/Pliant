@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pliant
 {
-    public class TransitionState : State
+    public class TransitionState : State, ITransitionState
     {
         public ISymbol Recognized { get; private set; }
 

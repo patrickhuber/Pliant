@@ -54,6 +54,7 @@
     <Compile Include="ISymbol.cs" />
     <Compile Include="ITerminal.cs" />
     <Compile Include="ITerminalBuilder.cs" />
+    <Compile Include="ITransitionState.cs" />
     <Compile Include="NonTerminal.cs" />
     <Compile Include="Production.cs" />
     <Compile Include="RuleBuilder.cs" />
