@@ -34,9 +34,7 @@ namespace Pliant
         {
             get
             {
-                if(index < _body.Count )
-                    return new ReadOnlyList<IState>(_body[index]);
-                return new ReadOnlyList<IState>(new List<IState>());
+                return new ReadOnlyList<IState>(_body[index]);
             }
         }
 
