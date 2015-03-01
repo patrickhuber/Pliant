@@ -13,72 +13,39 @@ namespace Pliant
         private IList<string> _ignore;
         private string _start;
 
-        public GrammarBuilder()
+        public GrammarBuilder(
+            string start, 
+            Action<IProductionBuilder> productions, 
+            Action<ILexemeBuilder> lexemes = null, 
+            Action<IListBuilder<string>> ignore = null)
         {
-            _productions = new List<IProduction>();
-            _lexemes = new List<ILexeme>();
-            _ignore = new List<string>();
-        }
+            _start = start;
+            
+            var productionBuilder = new ProductionBuilder();
+            productions(productionBuilder);
+            _productions = productionBuilder.GetProductions();
 
-        public GrammarBuilder(Action<IGrammarBuilder> grammar)
-        {
-            var grammarBuilder = new GrammarBuilder();
-            grammar(grammarBuilder);
-            _productions = grammarBuilder.GetProductions();
-            _lexemes = grammarBuilder.GetLexemes();
+            var lexemeBuilder = new LexemeBuilder();
+            lexemes(lexemeBuilder);
+            _lexemes = lexemeBuilder.GetLexemes();
+
+            var ignoreBuilder = new ListBuilder<string>();
+            ignore(ignoreBuilder);
+            _ignore = ignoreBuilder.GetList();
         }
                 
-        public IGrammarBuilder Production(string name, Action<IRuleBuilder> rules=null)
-        {
-            if (rules == null)
-                _productions.Add(new Production(name));
-            else
-            {
-                var ruleBuilder = new RuleBuilder();
-                rules(ruleBuilder);
-                foreach (var rule in ruleBuilder.GetRules())
-                {
-                    var production = new Production(name, rule.ToArray());
-                    _productions.Add(production);
-                }
-            }
-            return this;
-        }
-        
         public Grammar GetGrammar()
         {
-            return new Grammar(_productions.ToArray(), _lexemes.ToArray());
-        }
-
-        internal IList<IProduction> GetProductions()
-        {
-            return _productions;
-        }
-
-        internal IList<ILexeme> GetLexemes()
-        {
-            return _lexemes;
-        }
-
-        public IGrammarBuilder Start(string name)
-        {
-            _start = name;
-            return this;
-        }
-
-        public IGrammarBuilder Lexeme(string name, Action<ITerminalBuilder> terminals)
-        {
-            var terminalBuilder = new TerminalBuilder();
-            terminals(terminalBuilder);
-            var lexeme = new Lexeme(new NonTerminal(name), terminalBuilder.GetTerminals().ToArray());
-            _lexemes.Add(lexeme);
-            return this;
-        }
-
-        public IGrammarBuilder Ignore(string name)
-        {
-            _ignore.Add(name);
-            return this;
+            if (_start == null)
+                throw new Exception("no start production specified");
+            var startProduction = _productions.FirstOrDefault(x => x.LeftHandSide.Value == _start);
+            if (startProduction == null)
+                throw new Exception("no start production specified");
+            var start = startProduction.LeftHandSide;
+            var ignore = _lexemes
+                .Where(x => _ignore.Contains(x.LeftHandSide.Value))
+                .Select(l=>l.LeftHandSide);
+            return new Grammar(start, _productions.ToArray(), _lexemes.ToArray(), ignore.ToArray());
         }
     }
 }

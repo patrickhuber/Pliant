@@ -43,7 +43,7 @@ namespace Pliant.Tests.Unit
              *  identifier      ->  letter { letter | digit }
              *  quoted_symbol   ->  '"' { any_character } '"'
              */
-            var grammarBuilder = new GrammarBuilder(g=>g
+            var grammarBuilder = new GrammarBuilder("syntax", g=>g
                 .Production("syntax", p=>p
                     .Rule("syntax", "rule")
                     .Lambda())
@@ -57,21 +57,22 @@ namespace Pliant.Tests.Unit
                     .Rule("factor", "term", "factor"))
                 .Production("factor", p=>p
                     .Rule("identifier")
-                    .Rule('(', "identifier", ')')
-                    .Rule('[', "identifier", ']')
-                    .Rule('{', "identifier", '}'))
+                    .Rule("quoted")
+                    .Rule('(', "expression", ')')
+                    .Rule('[', "expression", ']')
+                    .Rule('{', "expression", '}'))
                 .Production("identifier", p=>p
                     .Rule("letter")
                     .Rule("letter", "identifier", "letterOrDigit"))
                 .Production("letterOrDigit", p=>p
                     .Rule("letter")
-                    .Rule("digit"))
-                .Lexeme("letter", l=>l
+                    .Rule("digit")), l=>l
+                .Lexeme("letter", t=>t
                     .Range('a', 'z')
                     .Range('A', 'Z'))
-                .Lexeme("digit", l => l.Digit())
-                .Lexeme("whitespace", l=> l.WhiteSpace())
-                .Ignore("whitespace"));
+                .Lexeme("digit", t => t.Digit())
+                .Lexeme("whitespace", t=> t.WhiteSpace()), ignore=>ignore
+                .Add("whitespace"));
 
             var grammar = grammarBuilder.GetGrammar();
             Assert.IsNotNull(grammar);
@@ -82,7 +83,7 @@ namespace Pliant.Tests.Unit
             expression  -> term { ""|"" }
             term        -> factor { factor }
             factor      ->  identifier | 
-                            quoted_symbol | 
+                            quoted | 
                             ""("" expression "")""
                             ""["" expression ""]""
                             ""{"" expression ""}""

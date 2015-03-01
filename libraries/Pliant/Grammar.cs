@@ -12,11 +12,14 @@ namespace Pliant
         
         public IReadOnlyList<ILexeme> Lexemes { get; private set; }
 
-        public Grammar(IProduction[] productions, ILexeme[] lexemes)
+        public Grammar(INonTerminal start, IProduction[] productions, ILexeme[] lexemes, INonTerminal[] ignore)
         {
             Assert.IsNotNullOrEmpty(productions, "productions");
+            Assert.IsNotNull(start, "start");
             Productions = new ReadOnlyList<IProduction>(productions);
             Lexemes = new ReadOnlyList<ILexeme>(lexemes);
+            Ignore = new ReadOnlyList<INonTerminal>(ignore);
+            Start = start; 
         }
 
         public IEnumerable<IProduction> RulesFor(INonTerminal symbol)
@@ -29,5 +32,10 @@ namespace Pliant
                     yield return production;
             }
         }
+
+
+        public INonTerminal Start { get; private set; }
+
+        public IReadOnlyList<INonTerminal> Ignore { get; private set; }
     }
 }

@@ -23,8 +23,9 @@ namespace Pliant.Tests.Unit
 
         private Grammar CreateGrammar()
         {
-            var grammarBuilder = new GrammarBuilder(g => g
-                .Production("A", p=>p
+            var grammarBuilder = new GrammarBuilder(
+                "A", p => p
+                .Production("A", r=>r
                     .Rule('a', "A")
                     .Lambda()));
             return grammarBuilder.GetGrammar();

@@ -8,11 +8,11 @@ namespace Pliant.Tests.Unit
     [TestClass]
     public class AycockHorspoolAlgorithmTests
     {
-        private Grammar _grammar = new GrammarBuilder(g => g
-                .Production("S'", p => p.Rule("S"))
-                .Production("S", p => p.Rule("A", "A", "A", "A"))
-                .Production("A", p => p.Rule('a').Rule("E"))
-                .Production("E", p => p.Lambda()))
+        private Grammar _grammar = new GrammarBuilder("S'", p => p
+                .Production("S'", r => r.Rule("S"))
+                .Production("S",  r => r.Rule("A", "A", "A", "A"))
+                .Production("A",  r => r.Rule('a').Rule("E"))
+                .Production("E",  r => r.Lambda()))
             .GetGrammar();
 
         [TestMethod]

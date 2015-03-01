@@ -13,8 +13,8 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_GrammarBuilder_That_Production_With_No_RHS_Adds_Empty_Production_To_List()
         {
-            var grammarBuilder = new GrammarBuilder();
-            grammarBuilder.Production("A");
+            var grammarBuilder = new GrammarBuilder("A", p=>p
+                .Production("A", r=>r.Lambda()));
             
             var grammar = grammarBuilder.GetGrammar();
             Assert.IsNotNull(grammar);
@@ -29,8 +29,9 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_GrammarBuilder_That_Production_With_Character_RHS_Adds_Terminal()
         {
-            var grammarBuilder = new GrammarBuilder();
-            grammarBuilder.Production("A", p => p.Rule('a'));
+            var grammarBuilder = new GrammarBuilder(
+                "A", p => p
+                .Production("A", r => r.Rule('a')));
             
             var grammar = grammarBuilder.GetGrammar();
             Assert.IsNotNull(grammar);
@@ -47,8 +48,8 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_GrammarBuilder_That_Production_With_String_RHS_Adds_NonTerminal()
         {
-            var grammarBuilder = new GrammarBuilder(g=>g
-                .Production("A", p=>p.Rule("B")));
+            var grammarBuilder = new GrammarBuilder("A", p=>p
+                .Production("A", r=>r.Rule("B")));
 
             var grammar = grammarBuilder.GetGrammar();
             Assert.IsNotNull(grammar);
@@ -65,10 +66,10 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_GrammarBuilder_That_Production_With_Two_Calls_To_RuleBuilder_Rule_Method_Creates_Two_Productions()
         {
-            var grammarBuilder = new GrammarBuilder();
-            grammarBuilder.Production("A", p => p.Rule("B").Rule("C"));
+            var grammarBuilder = new GrammarBuilder("A", p=>p
+                .Production("A", r=>r.Rule("B").Rule("C")));
             var grammar = grammarBuilder.GetGrammar();
-
+            Assert.AreEqual(2, grammar.Productions.Count);
         }
     }
 }

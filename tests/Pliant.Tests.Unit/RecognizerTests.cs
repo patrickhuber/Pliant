@@ -12,14 +12,15 @@ namespace Pliant.Tests.Unit
         // S -> S + M | M
         // M -> M * T | T
         // T -> 1 | 2 | 3 | 4
-        private readonly Grammar expressionGrammar = new GrammarBuilder(g=>g
-                .Production("S", p=>p
+        private readonly Grammar expressionGrammar = new GrammarBuilder(
+                "S", p=>p
+                .Production("S", r=>r
                     .Rule("S", '+', "M")
                     .Rule("M"))
-                .Production("M", p=>p
+                .Production("M", r=>r
                     .Rule("M", '*', "T")
                     .Rule("T"))
-                .Production("T", p=>p
+                .Production("T", r=>r
                     .Rule('1')
                     .Rule('2')
                     .Rule('3')
@@ -29,19 +30,20 @@ namespace Pliant.Tests.Unit
         // A -> B C
         // B -> b
         // C -> c
-        private readonly Grammar abcGrammar = new GrammarBuilder(g => g
-                .Production("A", p=>p
-                    .Rule("B", "C"))
-                .Production("B", p=>p
-                    .Rule('b'))
-                .Production("C", p=>p
-                    .Rule('c')))
+        private readonly Grammar abcGrammar = new GrammarBuilder(
+                "A", p => p
+                    .Production("A", r=>r
+                        .Rule("B", "C"))
+                    .Production("B", r=>r
+                        .Rule('b'))
+                    .Production("C", r=>r
+                        .Rule('c')))
             .GetGrammar();
 
         // A -> Aa
         // A -> 
-        private readonly Grammar simpleRightRecursive = new GrammarBuilder(g => g
-                .Production("A", p => p
+        private readonly Grammar simpleRightRecursive = new GrammarBuilder("A", p => p
+                .Production("A", r => r
                     .Rule('a', "A")
                     .Lambda()))
             .GetGrammar();
@@ -145,8 +147,8 @@ namespace Pliant.Tests.Unit
         public void Test_Recognizer_That_Unmarked_Middle_Recursion_Parses()
         {
             const string input = "aaaaaaaaa";
-            var grammar = new GrammarBuilder(g=>g
-                    .Production("S", p=>p
+            var grammar = new GrammarBuilder("S", p=>p
+                    .Production("S", r=>r
                         .Rule('a', "S", 'a')
                         .Rule('a')))
                 .GetGrammar();
@@ -162,12 +164,12 @@ namespace Pliant.Tests.Unit
         public void Test_Recognizer_That_Whitespace_Is_Ignored()
         {
             const string input = "a abc a a";
-            var grammar = new GrammarBuilder(g => g
-                    .Production("A", p => p
+            var grammar = new GrammarBuilder("A", p => p
+                    .Production("A", r => r
                         .Rule('a', "A")
-                        .Rule('a', 'b', 'c', "A"))
-                    .Lexeme("whitespace", x=>x.WhiteSpace())
-                    .Ignore("whitespace"))
+                        .Rule('a', 'b', 'c', "A")), l=>l
+                    .Lexeme("whitespace", x=>x.WhiteSpace()), ignore=>ignore
+                    .Add("whitespace"))
                 .GetGrammar();
             var recognizer = new Recognizer(grammar);
             var chart = recognizer.Parse(new StringReader(input));

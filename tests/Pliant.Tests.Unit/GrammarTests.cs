@@ -13,13 +13,13 @@ namespace Pliant.Tests.Unit
             var B = new NonTerminal("B");
             var A = new NonTerminal("A");
             var S = new NonTerminal("S");
-            var grammarBuilder = new GrammarBuilder(g => g
-                .Production("S", p=>p
+            var grammarBuilder = new GrammarBuilder("S", p => p
+                .Production("S", r => r
                     .Rule("A")
                     .Rule("B"))
-                .Production("A", p=>p
+                .Production("A", r => r
                     .Rule('a'))
-                .Production("B", p=>p
+                .Production("B", r => r
                     .Rule('b')));
             var grammar = grammarBuilder.GetGrammar();
             var rules = grammar.RulesFor(A).ToList();
