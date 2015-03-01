@@ -48,7 +48,7 @@
     <Compile Include="IGrammarBuilder.cs" />
     <Compile Include="ILexeme.cs" />
     <Compile Include="ILexemeBuilder.cs" />
-    <Compile Include="IListBuilder.cs" />
+    <Compile Include="ICommandBuilder.cs" />
     <Compile Include="INonTerminal.cs" />
     <Compile Include="IProduction.cs" />
     <Compile Include="IProductionBuilder.cs" />
@@ -61,7 +61,7 @@
     <Compile Include="ITransitionState.cs" />
     <Compile Include="Lexeme.cs" />
     <Compile Include="LexemeBuilder.cs" />
-    <Compile Include="ListBuilder.cs" />
+    <Compile Include="CommandBuilder.cs" />
     <Compile Include="NonTerminal.cs" />
     <Compile Include="Production.cs" />
     <Compile Include="ProductionBuilder.cs" />

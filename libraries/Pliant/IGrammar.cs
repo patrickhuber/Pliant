@@ -13,5 +13,7 @@ namespace Pliant
         IReadOnlyList<INonTerminal> Ignore { get; }
 
         IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal);
+
+        IEnumerable<IProduction> StartProductions();
     }
 }

@@ -72,7 +72,7 @@ namespace Pliant.Tests.Unit
                     .Range('A', 'Z'))
                 .Lexeme("digit", t => t.Digit())
                 .Lexeme("whitespace", t=> t.WhiteSpace()), ignore=>ignore
-                .Add("whitespace"));
+                .Ignore("whitespace"));
 
             var grammar = grammarBuilder.GetGrammar();
             Assert.IsNotNull(grammar);

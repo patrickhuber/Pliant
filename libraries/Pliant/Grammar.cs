@@ -37,5 +37,10 @@ namespace Pliant
         public INonTerminal Start { get; private set; }
 
         public IReadOnlyList<INonTerminal> Ignore { get; private set; }
+
+        public IEnumerable<IProduction> StartProductions()
+        {
+            return Productions.Where(p => p.LeftHandSide.Equals(Start));
+        }
     }
 }

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Pliant
 {
-    public interface IListBuilder<T>
+    public interface ICommandBuilder
     {
-        IListBuilder<T> Add(T item);
+        ICommandBuilder Ignore(string item);
     }
 }

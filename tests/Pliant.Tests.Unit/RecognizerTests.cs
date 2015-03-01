@@ -169,7 +169,7 @@ namespace Pliant.Tests.Unit
                         .Rule('a', "A")
                         .Rule('a', 'b', 'c', "A")), l=>l
                     .Lexeme("whitespace", x=>x.WhiteSpace()), ignore=>ignore
-                    .Add("whitespace"))
+                    .Ignore("whitespace"))
                 .GetGrammar();
             var recognizer = new Recognizer(grammar);
             var chart = recognizer.Parse(new StringReader(input));

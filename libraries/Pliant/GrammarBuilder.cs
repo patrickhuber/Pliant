@@ -17,7 +17,7 @@ namespace Pliant
             string start, 
             Action<IProductionBuilder> productions, 
             Action<ILexemeBuilder> lexemes = null, 
-            Action<IListBuilder<string>> ignore = null)
+            Action<ICommandBuilder> ignore = null)
         {
             _start = start;
             
@@ -26,12 +26,14 @@ namespace Pliant
             _productions = productionBuilder.GetProductions();
 
             var lexemeBuilder = new LexemeBuilder();
-            lexemes(lexemeBuilder);
+            if(lexemes != null)
+                lexemes(lexemeBuilder);
             _lexemes = lexemeBuilder.GetLexemes();
 
-            var ignoreBuilder = new ListBuilder<string>();
-            ignore(ignoreBuilder);
-            _ignore = ignoreBuilder.GetList();
+            var ignoreBuilder = new CommandBuilder();
+            if(ignore != null)
+                ignore(ignoreBuilder);
+            _ignore = ignoreBuilder.GetIgnoreList();
         }
                 
         public Grammar GetGrammar()

@@ -20,10 +20,8 @@ namespace Pliant
         public Chart Parse(TextReader textReader)
         {
             var chart = new Chart(_grammar);
-            var firstProduction = _grammar.Productions[0];
-            var startProductions = _grammar.Productions.Where(p => p.LeftHandSide.Equals(firstProduction.LeftHandSide));
-
-            foreach (var startProduction in startProductions)
+            
+            foreach (var startProduction in _grammar.StartProductions())
             {
                 var startState = new State(startProduction, 0, 0);
                 chart.EnqueueAt(0, startState);
