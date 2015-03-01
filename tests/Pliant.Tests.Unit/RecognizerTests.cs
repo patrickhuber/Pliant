@@ -157,5 +157,22 @@ namespace Pliant.Tests.Unit
             var lastColumn = chart[input.Length];
             Assert.IsTrue(IsRecognized(chart, "S"));
         }
+
+        [TestMethod]
+        public void Test_Recognizer_That_Whitespace_Is_Ignored()
+        {
+            const string input = "a abc a a";
+            var grammar = new GrammarBuilder(g => g
+                    .Production("A", p => p
+                        .Rule('a', "A")
+                        .Rule('a', 'b', 'c', "A"))
+                    .Lexeme("whitespace", x=>x.WhiteSpace())
+                    .Ignore("whitespace"))
+                .GetGrammar();
+            var recognizer = new Recognizer(grammar);
+            var chart = recognizer.Parse(new StringReader(input));
+            Assert.IsNotNull(chart);
+            Assert.IsTrue(chart.Count > 5);
+        }
     }
 }

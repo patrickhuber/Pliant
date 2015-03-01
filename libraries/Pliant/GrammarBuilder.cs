@@ -9,12 +9,15 @@ namespace Pliant
     public class GrammarBuilder : IGrammarBuilder
     {
         private IList<IProduction> _productions;
-        private IList<ITerminal> _characterClasses;
+        private IList<ILexeme> _lexemes;
+        private IList<string> _ignore;
+        private string _start;
 
         public GrammarBuilder()
         {
             _productions = new List<IProduction>();
-            _characterClasses = new List<ITerminal>();
+            _lexemes = new List<ILexeme>();
+            _ignore = new List<string>();
         }
 
         public GrammarBuilder(Action<IGrammarBuilder> grammar)
@@ -22,7 +25,7 @@ namespace Pliant
             var grammarBuilder = new GrammarBuilder();
             grammar(grammarBuilder);
             _productions = grammarBuilder.GetProductions();
-            _characterClasses = grammarBuilder.GetCharacterClasses();
+            _lexemes = grammarBuilder.GetLexemes();
         }
                 
         public IGrammarBuilder Production(string name, Action<IRuleBuilder> rules=null)
@@ -42,18 +45,9 @@ namespace Pliant
             return this;
         }
         
-        public IGrammarBuilder CharacterClass(string name, Action<ITerminalBuilder> terminals)
-        {
-            var terminalBuilder = new TerminalBuilder();
-            terminals(terminalBuilder);
-            foreach (var terminal in terminalBuilder.GetTerminals())
-                _characterClasses.Add(terminal);
-            return this;
-        }
-
         public Grammar GetGrammar()
         {
-            return new Grammar(_productions.ToArray());
+            return new Grammar(_productions.ToArray(), _lexemes.ToArray());
         }
 
         internal IList<IProduction> GetProductions()
@@ -61,9 +55,30 @@ namespace Pliant
             return _productions;
         }
 
-        internal IList<ITerminal> GetCharacterClasses()
+        internal IList<ILexeme> GetLexemes()
         {
-            return _characterClasses;
+            return _lexemes;
+        }
+
+        public IGrammarBuilder Start(string name)
+        {
+            _start = name;
+            return this;
+        }
+
+        public IGrammarBuilder Lexeme(string name, Action<ITerminalBuilder> terminals)
+        {
+            var terminalBuilder = new TerminalBuilder();
+            terminals(terminalBuilder);
+            var lexeme = new Lexeme(new NonTerminal(name), terminalBuilder.GetTerminals().ToArray());
+            _lexemes.Add(lexeme);
+            return this;
+        }
+
+        public IGrammarBuilder Ignore(string name)
+        {
+            _ignore.Add(name);
+            return this;
         }
     }
 }

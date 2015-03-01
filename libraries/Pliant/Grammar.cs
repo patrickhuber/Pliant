@@ -8,18 +8,20 @@ namespace Pliant
 {
     public class Grammar : IGrammar
     {
-        private ReadOnlyList<IProduction> _productions;
-        public IReadOnlyList<IProduction> Productions { get { return _productions; } }
+        public IReadOnlyList<IProduction> Productions { get; private set; }
+        
+        public IReadOnlyList<ILexeme> Lexemes { get; private set; }
 
-        public Grammar(params IProduction[] productions)
+        public Grammar(IProduction[] productions, ILexeme[] lexemes)
         {
             Assert.IsNotNullOrEmpty(productions, "productions");
-            _productions = new ReadOnlyList<IProduction>(productions);
+            Productions = new ReadOnlyList<IProduction>(productions);
+            Lexemes = new ReadOnlyList<ILexeme>(lexemes);
         }
 
         public IEnumerable<IProduction> RulesFor(INonTerminal symbol)
         {
-            foreach (var production in _productions)
+            foreach (var production in Productions)
             {
                 var leftHandSide = production.LeftHandSide;
                 if (leftHandSide.SymbolType == symbol.SymbolType

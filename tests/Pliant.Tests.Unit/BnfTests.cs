@@ -2,6 +2,7 @@
 using System.Text;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.IO;
 
 namespace Pliant.Tests.Unit
 {
@@ -14,7 +15,7 @@ namespace Pliant.Tests.Unit
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        public void Test_Bnf_That_Parse_Produces_Bnf_Grammar()
+        public void Test_Bnf_That_Parse_Produces_Bnf_Chart()
         {
             /*  A -> B | C
              *  equals
@@ -65,14 +66,33 @@ namespace Pliant.Tests.Unit
                 .Production("letterOrDigit", p=>p
                     .Rule("letter")
                     .Rule("digit"))
-                .CharacterClass("letter", l=>l
+                .Lexeme("letter", l=>l
                     .Range('a', 'z')
                     .Range('A', 'Z'))
-                .CharacterClass("digit", l => l.Digit())
-                .CharacterClass("whitespace", l=> l.WhiteSpace()));
+                .Lexeme("digit", l => l.Digit())
+                .Lexeme("whitespace", l=> l.WhiteSpace())
+                .Ignore("whitespace"));
 
             var grammar = grammarBuilder.GetGrammar();
             Assert.IsNotNull(grammar);
+
+            var sampleBnf = @"
+            syntax      -> { rule }
+            rule        -> identifier ""->"" expression
+            expression  -> term { ""|"" }
+            term        -> factor { factor }
+            factor      ->  identifier | 
+                            quoted_symbol | 
+                            ""("" expression "")""
+                            ""["" expression ""]""
+                            ""{"" expression ""}""
+            identifier  -> letter { letter | digit }
+            quoted      -> """""" { any_character } """"""";
+            var recognizer = new Recognizer(grammar);
+            var stringReader = new StringReader(sampleBnf);
+            var chart = recognizer.Parse(stringReader);
+            Assert.IsNotNull(chart);
+            Assert.IsTrue(chart.Count > 10);
         }
     }
 }
