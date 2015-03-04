@@ -53,8 +53,8 @@ namespace Pliant
                     {
                         Complete(state, origin, chart);
                     }
-                }
-                origin++;
+                }                
+                origin++;                
             }
             return chart;
         }
@@ -76,12 +76,6 @@ namespace Pliant
             var nonTerminal = sourceState.CurrentSymbol() as INonTerminal;
             foreach (var production in _grammar.RulesFor(nonTerminal))
             {
-                PredictProduction(sourceState, j, chart, production);
-            }
-            foreach (var lexeme in _grammar.LexemeFor(nonTerminal))
-            {
-                // create a production from the lexeme
-                var production = new Production(lexeme.LeftHandSide, lexeme.RightHandSide.ToArray());
                 PredictProduction(sourceState, j, chart, production);
             }
         }

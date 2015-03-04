@@ -93,7 +93,7 @@ namespace Pliant.Tests.Unit
             var stringReader = new StringReader(sampleBnf);
             var chart = recognizer.Parse(stringReader);
             Assert.IsNotNull(chart);
-            Assert.IsTrue(chart.Count > 10);
+            Assert.AreEqual(sampleBnf.Length, chart.Count);
         }
     }
 }

@@ -67,8 +67,8 @@ namespace Pliant
             for (p=0; p < Production.RightHandSide.Count; p++)
             {       
                 stringBuilder.AppendFormat(
-                    "{0}{1}", 
-                    p == Position ? "." : " " , 
+                    "{0}{1}",
+                    p == Position ? "\u25CF" : " ", 
                     Production.RightHandSide[p]);
             }
             

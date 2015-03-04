@@ -18,7 +18,7 @@ namespace Pliant
             Assert.IsNotNull(start, "start");
             Productions = new ReadOnlyList<IProduction>(productions);
             Lexemes = new ReadOnlyList<ILexeme>(lexemes);
-            Ignore = new ReadOnlyList<INonTerminal>(ignore);
+            Ignores = new ReadOnlyList<INonTerminal>(ignore);
             Start = start; 
         }
 
@@ -33,7 +33,7 @@ namespace Pliant
             }
         }
 
-        public IEnumerable<ILexeme> LexemeFor(INonTerminal symbol)
+        public IEnumerable<ILexeme> LexemesFor(INonTerminal symbol)
         {
             foreach (var lexeme in Lexemes)
             {
@@ -46,7 +46,7 @@ namespace Pliant
 
         public INonTerminal Start { get; private set; }
 
-        public IReadOnlyList<INonTerminal> Ignore { get; private set; }
+        public IReadOnlyList<INonTerminal> Ignores { get; private set; }
 
         public IEnumerable<IProduction> StartProductions()
         {

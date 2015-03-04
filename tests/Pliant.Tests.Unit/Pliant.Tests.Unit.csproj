@@ -50,7 +50,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AnyTerminalTests.cs" />
     <Compile Include="BnfTests.cs" />
+    <Compile Include="DigitTerminalTests.cs" />
     <Compile Include="GrammarBuilderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RecognizerTests.cs" />

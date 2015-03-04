@@ -12,7 +12,7 @@ namespace Pliant.Tests.Unit
             var state = new State(
                 new Production("A", new NonTerminal("B"), new NonTerminal("C")),
                 1,0);
-            Assert.AreEqual("A -> B.C\t\t(0)", state.ToString());
+            Assert.AreEqual("A -> B\u25CFC\t\t(0)", state.ToString());
         }
     }
 }

@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnyTerminal.cs" />
     <Compile Include="Assert.cs" />
     <Compile Include="Chart.cs" />
     <Compile Include="DigitTerminal.cs" />
