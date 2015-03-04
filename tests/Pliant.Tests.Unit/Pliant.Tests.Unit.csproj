@@ -59,6 +59,8 @@
     <Compile Include="GrammarTests.cs" />
     <Compile Include="LeoAlgorithmTests.cs" />
     <Compile Include="AycockHorspoolAlgorithmTests.cs" />
+    <Compile Include="RangeTerminalTests.cs" />
+    <Compile Include="WhitespaceTerminalTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj">
