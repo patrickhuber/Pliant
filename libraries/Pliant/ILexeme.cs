@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pliant
 {
-    public interface ILexeme
+    public interface ILexeme : IRule<ITerminal>
     {
-        INonTerminal LeftHandSide { get; }
-        IReadOnlyList<ITerminal> Terminals { get; }
     }
 }

@@ -22,20 +22,21 @@ namespace Pliant
 
         public ITerminalBuilder Range(char start, char end)
         {
-            _terminals.Add(new DelegateTerminal(character=> start <= character && character <= end));
+            var rangeTerminal = new RangeTerminal(start, end);
+            _terminals.Add(rangeTerminal);
             return this;
         }
 
         public ITerminalBuilder Digit()
         {
-            var digitTerminal = new DelegateTerminal(c => char.IsDigit(c));
+            var digitTerminal = new DigitTerminal();
             _terminals.Add(digitTerminal);
             return this;
         }
 
         public ITerminalBuilder WhiteSpace()
         {
-            var whitespaceTerminal = new DelegateTerminal(c => char.IsWhiteSpace(c));
+            var whitespaceTerminal = new WhitespaceTerminal();
             _terminals.Add(whitespaceTerminal);
             return this;
         }

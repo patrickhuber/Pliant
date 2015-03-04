@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 namespace Pliant
 {
-    public interface IProduction
+    public interface IProduction : IRule<ISymbol>
     {
-        INonTerminal LeftHandSide { get; }
-        IReadOnlyList<ISymbol> RightHandSide { get; }
     }
 }

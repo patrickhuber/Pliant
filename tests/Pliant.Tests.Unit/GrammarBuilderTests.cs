@@ -71,5 +71,15 @@ namespace Pliant.Tests.Unit
             var grammar = grammarBuilder.GetGrammar();
             Assert.AreEqual(2, grammar.Productions.Count);
         }
+
+        [TestMethod]
+        public void Test_GrammarBuilder_That_Lexeme_With_Two_Calls_To_Range_Lexeme_Method_Creates_Two_Lexemes()
+        {
+            var grammarBuilder = new GrammarBuilder("A", p => p
+                .Production("A", r => r.Rule("B").Rule("C")), l => l
+                .Lexeme("M", r => r.Range('a', 'z').Range('A', 'Z')));
+            var grammar = grammarBuilder.GetGrammar();
+            Assert.AreEqual(2, grammar.Lexemes.Count);
+        }
     }
 }

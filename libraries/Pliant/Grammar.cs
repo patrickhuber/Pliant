@@ -33,6 +33,16 @@ namespace Pliant
             }
         }
 
+        public IEnumerable<ILexeme> LexemeFor(INonTerminal symbol)
+        {
+            foreach (var lexeme in Lexemes)
+            {
+                var leftHandSide = lexeme.LeftHandSide;
+                if (leftHandSide.SymbolType == symbol.SymbolType
+                    && leftHandSide.Value.Equals(symbol.Value))
+                    yield return lexeme;
+            }
+        }
 
         public INonTerminal Start { get; private set; }
 
@@ -42,5 +52,6 @@ namespace Pliant
         {
             return Productions.Where(p => p.LeftHandSide.Equals(Start));
         }
+        
     }
 }

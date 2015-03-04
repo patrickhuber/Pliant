@@ -19,8 +19,11 @@ namespace Pliant
         {
             var terminalBuilder = new TerminalBuilder();
             terminals(terminalBuilder);
-            var lexeme = new Lexeme(new NonTerminal(name), terminalBuilder.GetTerminals().ToArray());
-            _lexemes.Add(lexeme);
+            foreach (var terminal in terminalBuilder.GetTerminals())
+            {
+                var lexeme = new Lexeme(new NonTerminal(name), terminalBuilder.GetTerminals().ToArray());
+                _lexemes.Add(lexeme);
+            }            
             return this;
         }
 

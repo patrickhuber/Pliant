@@ -14,6 +14,8 @@ namespace Pliant
 
         IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal);
 
+        IEnumerable<ILexeme> LexemeFor(INonTerminal nonTerminal);
+
         IEnumerable<IProduction> StartProductions();
     }
 }

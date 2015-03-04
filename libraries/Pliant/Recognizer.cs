@@ -19,16 +19,9 @@ namespace Pliant
 
         public Chart Parse(TextReader textReader)
         {
-            var chart = new Chart(_grammar);
-            
-            foreach (var startProduction in _grammar.StartProductions())
-            {
-                var startState = new State(startProduction, 0, 0);
-                chart.EnqueueAt(0, startState);
-                Console.WriteLine("{0}\t{1}\t # Start", 0, startState);
-            }
+            var chart = CreateChart();
 
-            int origin = 0;
+            var origin = 0;
             // TODO:
             // Update algorithm to follow these steps from :
             // https://github.com/jeffreykegler/kollos/blob/master/notes/misc/leo2.md
@@ -66,22 +59,45 @@ namespace Pliant
             return chart;
         }
 
+        private Chart CreateChart()
+        {
+            var chart = new Chart(_grammar);
+            foreach (var startProduction in _grammar.StartProductions())
+            {
+                var startState = new State(startProduction, 0, 0);
+                chart.EnqueueAt(0, startState);
+                Console.WriteLine("{0}\t{1}\t # Start", 0, startState);
+            }
+            return chart;
+        }
+
         private void Predict(IState sourceState, int j, Chart chart)
         {
             var nonTerminal = sourceState.CurrentSymbol() as INonTerminal;
             foreach (var production in _grammar.RulesFor(nonTerminal))
             {
-                var state = new State(production, 0, j);
-                if(chart.EnqueueAt(j, state))
-                    Log("Predict", j, state);
+                PredictProduction(sourceState, j, chart, production);
+            }
+            foreach (var lexeme in _grammar.LexemeFor(nonTerminal))
+            {
+                // create a production from the lexeme
+                var production = new Production(lexeme.LeftHandSide, lexeme.RightHandSide.ToArray());
+                PredictProduction(sourceState, j, chart, production);
+            }
+        }
 
-                var stateIsNullable = state.Production.RightHandSide.Count == 0;
-                if (stateIsNullable)
-                {
-                    var aycockHorspoolState = new State(sourceState.Production, sourceState.Position + 1, j);
-                    chart.EnqueueAt(j, aycockHorspoolState);
-                    Log("Predict", j, aycockHorspoolState);
-                }
+        private void PredictProduction(IState sourceState, int j, Chart chart, IProduction production)
+        {
+            var state = new State(production, 0, j);
+            if (chart.EnqueueAt(j, state))
+                Log("Predict", j, state);
+
+            var stateIsNullable = state.Production.RightHandSide.Count == 0;
+            if (stateIsNullable)
+            {
+                var aycockHorspoolState = new State(sourceState.Production, sourceState.Position + 1, j);
+                chart.EnqueueAt(j, aycockHorspoolState);
+                Log("Predict", j, aycockHorspoolState);
             }
         }
 
@@ -98,7 +114,7 @@ namespace Pliant
                     var currentSymbol = state.CurrentSymbol();
                     if (currentSymbol.SymbolType == SymbolType.Terminal)
                     {
-                        var terminal = currentSymbol as Terminal;
+                        var terminal = currentSymbol as ITerminal;
                         if (terminal.IsMatch(token))
                         {
                             var scanState = new State(
