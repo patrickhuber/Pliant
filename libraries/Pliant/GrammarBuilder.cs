@@ -42,7 +42,7 @@ namespace Pliant
                 throw new Exception("no start production specified");
             var startProduction = _productions.FirstOrDefault(x => x.LeftHandSide.Value == _start);
             if (startProduction == null)
-                throw new Exception("no start production specified");
+                throw new Exception("no start production found for start symbol");
             var start = startProduction.LeftHandSide;
             var ignore = _lexemes
                 .Where(x => _ignore.Contains(x.LeftHandSide.Value))

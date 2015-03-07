@@ -88,5 +88,12 @@ namespace Pliant
                 return null;
             return new State(Production, Position + 1, Origin);
         }
+        
+        public bool IsSource(ISymbol searchSymbol)
+        {
+            if (IsComplete())
+                return false;
+            return CurrentSymbol().Equals(searchSymbol);
+        }
     }
 }

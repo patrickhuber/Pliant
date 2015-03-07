@@ -26,6 +26,10 @@ namespace Pliant
                         var terminal = new Terminal((char)symbol);
                         symbolList.Add(terminal);
                     }
+                    else if (symbol is ITerminal)
+                    {
+                        symbolList.Add(symbol as ITerminal);
+                    }
                     else if (symbol is string)
                     {
                         var nonTerminal = new NonTerminal(symbol as string);

@@ -30,6 +30,10 @@ namespace Pliant.Tests.Unit
              *  equals
              *  A -> B | <null>
              *  
+             *  A -> B { B }
+             *  equals
+             *  A -> B A | B
+             * 
              *  Grammar
              *  -------
              *  syntax          ->  { rule }

@@ -55,6 +55,7 @@
     <Compile Include="DigitTerminalTests.cs" />
     <Compile Include="GrammarBuilderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PulseRecognizerTests.cs" />
     <Compile Include="RecognizerTests.cs" />
     <Compile Include="ProductionTests.cs" />
     <Compile Include="StateTests.cs" />

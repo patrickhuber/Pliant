@@ -60,6 +60,7 @@
     <Compile Include="ISymbol.cs" />
     <Compile Include="ITerminal.cs" />
     <Compile Include="ITerminalBuilder.cs" />
+    <Compile Include="IToken.cs" />
     <Compile Include="ITransitionState.cs" />
     <Compile Include="Lexeme.cs" />
     <Compile Include="LexemeBuilder.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="NonTerminal.cs" />
     <Compile Include="Production.cs" />
     <Compile Include="ProductionBuilder.cs" />
+    <Compile Include="PulseRecognizer.cs" />
     <Compile Include="RangeTerminal.cs" />
     <Compile Include="RuleBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -78,6 +80,7 @@
     <Compile Include="Symbol.cs" />
     <Compile Include="Terminal.cs" />
     <Compile Include="TerminalBuilder.cs" />
+    <Compile Include="Token.cs" />
     <Compile Include="TransitionState.cs" />
     <Compile Include="WhitespaceTerminal.cs" />
   </ItemGroup>
