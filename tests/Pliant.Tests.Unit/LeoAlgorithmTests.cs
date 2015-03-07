@@ -16,7 +16,7 @@ namespace Pliant.Tests.Unit
             var chart = CreateChart(grammar);
             var completedState = new State(A_, 0, 2);
 
-            var recognizer = new Recognizer(grammar);
+            var recognizer = new PulseRecognizer(grammar);
             var invoker = new PrivateObject(recognizer);
             invoker.Invoke("OptimizeReductionPath", completedState.Production.LeftHandSide, 3, chart);            
         }
