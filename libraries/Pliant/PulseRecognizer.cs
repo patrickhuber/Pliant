@@ -9,11 +9,11 @@ namespace Pliant
 {
     public class PulseRecognizer
     {
-        public Grammar Grammar { get; private set; }
+        public IGrammar Grammar { get; private set; }
         public Chart Chart { get; private set; }
         public int Origin { get; private set; }
 
-        public PulseRecognizer(Grammar grammar)
+        public PulseRecognizer(IGrammar grammar)
         {
             Grammar = grammar;
             Chart = CreateChart();
