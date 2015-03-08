@@ -43,9 +43,6 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_PulseRecognizer_That_Single_Token_Increments_Parse()
         {
-            const int whitespace = 1;
-            const int other = 2;
-            
             //  S   -> W
             //  W   -> [\s]+
             var grammar = new GrammarBuilder("S", p=>p
@@ -55,7 +52,7 @@ namespace Pliant.Tests.Unit
                     .Rule(new WhitespaceTerminal(), "whitespace"))
                 .Production("whitespace", r=>r
                     .Rule(new WhitespaceTerminal())
-                    .Lambda())                )
+                    .Lambda()))
                 .GetGrammar();
             var pulseRecognizer = new PulseRecognizer(grammar);
 

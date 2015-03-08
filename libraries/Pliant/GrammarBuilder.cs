@@ -9,7 +9,7 @@ namespace Pliant
     public class GrammarBuilder : IGrammarBuilder
     {
         private IList<IProduction> _productions;
-        private IList<ILexeme> _lexemes;
+        private IList<IProduction> _lexemes;
         private IList<string> _ignore;
         private string _start;
 

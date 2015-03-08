@@ -47,14 +47,12 @@
     <Compile Include="GrammarBuilder.cs" />
     <Compile Include="IGrammar.cs" />
     <Compile Include="IGrammarBuilder.cs" />
-    <Compile Include="ILexeme.cs" />
     <Compile Include="ILexemeBuilder.cs" />
     <Compile Include="ICommandBuilder.cs" />
     <Compile Include="INonTerminal.cs" />
     <Compile Include="IProduction.cs" />
     <Compile Include="IProductionBuilder.cs" />
     <Compile Include="IReadOnlyList.cs" />
-    <Compile Include="IRule.cs" />
     <Compile Include="IRuleBuilder.cs" />
     <Compile Include="IState.cs" />
     <Compile Include="ISymbol.cs" />
@@ -62,9 +60,9 @@
     <Compile Include="ITerminalBuilder.cs" />
     <Compile Include="IToken.cs" />
     <Compile Include="ITransitionState.cs" />
-    <Compile Include="Lexeme.cs" />
     <Compile Include="LexemeBuilder.cs" />
     <Compile Include="CommandBuilder.cs" />
+    <Compile Include="Lexer.cs" />
     <Compile Include="NonTerminal.cs" />
     <Compile Include="Production.cs" />
     <Compile Include="ProductionBuilder.cs" />

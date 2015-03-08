@@ -10,14 +10,14 @@ namespace Pliant
     {
         public IReadOnlyList<IProduction> Productions { get; private set; }
         
-        public IReadOnlyList<ILexeme> Lexemes { get; private set; }
+        public IReadOnlyList<IProduction> Lexemes { get; private set; }
 
-        public Grammar(INonTerminal start, IProduction[] productions, ILexeme[] lexemes, INonTerminal[] ignore)
+        public Grammar(INonTerminal start, IProduction[] productions, IProduction[] lexemes, INonTerminal[] ignore)
         {
             Assert.IsNotNullOrEmpty(productions, "productions");
             Assert.IsNotNull(start, "start");
             Productions = new ReadOnlyList<IProduction>(productions);
-            Lexemes = new ReadOnlyList<ILexeme>(lexemes);
+            Lexemes = new ReadOnlyList<IProduction>(lexemes);
             Ignores = new ReadOnlyList<INonTerminal>(ignore);
             Start = start; 
         }
@@ -33,7 +33,7 @@ namespace Pliant
             }
         }
 
-        public IEnumerable<ILexeme> LexemesFor(INonTerminal symbol)
+        public IEnumerable<IProduction> LexemesFor(INonTerminal symbol)
         {
             foreach (var lexeme in Lexemes)
             {
