@@ -73,7 +73,7 @@ namespace Pliant
             }
             
             if (Position == Production.RightHandSide.Count)
-                stringBuilder.Append(".");
+                stringBuilder.Append("\u25CF");
 
             stringBuilder.AppendFormat("\t\t({0})", Origin);
             return stringBuilder.ToString();

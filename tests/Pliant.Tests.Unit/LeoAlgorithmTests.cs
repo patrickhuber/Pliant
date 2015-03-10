@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Pliant.Tests.Unit
@@ -18,7 +19,8 @@ namespace Pliant.Tests.Unit
 
             var recognizer = new PulseRecognizer(grammar);
             var invoker = new PrivateObject(recognizer);
-            invoker.Invoke("OptimizeReductionPath", completedState.Production.LeftHandSide, 3, chart);            
+            invoker.Invoke("OptimizeReductionPath", completedState.Production.LeftHandSide, 3, chart);
+            Assert.IsTrue(chart[3].Any(x => x.StateType == StateType.Transitive));
         }
 
         private Grammar CreateGrammar()
