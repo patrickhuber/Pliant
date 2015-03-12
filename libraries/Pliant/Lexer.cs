@@ -1,30 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Pliant
 {
-    public class Lexer
+    public class Lexer : Observable<IToken>
     {
         private PulseRecognizer _recognizer;
-        
+
         public Lexer(IGrammar grammar)
+            : base()
         {
             _recognizer = new PulseRecognizer(grammar);
         }
 
-        public IEnumerable<IToken> Scan(char c)
+        public void Scan(char c)
         {
             _recognizer.Pulse(c);
-            return DiscoverTokens(_recognizer.Chart);
+            IToken token = null;
+            if (TryGetToken(_recognizer, out token))
+            {
+                OnNext(token);
+            }
         }
 
-        private IEnumerable<IToken> DiscoverTokens(Chart chart)
+        public void Scan(TextReader textReader)
         {
+ 
+        }
 
-            yield break;
+        private bool TryGetToken(PulseRecognizer recognizer, out IToken token)
+        {
+            token = null;
+            return false;
         }
     }
 }

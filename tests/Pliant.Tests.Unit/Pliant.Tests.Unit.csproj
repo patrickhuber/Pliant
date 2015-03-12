@@ -63,6 +63,8 @@
     <Compile Include="LeoAlgorithmTests.cs" />
     <Compile Include="AycockHorspoolAlgorithmTests.cs" />
     <Compile Include="RangeTerminalTests.cs" />
+    <Compile Include="ParserTests.cs" />
+    <Compile Include="LexerTests.cs" />
     <Compile Include="WhitespaceTerminalTests.cs" />
   </ItemGroup>
   <ItemGroup>

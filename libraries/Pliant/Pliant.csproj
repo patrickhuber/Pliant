@@ -64,6 +64,8 @@
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="NonTerminal.cs" />
+    <Compile Include="Observable.cs" />
+    <Compile Include="Parser.cs" />
     <Compile Include="Production.cs" />
     <Compile Include="ProductionBuilder.cs" />
     <Compile Include="PulseRecognizer.cs" />
