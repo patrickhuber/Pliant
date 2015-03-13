@@ -10,31 +10,43 @@ namespace Pliant.Tests.Unit
         public void Test_Lexer_Scan_Emits_Three_Tokens()
         {
             var input = "three tokens";
-            //  S   -> W | C
-            //  W   -> [\s]+
-            //  C   -> [a-z]+
+            //  S   ->  S W
+            //  S   ->  S L
+            //  S   ->  <null>
+            //  W   ->  W \s
+            //  W   ->  \s
+            //  L   ->  L [a-z]
+            //  L   ->  [a-z]
             var grammar = new GrammarBuilder("S", p=>p
                     .Production("S", r=>r
-                        .Rule("W")
-                        .Rule("C"))
-                    .Production("W", r=>r
-                        .Rule(new WhitespaceTerminal(), "whitespace"))
-                    .Production("whitespace", r=>r
-                        .Rule(new WhitespaceTerminal())
+                        .Rule("S", "W")
+                        .Rule("S", "L")
                         .Lambda())
-                    .Production("C", r=>r
-                        .Rule(new RangeTerminal('a','z'), "word"))
-                    .Production("word", r=>r
-                        .Rule(new RangeTerminal('a','z'))
-                        .Lambda()))
+                    .Production("W", r=>r
+                        .Rule("W", new WhitespaceTerminal())
+                        .Rule(new WhitespaceTerminal()))
+                    .Production("L", r=>r
+                        .Rule(new RangeTerminal('a', 'z'), "L")
+                        .Rule(new RangeTerminal('a', 'z'))))
                 .GetGrammar();
 
             var lexer = new Lexer(grammar);
+
+            int tokenCount = 0;
+            var tokenObserver = new Observer<IToken>(t=>
+            {
+                tokenCount++;
+            });
+            lexer.Subscribe(tokenObserver);
+
             for (int i = 0; i < input.Length; i++)
             {
                 char c = input[i];
-                lexer.Scan(c);
+                if (!lexer.Scan(c))
+                    break;
             }
+
+            Assert.AreEqual(3, tokenCount);
         }
     }
 }

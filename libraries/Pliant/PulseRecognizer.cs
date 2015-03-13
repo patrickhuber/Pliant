@@ -100,10 +100,11 @@ namespace Pliant
                         var terminal = currentSymbol as ITerminal;
                         if (terminal.IsMatch(token))
                         {
-                            var scanState = new State(
+                            var scanState = new ScanState(
                                 state.Production,
                                 state.Position + 1,
-                                i);
+                                i,
+                                token);
                             if (Chart.EnqueueAt(j + 1, scanState))
                                 LogScan(j + 1, scanState, token);
                         }

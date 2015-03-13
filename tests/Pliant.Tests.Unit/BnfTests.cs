@@ -82,17 +82,20 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(grammar);
 
             var sampleBnf = @"
-            syntax      -> { rule }
-            rule        -> identifier ""->"" expression
-            expression  -> term { ""|"" }
-            term        -> factor { factor }
+            syntax      ->  { rule }
+            rule        ->  identifier '->' expression
+            expression  ->  term { '|' }
+            term        ->  factor { factor }
             factor      ->  identifier | 
                             quoted | 
-                            ""("" expression "")""
-                            ""["" expression ""]""
-                            ""{"" expression ""}""
-            identifier  -> letter { letter | digit }
-            quoted      -> """""" { any_character } """"""";
+                            '(' expression ')'
+                            '[' expression ']'
+                            '{' expression '}'
+            identifier  ->  letter { letter | digit }
+            quoted      ->  '""' { any } '""'
+            letter      ->  '[a-zA-Z]'
+            digit       ->  '[\d]'
+            any         ->  '.'";
             var recognizer = new Recognizer(grammar);
             var stringReader = new StringReader(sampleBnf);
             var chart = recognizer.Parse(stringReader);

@@ -17,19 +17,16 @@ namespace Pliant
             _recognizer = new PulseRecognizer(grammar);
         }
 
-        public void Scan(char c)
+        public bool Scan(char c)
         {
+            int size = _recognizer.Chart.Count;
             _recognizer.Pulse(c);
             IToken token = null;
             if (TryGetToken(_recognizer, out token))
             {
                 OnNext(token);
             }
-        }
-
-        public void Scan(TextReader textReader)
-        {
- 
+            return size < _recognizer.Chart.Count;
         }
 
         private bool TryGetToken(PulseRecognizer recognizer, out IToken token)
