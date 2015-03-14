@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="AnyTerminalTests.cs" />
     <Compile Include="BnfTests.cs" />
+    <Compile Include="ChartTests.cs" />
     <Compile Include="DigitTerminalTests.cs" />
     <Compile Include="GrammarBuilderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

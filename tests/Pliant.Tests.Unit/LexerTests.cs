@@ -23,11 +23,15 @@ namespace Pliant.Tests.Unit
                         .Rule("S", "L")
                         .Lambda())
                     .Production("W", r=>r
-                        .Rule("W", new WhitespaceTerminal())
-                        .Rule(new WhitespaceTerminal()))
+                        .Rule(new WhitespaceTerminal(), "W`"))
+                    .Production("W`", r=>r
+                        .Rule(new WhitespaceTerminal(), "W`")
+                        .Lambda())
                     .Production("L", r=>r
-                        .Rule(new RangeTerminal('a', 'z'), "L")
-                        .Rule(new RangeTerminal('a', 'z'))))
+                        .Rule(new RangeTerminal('a', 'z'), "L`"))
+                    .Production("L`", r=>r
+                        .Rule(new RangeTerminal('a', 'z'), "L`")
+                        .Lambda()))
                 .GetGrammar();
 
             var lexer = new Lexer(grammar);
