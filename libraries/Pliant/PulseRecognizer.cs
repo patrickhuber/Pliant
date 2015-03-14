@@ -249,7 +249,7 @@ namespace Pliant
 
         private void LogScan(int origin, IState state, char token)
         {
-            Trace.Write(string.Format("{0}\t{1}", Origin, state));
+            Trace.Write(string.Format("{0}\t{1}", origin, state));
             Trace.WriteLine(string.Format("\t # Scan {0}", token));
         }
     }
