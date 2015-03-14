@@ -3,6 +3,7 @@ Implementation of a modified Earley parser in C# inspired by the Marpa Parser pr
 
 ## Description
 Pliant is a table driven parser that implements the Earley algorithm. Two optimizations are added to handle issues with the original Earley implementation: 
+
 1. Optimization from joop leo to efficiently handle right recursions. 
 2. Bug fix from Aycock and Horspool to handle nullable predictions
 
