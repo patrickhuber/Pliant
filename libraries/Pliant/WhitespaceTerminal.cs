@@ -22,5 +22,15 @@ namespace Pliant
         {
             return @"\s";
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is WhitespaceTerminal;
+        }
+
+        public override int GetHashCode()
+        {
+            return ToString().GetHashCode();
+        }
     }
 }

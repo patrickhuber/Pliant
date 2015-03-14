@@ -31,5 +31,19 @@ namespace Pliant
         {
             return string.Format("[{0}-{1}]", Start, End);
         }
+
+        public override int GetHashCode()
+        {
+            return Start.GetHashCode() ^ End.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            var rangeTerminal = obj as RangeTerminal;
+            if (rangeTerminal == null)
+                return false;
+            return rangeTerminal.End == End
+                && rangeTerminal.Start == Start;
+        }
     }
 }

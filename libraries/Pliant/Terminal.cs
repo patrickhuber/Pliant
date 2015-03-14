@@ -8,17 +8,17 @@ namespace Pliant
 {
     public class Terminal : Symbol, ITerminal
     {
-        private char _character;
+        public char Character { get; private set; }
 
         public Terminal(char character)
             : base(SymbolType.Terminal)
         {
-            _character = character;
+            Character = character;
         }
         
         public override int GetHashCode()
         {
-            return base.GetHashCode() ^ _character.GetHashCode();
+            return base.GetHashCode() ^ Character.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -26,17 +26,17 @@ namespace Pliant
             var terminal = obj as Terminal;
             if (terminal == null)
                 return false;
-            return terminal._character == _character;
+            return terminal.Character == Character;
         }
 
         public virtual bool IsMatch(char character)
         {
-            return _character == character;
+            return Character == character;
         }
 
         public override string ToString()
         {
-            return _character.ToString();
+            return Character.ToString();
         }
     }
 }

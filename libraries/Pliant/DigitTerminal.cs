@@ -22,5 +22,15 @@ namespace Pliant
         {
             return "[0-9]";
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is DigitTerminal;
+        }
+
+        public override int GetHashCode()
+        {
+            return ToString().GetHashCode();
+        }
     }
 }
