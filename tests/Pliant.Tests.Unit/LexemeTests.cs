@@ -12,7 +12,8 @@ namespace Pliant.Tests.Unit
             var whitespace = new NonTerminal("whitespace");
             var terminal = new WhitespaceTerminal();
             var input = "\t \v\f\r\n";
-            var lexeme = new Lexeme(whitespace, terminal, Repetition.ZeroOrMany);
+            var lexerRule = new LexerRule(whitespace, new[] { terminal }, Repetition.ZeroOrMany);
+            var lexeme = new Lexeme(lexerRule);
             foreach (var c in input)
                 Assert.IsTrue(lexeme.Match(c));
             Assert.AreEqual(input, lexeme.Capture);
@@ -24,7 +25,8 @@ namespace Pliant.Tests.Unit
             var letter = new NonTerminal("letter");
             var terminal = new RangeTerminal('a', 'z');
             var input = "thisisabunchofletters";
-            var lexeme = new Lexeme(letter, terminal, Repetition.OneOrMany);
+            var lexerRule = new LexerRule(letter, new[]{ terminal }, Repetition.OneOrMany);
+            var lexeme = new Lexeme(lexerRule);
             foreach (var c in input)
                 Assert.IsTrue(lexeme.Match(c));
             Assert.AreEqual(input, lexeme.Capture);
