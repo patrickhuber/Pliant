@@ -243,14 +243,14 @@ namespace Pliant
 
         private void Log(string operation, int origin, IState state)
         {
-            Trace.Write(string.Format("{0}\t{1}", origin, state));
-            Trace.WriteLine(string.Format("\t # {0}", operation));
+            Debug.Write(string.Format("{0}\t{1}", origin, state));
+            Debug.WriteLine(string.Format("\t # {0}", operation));
         }
 
         private void LogScan(int origin, IState state, char token)
         {
-            Trace.Write(string.Format("{0}\t{1}", origin, state));
-            Trace.WriteLine(string.Format("\t # Scan {0}", token));
+            Debug.Write(string.Format("{0}\t{1}", origin, state));
+            Debug.WriteLine(string.Format("\t # Scan {0}", token));
         }
     }
 }

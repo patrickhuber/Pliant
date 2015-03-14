@@ -66,6 +66,7 @@
     <Compile Include="RangeTerminalTests.cs" />
     <Compile Include="ParserTests.cs" />
     <Compile Include="LexerTests.cs" />
+    <Compile Include="LexemeTests.cs" />
     <Compile Include="WhitespaceTerminalTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +74,9 @@
       <Project>{5c23805f-0ffc-4039-b853-e5acbe63a3c0}</Project>
       <Name>Pliant</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

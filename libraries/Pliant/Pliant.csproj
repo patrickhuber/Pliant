@@ -45,6 +45,7 @@
     <Compile Include="DigitTerminal.cs" />
     <Compile Include="Grammar.cs" />
     <Compile Include="GrammarBuilder.cs" />
+    <Compile Include="IDottedRule.cs" />
     <Compile Include="IGrammar.cs" />
     <Compile Include="IGrammarBuilder.cs" />
     <Compile Include="ILexemeBuilder.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="ITerminalBuilder.cs" />
     <Compile Include="IToken.cs" />
     <Compile Include="ITransitionState.cs" />
+    <Compile Include="Lexeme.cs" />
     <Compile Include="LexemeBuilder.cs" />
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="Lexer.cs" />
@@ -71,6 +73,7 @@
     <Compile Include="ProductionBuilder.cs" />
     <Compile Include="PulseRecognizer.cs" />
     <Compile Include="RangeTerminal.cs" />
+    <Compile Include="Repetition.cs" />
     <Compile Include="RuleBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadOnlyList.cs" />
