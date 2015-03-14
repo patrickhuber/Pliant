@@ -50,6 +50,7 @@
     <Compile Include="IGrammarBuilder.cs" />
     <Compile Include="ILexemeBuilder.cs" />
     <Compile Include="ICommandBuilder.cs" />
+    <Compile Include="ILexerRule.cs" />
     <Compile Include="INonTerminal.cs" />
     <Compile Include="IProduction.cs" />
     <Compile Include="IProductionBuilder.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="LexemeBuilder.cs" />
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="Lexer.cs" />
+    <Compile Include="LexerRule.cs" />
     <Compile Include="NonTerminal.cs" />
     <Compile Include="Observable.cs" />
     <Compile Include="Observer.cs" />

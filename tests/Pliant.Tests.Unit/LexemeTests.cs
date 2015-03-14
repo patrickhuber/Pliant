@@ -17,5 +17,17 @@ namespace Pliant.Tests.Unit
                 Assert.IsTrue(lexeme.Match(c));
             Assert.AreEqual(input, lexeme.Capture);
         }
+
+        [TestMethod]
+        public void Test_Lexeme_That_Consumes_Character_Sequence()
+        {
+            var letter = new NonTerminal("letter");
+            var terminal = new RangeTerminal('a', 'z');
+            var input = "thisisabunchofletters";
+            var lexeme = new Lexeme(letter, terminal, Repetition.OneOrMany);
+            foreach (var c in input)
+                Assert.IsTrue(lexeme.Match(c));
+            Assert.AreEqual(input, lexeme.Capture);
+        }
     }
 }
