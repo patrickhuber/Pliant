@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Pliant
 {
     /// <summary>
-    /// A Lexeme is something special. It is not a production.
+    /// A Lexeme is something special. It acts like a token and a mini parser.
     /// </summary>
     public class Lexeme
     {
