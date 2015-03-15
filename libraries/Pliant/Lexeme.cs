@@ -9,7 +9,7 @@ namespace Pliant
     /// <summary>
     /// A Lexeme is something special. It acts like a token and a mini parser.
     /// </summary>
-    public class Lexeme
+    public class Lexeme : ILexeme
     {
         private StringBuilder _catpure;
         private PulseRecognizer _recognizer;
@@ -22,7 +22,7 @@ namespace Pliant
                 
         public string Capture { get { return _catpure.ToString(); } }
         
-        public bool Match(char c)
+        public bool Scan(char c)
         {
             int originalChartSize = _recognizer.Chart.Count;
             _recognizer.Pulse(c);

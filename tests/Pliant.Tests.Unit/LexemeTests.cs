@@ -15,7 +15,7 @@ namespace Pliant.Tests.Unit
             var lexerRule = new LexerRule(whitespace, new[] { terminal }, Repetition.ZeroOrMany);
             var lexeme = new Lexeme(lexerRule);
             foreach (var c in input)
-                Assert.IsTrue(lexeme.Match(c));
+                Assert.IsTrue(lexeme.Scan(c));
             Assert.AreEqual(input, lexeme.Capture);
         }
 
@@ -28,7 +28,7 @@ namespace Pliant.Tests.Unit
             var lexerRule = new LexerRule(letter, new[]{ terminal }, Repetition.OneOrMany);
             var lexeme = new Lexeme(lexerRule);
             foreach (var c in input)
-                Assert.IsTrue(lexeme.Match(c));
+                Assert.IsTrue(lexeme.Scan(c));
             Assert.AreEqual(input, lexeme.Capture);
         }
     }
