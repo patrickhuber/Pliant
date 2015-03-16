@@ -68,7 +68,7 @@
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="LexerRule.cs" />
-    <Compile Include="MetaTerminal.cs" />
+    <Compile Include="SetTerminal.cs" />
     <Compile Include="NegationTerminal.cs" />
     <Compile Include="NonTerminal.cs" />
     <Compile Include="Observable.cs" />

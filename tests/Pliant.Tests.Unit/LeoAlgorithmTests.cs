@@ -23,37 +23,7 @@ namespace Pliant.Tests.Unit
             Assert.IsTrue(chart[3].Any(x => x.StateType == StateType.Transitive));
         }
 
-        [TestMethod]
-        public void Test_LeoAlgorithm_That_Quasi_Complete_Items_Create_Transition_Items()
-        {
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule("S", "W")
-                        .Rule("S", "L")
-                        .Lambda())
-                    .Production("W", r => r
-                        .Rule(new WhitespaceTerminal(), "W`"))
-                    .Production("W`", r => r
-                        .Rule(new WhitespaceTerminal(), "W`")
-                        .Lambda())
-                    .Production("L", r => r
-                        .Rule(new RangeTerminal('a', 'z'), "L`"))
-                    .Production("L`", r => r
-                        .Rule(new RangeTerminal('a', 'z'), "L`")
-                        .Lambda()))
-                .GetGrammar();
-            var input = "thisisonelonginputstring";
-            var recognizer = new PulseRecognizer(grammar);
-            foreach (var c in input)
-            {
-                recognizer.Pulse(c);
-            }
-            recognizer.Pulse((char)0);
-            Assert.IsTrue(recognizer.IsAccepted());
-            // when this count is < 10 we know that quasi complete items are being processed successfully
-            Assert.IsTrue(recognizer.Chart[23].Count < 10);
-        }
-
+        
         private Grammar CreateGrammar()
         {
             var grammarBuilder = new GrammarBuilder(

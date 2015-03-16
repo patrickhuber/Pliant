@@ -66,5 +66,30 @@ namespace Pliant.Tests.Unit
             }
             Assert.IsTrue(pulseRecognizer.IsAccepted());
         }
+
+        [TestMethod]
+        public void Test_PulseRecognizer_That_Ambiguous_Right_Recursive_Is_ReWritten()
+        {
+            var grammar = new GrammarBuilder("S", p => p
+                    .Production("S", r => r
+                        .Rule("S", "L")
+                        .Lambda())
+                    .Production("L", r => r
+                        .Rule(new RangeTerminal('a', 'z'), "L`"))
+                    .Production("L`", r => r
+                        .Rule(new RangeTerminal('a', 'z'), "L`")
+                        .Lambda()))
+                .GetGrammar();
+            var input = "thisisonelonginputstring";
+            var recognizer = new PulseRecognizer(grammar);
+            foreach (var c in input)
+            {
+                recognizer.Pulse(c);
+            }
+            recognizer.Pulse((char)0);
+            Assert.IsTrue(recognizer.IsAccepted());
+            // when this count is < 10 we know that quasi complete items are being processed successfully
+            Assert.IsTrue(recognizer.Chart[23].Count < 10);
+        }
     }
 }

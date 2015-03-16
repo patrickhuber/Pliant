@@ -162,7 +162,7 @@ namespace Pliant
                 if (sourceState != null)
                 {
                     var sourceStateNext = sourceState.NextState();
-                    if (sourceStateNext.IsComplete())
+                    if (IsQuasiComplete(sourceStateNext))
                     {
                         t_rule = sourceStateNext;
                         OptimizeReductionPathRecursive(sourceState.Production.LeftHandSide, sourceState.Origin, chart, ref t_rule);
@@ -179,6 +179,11 @@ namespace Pliant
                     }
                 }
             }
+        }
+
+        bool IsQuasiComplete(IState state)
+        {            
+            return state.IsComplete();
         }
 
         IState FindSourceState(IReadOnlyList<IState> list, ISymbol searchSymbol)

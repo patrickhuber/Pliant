@@ -11,10 +11,20 @@ namespace Pliant.Tests.Unit
     [TestClass]
     public class RegexTests
     {
-        IGrammar regexGrammar;
+        IGrammar _regexGrammar;
+        PulseRecognizer _pulseRecognizer;
+        
+        [TestInitialize]
+        public void Initialize_Regex_Tests()
+        {
+            _pulseRecognizer = new PulseRecognizer(_regexGrammar);
+        }
+
         public RegexTests()
         {
-            regexGrammar = new GrammarBuilder("Regex", p => p
+            var metaCharacterSet = new HashSet<char>(new[] { '.', '$', '^', '(', ')', '[', ']'});
+            var metaCharacterTerminal = new SetTerminal(metaCharacterSet);
+            _regexGrammar = new GrammarBuilder("Regex", p => p
                     .Production("Regex", r => r
                         .Rule("Union")
                         .Rule("SimpleRegex"))
@@ -46,8 +56,8 @@ namespace Pliant.Tests.Unit
                     .Production("EndOfString", r => r
                         .Rule('$'))
                     .Production("Character", r => r
-                        .Rule(new NegationTerminal(new MetaTerminal()))
-                        .Rule('\\', new MetaTerminal()))
+                        .Rule(new NegationTerminal(metaCharacterTerminal))
+                        .Rule('\\', metaCharacterTerminal))
                     .Production("Set", r => r
                         .Rule("PositiveSet")
                         .Rule("NegativeSet"))
@@ -93,8 +103,10 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_Regex_That_Parses_String_Literal()
         {
-            var input = "";
-            Assert.Fail();
+            var input = "abc";
+            foreach (var c in input)
+                _pulseRecognizer.Pulse(c);
+            Assert.IsTrue(_pulseRecognizer.IsAccepted());
         }
     }
 }
