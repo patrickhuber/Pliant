@@ -34,6 +34,13 @@ namespace Pliant
 
         public void Pulse(char token)
         {
+            // TODO:
+            // Update algorithm to follow these steps from :
+            // https://github.com/jeffreykegler/kollos/blob/master/notes/misc/leo2.md
+            // * you first perform all scans;
+            // * then all completions;
+            // * then all predictions;
+            // * and finally do post-processing, including eager computation of Leo items.
             for (int c = 0; c < Chart[Origin].Count; c++)
             {
                 var state = Chart[Origin][c];
