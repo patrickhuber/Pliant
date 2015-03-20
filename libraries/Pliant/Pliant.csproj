@@ -43,9 +43,11 @@
     <Compile Include="Assert.cs" />
     <Compile Include="Chart.cs" />
     <Compile Include="DigitTerminal.cs" />
+    <Compile Include="Earleme.cs" />
     <Compile Include="Grammar.cs" />
     <Compile Include="GrammarBuilder.cs" />
     <Compile Include="IDottedRule.cs" />
+    <Compile Include="IEarleme.cs" />
     <Compile Include="IGrammar.cs" />
     <Compile Include="IGrammarBuilder.cs" />
     <Compile Include="ILexeme.cs" />
@@ -68,6 +70,7 @@
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="Lexer.cs" />
     <Compile Include="LexerRule.cs" />
+    <Compile Include="ReadWriteList.cs" />
     <Compile Include="SetTerminal.cs" />
     <Compile Include="NegationTerminal.cs" />
     <Compile Include="NonTerminal.cs" />
@@ -85,6 +88,7 @@
     <Compile Include="Recognizer.cs" />
     <Compile Include="ScanState.cs" />
     <Compile Include="State.cs" />
+    <Compile Include="StateQueue.cs" />
     <Compile Include="StateType.cs" />
     <Compile Include="SymbolType.cs" />
     <Compile Include="Symbol.cs" />

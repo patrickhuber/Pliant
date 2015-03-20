@@ -98,9 +98,7 @@ namespace Pliant.Tests.Unit
             any         ->  '.'";
             var recognizer = new Recognizer(grammar);
             var stringReader = new StringReader(sampleBnf);
-            var chart = recognizer.Parse(stringReader);
-            Assert.IsNotNull(chart);
-            Assert.AreEqual(sampleBnf.Length, chart.Count);
+            Assert.IsTrue(recognizer.Recognize(stringReader));
         }
     }
 }

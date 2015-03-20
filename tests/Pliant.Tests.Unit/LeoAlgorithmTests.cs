@@ -36,43 +36,43 @@ namespace Pliant.Tests.Unit
 
         private Chart CreateChart(Grammar grammar)
         {            
-            var chart = new Chart(grammar);
+            var chart = new Chart();
 
             // === 0 ===
             // A -> . 'a' A (0)
             // A -> .       (0)
-            chart.EnqueueAt(0, new State(A_aA, 0, 0));
-            chart.EnqueueAt(0, new State(A_, 0, 0));
+            chart.Enqueue(0, new State(A_aA, 0, 0));
+            chart.Enqueue(0, new State(A_, 0, 0));
 
             // === 1 ===
             // A -> 'a' . A (0)
             // A -> . 'a' A (1)
             // A -> 'a' A . (0)
             // A -> .       (1)
-            chart.EnqueueAt(1, new State(A_aA, 1, 0));
-            chart.EnqueueAt(1, new State(A_aA, 0, 1));
-            chart.EnqueueAt(1, new State(A_aA, 2, 0));
-            chart.EnqueueAt(1, new State(A_, 0, 1));
+            chart.Enqueue(1, new State(A_aA, 1, 0));
+            chart.Enqueue(1, new State(A_aA, 0, 1));
+            chart.Enqueue(1, new State(A_aA, 2, 0));
+            chart.Enqueue(1, new State(A_, 0, 1));
 
             // === 2 === 
             // A -> 'a' . A  (1)
             // A -> . 'a' A  (2)
             // A -> 'a' A .  (1)
             // A -> .        (2)
-            chart.EnqueueAt(2, new State(A_aA, 1, 1));
-            chart.EnqueueAt(2, new State(A_aA, 0, 2));
-            chart.EnqueueAt(2, new State(A_aA, 2, 1));
-            chart.EnqueueAt(2, new State(A_, 0, 2));
+            chart.Enqueue(2, new State(A_aA, 1, 1));
+            chart.Enqueue(2, new State(A_aA, 0, 2));
+            chart.Enqueue(2, new State(A_aA, 2, 1));
+            chart.Enqueue(2, new State(A_, 0, 2));
 
             // === 3 === 
             // A -> 'a' . A  (2)
             // A -> . 'a' A  (3)
             // A -> 'a' A .  (2)
             // A -> .        (3)
-            chart.EnqueueAt(3, new State(A_aA, 1, 2));
-            chart.EnqueueAt(3, new State(A_aA, 0, 3));
-            chart.EnqueueAt(3, new State(A_aA, 2, 2));
-            chart.EnqueueAt(3, new State(A_, 0, 3));
+            chart.Enqueue(3, new State(A_aA, 1, 2));
+            chart.Enqueue(3, new State(A_aA, 0, 3));
+            chart.Enqueue(3, new State(A_aA, 2, 2));
+            chart.Enqueue(3, new State(A_, 0, 3));
             
             return chart;
         }

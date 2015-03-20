@@ -50,11 +50,11 @@ namespace Pliant.Tests.Unit
                         .Rule("L", new RangeTerminal('a', 'z'))
                         .Rule(new RangeTerminal('a','z'))))
                 .GetGrammar();
-            var chart = new Chart(grammar);
+            var chart = new Chart();
             var firstState = new State(grammar.Productions[0], 0, 1);
             var secondState = new State(grammar.Productions[0], 0, 1);
-            chart.EnqueueAt(0, firstState);
-            chart.EnqueueAt(0, secondState);
+            chart.Enqueue(0, firstState);
+            chart.Enqueue(0, secondState);
             Assert.AreEqual(1, chart[0].Count);
         }
     }

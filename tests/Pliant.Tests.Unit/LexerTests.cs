@@ -14,9 +14,9 @@ namespace Pliant.Tests.Unit
             //  S   ->  S L
             //  S   ->  <null>
             //  W   ->  W \s
-            //  W   ->  \s
+            //  W   ->  <null>
             //  L   ->  L [a-z]
-            //  L   ->  [a-z]
+            //  L   ->  <null>
             var grammar = new GrammarBuilder("S", p=>p
                     .Production("S", r=>r
                         .Rule("S", "W")
@@ -24,10 +24,10 @@ namespace Pliant.Tests.Unit
                         .Lambda())
                     .Production("W", r=>r
                         .Rule(new WhitespaceTerminal(), "W")
-                        .Lambda())
+                        .Rule(new WhitespaceTerminal()))
                     .Production("L", r=>r
                         .Rule(new RangeTerminal('a', 'z'), "L")
-                        .Lambda()))
+                        .Rule(new RangeTerminal('a', 'z'))))
                 .GetGrammar();
 
             var lexer = new Lexer(grammar);

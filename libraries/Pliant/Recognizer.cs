@@ -17,18 +17,17 @@ namespace Pliant
             _grammar = grammar;
         }
 
-        public Chart Parse(TextReader textReader)
+        public bool Recognize(TextReader textReader)
         {
             var pulseRecognizer = new PulseRecognizer(_grammar);
 
-            int origin = 0;
-            while(origin < pulseRecognizer.Chart.Count)
+            while(textReader.Peek() != -1)
             {
                 var token = (char)textReader.Read();
-                pulseRecognizer.Pulse(token);
-                origin++;                
+                if (!pulseRecognizer.Pulse(token))
+                    return false;
             }
-            return pulseRecognizer.Chart;
+            return pulseRecognizer.IsAccepted();
         }                
     }
 }
