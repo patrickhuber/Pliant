@@ -56,10 +56,10 @@ namespace Pliant.Tests.Unit
             var scanState = new State(expressionGrammar.Productions[5], 0, 0);
             var chart = recognizer.Chart;
             for (int i = 0; i < expressionGrammar.Productions.Count;i++)
-                chart.EnqueueAt(0, new State(expressionGrammar.Productions[i], 0, 0));
+                chart.Enqueue(0, new State(expressionGrammar.Productions[i], 0, 0));
             var j = 0;
             privateObject.Invoke("Scan", scanState, j, '2');
-            Assert.AreEqual(1, chart[1].Count);
+            Assert.AreEqual(1, chart.Earlemes[1].Completions.Count);
         }
 
         [TestMethod]
@@ -70,12 +70,12 @@ namespace Pliant.Tests.Unit
             var completeState = new State(expressionGrammar.Productions[5], 1, 0);
             var chart = recognizer.Chart;
             for (int i = 0; i < expressionGrammar.Productions.Count; i++)
-                chart.EnqueueAt(0, new State(expressionGrammar.Productions[i], 0, 0));
-            chart.EnqueueAt(1, completeState);
+                chart.Enqueue(0, new State(expressionGrammar.Productions[i], 0, 0));
+            chart.Enqueue(1, completeState);
             var k = 1;
             privateObject.Invoke("Complete", completeState, k);
             Assert.AreEqual(2, chart.Count);
-            Assert.AreEqual(2, chart[1].Count);
+            Assert.AreEqual(2, chart.Earlemes[1].Completions.Count);
         }
 
         [TestMethod]
@@ -83,10 +83,7 @@ namespace Pliant.Tests.Unit
         {            
             var recognizer = new Recognizer(abcGrammar);
             var stringReader = new StringReader("bc");
-            var chart = recognizer.Parse(stringReader);
-            Assert.IsNotNull(chart);
-            Assert.AreEqual(3, chart.Count);
-            Assert.IsTrue(IsRecognized(chart, "A"));
+            Assert.IsTrue(recognizer.Recognize(stringReader));
         }
 
         [TestMethod]
@@ -94,53 +91,7 @@ namespace Pliant.Tests.Unit
         {
             var recognizer = new Recognizer(expressionGrammar);
             var stringReader = new StringReader("2+3*4");
-            var chart = recognizer.Parse(stringReader);
-            Assert.IsNotNull(chart);
-            Assert.AreEqual(6, chart.Count);
-            Assert.IsTrue(IsRecognized(chart, "S"));
-        }
-
-        [TestMethod]
-        public void Test_Recognizer_That_Right_Recursion_Is_Not_O_N_3()
-        {
-            const string input = "aaaaa";
-            var grammar = simpleRightRecursive;
-            var recognizer = new Recognizer(grammar);
-            var stringReader = new StringReader(input);
-
-            var chart = recognizer.Parse(stringReader);
-            // -- 0 --
-            // A ->.a A		    (0)	 # Start
-            // A ->.			(0)	 # Start
-            //
-            // ...
-            // -- n --
-            // n	A -> a.A		(n-1)	 # Scan a
-            // n	A ->.a A		(n)	 # Predict
-            // n	A ->.			(n)	 # Predict
-            // n	A -> a A.		(n)	 # Predict
-            // n	A : A -> a A.	(0)	 # Transition
-            // n	A -> a A.		(0)	 # Complete
-            Assert.AreEqual(input.Length + 1, chart.Count);
-
-            var lastColumn = chart[input.Length];
-            Assert.IsNotNull(lastColumn);
-            Assert.AreEqual(6, lastColumn.Count);
-            Assert.IsTrue(IsRecognized(chart, "A"));
-        }
-        private bool IsRecognized(Chart chart, string startStateSymbol)
-        {
-            var lastColumn = chart[chart.Count - 1];
-            return lastColumn.Any(x => x.IsComplete() && x.Origin == 0 && x.Production.LeftHandSide.Value == startStateSymbol);
-        }
-
-        [TestMethod]
-        public void Test_Recognizer_That_Invalid_Input_Exists_Parse()
-        {
-            var recognizer = new Recognizer(expressionGrammar);
-            var chart = recognizer.Parse(new StringReader("1+b*3"));
-            Assert.IsNotNull(chart);
-            Assert.AreEqual(3, chart.Count);
+            Assert.IsTrue(recognizer.Recognize(stringReader));
         }
 
         [TestMethod]
@@ -153,11 +104,7 @@ namespace Pliant.Tests.Unit
                         .Rule('a')))
                 .GetGrammar();
             var recognizer = new Recognizer(grammar);
-            var chart = recognizer.Parse(new StringReader(input));
-            Assert.IsNotNull(chart);
-            Assert.AreEqual(input.Length + 1, chart.Count);
-            var lastColumn = chart[input.Length];
-            Assert.IsTrue(IsRecognized(chart, "S"));
+            Assert.IsTrue(recognizer.Recognize(new StringReader(input)));
         }
 
         [TestMethod]
@@ -172,9 +119,28 @@ namespace Pliant.Tests.Unit
                     .Ignore("whitespace"))
                 .GetGrammar();
             var recognizer = new Recognizer(grammar);
-            var chart = recognizer.Parse(new StringReader(input));
-            Assert.IsNotNull(chart);
-            Assert.IsTrue(chart.Count > 5);
+            Assert.IsTrue(recognizer.Recognize(new StringReader(input)));            
+        }
+
+        [TestMethod]
+        public void Test_PulseRecognizer_That_Invalid_Input_Exists_Parse()
+        {
+            var expressionGrammar = new GrammarBuilder(
+                "S", p => p
+                .Production("S", r => r
+                    .Rule("S", '+', "M")
+                    .Rule("M"))
+                .Production("M", r => r
+                    .Rule("M", '*', "T")
+                    .Rule("T"))
+                .Production("T", r => r
+                    .Rule('1')
+                    .Rule('2')
+                    .Rule('3')
+                    .Rule('4')))
+            .GetGrammar();
+            var recognizer = new Recognizer(expressionGrammar);
+            Assert.IsFalse(recognizer.Recognize(new StringReader("1+b*3")));
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Text;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.IO;
 
 namespace Pliant.Tests.Unit
 {
@@ -86,10 +87,48 @@ namespace Pliant.Tests.Unit
             {
                 recognizer.Pulse(c);
             }
-            recognizer.Pulse((char)0);
+            
             Assert.IsTrue(recognizer.IsAccepted());
             // when this count is < 10 we know that quasi complete items are being processed successfully
-            Assert.IsTrue(recognizer.Chart[23].Count < 10);
+            Assert.IsTrue(recognizer.Chart.Earlemes[23].Completions.Count < 10);
         }
+
+        [TestMethod]
+        public void Test_PulseRecognizer_That_Right_Recursion_Is_Not_O_N_3()
+        {
+            var grammar = new GrammarBuilder("A", p => p
+                .Production("A", r => r
+                    .Rule('a', "A")
+                    .Lambda()))
+            .GetGrammar();
+
+            const string input = "aaaaa";
+            var recognizer = new PulseRecognizer(grammar);
+            foreach (var c in input)
+                if (!recognizer.Pulse(c))
+                    break;
+            
+            Assert.IsTrue(recognizer.IsAccepted());
+            
+            var chart = recognizer.Chart;
+            // -- 0 --
+            // A ->.a A		    (0)	 # Start
+            // A ->.			(0)	 # Start
+            //
+            // ...
+            // -- n --
+            // n	A -> a.A		(n-1)	 # Scan a
+            // n	A ->.a A		(n)	 # Predict
+            // n	A ->.			(n)	 # Predict
+            // n	A -> a A.		(n)	 # Predict
+            // n	A : A -> a A.	(0)	 # Transition
+            // n	A -> a A.		(0)	 # Complete
+            Assert.AreEqual(input.Length + 1, chart.Count);
+            var lastEarleme = chart.Earlemes[chart.Earlemes.Count - 1];
+            Assert.AreEqual(3, lastEarleme.Completions.Count);
+            Assert.AreEqual(1, lastEarleme.Transitions.Count);
+            Assert.AreEqual(1, lastEarleme.Predictions.Count);
+            Assert.AreEqual(1, lastEarleme.Scans.Count);
+        }        
     }
 }

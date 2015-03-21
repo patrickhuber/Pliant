@@ -8,39 +8,26 @@ namespace Pliant
 {
     public class Chart
     {
-        private IGrammar _grammar;
-        private IDictionary<int, List<IState>> _body;
-        
-        public Chart(IGrammar grammar)
-        {
-            Assert.IsNotNull(grammar, "grammar");
-            _grammar = grammar;
-            _body = new Dictionary<int, List<IState>>();
-        }
+        private ReadWriteList<IEarleme> _earlemes;
 
-        public bool EnqueueAt(int index, IState state)
+        public Chart()
         {
-            if (!_body.ContainsKey(index))
-                _body.Add(index, new List<IState>());
-            var list = _body[index];
-            if (list.Any(x => x.Equals(state) 
-                && x.StateType == state.StateType))
-                return false;
-            list.Add(state);
-            return true;
+            _earlemes = new ReadWriteList<IEarleme>();
         }
         
-        public IReadOnlyList<IState> this[int index]
+        public bool Enqueue(int index, IState state)
         {
-            get
-            {
-                return new ReadOnlyList<IState>(_body[index]);
-            }
+            if (_earlemes.Count <= index)
+                _earlemes.Add(new Earleme());
+            var earleme = _earlemes[index];
+            return earleme.Enqueue(state);
         }
+        
+        public IReadOnlyList<IEarleme> Earlemes { get { return _earlemes; } }
 
         public int Count
         {
-            get { return _body.Count; }
+            get { return Earlemes.Count; }
         }
     }
 }

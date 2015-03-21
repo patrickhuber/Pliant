@@ -9,55 +9,97 @@ namespace Pliant
 {
     public class PulseRecognizer
     {
+        /// <summary>
+        /// The grammar used in the parse
+        /// </summary>
         public IGrammar Grammar { get; private set; }
+
+        /// <summary>
+        /// The state of the parse
+        /// </summary>
         public Chart Chart { get; private set; }
-        public int Origin { get; private set; }
+
+        /// <summary>
+        /// The current location within the parse
+        /// </summary>
+        public int Location { get; private set; }
 
         public PulseRecognizer(IGrammar grammar)
         {
             Grammar = grammar;
-            Chart = CreateChart();
+            Initialization();
         }
-
-        private Chart CreateChart()
+        
+        private void Initialization()
         {
-            var chart = new Chart(Grammar);
+            Location = 0;
+            Chart = new Chart();
             foreach (var startProduction in Grammar.StartProductions())
             {
                 var startState = new State(startProduction, 0, 0);
-                if (chart.EnqueueAt(0, startState))
-                    Log("Start", 0, startState);                
+                if (Chart.Enqueue(0, startState))
+                    Log("Start", 0, startState);
             }
-            return chart;
+
+            ReductionPass(Location);
         }
 
-
-        public void Pulse(char token)
+        public bool Pulse(char token)
         {
-            for (int c = 0; c < Chart[Origin].Count; c++)
+            ScanPass(Location, token);
+            
+            // Move to next earlmeme
+            Location++;
+
+            bool tokenNotRecognized = Chart.Earlemes.Count <= Location;
+            if (tokenNotRecognized)
+                return false;
+            
+            ReductionPass(Location);
+            
+            return true;
+        }
+        
+        private void ScanPass(int location, char token)
+        {
+            IEarleme earleme = Chart.Earlemes[location];
+            for (int s = 0; s < earleme.Scans.Count; s++)
             {
-                var state = Chart[Origin][c];
-                if (state.StateType == StateType.Transitive)
-                    continue;
-                if (!state.IsComplete())
+                var scanState = earleme.Scans[s];
+                Scan(scanState, location, token);
+            }
+        }
+
+        private void ReductionPass(int location)
+        {
+            IEarleme earleme = Chart.Earlemes[location];
+            var resume = true;
+
+            int p = 0;
+            int c = 0;
+            int t = 0;
+
+            while (resume)
+            {
+                if (c < earleme.Completions.Count)
                 {
-                    var currentSymbol = state.CurrentSymbol();
-                    if (currentSymbol.SymbolType == SymbolType.NonTerminal)
-                    {
-                        Predict(state, Origin);
-                    }
-                    else
-                    {
-                        Scan(state, Origin, token);
-                    }
+                    var completion = earleme.Completions[c];
+                    Complete(completion, location);
+                    c++;
+                }
+                else if (p < earleme.Predictions.Count)
+                {
+                    var prediction = earleme.Predictions[p];
+                    Predict(prediction, location);
+                    p++;
+                }
+                else if (t < earleme.Transitions.Count)
+                {
+                    t++;
                 }
                 else
-                {
-                    Complete(state, Origin);
-                }
+                    resume = false;
             }
-            
-            Origin++;
         }
 
         private void Predict(IState sourceState, int j)
@@ -72,14 +114,14 @@ namespace Pliant
         private void PredictProduction(IState sourceState, int j, IProduction production)
         {
             var state = new State(production, 0, j);
-            if (Chart.EnqueueAt(j, state))
+            if (Chart.Enqueue(j, state))
                 Log("Predict", j, state);
 
             var stateIsNullable = state.Production.RightHandSide.Count == 0;
             if (stateIsNullable)
             {
                 var aycockHorspoolState = new State(sourceState.Production, sourceState.Position + 1, j);
-                Chart.EnqueueAt(j, aycockHorspoolState);
+                Chart.Enqueue(j, aycockHorspoolState);
                 Log("Predict", j, aycockHorspoolState);
             }
         }
@@ -87,54 +129,44 @@ namespace Pliant
         private void Scan(IState scan, int j, char token)
         {
             int i = scan.Origin;
-            for (var s = 0; s < Chart[j].Count; s++)
+            var currentSymbol = scan.CurrentSymbol();
+            var terminal = currentSymbol as ITerminal;
+            if (terminal.IsMatch(token))
             {
-                var state = Chart[j][s];
-                if (state.StateType == StateType.Transitive)
-                    continue;
-                if (!state.IsComplete())
-                {
-                    var currentSymbol = state.CurrentSymbol();
-                    if (currentSymbol.SymbolType == SymbolType.Terminal)
-                    {
-                        var terminal = currentSymbol as ITerminal;
-                        if (terminal.IsMatch(token))
-                        {
-                            var scanState = new ScanState(
-                                state.Production,
-                                state.Position + 1,
-                                i,
-                                token);
-                            if (Chart.EnqueueAt(j + 1, scanState))
-                                LogScan(j + 1, scanState, token);
-                        }
-                    }
-                }
+                var scanState = new ScanState(
+                    scan.Production,
+                    scan.Position + 1,
+                    i,
+                    token);
+                if (Chart.Enqueue(j + 1, scanState))
+                    LogScan(j + 1, scanState, token);
             }
         }
         
         private void Complete(IState completed, int k)
         {
+            var earleme = Chart.Earlemes[k];
             var searchSymbol = completed.Production.LeftHandSide;
             OptimizeReductionPath(searchSymbol, k, Chart);
-            var transitiveState = FindTransitiveState(Chart[k], searchSymbol);
+            var transitiveState = FindTransitiveState(earleme, searchSymbol);
             if (transitiveState != null)
             {
                 var topmostItem = new State(transitiveState.Production, transitiveState.Position, transitiveState.Origin);
-                if (Chart.EnqueueAt(k, topmostItem))
+                if (Chart.Enqueue(k, topmostItem))
                     Log("Complete", k, topmostItem);
             }
             else
             {
                 int j = completed.Origin;
-                for (int s = 0; s < Chart[j].Count; s++)
+                var sourceEarleme = Chart.Earlemes[j];
+                for (int s = 0; s < sourceEarleme.Predictions.Count; s++)
                 {
-                    var state = Chart[j][s];
+                    var state = sourceEarleme.Predictions[s];
                     if (IsSourceState(completed.Production.LeftHandSide, state))
                     {
                         int i = state.Origin;
                         var nextState = new State(state.Production, state.Position + 1, i);
-                        if (Chart.EnqueueAt(k, nextState))
+                        if (Chart.Enqueue(k, nextState))
                             Log("Complete", k, nextState);
                     }
                 }
@@ -149,15 +181,15 @@ namespace Pliant
 
         private void OptimizeReductionPathRecursive(ISymbol searchSymbol, int k, Chart chart, ref IState t_rule)
         {
-            var list = chart[k];
-            var transitiveState = FindTransitiveState(list, searchSymbol);
+            var earleme = chart.Earlemes[k];
+            var transitiveState = FindTransitiveState(earleme, searchSymbol);
             if (transitiveState != null)
             {
                 t_rule = transitiveState;
             }
             else
             {
-                var sourceState = FindSourceState(list, searchSymbol);
+                var sourceState = FindSourceState(earleme, searchSymbol);
 
                 if (sourceState != null)
                 {
@@ -173,7 +205,7 @@ namespace Pliant
                                 t_rule.Production,
                                 t_rule.Production.RightHandSide.Count,
                                 t_rule.Origin);
-                            if (chart.EnqueueAt(k, transitionItem))
+                            if (chart.Enqueue(k, transitionItem))
                                 Log("Transition", k, transitionItem);
                         }
                     }
@@ -186,13 +218,13 @@ namespace Pliant
             return state.IsComplete();
         }
 
-        IState FindSourceState(IReadOnlyList<IState> list, ISymbol searchSymbol)
+        IState FindSourceState(IEarleme earleme, ISymbol searchSymbol)
         {
             var sourceItemCount = 0;
             IState sourceItem = null;
-            for (int s = 0; s < list.Count; s++)
+            for (int s = 0; s < earleme.Predictions.Count; s++)
             {
-                var state = list[s];
+                var state = earleme.Predictions[s];
                 if (IsSourceState(searchSymbol, state))
                 {
                     bool moreThanOneSourceItemExists = sourceItemCount > 0;
@@ -212,38 +244,31 @@ namespace Pliant
             return state.CurrentSymbol().Equals(searchSymbol);
         }
 
-        private IState FindTransitiveState(IReadOnlyList<IState> list, ISymbol searchSymbol)
+        private IState FindTransitiveState(IEarleme earleme, ISymbol searchSymbol)
         {
-            for (int s = 0; s < list.Count; s++)
+            for (int t = 0; t < earleme.Transitions.Count; t++)
             {
-                var state = list[s];
-                if (IsTransitiveState(searchSymbol, state))
-                    return state;
+                var transitionState = earleme.Transitions[t] as TransitionState;
+                if (transitionState.Recognized.Equals(searchSymbol))
+                    return transitionState;
             }
             return null;
         }
-
-        private bool IsTransitiveState(ISymbol searchSymbol, IState state)
-        {
-            if (state.StateType != StateType.Transitive)
-                return false;
-            var transitiveState = state as TransitionState;
-            return transitiveState.Recognized.Equals(searchSymbol);
-        }
-
+        
         public void Reset()
         {
-            Chart = new Chart(Grammar);
-            Origin = 0;
+            Initialization();
         }
 
         public bool IsAccepted()
         {
-            var lastColumn = Chart[Chart.Count - 1];
-            return lastColumn
-                .Any(x => x.IsComplete() 
-                    && x.Origin == 0 
-                    && x.Production.LeftHandSide.Value == Grammar.Start.Value);
+            var lastEarleme = Chart.Earlemes[Chart.Count - 1];
+            var startStateSymbol = Grammar.Start;
+            return lastEarleme
+                .Completions
+                .Any(x =>
+                    x.Origin == 0
+                    && x.Production.LeftHandSide.Value == startStateSymbol.Value);
         }
 
         private void Log(string operation, int origin, IState state)

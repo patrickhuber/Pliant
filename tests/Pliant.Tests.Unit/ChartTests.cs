@@ -43,19 +43,19 @@ namespace Pliant.Tests.Unit
         #endregion
 
         [TestMethod]
-        public void Test_Chart_That_EnqueueAt_Avoids_Duplicates()
+        public void Test_Chart_That_Enqueue_Avoids_Duplicates()
         {
             var grammar = new GrammarBuilder("L", p => p
                     .Production("L", r => r
                         .Rule("L", new RangeTerminal('a', 'z'))
                         .Rule(new RangeTerminal('a','z'))))
                 .GetGrammar();
-            var chart = new Chart(grammar);
+            var chart = new Chart();
             var firstState = new State(grammar.Productions[0], 0, 1);
             var secondState = new State(grammar.Productions[0], 0, 1);
-            chart.EnqueueAt(0, firstState);
-            chart.EnqueueAt(0, secondState);
-            Assert.AreEqual(1, chart[0].Count);
+            chart.Enqueue(0, firstState);
+            chart.Enqueue(0, secondState);
+            Assert.AreEqual(1, chart.Earlemes[0].Predictions.Count);
         }
     }
 }
