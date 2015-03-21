@@ -121,29 +121,17 @@ namespace Pliant
         private void Scan(IState scan, int j, char token)
         {
             int i = scan.Origin;
-            for (var s = 0; s < Chart[j].Count; s++)
+            var currentSymbol = scan.CurrentSymbol();
+            var terminal = currentSymbol as ITerminal;
+            if (terminal.IsMatch(token))
             {
-                var state = Chart[j][s];
-                if (state.StateType == StateType.Transitive)
-                    continue;
-                if (!state.IsComplete())
-                {
-                    var currentSymbol = state.CurrentSymbol();
-                    if (currentSymbol.SymbolType == SymbolType.Terminal)
-                    {
-                        var terminal = currentSymbol as ITerminal;
-                        if (terminal.IsMatch(token))
-                        {
-                            var scanState = new ScanState(
-                                state.Production,
-                                state.Position + 1,
-                                i,
-                                token);
-                            if (Chart.Enqueue(j + 1, scanState))
-                                LogScan(j + 1, scanState, token);
-                        }
-                    }
-                }
+                var scanState = new ScanState(
+                    scan.Production,
+                    scan.Position + 1,
+                    i,
+                    token);
+                if (Chart.Enqueue(j + 1, scanState))
+                    LogScan(j + 1, scanState, token);
             }
         }
         
