@@ -18,3 +18,4 @@ Pliant is a table driven parser that implements the Earley algorithm. Two optimi
 * [joop leo - optimizing right recursions](http://www.sciencedirect.com/science/article/pii/030439759190180A)
 * [parsing techniques - a practical guide](http://amzn.com/B0017AMLL8)
 * [practical earley parsing](http://webhome.cs.uvic.ca/~nigelh/Publications/PracticalEarleyParsing.pdf)
+* [detailed description of leo optimizations and internals of marpa](https://github.com/jeffreykegler/kollos/blob/master/notes/misc/leo2.md)
