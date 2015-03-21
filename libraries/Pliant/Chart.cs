@@ -38,19 +38,11 @@ namespace Pliant
             return earleme.Enqueue(state);
         }
         
-        public IReadOnlyList<IState> this[int index]
-        {
-            get
-            {
-                return new ReadOnlyList<IState>(_body[index]);
-            }
-        }
-
         public IList<IEarleme> Earlemes { get { return _earlemes; } }
 
         public int Count
         {
-            get { return _body.Count; }
+            get { return Earlemes.Count; }
         }
     }
 }

@@ -59,7 +59,7 @@ namespace Pliant.Tests.Unit
                 chart.Enqueue(0, new State(expressionGrammar.Productions[i], 0, 0));
             var j = 0;
             privateObject.Invoke("Scan", scanState, j, '2');
-            Assert.AreEqual(1, chart[1].Count);
+            Assert.AreEqual(1, chart.Earlemes[1].Completions.Count);
         }
 
         [TestMethod]
@@ -75,7 +75,7 @@ namespace Pliant.Tests.Unit
             var k = 1;
             privateObject.Invoke("Complete", completeState, k);
             Assert.AreEqual(2, chart.Count);
-            Assert.AreEqual(2, chart[1].Count);
+            Assert.AreEqual(2, chart.Earlemes[1].Completions.Count);
         }
 
         [TestMethod]
@@ -92,13 +92,6 @@ namespace Pliant.Tests.Unit
             var recognizer = new Recognizer(expressionGrammar);
             var stringReader = new StringReader("2+3*4");
             Assert.IsTrue(recognizer.Recognize(stringReader));
-        }
-
-        
-        private bool IsRecognized(Chart chart, string startStateSymbol)
-        {
-            var lastColumn = chart[chart.Count - 1];
-            return lastColumn.Any(x => x.IsComplete() && x.Origin == 0 && x.Production.LeftHandSide.Value == startStateSymbol);
         }
 
         [TestMethod]

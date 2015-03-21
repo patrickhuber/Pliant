@@ -9,8 +9,19 @@ namespace Pliant
 {
     public class PulseRecognizer
     {
+        /// <summary>
+        /// The grammar used in the parse
+        /// </summary>
         public IGrammar Grammar { get; private set; }
+
+        /// <summary>
+        /// The state of the parse
+        /// </summary>
         public Chart Chart { get; private set; }
+
+        /// <summary>
+        /// The current location within the parse
+        /// </summary>
         public int Location { get; private set; }
 
         public PulseRecognizer(IGrammar grammar)
@@ -30,15 +41,12 @@ namespace Pliant
                     Log("Start", 0, startState);
             }
 
-            Reduce();
+            ReductionPass(Location);
         }
 
         public bool Pulse(char token)
         {
-            // https://github.com/jeffreykegler/kollos/blob/master/notes/misc/leo2.md
-            var earleme = Chart.Earlemes[Location];
-            
-            RunScans(token);
+            ScanPass(Location, token);
             
             // Move to next earlmeme
             Location++;
@@ -47,24 +55,24 @@ namespace Pliant
             if (tokenNotRecognized)
                 return false;
             
-            Reduce();
+            ReductionPass(Location);
             
             return true;
         }
         
-        private void RunScans(char token)
+        private void ScanPass(int location, char token)
         {
-            IEarleme earleme = Chart.Earlemes[Location];
+            IEarleme earleme = Chart.Earlemes[location];
             for (int s = 0; s < earleme.Scans.Count; s++)
             {
                 var scanState = earleme.Scans[s];
-                Scan(scanState, Location, token);
+                Scan(scanState, location, token);
             }
         }
 
-        private void Reduce()
+        private void ReductionPass(int location)
         {
-            IEarleme earleme = Chart.Earlemes[Location];
+            IEarleme earleme = Chart.Earlemes[location];
             var resume = true;
 
             int p = 0;
@@ -76,13 +84,13 @@ namespace Pliant
                 if (c < earleme.Completions.Count)
                 {
                     var completion = earleme.Completions[c];
-                    Complete(completion, Location);
+                    Complete(completion, location);
                     c++;
                 }
                 else if (p < earleme.Predictions.Count)
                 {
                     var prediction = earleme.Predictions[p];
-                    Predict(prediction, Location);
+                    Predict(prediction, location);
                     p++;
                 }
                 else if (t < earleme.Transitions.Count)
@@ -150,9 +158,10 @@ namespace Pliant
             else
             {
                 int j = completed.Origin;
-                for (int s = 0; s < Chart[j].Count; s++)
+                var sourceEarleme = Chart.Earlemes[j];
+                for (int s = 0; s < sourceEarleme.Predictions.Count; s++)
                 {
-                    var state = Chart[j][s];
+                    var state = sourceEarleme.Predictions[s];
                     if (IsSourceState(completed.Production.LeftHandSide, state))
                     {
                         int i = state.Origin;
@@ -172,7 +181,6 @@ namespace Pliant
 
         private void OptimizeReductionPathRecursive(ISymbol searchSymbol, int k, Chart chart, ref IState t_rule)
         {
-            var list = chart[k];
             var earleme = chart.Earlemes[k];
             var transitiveState = FindTransitiveState(earleme, searchSymbol);
             if (transitiveState != null)
@@ -181,7 +189,7 @@ namespace Pliant
             }
             else
             {
-                var sourceState = FindSourceState(list, searchSymbol);
+                var sourceState = FindSourceState(earleme, searchSymbol);
 
                 if (sourceState != null)
                 {
@@ -210,13 +218,13 @@ namespace Pliant
             return state.IsComplete();
         }
 
-        IState FindSourceState(IReadOnlyList<IState> list, ISymbol searchSymbol)
+        IState FindSourceState(IEarleme earleme, ISymbol searchSymbol)
         {
             var sourceItemCount = 0;
             IState sourceItem = null;
-            for (int s = 0; s < list.Count; s++)
+            for (int s = 0; s < earleme.Predictions.Count; s++)
             {
-                var state = list[s];
+                var state = earleme.Predictions[s];
                 if (IsSourceState(searchSymbol, state))
                 {
                     bool moreThanOneSourceItemExists = sourceItemCount > 0;
@@ -254,11 +262,13 @@ namespace Pliant
 
         public bool IsAccepted()
         {
-            var lastColumn = Chart[Chart.Count - 1];
-            return lastColumn
-                .Any(x => x.IsComplete() 
-                    && x.Origin == 0 
-                    && x.Production.LeftHandSide.Value == Grammar.Start.Value);
+            var lastEarleme = Chart.Earlemes[Chart.Count - 1];
+            var startStateSymbol = Grammar.Start;
+            return lastEarleme
+                .Completions
+                .Any(x =>
+                    x.Origin == 0
+                    && x.Production.LeftHandSide.Value == startStateSymbol.Value);
         }
 
         private void Log(string operation, int origin, IState state)

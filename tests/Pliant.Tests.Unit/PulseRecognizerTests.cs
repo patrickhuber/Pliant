@@ -90,7 +90,7 @@ namespace Pliant.Tests.Unit
             
             Assert.IsTrue(recognizer.IsAccepted());
             // when this count is < 10 we know that quasi complete items are being processed successfully
-            Assert.IsTrue(recognizer.Chart[23].Count < 10);
+            Assert.IsTrue(recognizer.Chart.Earlemes[23].Completions.Count < 10);
         }
 
         [TestMethod]
@@ -124,9 +124,11 @@ namespace Pliant.Tests.Unit
             // n	A : A -> a A.	(0)	 # Transition
             // n	A -> a A.		(0)	 # Complete
             Assert.AreEqual(input.Length + 1, chart.Count);
-            var lastColumn = chart[input.Length];
-            Assert.IsNotNull(lastColumn);
-            Assert.AreEqual(6, lastColumn.Count);
+            var lastEarleme = chart.Earlemes[chart.Earlemes.Count - 1];
+            Assert.AreEqual(3, lastEarleme.Completions.Count);
+            Assert.AreEqual(1, lastEarleme.Transitions.Count);
+            Assert.AreEqual(1, lastEarleme.Predictions.Count);
+            Assert.AreEqual(1, lastEarleme.Scans.Count);
         }        
     }
 }

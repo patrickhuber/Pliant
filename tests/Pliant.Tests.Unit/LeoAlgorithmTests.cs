@@ -20,7 +20,7 @@ namespace Pliant.Tests.Unit
             var recognizer = new PulseRecognizer(grammar);
             var invoker = new PrivateObject(recognizer);
             invoker.Invoke("OptimizeReductionPath", completedState.Production.LeftHandSide, 3, chart);
-            Assert.IsTrue(chart[3].Any(x => x.StateType == StateType.Transitive));
+            Assert.IsTrue(chart.Earlemes[3].Transitions.Any());
         }
 
         
