@@ -107,8 +107,10 @@ namespace Pliant.Tests.Unit
             foreach (var c in input)
                 if (!recognizer.Pulse(c))
                     break;
+            
+            Assert.IsTrue(recognizer.IsAccepted());
+            
             var chart = recognizer.Chart;
-
             // -- 0 --
             // A ->.a A		    (0)	 # Start
             // A ->.			(0)	 # Start
@@ -122,14 +124,9 @@ namespace Pliant.Tests.Unit
             // n	A : A -> a A.	(0)	 # Transition
             // n	A -> a A.		(0)	 # Complete
             Assert.AreEqual(input.Length + 1, chart.Count);
-
             var lastColumn = chart[input.Length];
             Assert.IsNotNull(lastColumn);
             Assert.AreEqual(6, lastColumn.Count);
-            Assert.IsTrue(recognizer.IsAccepted());
-        }
-
-
-        
+        }        
     }
 }

@@ -30,8 +30,7 @@ namespace Pliant
                     Log("Start", 0, startState);
             }
 
-            RunCompletions();
-            RunPredictions();
+            Reduce();
         }
 
         public bool Pulse(char token)
@@ -48,15 +47,11 @@ namespace Pliant
             if (tokenNotRecognized)
                 return false;
             
-            earleme = Chart.Earlemes[Origin];
-
-            RunCompletions();
-            RunPredictions();
+            Reduce();
             
-            // RunTransitions(earleme);
             return true;
         }
-
+        
         private void RunScans(char token)
         {
             IEarleme earleme = Chart.Earlemes[Origin];
@@ -67,35 +62,38 @@ namespace Pliant
             }
         }
 
-        private void RunPredictions()
+        private void Reduce()
         {
             IEarleme earleme = Chart.Earlemes[Origin];
-            for (int p = 0; p < earleme.Predictions.Count; p++)
+            var resume = true;
+
+            int p = 0;
+            int c = 0;
+            int t = 0;
+
+            while (resume)
             {
-                var predictState = earleme.Predictions[p];
-                Predict(predictState, Origin);
+                if (c < earleme.Completions.Count)
+                {
+                    var completion = earleme.Completions[c];
+                    Complete(completion, Origin);
+                    c++;
+                }
+                else if (p < earleme.Predictions.Count)
+                {
+                    var prediction = earleme.Predictions[p];
+                    Predict(prediction, Origin);
+                    p++;
+                }
+                else if (t < earleme.Transitions.Count)
+                {
+                    t++;
+                }
+                else
+                    resume = false;
             }
         }
 
-        private void RunCompletions()
-        {
-            IEarleme earleme = Chart.Earlemes[Origin];
-            for (int c = 0; c < earleme.Completions.Count; c++)
-            {
-                var completeState = earleme.Completions[c];
-                Complete(completeState, Origin);
-            }
-        }
-        private void RunTransitions()
-        {
-            IEarleme earleme = Chart.Earlemes[Origin];
-            for (int t = 0; t < earleme.Transitions.Count; t++)
-            {
-                var transitionState = earleme.Transitions[t];
-                // TODO: find out what to do with transitions. may need to tear up Complete method
-            }
-        }
-        
         private void Predict(IState sourceState, int j)
         {
             var nonTerminal = sourceState.CurrentSymbol() as INonTerminal;
