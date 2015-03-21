@@ -11,7 +11,7 @@ namespace Pliant
     {
         public IGrammar Grammar { get; private set; }
         public Chart Chart { get; private set; }
-        public int Origin { get; private set; }
+        public int Location { get; private set; }
 
         public PulseRecognizer(IGrammar grammar)
         {
@@ -21,7 +21,7 @@ namespace Pliant
         
         private void Initialization()
         {
-            Origin = 0;
+            Location = 0;
             Chart = new Chart();
             foreach (var startProduction in Grammar.StartProductions())
             {
@@ -36,14 +36,14 @@ namespace Pliant
         public bool Pulse(char token)
         {
             // https://github.com/jeffreykegler/kollos/blob/master/notes/misc/leo2.md
-            var earleme = Chart.Earlemes[Origin];
+            var earleme = Chart.Earlemes[Location];
             
             RunScans(token);
             
             // Move to next earlmeme
-            Origin++;
+            Location++;
 
-            bool tokenNotRecognized = Chart.Earlemes.Count <= Origin;
+            bool tokenNotRecognized = Chart.Earlemes.Count <= Location;
             if (tokenNotRecognized)
                 return false;
             
@@ -54,17 +54,17 @@ namespace Pliant
         
         private void RunScans(char token)
         {
-            IEarleme earleme = Chart.Earlemes[Origin];
+            IEarleme earleme = Chart.Earlemes[Location];
             for (int s = 0; s < earleme.Scans.Count; s++)
             {
                 var scanState = earleme.Scans[s];
-                Scan(scanState, Origin, token);
+                Scan(scanState, Location, token);
             }
         }
 
         private void Reduce()
         {
-            IEarleme earleme = Chart.Earlemes[Origin];
+            IEarleme earleme = Chart.Earlemes[Location];
             var resume = true;
 
             int p = 0;
@@ -76,13 +76,13 @@ namespace Pliant
                 if (c < earleme.Completions.Count)
                 {
                     var completion = earleme.Completions[c];
-                    Complete(completion, Origin);
+                    Complete(completion, Location);
                     c++;
                 }
                 else if (p < earleme.Predictions.Count)
                 {
                     var prediction = earleme.Predictions[p];
-                    Predict(prediction, Origin);
+                    Predict(prediction, Location);
                     p++;
                 }
                 else if (t < earleme.Transitions.Count)
@@ -149,9 +149,10 @@ namespace Pliant
         
         private void Complete(IState completed, int k)
         {
+            var earleme = Chart.Earlemes[k];
             var searchSymbol = completed.Production.LeftHandSide;
             OptimizeReductionPath(searchSymbol, k, Chart);
-            var transitiveState = FindTransitiveState(Chart[k], searchSymbol);
+            var transitiveState = FindTransitiveState(earleme, searchSymbol);
             if (transitiveState != null)
             {
                 var topmostItem = new State(transitiveState.Production, transitiveState.Position, transitiveState.Origin);
@@ -184,7 +185,8 @@ namespace Pliant
         private void OptimizeReductionPathRecursive(ISymbol searchSymbol, int k, Chart chart, ref IState t_rule)
         {
             var list = chart[k];
-            var transitiveState = FindTransitiveState(list, searchSymbol);
+            var earleme = chart.Earlemes[k];
+            var transitiveState = FindTransitiveState(earleme, searchSymbol);
             if (transitiveState != null)
             {
                 t_rule = transitiveState;
@@ -246,25 +248,17 @@ namespace Pliant
             return state.CurrentSymbol().Equals(searchSymbol);
         }
 
-        private IState FindTransitiveState(IReadOnlyList<IState> list, ISymbol searchSymbol)
+        private IState FindTransitiveState(IEarleme earleme, ISymbol searchSymbol)
         {
-            for (int s = 0; s < list.Count; s++)
+            for (int t = 0; t < earleme.Transitions.Count; t++)
             {
-                var state = list[s];
-                if (IsTransitiveState(searchSymbol, state))
-                    return state;
+                var transitionState = earleme.Transitions[t] as TransitionState;
+                if (transitionState.Recognized.Equals(searchSymbol))
+                    return transitionState;
             }
             return null;
         }
-
-        private bool IsTransitiveState(ISymbol searchSymbol, IState state)
-        {
-            if (state.StateType != StateType.Transitive)
-                return false;
-            var transitiveState = state as TransitionState;
-            return transitiveState.Recognized.Equals(searchSymbol);
-        }
-
+        
         public void Reset()
         {
             Initialization();
