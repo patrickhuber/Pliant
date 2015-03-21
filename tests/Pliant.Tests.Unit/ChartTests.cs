@@ -43,7 +43,7 @@ namespace Pliant.Tests.Unit
         #endregion
 
         [TestMethod]
-        public void Test_Chart_That_EnqueueAt_Avoids_Duplicates()
+        public void Test_Chart_That_Enqueue_Avoids_Duplicates()
         {
             var grammar = new GrammarBuilder("L", p => p
                     .Production("L", r => r
