@@ -52,7 +52,7 @@ namespace Pliant
             if (tokenNotRecognized)
                 return false;  
 
-            // Move to next earlmeme
+            // Move to next earleme
             Location++;          
             
             ReductionPass(Location);
