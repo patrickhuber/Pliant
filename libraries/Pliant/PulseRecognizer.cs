@@ -47,13 +47,13 @@ namespace Pliant
         public bool Pulse(char token)
         {
             ScanPass(Location, token);
-            
-            // Move to next earlmeme
-            Location++;
 
-            bool tokenNotRecognized = Chart.Earlemes.Count <= Location;
+            bool tokenNotRecognized = Chart.Earlemes.Count <= Location + 1;
             if (tokenNotRecognized)
-                return false;
+                return false;  
+
+            // Move to next earleme
+            Location++;          
             
             ReductionPass(Location);
             
@@ -75,9 +75,8 @@ namespace Pliant
             IEarleme earleme = Chart.Earlemes[location];
             var resume = true;
 
-            int p = 0;
-            int c = 0;
-            int t = 0;
+            int p = 0, 
+                c = 0;
 
             while (resume)
             {
@@ -92,10 +91,6 @@ namespace Pliant
                     var prediction = earleme.Predictions[p];
                     Predict(prediction, location);
                     p++;
-                }
-                else if (t < earleme.Transitions.Count)
-                {
-                    t++;
                 }
                 else
                     resume = false;
@@ -151,7 +146,10 @@ namespace Pliant
             var transitiveState = FindTransitiveState(earleme, searchSymbol);
             if (transitiveState != null)
             {
-                var topmostItem = new State(transitiveState.Production, transitiveState.Position, transitiveState.Origin);
+                var topmostItem = new State(
+                    transitiveState.Production, 
+                    transitiveState.Position, 
+                    transitiveState.Origin);
                 if (Chart.Enqueue(k, topmostItem))
                     Log("Complete", k, topmostItem);
             }
@@ -159,9 +157,9 @@ namespace Pliant
             {
                 int j = completed.Origin;
                 var sourceEarleme = Chart.Earlemes[j];
-                for (int s = 0; s < sourceEarleme.Predictions.Count; s++)
+                for (int p = 0; p < sourceEarleme.Predictions.Count; p++)
                 {
-                    var state = sourceEarleme.Predictions[s];
+                    var state = sourceEarleme.Predictions[p];
                     if (IsSourceState(completed.Production.LeftHandSide, state))
                     {
                         int i = state.Origin;

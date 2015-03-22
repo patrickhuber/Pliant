@@ -58,13 +58,11 @@ namespace Pliant.Tests.Unit
             var pulseRecognizer = new PulseRecognizer(grammar);
 
             const string input = "\t\f\r\n ";
-            int i = 0;
-            while (i < pulseRecognizer.Chart.Count)
-            {
-                var c = i==input.Length ? (char)0 : input[i];
+            foreach(var c in input)
+            {                
                 pulseRecognizer.Pulse(c);
-                i++;
             }
+
             Assert.IsTrue(pulseRecognizer.IsAccepted());
         }
 
