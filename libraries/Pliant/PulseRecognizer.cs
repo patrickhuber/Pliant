@@ -95,18 +95,6 @@ namespace Pliant
                 else
                     resume = false;
             }
-            MemoizeTransitions(location);
-        }
-
-        private void MemoizeTransitions(int location)
-        {
-            var earleySet = Chart.EarleySets[location];
-            for (int c = 0; c < earleySet.Completions.Count; c++)
-            {
-                var completed = earleySet.Completions[c];
-                var searchSymbol = completed.Production.LeftHandSide;
-                OptimizeReductionPath(searchSymbol, location, Chart);
-            }
         }
 
         private void Predict(IState sourceState, int j)
