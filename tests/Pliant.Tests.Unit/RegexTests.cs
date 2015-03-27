@@ -11,9 +11,9 @@ namespace Pliant.Tests.Unit
     [TestClass]
     public class RegexTests
     {
-        IGrammar _regexGrammar;
         PulseRecognizer _pulseRecognizer;
-        
+        IGrammar _regexGrammar;
+
         [TestInitialize]
         public void Initialize_Regex_Tests()
         {
@@ -22,90 +22,144 @@ namespace Pliant.Tests.Unit
 
         public RegexTests()
         {
-            var metaCharacterSet = new HashSet<char>(new[] { '.', '$', '^', '(', ')', '[', ']'});
-            var metaCharacterTerminal = new SetTerminal(metaCharacterSet);
-            _regexGrammar = new GrammarBuilder("Regex", p => p
-                    .Production("Regex", r => r
-                        .Rule("Union")
-                        .Rule("SimpleRegex"))
-                    .Production("Union", r=>r
-                        .Rule("Regex", '|', "SimpleRegex"))
-                    .Production("SimpleRegex", r=>r
-                        .Rule("Concatenation")
-                        .Rule("BasicRegex"))
-                    .Production("Concatenation", r=>r
-                        .Rule("SimpleRegex", "BasicRegex"))
-                    .Production("BasicRegex", r => r
-                        .Rule("Star")
-                        .Rule("Plus")
-                        .Rule("ElementaryRegex"))
-                    .Production("Star", r => r
-                        .Rule("ElementaryRegex", '*'))
-                    .Production("Plus", r => r
-                        .Rule("ElementaryRegex", '+'))
-                    .Production("ElementaryRegex", r=>r
-                        .Rule("Group")
-                        .Rule("Any")
-                        .Rule("EndOfString")
-                        .Rule("Character")
-                        .Rule("Set"))
-                    .Production("Group", r => r
-                        .Rule('(', "Regex", ')'))
-                    .Production("Any", r => r
-                        .Rule('.'))
-                    .Production("EndOfString", r => r
-                        .Rule('$'))
-                    .Production("Character", r => r
-                        .Rule(new NegationTerminal(metaCharacterTerminal))
-                        .Rule('\\', metaCharacterTerminal))
-                    .Production("Set", r => r
-                        .Rule("PositiveSet")
-                        .Rule("NegativeSet"))
-                    .Production("PositiveSet", r => r
-                        .Rule('[', "SetItems", ']'))
-                    .Production("NegativeSet", r => r
-                        .Rule('[', '^', "SetItems", ']'))
-                    .Production("SetItems", r => r
-                        .Rule("SetItem")
-                        .Rule("SetItem", "SetItems"))
-                    .Production("SetItem", r => r
-                        .Rule("Range")
-                        .Rule("Character"))
-                    .Production("Range", r => r
-                        .Rule("Character", '-', "Character")))
-                .GetGrammar();
+            /*  Regex                      ->   Expression |   
+             *                                  '^' Expression | 
+             *                                  Expression '$' |
+             *                                  '^' Expression '$'
+             *              
+             *  Expresion                  ->   Term |   
+             *                                  Term '|' Expression
+             *              
+             *  Term                       ->   Factor |   
+             *                                  Factor Term
+             *             
+             *  Factor                     ->   Atom |   
+             *                                  Atom Iterator
+             *  
+             *  Atom                       ->   Char | 
+             *                                  '(' Expression ')' | 
+             *                                  Set
+             *  
+             *  Set                        ->   PositiveSet |
+             *                                  NegativeSet
+             *  
+             *  PositiveSet                ->   '[' CharacterSet ']'
+             *  
+             *  NegativeSet                ->   '[^' CharacterSet ']'
+             *  
+             *  CharacterClass             ->   CharacterRange |
+             *                                  CharacterRange CharacterClass
+             *  
+             *  CharacterRange             ->   CharacterClassCharacter |
+             *                                  CharacterClassCharacter '-' CharacterClassCharacter
+             *  
+             *  Character                  ->   NotMetaCharacter
+             *                                  '\' AnyCharacter
+             *                                  EscapeSequence
+             *                                  
+             *  CharacterClassCharacter    ->   NotCloseBracketCharacter | 
+             *                                  '\' AnyCharacter
+             */
+            const string Regex = "Regex";
+            const string Expression = "Expression";
+            const string Term = "Term";
+            const string Factor = "Factor";
+            const string Atom = "Atom";
+            const string Iterator = "Iterator";
+            const string Set = "Set";
+            const string PositiveSet = "PositiveSet";
+            const string NegativeSet = "NegativeSet";
+            const string CharacterClass = "CharacterClass";
+            const string Character = "Character";
+            const string CharacterRange = "CharacterRange";
+            const string CharacterClassCharacter = "CharacterClassCharacter";
+            const string NotCloseBracket = "NotCloseBracket";
+            const string NotMetaCharacter = "NotMetaCharacter";
+
+            var grammarBuilder = new GrammarBuilder(Regex, p => p
+                .Production(Regex, r => r
+                    .Rule(Expression)
+                    .Rule('^', Expression)
+                    .Rule(Expression, '$')
+                    .Rule('^', Expression, '$'))
+                .Production(Expression, r => r
+                    .Rule(Term)
+                    .Rule(Term, '|', Expression))
+                .Production(Term, r => r
+                    .Rule(Factor)
+                    .Rule(Factor, Term))
+                .Production(Factor, r => r
+                    .Rule(Atom)
+                    .Rule(Atom, Iterator))
+                .Production(Atom, r => r
+                    .Rule(Character)
+                    .Rule('(', Expression, ')')
+                    .Rule(Set))
+                .Production(Iterator, r => r
+                    .Rule(new SetTerminal('*', '+', '?')))
+                .Production(Set, r => r
+                    .Rule(PositiveSet)
+                    .Rule(NegativeSet))
+                .Production(PositiveSet, r => r
+                    .Rule('[', CharacterClass, ']'))
+                .Production(NegativeSet, r => r
+                    .Rule('[', '^', CharacterClass, ']'))
+                .Production(CharacterClass, r => r
+                    .Rule(CharacterRange)
+                    .Rule(CharacterRange, CharacterClass))
+                .Production(CharacterRange, r => r
+                    .Rule(CharacterClassCharacter)
+                    .Rule(CharacterClassCharacter, '-', CharacterClassCharacter))
+                .Production(Character, r => r
+                    .Rule(NotMetaCharacter)
+                    .Rule('\\', new AnyTerminal()))
+                .Production(CharacterClassCharacter, r => r
+                    .Rule(NotCloseBracket)
+                    .Rule('\\', new AnyTerminal()))
+                .Production(NotMetaCharacter, r => r
+                    .Rule(new NegationTerminal(new SetTerminal('.', '^', '$'))))
+                .Production(NotCloseBracket, r => r
+                    .Rule(new NegationTerminal(new Terminal(']')))));
+            _regexGrammar = grammarBuilder.GetGrammar();
         }
 
         public TestContext TestContext { get; set; }
-
-        #region Additional test attributes
-        //
-        // You can use the following additional attributes as you write your tests:
-        //
-        // Use ClassInitialize to run code before running the first test in the class
-        // [ClassInitialize()]
-        // public static void MyClassInitialize(TestContext testContext) { }
-        //
-        // Use ClassCleanup to run code after all tests in a class have run
-        // [ClassCleanup()]
-        // public static void MyClassCleanup() { }
-        //
-        // Use TestInitialize to run code before running each test 
-        // [TestInitialize()]
-        // public void MyTestInitialize() { }
-        //
-        // Use TestCleanup to run code after each test has run
-        // [TestCleanup()]
-        // public void MyTestCleanup() { }
-        //
-        #endregion
+        
+        [TestMethod]
+        public void Test_Regex_That_Parses_Single_Character()
+        {
+            var input = "a";
+            Recognize(input);
+        }
 
         [TestMethod]
         public void Test_Regex_That_Parses_String_Literal()
         {
             var input = "abc";
+            Recognize(input);
+        }
+
+        [TestMethod]
+        public void Test_Regex_That_Parses_Whitespace_Character_Class()
+        {
+            var input = @"[\s]+";
+            Recognize(input);
+        }
+
+        [TestMethod]
+        public void Test_Regex_That_Parses_Range_Character_Class()
+        {
+            var input = @"[a-z]";
+            Recognize(input);
+        }
+
+        private void Recognize(string input)
+        {
             foreach (var c in input)
-                _pulseRecognizer.Pulse(c);
+                Assert.IsTrue(_pulseRecognizer.Pulse(c),
+                    string.Format("Line 0, Column {1} : Invalid Character '{0}'",
+                        c,
+                        _pulseRecognizer.Location));
             Assert.IsTrue(_pulseRecognizer.IsAccepted());
         }
     }
