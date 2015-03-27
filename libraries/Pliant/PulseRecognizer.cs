@@ -154,6 +154,7 @@ namespace Pliant
         {
             var earleySet = Chart.EarleySets[k];
             var searchSymbol = completed.Production.LeftHandSide;
+            OptimizeReductionPath(searchSymbol, k, Chart);
             var transitiveState = FindTransitiveState(earleySet, searchSymbol);
             if (transitiveState != null)
             {
