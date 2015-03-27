@@ -48,11 +48,11 @@ namespace Pliant
         {
             ScanPass(Location, token);
 
-            bool tokenNotRecognized = Chart.Earlemes.Count <= Location + 1;
+            bool tokenNotRecognized = Chart.EarleySets.Count <= Location + 1;
             if (tokenNotRecognized)
                 return false;  
 
-            // Move to next earleme
+            // Move to next earleySet
             Location++;          
             
             ReductionPass(Location);
@@ -62,17 +62,17 @@ namespace Pliant
         
         private void ScanPass(int location, char token)
         {
-            IEarleme earleme = Chart.Earlemes[location];
-            for (int s = 0; s < earleme.Scans.Count; s++)
+            IEarleySet earleySet = Chart.EarleySets[location];
+            for (int s = 0; s < earleySet.Scans.Count; s++)
             {
-                var scanState = earleme.Scans[s];
+                var scanState = earleySet.Scans[s];
                 Scan(scanState, location, token);
             }
         }
 
         private void ReductionPass(int location)
         {
-            IEarleme earleme = Chart.Earlemes[location];
+            IEarleySet earleySet = Chart.EarleySets[location];
             var resume = true;
 
             int p = 0, 
@@ -80,20 +80,32 @@ namespace Pliant
 
             while (resume)
             {
-                if (c < earleme.Completions.Count)
+                if (c < earleySet.Completions.Count)
                 {
-                    var completion = earleme.Completions[c];
+                    var completion = earleySet.Completions[c];
                     Complete(completion, location);
                     c++;
                 }
-                else if (p < earleme.Predictions.Count)
+                else if (p < earleySet.Predictions.Count)
                 {
-                    var prediction = earleme.Predictions[p];
+                    var prediction = earleySet.Predictions[p];
                     Predict(prediction, location);
                     p++;
                 }
                 else
                     resume = false;
+            }
+            MemoizeTransitions(location);
+        }
+
+        private void MemoizeTransitions(int location)
+        {
+            var earleySet = Chart.EarleySets[location];
+            for (int c = 0; c < earleySet.Completions.Count; c++)
+            {
+                var completed = earleySet.Completions[c];
+                var searchSymbol = completed.Production.LeftHandSide;
+                OptimizeReductionPath(searchSymbol, location, Chart);
             }
         }
 
@@ -140,10 +152,9 @@ namespace Pliant
         
         private void Complete(IState completed, int k)
         {
-            var earleme = Chart.Earlemes[k];
+            var earleySet = Chart.EarleySets[k];
             var searchSymbol = completed.Production.LeftHandSide;
-            OptimizeReductionPath(searchSymbol, k, Chart);
-            var transitiveState = FindTransitiveState(earleme, searchSymbol);
+            var transitiveState = FindTransitiveState(earleySet, searchSymbol);
             if (transitiveState != null)
             {
                 var topmostItem = new State(
@@ -156,10 +167,10 @@ namespace Pliant
             else
             {
                 int j = completed.Origin;
-                var sourceEarleme = Chart.Earlemes[j];
-                for (int p = 0; p < sourceEarleme.Predictions.Count; p++)
+                var sourceEarleySet = Chart.EarleySets[j];
+                for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
                 {
-                    var state = sourceEarleme.Predictions[p];
+                    var state = sourceEarleySet.Predictions[p];
                     if (IsSourceState(completed.Production.LeftHandSide, state))
                     {
                         int i = state.Origin;
@@ -179,15 +190,15 @@ namespace Pliant
 
         private void OptimizeReductionPathRecursive(ISymbol searchSymbol, int k, Chart chart, ref IState t_rule)
         {
-            var earleme = chart.Earlemes[k];
-            var transitiveState = FindTransitiveState(earleme, searchSymbol);
+            var earleySet = chart.EarleySets[k];
+            var transitiveState = FindTransitiveState(earleySet, searchSymbol);
             if (transitiveState != null)
             {
                 t_rule = transitiveState;
             }
             else
             {
-                var sourceState = FindSourceState(earleme, searchSymbol);
+                var sourceState = FindSourceState(earleySet, searchSymbol);
 
                 if (sourceState != null)
                 {
@@ -216,13 +227,13 @@ namespace Pliant
             return state.IsComplete();
         }
 
-        IState FindSourceState(IEarleme earleme, ISymbol searchSymbol)
+        IState FindSourceState(IEarleySet earleySet, ISymbol searchSymbol)
         {
             var sourceItemCount = 0;
             IState sourceItem = null;
-            for (int s = 0; s < earleme.Predictions.Count; s++)
+            for (int s = 0; s < earleySet.Predictions.Count; s++)
             {
-                var state = earleme.Predictions[s];
+                var state = earleySet.Predictions[s];
                 if (IsSourceState(searchSymbol, state))
                 {
                     bool moreThanOneSourceItemExists = sourceItemCount > 0;
@@ -242,11 +253,11 @@ namespace Pliant
             return state.CurrentSymbol().Equals(searchSymbol);
         }
 
-        private IState FindTransitiveState(IEarleme earleme, ISymbol searchSymbol)
+        private IState FindTransitiveState(IEarleySet earleySet, ISymbol searchSymbol)
         {
-            for (int t = 0; t < earleme.Transitions.Count; t++)
+            for (int t = 0; t < earleySet.Transitions.Count; t++)
             {
-                var transitionState = earleme.Transitions[t] as TransitionState;
+                var transitionState = earleySet.Transitions[t] as TransitionState;
                 if (transitionState.Recognized.Equals(searchSymbol))
                     return transitionState;
             }
@@ -260,9 +271,9 @@ namespace Pliant
 
         public bool IsAccepted()
         {
-            var lastEarleme = Chart.Earlemes[Chart.Count - 1];
+            var lastEarleySet = Chart.EarleySets[Chart.Count - 1];
             var startStateSymbol = Grammar.Start;
-            return lastEarleme
+            return lastEarleySet
                 .Completions
                 .Any(x =>
                     x.Origin == 0

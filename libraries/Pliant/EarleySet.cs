@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Pliant
 {
-    public class Earleme : IEarleme
+    public class EarleySet : IEarleySet
     {
         private StateQueue _predictions;
         private StateQueue _scans;
         private StateQueue _completions;
         private StateQueue _transitions;
 
-        public Earleme()
+        public EarleySet()
         {
             _predictions = new StateQueue();
             _scans = new StateQueue();

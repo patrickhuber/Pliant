@@ -8,26 +8,26 @@ namespace Pliant
 {
     public class Chart
     {
-        private ReadWriteList<IEarleme> _earlemes;
+        private ReadWriteList<IEarleySet> _earleySets;
 
         public Chart()
         {
-            _earlemes = new ReadWriteList<IEarleme>();
+            _earleySets = new ReadWriteList<IEarleySet>();
         }
         
         public bool Enqueue(int index, IState state)
         {
-            if (_earlemes.Count <= index)
-                _earlemes.Add(new Earleme());
-            var earleme = _earlemes[index];
-            return earleme.Enqueue(state);
+            if (_earleySets.Count <= index)
+                _earleySets.Add(new EarleySet());
+            var earleySet = _earleySets[index];
+            return earleySet.Enqueue(state);
         }
         
-        public IReadOnlyList<IEarleme> Earlemes { get { return _earlemes; } }
+        public IReadOnlyList<IEarleySet> EarleySets { get { return _earleySets; } }
 
         public int Count
         {
-            get { return Earlemes.Count; }
+            get { return EarleySets.Count; }
         }
     }
 }

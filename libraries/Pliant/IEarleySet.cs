@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pliant
 {
-    public interface IEarleme
+    public interface IEarleySet
     {
         IReadOnlyList<IState> Predictions { get; }
         IReadOnlyList<IState> Scans { get; }

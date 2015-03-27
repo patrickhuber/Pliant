@@ -59,7 +59,7 @@ namespace Pliant.Tests.Unit
                 chart.Enqueue(0, new State(expressionGrammar.Productions[i], 0, 0));
             var j = 0;
             privateObject.Invoke("Scan", scanState, j, '2');
-            Assert.AreEqual(1, chart.Earlemes[1].Completions.Count);
+            Assert.AreEqual(1, chart.EarleySets[1].Completions.Count);
         }
 
         [TestMethod]
@@ -75,7 +75,7 @@ namespace Pliant.Tests.Unit
             var k = 1;
             privateObject.Invoke("Complete", completeState, k);
             Assert.AreEqual(2, chart.Count);
-            Assert.AreEqual(2, chart.Earlemes[1].Completions.Count);
+            Assert.AreEqual(2, chart.EarleySets[1].Completions.Count);
         }
 
         [TestMethod]
