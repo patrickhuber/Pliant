@@ -92,6 +92,7 @@ namespace Pliant.Tests.Unit
                     .Rule(Atom)
                     .Rule(Atom, Iterator))
                 .Production(Atom, r => r
+                    .Rule('.')
                     .Rule(Character)
                     .Rule('(', Expression, ')')
                     .Rule(Set))
@@ -124,7 +125,7 @@ namespace Pliant.Tests.Unit
         }
 
         public TestContext TestContext { get; set; }
-        
+
         [TestMethod]
         public void Test_Regex_That_Parses_Single_Character()
         {
@@ -150,6 +151,13 @@ namespace Pliant.Tests.Unit
         public void Test_Regex_That_Parses_Range_Character_Class()
         {
             var input = @"[a-z]";
+            Recognize(input);
+        }
+
+        [TestMethod]
+        public void Test_Regex_That_Parses_Any_Character_Class()
+        {
+            var input = @".*";
             Recognize(input);
         }
 
