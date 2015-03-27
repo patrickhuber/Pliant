@@ -10,6 +10,11 @@ namespace Pliant
     {
         ISet<char> _characterSet;
 
+        public SetTerminal(params char[] characters)
+            : this(new HashSet<char>(characters))
+        {            
+        }
+
         public SetTerminal(ISet<char> characterSet)
         {
             _characterSet = characterSet;

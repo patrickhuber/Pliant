@@ -43,11 +43,11 @@
     <Compile Include="Assert.cs" />
     <Compile Include="Chart.cs" />
     <Compile Include="DigitTerminal.cs" />
-    <Compile Include="Earleme.cs" />
+    <Compile Include="EarleySet.cs" />
     <Compile Include="Grammar.cs" />
     <Compile Include="GrammarBuilder.cs" />
     <Compile Include="IDottedRule.cs" />
-    <Compile Include="IEarleme.cs" />
+    <Compile Include="IEarleySet.cs" />
     <Compile Include="IGrammar.cs" />
     <Compile Include="IGrammarBuilder.cs" />
     <Compile Include="ILexeme.cs" />

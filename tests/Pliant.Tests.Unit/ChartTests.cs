@@ -55,7 +55,7 @@ namespace Pliant.Tests.Unit
             var secondState = new State(grammar.Productions[0], 0, 1);
             chart.Enqueue(0, firstState);
             chart.Enqueue(0, secondState);
-            Assert.AreEqual(1, chart.Earlemes[0].Predictions.Count);
+            Assert.AreEqual(1, chart.EarleySets[0].Predictions.Count);
         }
     }
 }
