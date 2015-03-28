@@ -110,6 +110,7 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_Recognizer_That_Whitespace_Is_Ignored()
         {
+            // a <word boundary> abc <word boundary> a <word boundary> a
             const string input = "a abc a a";
             var grammar = new GrammarBuilder("A", p => p
                     .Production("A", r => r

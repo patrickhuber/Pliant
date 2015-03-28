@@ -22,106 +22,7 @@ namespace Pliant.Tests.Unit
 
         public RegexTests()
         {
-            /*  Regex                      ->   Expression |   
-             *                                  '^' Expression | 
-             *                                  Expression '$' |
-             *                                  '^' Expression '$'
-             *              
-             *  Expresion                  ->   Term |   
-             *                                  Term '|' Expression
-             *              
-             *  Term                       ->   Factor |   
-             *                                  Factor Term
-             *             
-             *  Factor                     ->   Atom |   
-             *                                  Atom Iterator
-             *  
-             *  Atom                       ->   Char | 
-             *                                  '(' Expression ')' | 
-             *                                  Set
-             *  
-             *  Set                        ->   PositiveSet |
-             *                                  NegativeSet
-             *  
-             *  PositiveSet                ->   '[' CharacterSet ']'
-             *  
-             *  NegativeSet                ->   '[^' CharacterSet ']'
-             *  
-             *  CharacterClass             ->   CharacterRange |
-             *                                  CharacterRange CharacterClass
-             *  
-             *  CharacterRange             ->   CharacterClassCharacter |
-             *                                  CharacterClassCharacter '-' CharacterClassCharacter
-             *  
-             *  Character                  ->   NotMetaCharacter
-             *                                  '\' AnyCharacter
-             *                                  EscapeSequence
-             *                                  
-             *  CharacterClassCharacter    ->   NotCloseBracketCharacter | 
-             *                                  '\' AnyCharacter
-             */
-            const string Regex = "Regex";
-            const string Expression = "Expression";
-            const string Term = "Term";
-            const string Factor = "Factor";
-            const string Atom = "Atom";
-            const string Iterator = "Iterator";
-            const string Set = "Set";
-            const string PositiveSet = "PositiveSet";
-            const string NegativeSet = "NegativeSet";
-            const string CharacterClass = "CharacterClass";
-            const string Character = "Character";
-            const string CharacterRange = "CharacterRange";
-            const string CharacterClassCharacter = "CharacterClassCharacter";
-            const string NotCloseBracket = "NotCloseBracket";
-            const string NotMetaCharacter = "NotMetaCharacter";
-
-            var grammarBuilder = new GrammarBuilder(Regex, p => p
-                .Production(Regex, r => r
-                    .Rule(Expression)
-                    .Rule('^', Expression)
-                    .Rule(Expression, '$')
-                    .Rule('^', Expression, '$'))
-                .Production(Expression, r => r
-                    .Rule(Term)
-                    .Rule(Term, '|', Expression))
-                .Production(Term, r => r
-                    .Rule(Factor)
-                    .Rule(Factor, Term))
-                .Production(Factor, r => r
-                    .Rule(Atom)
-                    .Rule(Atom, Iterator))
-                .Production(Atom, r => r
-                    .Rule('.')
-                    .Rule(Character)
-                    .Rule('(', Expression, ')')
-                    .Rule(Set))
-                .Production(Iterator, r => r
-                    .Rule(new SetTerminal('*', '+', '?')))
-                .Production(Set, r => r
-                    .Rule(PositiveSet)
-                    .Rule(NegativeSet))
-                .Production(PositiveSet, r => r
-                    .Rule('[', CharacterClass, ']'))
-                .Production(NegativeSet, r => r
-                    .Rule('[', '^', CharacterClass, ']'))
-                .Production(CharacterClass, r => r
-                    .Rule(CharacterRange)
-                    .Rule(CharacterRange, CharacterClass))
-                .Production(CharacterRange, r => r
-                    .Rule(CharacterClassCharacter)
-                    .Rule(CharacterClassCharacter, '-', CharacterClassCharacter))
-                .Production(Character, r => r
-                    .Rule(NotMetaCharacter)
-                    .Rule('\\', new AnyTerminal()))
-                .Production(CharacterClassCharacter, r => r
-                    .Rule(NotCloseBracket)
-                    .Rule('\\', new AnyTerminal()))
-                .Production(NotMetaCharacter, r => r
-                    .Rule(new NegationTerminal(new SetTerminal('.', '^', '$'))))
-                .Production(NotCloseBracket, r => r
-                    .Rule(new NegationTerminal(new Terminal(']')))));
-            _regexGrammar = grammarBuilder.GetGrammar();
+            _regexGrammar = new RegexGrammar();            
         }
 
         public TestContext TestContext { get; set; }
@@ -161,6 +62,45 @@ namespace Pliant.Tests.Unit
             Recognize(input);
         }
 
+        [TestMethod]
+        public void Test_Regex_That_Fails_On_MisMatched_Parenthesis()
+        {
+            var input = "(a";
+            Assert.IsTrue(_pulseRecognizer.Pulse(input[0]));
+            Assert.IsTrue(_pulseRecognizer.Pulse(input[1]));
+            Assert.IsFalse(_pulseRecognizer.IsAccepted());
+        }
+
+        [TestMethod]
+        public void Test_Regex_That_Fails_On_MisMatched_Brackets()
+        {
+            var input = "[abc";
+            foreach (var c in input)
+                Assert.IsTrue(_pulseRecognizer.Pulse(c));
+            Assert.IsFalse(_pulseRecognizer.IsAccepted());
+        }
+
+        [TestMethod]
+        public void Test_Regex_That_Parses_Empty_Group()
+        {
+            var input = "()";
+            Recognize(input);
+        }
+
+        [TestMethod]
+        public void Test_Regex_That_Parses_Empty_String()
+        {
+            var input = "";
+            Recognize(input);
+        }
+
+        [TestMethod]
+        public void Test_Regex_That_Parses_Negative_Character_Class()
+        {
+            var input = "[^abc]";
+            Recognize(input);
+        }
+
         private void Recognize(string input)
         {
             foreach (var c in input)
@@ -168,7 +108,7 @@ namespace Pliant.Tests.Unit
                     string.Format("Line 0, Column {1} : Invalid Character '{0}'",
                         c,
                         _pulseRecognizer.Location));
-            Assert.IsTrue(_pulseRecognizer.IsAccepted());
+            Assert.IsTrue(_pulseRecognizer.IsAccepted(), "input is not recognized.");
         }
     }
 }
