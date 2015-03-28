@@ -88,6 +88,13 @@ namespace Pliant
                 return null;
             return new State(Production, Position + 1, Origin);
         }
+
+        public IState NextState(int newOrigin)
+        {
+            if (IsComplete())
+                return null;
+            return new State(Production, Position + 1, newOrigin);
+        }
         
         public bool IsSource(ISymbol searchSymbol)
         {
@@ -95,5 +102,7 @@ namespace Pliant
                 return false;
             return CurrentSymbol().Equals(searchSymbol);
         }
+
+        public IDottedRule DottedRule { get; private set; }
     }
 }

@@ -115,7 +115,7 @@ namespace Pliant
             var stateIsNullable = state.Production.RightHandSide.Count == 0;
             if (stateIsNullable)
             {
-                var aycockHorspoolState = new State(sourceState.Production, sourceState.Position + 1, j);
+                var aycockHorspoolState = sourceState.NextState(j);
                 Chart.Enqueue(j, aycockHorspoolState);
                 Log("Predict", j, aycockHorspoolState);
             }

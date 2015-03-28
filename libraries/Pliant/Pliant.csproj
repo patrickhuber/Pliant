@@ -43,6 +43,7 @@
     <Compile Include="Assert.cs" />
     <Compile Include="Chart.cs" />
     <Compile Include="DigitTerminal.cs" />
+    <Compile Include="DottedRule.cs" />
     <Compile Include="EarleySet.cs" />
     <Compile Include="Grammar.cs" />
     <Compile Include="GrammarBuilder.cs" />

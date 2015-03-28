@@ -10,5 +10,7 @@ namespace Pliant
         bool IsComplete();
         StateType StateType { get; }
         IState NextState();
+        IState NextState(int newOrigin);
+        IDottedRule DottedRule { get; }
     }
 }

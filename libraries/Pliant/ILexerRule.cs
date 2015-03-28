@@ -8,6 +8,7 @@ namespace Pliant
 {
     public interface ILexerRule
     {
+        bool Greedy { get; }
         IGrammar Grammar { get; }
     }
 }
