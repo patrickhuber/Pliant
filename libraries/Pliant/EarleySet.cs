@@ -31,9 +31,9 @@ namespace Pliant
         
         public bool Enqueue(IState state)
         {
-            if (!state.IsComplete())
+            if (!state.DottedRule.IsComplete)
             {
-                var currentSymbol = state.CurrentSymbol();
+                var currentSymbol = state.DottedRule.Symbol;
                 if (currentSymbol.SymbolType == SymbolType.NonTerminal)
                     return _predictions.Enqueue(state);
                 else

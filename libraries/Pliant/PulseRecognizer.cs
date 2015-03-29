@@ -99,7 +99,7 @@ namespace Pliant
 
         private void Predict(IState sourceState, int j)
         {
-            var nonTerminal = sourceState.CurrentSymbol() as INonTerminal;
+            var nonTerminal = sourceState.DottedRule.Symbol as INonTerminal;
             foreach (var production in Grammar.RulesFor(nonTerminal))
             {
                 PredictProduction(sourceState, j, production);
@@ -124,14 +124,12 @@ namespace Pliant
         private void Scan(IState scan, int j, char token)
         {
             int i = scan.Origin;
-            var currentSymbol = scan.CurrentSymbol();
+            var currentSymbol = scan.DottedRule.Symbol;
             var terminal = currentSymbol as ITerminal;
             if (terminal.IsMatch(token))
             {
                 var scanState = new ScanState(
-                    scan.Production,
-                    scan.Position + 1,
-                    i,
+                    scan.NextState(),
                     token);
                 if (Chart.Enqueue(j + 1, scanState))
                     LogScan(j + 1, scanState, token);
@@ -148,7 +146,7 @@ namespace Pliant
             {
                 var topmostItem = new State(
                     transitiveState.Production, 
-                    transitiveState.Position, 
+                    transitiveState.DottedRule.Position, 
                     transitiveState.Origin);
                 if (Chart.Enqueue(k, topmostItem))
                     Log("Complete", k, topmostItem);
@@ -163,7 +161,7 @@ namespace Pliant
                     if (IsSourceState(completed.Production.LeftHandSide, state))
                     {
                         int i = state.Origin;
-                        var nextState = new State(state.Production, state.Position + 1, i);
+                        var nextState = state.NextState();
                         if (Chart.Enqueue(k, nextState))
                             Log("Complete", k, nextState);
                     }
@@ -212,8 +210,8 @@ namespace Pliant
         }
 
         bool IsQuasiComplete(IState state)
-        {            
-            return state.IsComplete();
+        {
+            return state.DottedRule.IsComplete;
         }
 
         IState FindSourceState(IEarleySet earleySet, ISymbol searchSymbol)
@@ -237,9 +235,9 @@ namespace Pliant
 
         private bool IsSourceState(ISymbol searchSymbol, IState state)
         {
-            if (state.IsComplete())
+            if (state.DottedRule.IsComplete)
                 return false;
-            return state.CurrentSymbol().Equals(searchSymbol);
+            return state.DottedRule.Symbol.Equals(searchSymbol);
         }
 
         private IState FindTransitiveState(IEarleySet earleySet, ISymbol searchSymbol)

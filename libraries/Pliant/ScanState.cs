@@ -14,6 +14,13 @@ namespace Pliant
             Capture = capture;
         }
 
+        public ScanState(IState state, char character)
+            : this(state.Production, 
+            state.DottedRule.Position, 
+            state.Origin, 
+            character)
+        { }
+
         public char Capture { get; private set; }
     }
 }

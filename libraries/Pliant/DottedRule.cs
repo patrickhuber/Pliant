@@ -50,5 +50,14 @@ namespace Pliant
                 return hash;
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            var dottedRule = obj as DottedRule;
+            if(dottedRule == null)
+                return false;
+            return _production.Equals(dottedRule._production)
+                && Position == dottedRule.Position;
+        }
     }
 }
