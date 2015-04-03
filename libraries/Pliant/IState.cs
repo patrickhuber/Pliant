@@ -9,5 +9,6 @@ namespace Pliant
         IState NextState();
         IState NextState(int newOrigin);
         IDottedRule DottedRule { get; }
+        IState Parent { get; }
     }
 }

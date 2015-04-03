@@ -9,6 +9,7 @@ namespace Pliant
     public enum SymbolType
     {
         Terminal,
-        NonTerminal
+        NonTerminal,
+        LexerRule
     }
 }

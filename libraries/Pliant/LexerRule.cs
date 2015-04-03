@@ -11,10 +11,16 @@ namespace Pliant
         public IGrammar Grammar { get; private set; }
         public bool Greedy { get; private set; }
 
-        public LexerRule(IGrammar grammar, bool greedy = true)
+        public LexerRule(INonTerminal leftHandSide, IGrammar grammar, bool greedy = true)
         {
             Greedy = greedy;
             Grammar = grammar;
         }
+
+        public SymbolType SymbolType
+        {
+            get { return SymbolType.LexerRule; }
+        }
+
     }
 }

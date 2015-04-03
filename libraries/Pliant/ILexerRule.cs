@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pliant
 {
-    public interface ILexerRule
+    public interface ILexerRule : ISymbol
     {
         bool Greedy { get; }
         IGrammar Grammar { get; }

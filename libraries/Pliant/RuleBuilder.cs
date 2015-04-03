@@ -30,6 +30,10 @@ namespace Pliant
                     {
                         symbolList.Add(symbol as ITerminal);
                     }
+                    else if (symbol is ILexerRule)
+                    {
+                        symbolList.Add(symbol as ILexerRule);
+                    }
                     else if (symbol is string)
                     {
                         var nonTerminal = new NonTerminal(symbol as string);

@@ -32,7 +32,7 @@ namespace Pliant
                 throw new ArgumentOutOfRangeException(propertyName, message);
         }
 
-        internal static void IsGreaterThanZero(int integer, string paramterName)
+        internal static void IsGreaterThanEqualToZero(int integer, string paramterName)
         {
             if (integer < 0)
                 throw new ArgumentOutOfRangeException(

@@ -16,6 +16,11 @@ namespace Pliant
             Recognized = recognized;
         }
 
+        public TransitionState(ISymbol recognized, IState state)
+            : this(recognized, state.Production, state.DottedRule.Position, state.Origin)
+        { 
+        }
+        
         public override bool Equals(object obj)
         {
             var transitionState = obj as TransitionState;

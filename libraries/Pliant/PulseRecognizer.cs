@@ -126,6 +126,7 @@ namespace Pliant
             int i = scan.Origin;
             var currentSymbol = scan.DottedRule.Symbol;
             var terminal = currentSymbol as ITerminal;
+            
             if (terminal.IsMatch(token))
             {
                 var scanState = new ScanState(
@@ -182,31 +183,33 @@ namespace Pliant
             if (transitiveState != null)
             {
                 t_rule = transitiveState;
+                return;
             }
-            else
-            {
-                var sourceState = FindSourceState(earleySet, searchSymbol);
 
-                if (sourceState != null)
-                {
-                    var sourceStateNext = sourceState.NextState();
-                    if (IsQuasiComplete(sourceStateNext))
-                    {
-                        t_rule = sourceStateNext;
-                        OptimizeReductionPathRecursive(sourceState.Production.LeftHandSide, sourceState.Origin, chart, ref t_rule);
-                        if (t_rule != null)
-                        {
-                            var transitionItem = new TransitionState(
-                                searchSymbol,
-                                t_rule.Production,
-                                t_rule.Production.RightHandSide.Count,
-                                t_rule.Origin);
-                            if (chart.Enqueue(k, transitionItem))
-                                Log("Transition", k, transitionItem);
-                        }
-                    }
-                }
-            }
+            var sourceState = FindSourceState(earleySet, searchSymbol);
+            if (sourceState == null)
+                return;
+
+            var sourceStateNext = sourceState.NextState();
+            if (!IsQuasiComplete(sourceStateNext))
+                return;
+
+            t_rule = sourceStateNext;
+            OptimizeReductionPathRecursive(
+                sourceState.Production.LeftHandSide, 
+                sourceState.Origin, 
+                chart, 
+                ref t_rule);
+            
+            if (t_rule == null)
+                return;
+            
+            var transitionItem = new TransitionState(
+                searchSymbol,
+                t_rule);
+            
+            if (chart.Enqueue(k, transitionItem))
+                Log("Transition", k, transitionItem);            
         }
 
         bool IsQuasiComplete(IState state)

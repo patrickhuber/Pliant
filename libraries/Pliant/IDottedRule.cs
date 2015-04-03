@@ -11,6 +11,7 @@ namespace Pliant
         int Position { get; }
         ISymbol Symbol { get; }
         bool IsComplete { get; }
+        bool HasMoreTransitions { get; }
         IDottedRule NextRule();
     }
 }

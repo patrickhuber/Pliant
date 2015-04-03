@@ -10,13 +10,13 @@ namespace Pliant
     {
         private IProduction _production;
 
+        public int Position { get; private set; }
+
         public DottedRule(IProduction production, int position)
         {
             Position = position;
             _production = production;
         }
-
-        public int Position { get; private set; }
 
         public ISymbol Symbol
         {
@@ -31,6 +31,11 @@ namespace Pliant
         public bool IsComplete
         {
             get { return Position == _production.RightHandSide.Count; }
+        }
+
+        public bool HasMoreTransitions
+        {
+            get { return !IsComplete; }
         }
 
         public IDottedRule NextRule()
