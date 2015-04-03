@@ -8,52 +8,39 @@ namespace Pliant
 {
     public class State : IState
     {
-        private int _count = -1;
-
         public IProduction Production { get; private set; }
-        
-        public int Position { get; private set; }
-        
-        public int Origin { get; private set; }
 
+        public int Origin { get; private set; }
+        
+        public IDottedRule DottedRule { get; private set; }
+        
+        public virtual StateType StateType { get { return StateType.Normal; } }
+
+        public IState Parent { get; private set; }
+        
         public State(IProduction production, int position, int origin)
         {
             Assert.IsNotNull(production, "production");
-            Assert.IsGreaterThanZero(position, "position");
-            Assert.IsGreaterThanZero(origin, "origin");
+            Assert.IsGreaterThanEqualToZero(position, "position");
+            Assert.IsGreaterThanEqualToZero(origin, "origin");
             Production = production;
-            Position = position;
             Origin = origin;
+            DottedRule = new DottedRule(production, position);
         }
-
-        public bool IsComplete()
-        {
-            // cache the count because productions are immutable
-            if (_count < 0)
-                _count = Production.RightHandSide.Count();
-            return _count <= Position;
-        }
-
-        public ISymbol CurrentSymbol()
-        {
-            if (IsComplete())
-                return null;
-            return Production.RightHandSide[Position];
-        }
-        
+                        
         public override bool Equals(object obj)
         {
             var state = obj as State;
             if (state == null)
                 return false;
-            return Position == state.Position
+            return DottedRule.Position == state.DottedRule.Position
                 && Origin == state.Origin
                 && Production.Equals(state.Production);
         }
 
         public override int GetHashCode()
         {
-            return Position.GetHashCode()
+            return DottedRule.Position.GetHashCode()
                 ^ Origin.GetHashCode()
                 ^ Production.GetHashCode();
         }
@@ -62,38 +49,48 @@ namespace Pliant
         {
             var stringBuilder = new StringBuilder()
                 .AppendFormat("{0} ->", Production.LeftHandSide.Value);
-            
-            int p = 0;
-            for (p=0; p < Production.RightHandSide.Count; p++)
-            {       
+            const string Dot = "\u25CF";
+
+            for (int p = 0; p < Production.RightHandSide.Count; p++)
+            {
                 stringBuilder.AppendFormat(
                     "{0}{1}",
-                    p == Position ? "\u25CF" : " ", 
+                    p == DottedRule.Position ? Dot : " ",
                     Production.RightHandSide[p]);
             }
             
-            if (Position == Production.RightHandSide.Count)
-                stringBuilder.Append("\u25CF");
+            if (DottedRule.Position == Production.RightHandSide.Count)
+                stringBuilder.Append(Dot);
 
             stringBuilder.AppendFormat("\t\t({0})", Origin);
             return stringBuilder.ToString();
         }
-
-        public virtual StateType StateType { get { return StateType.Normal; } }
-
-
+        
         public IState NextState()
         {
-            if (IsComplete())
+            if (DottedRule.IsComplete)
                 return null;
-            return new State(Production, Position + 1, Origin);
+            return new State(
+                Production, 
+                DottedRule.Position + 1, 
+                Origin);
+        }
+
+        public IState NextState(int newOrigin)
+        {
+            if (DottedRule.IsComplete)
+                return null;
+            return new State(
+                Production, 
+                DottedRule.Position + 1, 
+                newOrigin);
         }
         
         public bool IsSource(ISymbol searchSymbol)
         {
-            if (IsComplete())
+            if (DottedRule.IsComplete)
                 return false;
-            return CurrentSymbol().Equals(searchSymbol);
+            return DottedRule.Symbol.Equals(searchSymbol);
         }
     }
 }

@@ -21,10 +21,7 @@ namespace Pliant.Tests.Unit
                     .Rule("M", '*', "T")
                     .Rule("T"))
                 .Production("T", r=>r
-                    .Rule('1')
-                    .Rule('2')
-                    .Rule('3')
-                    .Rule('4')))
+                    .Rule(new DigitTerminal())))
             .GetGrammar();
 
         // A -> B C
@@ -53,7 +50,7 @@ namespace Pliant.Tests.Unit
         {
             var recognizer = new PulseRecognizer(expressionGrammar);
             var privateObject = new PrivateObject(recognizer);
-            var scanState = new State(expressionGrammar.Productions[5], 0, 0);
+            var scanState = new State(expressionGrammar.Productions[4], 0, 0);
             var chart = recognizer.Chart;
             for (int i = 0; i < expressionGrammar.Productions.Count;i++)
                 chart.Enqueue(0, new State(expressionGrammar.Productions[i], 0, 0));
@@ -67,7 +64,7 @@ namespace Pliant.Tests.Unit
         {
             var recognizer = new PulseRecognizer(expressionGrammar);
             var privateObject = new PrivateObject(recognizer);
-            var completeState = new State(expressionGrammar.Productions[5], 1, 0);
+            var completeState = new State(expressionGrammar.Productions[4], 1, 0);
             var chart = recognizer.Chart;
             for (int i = 0; i < expressionGrammar.Productions.Count; i++)
                 chart.Enqueue(0, new State(expressionGrammar.Productions[i], 0, 0));
@@ -110,6 +107,7 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_Recognizer_That_Whitespace_Is_Ignored()
         {
+            // a <word boundary> abc <word boundary> a <word boundary> a
             const string input = "a abc a a";
             var grammar = new GrammarBuilder("A", p => p
                     .Production("A", r => r

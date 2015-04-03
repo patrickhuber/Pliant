@@ -127,6 +127,6 @@ namespace Pliant.Tests.Unit
             Assert.AreEqual(1, lastEarleySet.Transitions.Count);
             Assert.AreEqual(1, lastEarleySet.Predictions.Count);
             Assert.AreEqual(1, lastEarleySet.Scans.Count);
-        }        
+        }
     }
 }

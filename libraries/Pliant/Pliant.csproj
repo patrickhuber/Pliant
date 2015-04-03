@@ -43,6 +43,7 @@
     <Compile Include="Assert.cs" />
     <Compile Include="Chart.cs" />
     <Compile Include="DigitTerminal.cs" />
+    <Compile Include="DottedRule.cs" />
     <Compile Include="EarleySet.cs" />
     <Compile Include="Grammar.cs" />
     <Compile Include="GrammarBuilder.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Lexer.cs" />
     <Compile Include="LexerRule.cs" />
     <Compile Include="ReadWriteList.cs" />
+    <Compile Include="RegexGrammar.cs" />
     <Compile Include="SetTerminal.cs" />
     <Compile Include="NegationTerminal.cs" />
     <Compile Include="NonTerminal.cs" />
