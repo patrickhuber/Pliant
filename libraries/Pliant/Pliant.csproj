@@ -56,6 +56,7 @@
     <Compile Include="ICommandBuilder.cs" />
     <Compile Include="ILexerRule.cs" />
     <Compile Include="INonTerminal.cs" />
+    <Compile Include="INullable.cs" />
     <Compile Include="IProduction.cs" />
     <Compile Include="IProductionBuilder.cs" />
     <Compile Include="IReadOnlyList.cs" />
