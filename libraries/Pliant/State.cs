@@ -16,7 +16,7 @@ namespace Pliant
         
         public virtual StateType StateType { get { return StateType.Normal; } }
 
-        public IState Parent { get; private set; }
+        public INode ParseNode { get; set; }
         
         public State(IProduction production, int position, int origin)
         {
@@ -26,6 +26,12 @@ namespace Pliant
             Production = production;
             Origin = origin;
             DottedRule = new DottedRule(production, position);
+        }
+
+        public State(IProduction production, int position, int origin, INode parseNode)
+            : this(production, position, origin)
+        {
+            ParseNode = parseNode;
         }
                         
         public override bool Equals(object obj)
@@ -68,29 +74,40 @@ namespace Pliant
         
         public IState NextState()
         {
-            if (DottedRule.IsComplete)
-                return null;
-            return new State(
-                Production, 
-                DottedRule.Position + 1, 
-                Origin);
+            return NextState(null as IInternalNode);
         }
 
-        public IState NextState(int newOrigin)
+        public IState NextState(INode node)
         {
             if (DottedRule.IsComplete)
                 return null;
             return new State(
-                Production, 
-                DottedRule.Position + 1, 
-                newOrigin);
+                Production,
+                DottedRule.Position + 1,
+                Origin,
+                node);
+        }
+
+        public IState NextState(int newOrigin)
+        {
+            return NextState(newOrigin, null);
+        }
+
+        public IState NextState(int newOrigin, INode parseNode)
+        {
+            if (DottedRule.IsComplete)
+                return null;
+            return new State(
+                Production,
+                DottedRule.Position + 1,
+                newOrigin); 
         }
         
         public bool IsSource(ISymbol searchSymbol)
         {
             if (DottedRule.IsComplete)
                 return false;
-            return DottedRule.Symbol.Equals(searchSymbol);
+            return DottedRule.PostDotSymbol.Value.Equals(searchSymbol);
         }
     }
 }

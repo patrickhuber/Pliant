@@ -13,5 +13,6 @@ namespace Pliant
         IReadOnlyList<IState> Completions { get; }
         IReadOnlyList<IState> Transitions { get; }
         bool Enqueue(IState state);
+        int Location { get; }
     }
 }

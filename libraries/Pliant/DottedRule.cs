@@ -9,13 +9,17 @@ namespace Pliant
     public class DottedRule : IDottedRule
     {
         private IProduction _production;
-
+        
         public int Position { get; private set; }
+        public INullable<ISymbol> PostDotSymbol { get; private set; }
+        public INullable<ISymbol> PreDotSymbol { get; private set; }
 
         public DottedRule(IProduction production, int position)
         {
             Position = position;
             _production = production;
+            PostDotSymbol = new NullablePostDotWrapper(this);
+            PreDotSymbol = new NullablePreDotWrapper(this);
         }
 
         public ISymbol Symbol
@@ -63,6 +67,59 @@ namespace Pliant
                 return false;
             return _production.Equals(dottedRule._production)
                 && Position == dottedRule.Position;
+        }
+
+        private class NullablePostDotWrapper : INullable<ISymbol>
+        {
+            private DottedRule _dottedRule;
+
+            public NullablePostDotWrapper(DottedRule dottedRule)
+            {
+                _dottedRule = dottedRule;
+            }
+
+            public ISymbol Value
+            {
+                get 
+                {
+                    if (!HasValue)
+                        return null;
+                    var production = _dottedRule._production;
+                    return production.RightHandSide[_dottedRule.Position];
+                }
+            }
+
+            public bool HasValue
+            {
+                get { return _dottedRule.Position < _dottedRule._production.RightHandSide.Count;}
+            }
+        }
+
+        private class NullablePreDotWrapper : INullable<ISymbol>
+        {
+            private DottedRule _dottedRule;
+                        
+            public NullablePreDotWrapper(DottedRule dottedRule)
+            {
+                _dottedRule = dottedRule;
+            }
+
+            public ISymbol Value
+            {
+                get 
+                {
+                    if (!HasValue)
+                        return null;
+                    var production = _dottedRule._production;
+                    var position = _dottedRule.Position;
+                    return production.RightHandSide[position - 1];
+                }
+            }
+
+            public bool HasValue
+            {
+                get { return _dottedRule.Position > 0 && !_dottedRule._production.IsEmpty; }
+            }
         }
     }
 }

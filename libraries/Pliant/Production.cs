@@ -14,6 +14,8 @@ namespace Pliant
 
         public IReadOnlyList<ISymbol> RightHandSide { get { return _rightHandSide; } }
 
+        public bool IsEmpty { get { return _rightHandSide.Count == 0; } }
+
         public Production(INonTerminal leftHandSide, params ISymbol[] rightHandSide)
         {
             Assert.IsNotNull(leftHandSide, "leftHandSide");

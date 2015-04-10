@@ -12,25 +12,34 @@ namespace Pliant
         
         public IReadOnlyList<IProduction> Lexemes { get; private set; }
 
+        private IDictionary<INonTerminal, IList<IProduction>> _productionIndex;
+
         public Grammar(INonTerminal start, IProduction[] productions, IProduction[] lexemes, INonTerminal[] ignore)
         {
             Assert.IsNotNullOrEmpty(productions, "productions");
             Assert.IsNotNull(start, "start");
+            CreateProductionIndex(productions);
             Productions = new ReadOnlyList<IProduction>(productions);
             Lexemes = new ReadOnlyList<IProduction>(lexemes);
             Ignores = new ReadOnlyList<INonTerminal>(ignore);
             Start = start; 
         }
 
-        public IEnumerable<IProduction> RulesFor(INonTerminal symbol)
+        private void CreateProductionIndex(IEnumerable<IProduction> productions)
         {
-            foreach (var production in Productions)
+            _productionIndex = new Dictionary<INonTerminal, IList<IProduction>>();
+            foreach (var production in productions)
             {
                 var leftHandSide = production.LeftHandSide;
-                if (leftHandSide.SymbolType == symbol.SymbolType
-                    && leftHandSide.Value.Equals(symbol.Value))
-                    yield return production;
+                if (!_productionIndex.ContainsKey(leftHandSide))
+                    _productionIndex.Add(leftHandSide, new List<IProduction>());
+                _productionIndex[leftHandSide].Add(production);
             }
+        }
+
+        public IEnumerable<IProduction> RulesFor(INonTerminal symbol)
+        {
+            return _productionIndex[symbol];
         }
 
         public IEnumerable<IProduction> LexemesFor(INonTerminal symbol)

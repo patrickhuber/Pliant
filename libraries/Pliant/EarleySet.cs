@@ -13,12 +13,13 @@ namespace Pliant
         private StateQueue _completions;
         private StateQueue _transitions;
 
-        public EarleySet()
+        public EarleySet(int location)
         {
             _predictions = new StateQueue();
             _scans = new StateQueue();
             _completions = new StateQueue();
             _transitions = new StateQueue();
+            Location = location;
         }
 
         public IReadOnlyList<IState> Predictions { get { return _predictions; } }
@@ -33,7 +34,7 @@ namespace Pliant
         {
             if (!state.DottedRule.IsComplete)
             {
-                var currentSymbol = state.DottedRule.Symbol;
+                var currentSymbol = state.DottedRule.PostDotSymbol.Value;
                 if (currentSymbol.SymbolType == SymbolType.NonTerminal)
                     return _predictions.Enqueue(state);
                 else
@@ -44,5 +45,7 @@ namespace Pliant
 
             return _completions.Enqueue(state);  
         }
+        
+        public int Location { get; private set; }
     }
 }
