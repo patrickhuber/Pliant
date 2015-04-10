@@ -31,7 +31,7 @@ namespace Pliant
             return _pulseRecognizer.IsAccepted();
         }
 
-        public void Parse()
+        public INode ParseTree()
         { 
             // thompson construction
             if (!IsAccepted())
@@ -40,7 +40,7 @@ namespace Pliant
             var lastSet = chart.EarleySets[chart.Count - 1];
             var start = _pulseRecognizer.Grammar.Start;
             var completed = lastSet.Completions.First(x => x.Production.LeftHandSide.Equals(start));
-            
+            return completed.ParseNode;
         }
 
         private static IGrammar OneOrMany(INonTerminal identifier, ITerminal[] terminals)

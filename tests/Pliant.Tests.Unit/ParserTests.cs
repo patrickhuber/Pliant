@@ -16,27 +16,25 @@ namespace Pliant.Tests.Unit
                         .Rule("S", "S")
                         .Rule('b')))
                 .GetGrammar();
-            var recognizer = new PulseRecognizer(grammar);
+            var parser = new Parser(grammar);
+            ParseInput(parser, input);
 
-            RecognizeInput(recognizer, input);
+            var rootNode = parser.ParseTree();
         }
 
         [TestMethod]
-        public void Test_Parser_That_Completed_Scan_Creates_Internal_And_Scan_Node()
+        public void Test_Parser_That_Completed_Scan_Creates_Internal_And_Terminal_Node()
         {
             const string input = "a";
             var grammar = new GrammarBuilder("S", p => p
-                .Production("S", r => r
-                    .Rule('a')))
+                    .Production("S", r => r
+                        .Rule('a')))
                 .GetGrammar();
-            var recognizer = new PulseRecognizer(grammar);
+            var parser = new Parser(grammar);
 
-            RecognizeInput(recognizer, input);
+            ParseInput(parser, input);
             
-            var onlyCompletion = recognizer.Chart.EarleySets[1].Completions.FirstOrDefault();
-            Assert.IsNotNull(onlyCompletion);
-            
-            var parseNode = onlyCompletion.ParseNode;
+            var parseNode = parser.ParseTree();
             Assert.IsNotNull(parseNode);
 
             var internalNode = parseNode as IInternalNode;
@@ -49,11 +47,36 @@ namespace Pliant.Tests.Unit
             Assert.AreEqual('a', terminalNode.Capture);
         }
 
-        private void RecognizeInput(PulseRecognizer recognizer, string input)
+        [TestMethod]
+        public void Test_Parser_That_Completed_Prediction_Creates_Internal_Node()
+        {
+            const string input = "a";
+            var grammar = new GrammarBuilder("S", p => p
+                    .Production("S", r => r
+                        .Rule("A"))
+                    .Production("A", r => r
+                        .Rule('a')))
+                .GetGrammar();
+            var parser = new Parser(grammar);
+            ParseInput(parser, input);
+
+            var rootNode = parser.ParseTree() as IInternalNode;
+            Assert.IsNotNull(rootNode);
+            Assert.AreEqual(1, rootNode.Children.Count);
+
+            var childNode = rootNode.Children[0] as IInternalNode;
+            Assert.IsNotNull(childNode);
+            Assert.IsNotNull(childNode.Children.Count);
+
+            var terminalNode = childNode.Children[0] as ITerminalNode;
+            Assert.IsNotNull(terminalNode);
+        }
+
+        private void ParseInput(Parser parser, string input)
         {
             foreach (var character in input)
-                Assert.IsTrue(recognizer.Pulse(character));
-            Assert.IsTrue(recognizer.IsAccepted());
+                Assert.IsTrue(parser.Pulse(character));
+            Assert.IsTrue(parser.IsAccepted());
         }
     }
 }

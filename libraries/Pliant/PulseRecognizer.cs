@@ -86,7 +86,7 @@ namespace Pliant
             if (terminal.IsMatch(token))
             {
                 // roll the symbol up to the list of symbols
-                var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(scan.Production.LeftHandSide, scan.Origin, j);
+                var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(scan.Production.LeftHandSide, scan.Origin, j + 1);
                 symbolNode.AddChild(scanNode);
 
                 var scanState = scan.NextState(symbolNode);
@@ -143,13 +143,7 @@ namespace Pliant
             var stateIsNullable = predictedState.Production.IsEmpty;
             if (stateIsNullable)
             {
-                var parseNode = CreateParseNode(
-                    prediction, 
-                    predictedState, 
-                    prediction.Origin,
-                    j,
-                    prediction.ParseNode,
-                    predictedState.ParseNode);
+                var parseNode = CreateParseNode(predictedState, prediction, j);
                 var aycockHorspoolState = prediction.NextState(j, parseNode);
                 Chart.Enqueue(j, aycockHorspoolState);
                 Log("Predict", j, aycockHorspoolState);
@@ -160,15 +154,10 @@ namespace Pliant
         {
             if (completed.ParseNode == null)
             {
-                // is empty?
-                if (completed.Production.IsEmpty)
-                { }                
-                // was a predict node?
-                else
-                {
-                    var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(completed.Production.LeftHandSide, completed.Origin, k);
-                    completed.ParseNode = symbolNode;
-                }
+                completed.ParseNode = _nodeSet.AddOrGetExistingSymbolNode(
+                    completed.Production.LeftHandSide, 
+                    completed.Origin, 
+                    k);
             }
 
             var earleySet = Chart.EarleySets[completed.Origin];
@@ -177,13 +166,7 @@ namespace Pliant
             var transitiveState = FindTransitiveState(earleySet, searchSymbol);
             if (transitiveState != null)
             {
-                var parseNode = CreateParseNode(
-                    completed, 
-                    transitiveState, 
-                    completed.Origin,
-                    k,
-                    completed.ParseNode,
-                    transitiveState.ParseNode);
+                var parseNode = CreateParseNode(transitiveState, completed, k);
                 var topmostItem = new State(
                     transitiveState.Production, 
                     transitiveState.DottedRule.Position, 
@@ -202,14 +185,12 @@ namespace Pliant
                     if (IsSourceState(completed.Production.LeftHandSide, prediction))
                     {
                         int i = prediction.Origin;
-                        var parseNode = CreateParseNode(
-                            prediction, 
-                            completed,
-                            i,
-                            k,
-                            prediction.ParseNode,
-                            completed.ParseNode);
-                        var nextState = prediction.NextState(parseNode);
+                        var nextState = prediction.NextState();
+                        if (nextState.DottedRule.IsComplete)
+                        {
+                            var parseNode = CreateParseNode(nextState, completed, k);
+                            nextState.ParseNode = parseNode;
+                        }
                         if (Chart.Enqueue(k, nextState))
                             Log("Complete", k, nextState);
                     }
@@ -328,43 +309,14 @@ namespace Pliant
         private IInternalNode CreateParseNode(
             IState source, 
             IState trigger, 
-            int origin, 
-            int location, 
-            INode w, 
-            INode v)
+            int location)
         {
-            IInternalNode parseNode = null;
-            
-            var postDotSymbol = trigger.DottedRule.PostDotSymbol;
-            var postDotRuleIsNullable = IsRuleNullable(postDotSymbol);
-
-            var preDotRuleIsNullable = false;
-            if (source != null)
-            {
-                var preDotSymbol = source.DottedRule.PreDotSymbol;
-                preDotRuleIsNullable = IsRuleNullable(preDotSymbol);
-            }
-
-            IInternalNode searchNode = null;
-            if (postDotRuleIsNullable)
-            {
-                searchNode = new SymbolNode(
-                   postDotSymbol.Value,
-                   trigger.Origin,
-                   location);
-            }
-            else
-                searchNode = new IntermediateNode(
-                    trigger,
-                    trigger.Origin,
-                    location);
-
-            if (preDotRuleIsNullable
-                && !postDotRuleIsNullable)
-            {
-                return null; // v
-            }
-
+            // create internal node (y) for source
+            // add trigger's parse node as child to source's parse node
+            // return (y)
+            var parseNode = new SymbolNode(source.Production.LeftHandSide, source.Origin, location);
+            if(trigger.ParseNode != null)
+                parseNode.AddChild(trigger.ParseNode);
             return parseNode;
         }
 
