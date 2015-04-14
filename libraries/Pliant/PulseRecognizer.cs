@@ -385,26 +385,7 @@ namespace Pliant
 
             return internalNode;            
         }
-
-        private INode CreateParseNode(IState state, int origin, int location, INode w, INode v)
-        {
-            var symbolNode = _nodeSet
-                .AddOrGetExistingSymbolNode(
-                    state.Production.LeftHandSide,
-                    origin,
-                    location);
-
-            if (v == null)
-                v = new TerminalNode('\0', location, location);
-
-            if (w == null)
-                symbolNode.AddUniqueFamily(v);
-            else
-                symbolNode.AddUniqueFamily(v, w);
-
-            return symbolNode;
-        }
-
+        
         private bool IsSymbolNullable(INullable<ISymbol> symbol)
         {
             if (!symbol.HasValue)
