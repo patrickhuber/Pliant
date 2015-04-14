@@ -93,6 +93,13 @@ namespace Pliant
             {
                 get { return _dottedRule.Position < _dottedRule._production.RightHandSide.Count;}
             }
+
+            public override string ToString()
+            {
+                if (HasValue)
+                    return Value.ToString();
+                return string.Empty;
+            }
         }
 
         private class NullablePreDotWrapper : INullable<ISymbol>
@@ -119,6 +126,13 @@ namespace Pliant
             public bool HasValue
             {
                 get { return _dottedRule.Position > 0 && !_dottedRule._production.IsEmpty; }
+            }
+            
+            public override string ToString()
+            {
+                if (HasValue)
+                    return Value.ToString();
+                return string.Empty;
             }
         }
     }

@@ -6,12 +6,8 @@ using System.Threading.Tasks;
 
 namespace Pliant
 {
-    public interface INode
+    public interface IAndNode
     {
-        int Origin { get; }
-
-        int Location { get; }
-
-        NodeType NodeType { get; }
+        IReadOnlyList<INode> Children { get; } 
     }
 }

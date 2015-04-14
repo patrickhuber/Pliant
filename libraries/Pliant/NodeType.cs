@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace Pliant
 {
-    public interface INode
+    public enum NodeType
     {
-        int Origin { get; }
-
-        int Location { get; }
-
-        NodeType NodeType { get; }
+        Intermediate,
+        Symbol,
+        Terminal
     }
 }

@@ -10,8 +10,12 @@ namespace Pliant
     {
         public IState State { get; private set; }
 
+        public override NodeType NodeType { get { return NodeType.Intermediate; } }
+
         public IntermediateNode(IState state, int origin, int location)
             : base(origin, location)
-        { }
+        {
+            State = state;
+        }
     }
 }

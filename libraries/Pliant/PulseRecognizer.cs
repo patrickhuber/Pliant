@@ -49,8 +49,6 @@ namespace Pliant
 
         public bool Pulse(char token)
         {
-            _nodeSet.Clear(); // V = 0
-
             ScanPass(Location, token);
 
             bool tokenNotRecognized = Chart.EarleySets.Count <= Location + 1;
@@ -61,7 +59,8 @@ namespace Pliant
             Location++;          
             
             ReductionPass(Location);
-            
+
+            _nodeSet.Clear();
             return true;
         }
         
@@ -85,11 +84,14 @@ namespace Pliant
             var token = scanNode.Capture;
             if (terminal.IsMatch(token))
             {
-                // roll the symbol up to the list of symbols
-                var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(scan.Production.LeftHandSide, scan.Origin, j + 1);
-                symbolNode.AddChild(scanNode);
-
-                var scanState = scan.NextState(symbolNode);
+                var scanState = scan.NextState();
+                var parseNode = CreateParseNode(
+                    scan, 
+                    scanState, 
+                    scan.ParseNode, 
+                    scanNode, 
+                    j + 1);
+                scanState.ParseNode = parseNode;
 
                 if (Chart.Enqueue(j + 1, scanState))
                     LogScan(j + 1, scanState, token);
@@ -143,10 +145,19 @@ namespace Pliant
             var stateIsNullable = predictedState.Production.IsEmpty;
             if (stateIsNullable)
             {
-                var parseNode = CreateParseNode(predictedState, prediction, j);
-                var aycockHorspoolState = prediction.NextState(j, parseNode);
-                Chart.Enqueue(j, aycockHorspoolState);
-                Log("Predict", j, aycockHorspoolState);
+                var aycockHorspoolState = prediction.NextState(j);
+                var nullParseNode = _nodeSet.AddOrGetExistingSymbolNode(
+                    predictedState.Production.LeftHandSide, 
+                    j, j);
+                var parseNode = CreateParseNode(
+                    aycockHorspoolState,
+                    prediction,
+                    prediction.ParseNode,
+                    nullParseNode,
+                    j);
+                aycockHorspoolState.ParseNode = parseNode;
+                if(Chart.Enqueue(j, aycockHorspoolState))
+                    Log("Predict", j, aycockHorspoolState);
             }
         }
 
@@ -154,50 +165,70 @@ namespace Pliant
         {
             if (completed.ParseNode == null)
             {
+                // this is a null production
                 completed.ParseNode = _nodeSet.AddOrGetExistingSymbolNode(
-                    completed.Production.LeftHandSide, 
-                    completed.Origin, 
-                    k);
+                    completed.Production.LeftHandSide, k, k);
             }
 
             var earleySet = Chart.EarleySets[completed.Origin];
             var searchSymbol = completed.Production.LeftHandSide;
+            
             OptimizeReductionPath(searchSymbol, completed.Origin, Chart);
+            
             var transitiveState = FindTransitiveState(earleySet, searchSymbol);
             if (transitiveState != null)
             {
-                var parseNode = CreateParseNode(transitiveState, completed, k);
-                var topmostItem = new State(
-                    transitiveState.Production, 
-                    transitiveState.DottedRule.Position, 
-                    transitiveState.Origin,
-                    parseNode);
-                if (Chart.Enqueue(k, topmostItem))
-                    Log("Complete", k, topmostItem);
+                LeoComplete(completed, k, transitiveState);
             }
             else
             {
-                int j = completed.Origin;
-                var sourceEarleySet = Chart.EarleySets[j];
-                for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
-                {
-                    var prediction = sourceEarleySet.Predictions[p];
-                    if (IsSourceState(completed.Production.LeftHandSide, prediction))
-                    {
-                        int i = prediction.Origin;
-                        var nextState = prediction.NextState();
-                        if (nextState.DottedRule.IsComplete)
-                        {
-                            var parseNode = CreateParseNode(nextState, completed, k);
-                            nextState.ParseNode = parseNode;
-                        }
-                        if (Chart.Enqueue(k, nextState))
-                            Log("Complete", k, nextState);
-                    }
-                }
+                EarleyComplete(completed, k);
             }
         }
 
+        private void LeoComplete(IState completed, int k, IState transitiveState)
+        {
+            // TODO: Find the Predicted state from k-1 that produced the item
+            var parseNode = CreateParseNode(
+                transitiveState,
+                null,
+                transitiveState.ParseNode,
+                null,
+                k);
+            var topmostItem = new State(
+                transitiveState.Production,
+                transitiveState.DottedRule.Position,
+                transitiveState.Origin,
+                parseNode);
+            if (Chart.Enqueue(k, topmostItem))
+                Log("Complete", k, topmostItem);
+        }
+
+        private void EarleyComplete(IState completed, int k)
+        {
+            int j = completed.Origin;
+            var sourceEarleySet = Chart.EarleySets[j];
+            for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
+            {
+                var prediction = sourceEarleySet.Predictions[p];
+                if (!IsSourceState(completed.Production.LeftHandSide, prediction))
+                    continue;
+
+                var i = prediction.Origin;
+                var nextState = prediction.NextState();
+                var parseNode = CreateParseNode(
+                    completed,
+                    nextState,
+                    completed.ParseNode,
+                    nextState.ParseNode,
+                    k);
+                nextState.ParseNode = parseNode;
+ 
+                if (Chart.Enqueue(k, nextState))
+                    Log("Complete", k, nextState);                
+            }
+        }
+        
         private void OptimizeReductionPath(ISymbol searchSymbol, int k, Chart chart)
         {
             IState t_rule = null;
@@ -252,7 +283,7 @@ namespace Pliant
             return state.DottedRule.IsComplete;
         }
 
-        IState FindSourceState(IEarleySet earleySet, ISymbol searchSymbol)
+        private IState FindSourceState(IEarleySet earleySet, ISymbol searchSymbol)
         {
             // TODO: speed up by using a index lookup
             var sourceItemCount = 0;
@@ -306,29 +337,82 @@ namespace Pliant
                     && x.Production.LeftHandSide.Value == startStateSymbol.Value);
         }
 
-        private IInternalNode CreateParseNode(
-            IState source, 
-            IState trigger, 
+        private INode CreateParseNode(
+            IState originalState, 
+            IState nextState,
+            INode w,
+            INode v,
             int location)
         {
-            // create internal node (y) for source
-            // add trigger's parse node as child to source's parse node
-            // return (y)
-            var parseNode = new SymbolNode(source.Production.LeftHandSide, source.Origin, location);
-            if(trigger.ParseNode != null)
-                parseNode.AddChild(trigger.ParseNode);
-            return parseNode;
+            // originalState is pre transition
+            // nextState is post transition
+            var anyPostDotRuleNull = IsSymbolNullable(nextState.DottedRule.PostDotSymbol);
+            var anyPreDotRuleNull = IsSymbolNullable(originalState.DottedRule.PreDotSymbol);
+            if (anyPostDotRuleNull && !anyPostDotRuleNull)
+                return v;
+
+            IInternalNode internalNode;
+            if (anyPostDotRuleNull)
+            {
+                internalNode = _nodeSet
+                    .AddOrGetExistingSymbolNode(
+                        originalState.Production.LeftHandSide,
+                        originalState.Origin,
+                        location);
+            }
+            else // should this be the trigger state or the source state ??
+            {
+                internalNode = _nodeSet
+                    .AddOrGetExistingIntermediateNode(
+                        originalState,
+                        originalState.Origin,
+                        location
+                    );
+            }
+            
+            if(v == null)
+                v = new TerminalNode('\0', nextState.Origin, location);
+
+            // if w = null and y doesn't have a family of children (v)
+            if (w == null)
+                internalNode.AddUniqueFamily(v);            
+
+            // if w != null and y doesn't have a family of children (w, v)
+            else
+                internalNode.AddUniqueFamily(w, v);            
+
+            return internalNode;            
         }
 
-        private bool IsRuleNullable(INullable<ISymbol> symbol)
+        private INode CreateParseNode(IState state, int origin, int location, INode w, INode v)
         {
-            if (symbol.HasValue
-                && symbol.Value.SymbolType == SymbolType.NonTerminal)
-            {
-                var postDotRules = Grammar.RulesFor(symbol.Value as INonTerminal);
-                return postDotRules.Any(x => x.IsEmpty);
-            }
-            return false;
+            var symbolNode = _nodeSet
+                .AddOrGetExistingSymbolNode(
+                    state.Production.LeftHandSide,
+                    origin,
+                    location);
+
+            if (v == null)
+                v = new TerminalNode('\0', location, location);
+
+            if (w == null)
+                symbolNode.AddUniqueFamily(v);
+            else
+                symbolNode.AddUniqueFamily(v, w);
+
+            return symbolNode;
+        }
+
+        private bool IsSymbolNullable(INullable<ISymbol> symbol)
+        {
+            if (!symbol.HasValue)
+                return true;
+
+            if (symbol.Value.SymbolType != SymbolType.NonTerminal)
+                return false;
+
+            var postDotRules = Grammar.RulesFor(symbol.Value as INonTerminal);
+            return postDotRules.Any(x => x.IsEmpty);            
         }
 
         private void Log(string operation, int origin, IState state)

@@ -74,7 +74,7 @@ namespace Pliant
         
         public IState NextState()
         {
-            return NextState(null as IInternalNode);
+            return NextState(null as INode);
         }
 
         public IState NextState(INode node)
@@ -100,7 +100,8 @@ namespace Pliant
             return new State(
                 Production,
                 DottedRule.Position + 1,
-                newOrigin); 
+                newOrigin,
+                parseNode);
         }
         
         public bool IsSource(ISymbol searchSymbol)

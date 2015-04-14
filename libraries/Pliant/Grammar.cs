@@ -61,6 +61,5 @@ namespace Pliant
         {
             return Productions.Where(p => p.LeftHandSide.Equals(Start));
         }
-        
     }
 }

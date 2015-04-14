@@ -9,8 +9,12 @@ namespace Pliant
     public class TerminalNode : ITerminalNode
     {
         public char Capture { get; private set; }
+        
         public int Location { get; private set; }
+
         public int Origin { get; private set; }
+
+        public NodeType NodeType { get { return NodeType.Terminal; } }
 
         public TerminalNode(char capture, int origin, int location)
         {

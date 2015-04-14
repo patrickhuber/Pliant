@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AndNode.cs" />
     <Compile Include="AnyTerminal.cs" />
     <Compile Include="Assert.cs" />
     <Compile Include="Chart.cs" />
@@ -47,6 +48,7 @@
     <Compile Include="EarleySet.cs" />
     <Compile Include="Grammar.cs" />
     <Compile Include="GrammarBuilder.cs" />
+    <Compile Include="IAndNode.cs" />
     <Compile Include="IDottedRule.cs" />
     <Compile Include="IEarleySet.cs" />
     <Compile Include="IGrammar.cs" />
@@ -80,6 +82,7 @@
     <Compile Include="LexerRule.cs" />
     <Compile Include="InternalNode.cs" />
     <Compile Include="NodeSet.cs" />
+    <Compile Include="NodeType.cs" />
     <Compile Include="ReadWriteList.cs" />
     <Compile Include="RegexGrammar.cs" />
     <Compile Include="SetTerminal.cs" />

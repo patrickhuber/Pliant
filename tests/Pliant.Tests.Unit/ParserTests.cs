@@ -10,16 +10,28 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_Parser_That_Ambiguous_Grammar_Creates_Multiple_Parse_Paths()
         {
-            const string input = "bbb";
-            var grammar = new GrammarBuilder("S", p=>p
-                    .Production("S", r=>r
-                        .Rule("S", "S")
-                        .Rule('b')))
+            // example 3 section 4, Elizabeth Scott
+            const string input = "abbb";
+            var grammar = new GrammarBuilder("S", p => p
+                    .Production("S", r => r
+                        .Rule("A", "T")
+                        .Rule('a', "T"))
+                    .Production("A", r=>r
+                        .Rule('a')
+                        .Rule("B", "A"))
+                    .Production("B", r => r
+                        .Lambda())
+                    .Production("T", r=>r
+                        .Rule('b', 'b', 'b')))
                 .GetGrammar();
+            var T_Production = grammar.Productions[3];
+
             var parser = new Parser(grammar);
             ParseInput(parser, input);
-
-            var rootNode = parser.ParseTree();
+                        
+            var S_0_4 = parser.ParseTree() as IInternalNode;
+            Assert.IsNotNull(S_0_4);
+            Assert.AreEqual(2, S_0_4.Children.Count);
         }
 
         [TestMethod]
@@ -60,16 +72,54 @@ namespace Pliant.Tests.Unit
             var parser = new Parser(grammar);
             ParseInput(parser, input);
 
-            var rootNode = parser.ParseTree() as IInternalNode;
-            Assert.IsNotNull(rootNode);
-            Assert.AreEqual(1, rootNode.Children.Count);
+            var S_0_1 = parser.ParseTree() as IInternalNode;
+            Assert.IsNotNull(S_0_1);
+            Assert.AreEqual(1, S_0_1.Children.Count);
+            
+            var S_0_1_1 = S_0_1.Children[0] as IAndNode;
+            Assert.IsNotNull(S_0_1_1);
+            Assert.AreEqual(1, S_0_1_1.Children.Count);
 
-            var childNode = rootNode.Children[0] as IInternalNode;
-            Assert.IsNotNull(childNode);
-            Assert.IsNotNull(childNode.Children.Count);
+            var A_0_1 = S_0_1_1.Children[0] as IInternalNode;
+            Assert.IsNotNull(A_0_1);
+            Assert.AreEqual(1, A_0_1.Children.Count);
 
-            var terminalNode = childNode.Children[0] as ITerminalNode;
-            Assert.IsNotNull(terminalNode);
+            var A_0_1_1 = A_0_1.Children[0] as IAndNode;
+            Assert.IsNotNull(A_0_1_1);
+            Assert.AreEqual(1, A_0_1_1.Children.Count);
+
+            var a_0_1 = A_0_1_1.Children[0] as ITerminalNode;
+            Assert.IsNotNull(a_0_1);
+        }
+
+        [TestMethod]
+        public void Test_Parser_That_Leo_Items_Generate_Proper_Parse_Tree()
+        {
+            var grammar = new GrammarBuilder("S", p => p
+                    .Production("S", r => r
+                        .Rule("A"))
+                    .Production("A", r => r
+                        .Rule('a', "A")
+                        .Rule('b')))
+                .GetGrammar();
+            const string input = "ab";
+            var parser = new Parser(grammar);
+            ParseInput(parser, input);
+
+            /*  S_0_2 -> A_0_2
+             *  A_0_2 -> a_0_1 A_1_2
+             *  A_1_2 -> b_1_2
+             */
+            var S_0_4 = parser.ParseTree() as IInternalNode;
+            Assert.IsNotNull(S_0_4);
+            Assert.AreEqual(1, S_0_4.Children.Count);
+            
+            var S_0_4_1 = S_0_4.Children[0] as IAndNode;
+            Assert.IsNotNull(S_0_4_1);
+
+            var A_0_4 = S_0_4_1.Children[0] as IInternalNode;
+            Assert.IsNotNull(A_0_4);
+            Assert.AreEqual(2, A_0_4.Children.Count);
         }
 
         private void ParseInput(Parser parser, string input)

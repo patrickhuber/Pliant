@@ -14,7 +14,7 @@ namespace Pliant
         public NodeSet()
         {
             _symbolNodes = new List<ISymbolNode>();
-            _intermediateNodes = new List<IIntermediateNode>(); 
+            _intermediateNodes = new List<IIntermediateNode>();
         }
 
         public ISymbolNode AddOrGetExistingSymbolNode(ISymbol symbol, int origin, int location)
@@ -30,19 +30,18 @@ namespace Pliant
             }
             return symbolNode;
         }
-
-        public IIntermediateNode AddOrGetExistingIntermediateNode(IState state)
+        
+        public IIntermediateNode AddOrGetExistingIntermediateNode(IState trigger, int origin, int location)
         {
             var intermediateNode = _intermediateNodes.FirstOrDefault(
-                n => n.State.Equals(state));
+                x=> x.State.Equals(trigger));
             if (intermediateNode == null)
             {
-                intermediateNode = new IntermediateNode(state, state.Origin, 0);
-                _intermediateNodes.Add(intermediateNode);
+                intermediateNode = new IntermediateNode(trigger, origin, location);
             }
             return intermediateNode;
         }
-
+        
         public void Clear()
         {
             _symbolNodes.Clear();
