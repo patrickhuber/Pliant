@@ -17,5 +17,10 @@ namespace Pliant
         {
             State = state;
         }
+
+        public override string ToString()
+        {
+            return string.Format("({0}, {1}, {2})", State, Origin, Location);
+        }
     }
 }

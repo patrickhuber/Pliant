@@ -28,10 +28,78 @@ namespace Pliant.Tests.Unit
 
             var parser = new Parser(grammar);
             ParseInput(parser, input);
-                        
-            var S_0_4 = parser.ParseTree() as IInternalNode;
+                 
+            var S_0_4 = parser.ParseTree() as ISymbolNode;
             Assert.IsNotNull(S_0_4);
             Assert.AreEqual(2, S_0_4.Children.Count);
+
+            var S_0_4_1 = S_0_4.Children[0] as IAndNode;
+            Assert.IsNotNull(S_0_4_1);
+            Assert.AreEqual(2, S_0_4_1.Children.Count);
+
+            var a_0_1 = S_0_4_1.Children[0] as ITerminalNode;
+            Assert.IsNotNull(a_0_1);
+            Assert.AreEqual('a', a_0_1.Capture);
+
+            var T_1_4 = S_0_4_1.Children[1] as ISymbolNode;
+            Assert.IsNotNull(T_1_4);
+            Assert.AreEqual(1, T_1_4.Children.Count);
+                
+            var S_0_4_2 = S_0_4.Children[1] as IAndNode;
+            Assert.IsNotNull(S_0_4_2);
+            Assert.AreEqual(2, S_0_4_2.Children.Count);
+
+            var A_0_1 = S_0_4_2.Children[0] as ISymbolNode;
+            Assert.IsNotNull(A_0_1);
+            Assert.AreEqual(2, A_0_1.Children.Count);
+
+            var A_0_1_1 = A_0_1.Children[0] as IAndNode;
+            Assert.IsNotNull(A_0_1_1);
+            Assert.AreEqual(1, A_0_1_1.Children.Count);
+
+            Assert.AreSame(a_0_1, A_0_1_1.Children[0]);
+
+            var A_0_1_2 = A_0_1.Children[1] as IAndNode;
+            Assert.IsNotNull(A_0_1_1);
+            Assert.AreEqual(2, A_0_1_2.Children.Count);
+            
+            Assert.AreSame(A_0_1, A_0_1_2.Children[1]);
+
+            var B_0_0 = A_0_1_2.Children[0] as ISymbolNode;
+            Assert.IsNotNull(B_0_0);
+            Assert.AreEqual(1, B_0_0.Children.Count);
+
+            var B_0_0_1 = B_0_0.Children[0] as IAndNode;
+            Assert.IsNotNull(B_0_0_1);
+            Assert.AreEqual(1, B_0_0_1.Children.Count);
+
+            var nullTerminal = B_0_0_1.Children[0] as ITerminalNode;
+            Assert.IsNotNull(nullTerminal);
+            Assert.AreEqual('\0', nullTerminal.Capture);
+
+            var T_1_4_1 = T_1_4.Children[0] as IAndNode;
+            Assert.IsNotNull(T_1_4_1);
+            Assert.AreEqual(2, T_1_4_1.Children.Count);
+
+            var T_1_3 = T_1_4_1.Children[0] as IIntermediateNode;
+            Assert.IsNotNull(T_1_3);
+            Assert.AreEqual(1, T_1_3.Children.Count);
+            
+            var b_3_4 = T_1_4_1.Children[1] as ITerminalNode;
+            Assert.IsNotNull(b_3_4);
+            Assert.AreEqual('b', b_3_4.Capture);
+
+            var T_1_3_1 = T_1_3.Children[0] as IAndNode;
+            Assert.IsNotNull(T_1_3_1);
+            Assert.AreEqual(2, T_1_3_1.Children.Count);
+
+            var b_1_2 = T_1_3_1.Children[0] as ITerminalNode;
+            Assert.IsNotNull(b_1_2);
+            Assert.AreEqual('b', b_1_2.Capture);
+
+            var b_2_3 = T_1_3_1.Children[1] as ITerminalNode;
+            Assert.IsNotNull(b_2_3);
+            Assert.AreEqual('b', b_2_3.Capture);
         }
 
         [TestMethod]
@@ -49,14 +117,17 @@ namespace Pliant.Tests.Unit
             var parseNode = parser.ParseTree();
             Assert.IsNotNull(parseNode);
 
-            var internalNode = parseNode as IInternalNode;
-            Assert.IsNotNull(internalNode);
-            Assert.AreNotEqual(0, internalNode.Children.Count);
+            var S_0_1 = parseNode as ISymbolNode;
+            Assert.IsNotNull(S_0_1);
+            Assert.AreEqual(1, S_0_1.Children.Count);
 
-            var terminalNode = internalNode.Children[0] as ITerminalNode;
-            Assert.IsNotNull(terminalNode);
+            var S_0_1_1 = S_0_1.Children[0] as IAndNode;
+            Assert.IsNotNull(S_0_1_1);
+            Assert.AreEqual(1, S_0_1_1.Children.Count);
 
-            Assert.AreEqual('a', terminalNode.Capture);
+            var a_0_1 = S_0_1_1.Children[0] as ITerminalNode;
+            Assert.IsNotNull(a_0_1);
+            Assert.AreEqual('a', a_0_1.Capture);
         }
 
         [TestMethod]
