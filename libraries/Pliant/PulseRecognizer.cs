@@ -28,8 +28,7 @@ namespace Pliant
 
         public PulseRecognizer(IGrammar grammar)
         {
-            _nodeSet = new NodeSet();
-            
+            _nodeSet = new NodeSet();            
             Grammar = grammar;
             Initialization();
         }
@@ -49,6 +48,7 @@ namespace Pliant
 
         public bool Pulse(char token)
         {
+            _nodeSet.Clear();
             ScanPass(Location, token);
 
             bool tokenNotRecognized = Chart.EarleySets.Count <= Location + 1;
@@ -60,7 +60,6 @@ namespace Pliant
             
             ReductionPass(Location);
 
-            _nodeSet.Clear();
             return true;
         }
         
@@ -86,7 +85,6 @@ namespace Pliant
             {
                 var scanState = scan.NextState();
                 var parseNode = CreateParseNode(
-                    scan, 
                     scanState, 
                     scan.ParseNode, 
                     scanNode, 
@@ -136,7 +134,7 @@ namespace Pliant
             }
         }
 
-        private void PredictProduction(IState prediction, int j, IProduction production)
+        private void PredictProduction(IState evidence, int j, IProduction production)
         {
             var predictedState = new State(production, 0, j);
             if (Chart.Enqueue(j, predictedState))
@@ -145,30 +143,35 @@ namespace Pliant
             var stateIsNullable = predictedState.Production.IsEmpty;
             if (stateIsNullable)
             {
-                var aycockHorspoolState = prediction.NextState(j);
-                var nullParseNode = _nodeSet.AddOrGetExistingSymbolNode(
-                    predictedState.Production.LeftHandSide, 
-                    j, j);
-                var parseNode = CreateParseNode(
-                    aycockHorspoolState,
-                    prediction,
-                    prediction.ParseNode,
-                    nullParseNode,
-                    j);
-                aycockHorspoolState.ParseNode = parseNode;
+                var aycockHorspoolState = evidence.NextState(j);
+                
+                var predictedParseNode = CreateNullParseNode(
+                    predictedState.Production.LeftHandSide, j);
+
+                aycockHorspoolState.ParseNode 
+                    = CreateParseNode(
+                        aycockHorspoolState,
+                        evidence.ParseNode,
+                        predictedParseNode,
+                        j);
+
                 if(Chart.Enqueue(j, aycockHorspoolState))
                     Log("Predict", j, aycockHorspoolState);
             }
         }
 
+        private INode CreateNullParseNode(ISymbol symbol, int location)
+        {
+            var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(symbol, location, location);
+            var nullNode = new TerminalNode('\0', location, location);
+            symbolNode.AddUniqueFamily(nullNode);
+            return symbolNode;
+        }
+
         private void Complete(IState completed, int k)
         {
             if (completed.ParseNode == null)
-            {
-                // this is a null production
-                completed.ParseNode = _nodeSet.AddOrGetExistingSymbolNode(
-                    completed.Production.LeftHandSide, k, k);
-            }
+                completed.ParseNode = CreateNullParseNode(completed.Production.LeftHandSide, k);
 
             var earleySet = Chart.EarleySets[completed.Origin];
             var searchSymbol = completed.Production.LeftHandSide;
@@ -188,10 +191,9 @@ namespace Pliant
 
         private void LeoComplete(IState completed, int k, IState transitiveState)
         {
-            // TODO: Find the Predicted state from k-1 that produced the item
+            // TODO: Find the Predicted state from Origin that produced the item
             var parseNode = CreateParseNode(
                 transitiveState,
-                null,
                 transitiveState.ParseNode,
                 null,
                 k);
@@ -217,10 +219,9 @@ namespace Pliant
                 var i = prediction.Origin;
                 var nextState = prediction.NextState();
                 var parseNode = CreateParseNode(
-                    completed,
                     nextState,
+                    prediction.ParseNode,
                     completed.ParseNode,
-                    nextState.ParseNode,
                     k);
                 nextState.ParseNode = parseNode;
  
@@ -338,17 +339,21 @@ namespace Pliant
         }
 
         private INode CreateParseNode(
-            IState originalState, 
             IState nextState,
             INode w,
             INode v,
             int location)
         {
-            // originalState is pre transition
-            // nextState is post transition
+            var anyPreDotRuleNull = true;
+            if (nextState.DottedRule.Position > 1)
+            {
+                var predotPrecursorSymbol = nextState
+                    .Production
+                    .RightHandSide[nextState.DottedRule.Position - 2];
+                anyPreDotRuleNull = IsSymbolNullable(predotPrecursorSymbol);
+            }
             var anyPostDotRuleNull = IsSymbolNullable(nextState.DottedRule.PostDotSymbol);
-            var anyPreDotRuleNull = IsSymbolNullable(originalState.DottedRule.PreDotSymbol);
-            if (anyPostDotRuleNull && !anyPostDotRuleNull)
+            if (anyPreDotRuleNull && !anyPostDotRuleNull)
                 return v;
 
             IInternalNode internalNode;
@@ -356,22 +361,19 @@ namespace Pliant
             {
                 internalNode = _nodeSet
                     .AddOrGetExistingSymbolNode(
-                        originalState.Production.LeftHandSide,
-                        originalState.Origin,
+                        nextState.Production.LeftHandSide,
+                        nextState.Origin,
                         location);
             }
             else // should this be the trigger state or the source state ??
             {
                 internalNode = _nodeSet
                     .AddOrGetExistingIntermediateNode(
-                        originalState,
-                        originalState.Origin,
+                        nextState,
+                        nextState.Origin,
                         location
                     );
             }
-            
-            if(v == null)
-                v = new TerminalNode('\0', nextState.Origin, location);
 
             // if w = null and y doesn't have a family of children (v)
             if (w == null)
@@ -408,11 +410,15 @@ namespace Pliant
             if (!symbol.HasValue)
                 return true;
 
-            if (symbol.Value.SymbolType != SymbolType.NonTerminal)
-                return false;
+            return IsSymbolNullable(symbol.Value);
+        }
 
-            var postDotRules = Grammar.RulesFor(symbol.Value as INonTerminal);
-            return postDotRules.Any(x => x.IsEmpty);            
+        private bool IsSymbolNullable(ISymbol symbol)
+        {
+            if (symbol.SymbolType != SymbolType.NonTerminal)
+                return false;
+            var rules = Grammar.RulesFor(symbol as INonTerminal);
+            return rules.Any(x => x.IsEmpty);
         }
 
         private void Log(string operation, int origin, IState state)
