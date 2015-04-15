@@ -128,5 +128,13 @@ namespace Pliant.Tests.Unit
             Assert.AreEqual(1, lastEarleySet.Predictions.Count);
             Assert.AreEqual(1, lastEarleySet.Scans.Count);
         }
+
+        [TestMethod]
+        public void Test_PulseRecognizer_That_Hidden_Right_Recursion_Is_Optimized()
+        {
+            // S -> a S E | null
+            // E -> null
+            Assert.Inconclusive();
+        }
     }
 }

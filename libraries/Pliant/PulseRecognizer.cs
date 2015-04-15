@@ -192,11 +192,12 @@ namespace Pliant
         private void LeoComplete(IState completed, int k, IState transitiveState)
         {
             // TODO: Find the Predicted state from Origin that produced the item
-            var parseNode = CreateParseNode(
-                transitiveState,
-                transitiveState.ParseNode,
-                null,
-                k);
+            INode parseNode = null;
+            //CreateParseNode(
+            //     transitiveState,
+            //     transitiveState.ParseNode,
+            //     null,
+            //     k);
             var topmostItem = new State(
                 transitiveState.Production,
                 transitiveState.DottedRule.Position,
@@ -344,6 +345,7 @@ namespace Pliant
             INode v,
             int location)
         {
+            Assert.IsNotNull(v, "v");
             var anyPreDotRuleNull = true;
             if (nextState.DottedRule.Position > 1)
             {
