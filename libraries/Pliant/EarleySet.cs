@@ -47,5 +47,37 @@ namespace Pliant
         }
         
         public int Location { get; private set; }
+
+
+        public ITransitionState FindTransitionState(ISymbol searchSymbol)
+        {
+            for (int t = 0; t < Transitions.Count; t++)
+            {
+                var transitionState = Transitions[t] as TransitionState;
+                if (transitionState.Recognized.Equals(searchSymbol))
+                    return transitionState;
+            }
+            return null;
+        }
+
+        public IState FindSourceState(ISymbol searchSymbol)
+        {
+            // TODO: speed up by using a index lookup
+            var sourceItemCount = 0;
+            IState sourceItem = null;
+            for (int s = 0; s < Predictions.Count; s++)
+            {
+                var state = Predictions[s];
+                if (state.IsSource(searchSymbol))
+                {
+                    bool moreThanOneSourceItemExists = sourceItemCount > 0;
+                    if (moreThanOneSourceItemExists)
+                        return null;
+                    sourceItemCount++;
+                    sourceItem = state;
+                }
+            }
+            return sourceItem;
+        }
     }
 }

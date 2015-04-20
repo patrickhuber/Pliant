@@ -9,16 +9,18 @@ namespace Pliant
     public class TransitionState : State, ITransitionState
     {
         public ISymbol Recognized { get; private set; }
+        
+        public IState Reduction { get; private set; }
+        
+        public ITransitionState PreviousTransition { get; private set; }
 
-        public TransitionState(ISymbol recognized, IProduction production, int position, int origin)
-            : base(production, position, origin)
+        public TransitionState(ISymbol recognized, IState transition, IState reduction)
+            : base(transition.Production, transition.DottedRule.Position, transition.Origin)
         {
+            if (transition.StateType == StateType.Transitive)
+                PreviousTransition = (transition as ITransitionState);
+            Reduction = reduction;
             Recognized = recognized;
-        }
-
-        public TransitionState(ISymbol recognized, IState state)
-            : this(recognized, state.Production, state.DottedRule.Position, state.Origin)
-        { 
         }
         
         public override bool Equals(object obj)

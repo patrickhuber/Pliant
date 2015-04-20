@@ -55,15 +55,9 @@ namespace Pliant.Tests.Unit
                     .Rule(new WhitespaceTerminal())
                     .Lambda()))
                 .GetGrammar();
-            var pulseRecognizer = new PulseRecognizer(grammar);
-
+            
             const string input = "\t\f\r\n ";
-            foreach(var c in input)
-            {                
-                pulseRecognizer.Pulse(c);
-            }
-
-            Assert.IsTrue(pulseRecognizer.IsAccepted());
+            Recognize(grammar, input);
         }
 
         [TestMethod]
@@ -81,12 +75,8 @@ namespace Pliant.Tests.Unit
                 .GetGrammar();
             var input = "thisisonelonginputstring";
             var recognizer = new PulseRecognizer(grammar);
-            foreach (var c in input)
-            {
-                recognizer.Pulse(c);
-            }
-            
-            Assert.IsTrue(recognizer.IsAccepted());
+            Recognize(recognizer, input);
+
             // when this count is < 10 we know that quasi complete items are being processed successfully
             Assert.IsTrue(recognizer.Chart.EarleySets[23].Completions.Count < 10);
         }
@@ -102,11 +92,7 @@ namespace Pliant.Tests.Unit
 
             const string input = "aaaaa";
             var recognizer = new PulseRecognizer(grammar);
-            foreach (var c in input)
-                if (!recognizer.Pulse(c))
-                    break;
-            
-            Assert.IsTrue(recognizer.IsAccepted());
+            Recognize(recognizer, input);
             
             var chart = recognizer.Chart;
             // -- 0 --
@@ -135,6 +121,36 @@ namespace Pliant.Tests.Unit
             // S -> a S E | null
             // E -> null
             Assert.Inconclusive();
+        }
+
+        [TestMethod]
+        public void Test_PulseRecognizer_That_Intermediate_Step_Creates_Transition_Items()
+        {
+            var grammar = new GrammarBuilder("S", p => p
+                .Production("S", r => r
+                    .Rule("A"))
+                .Production("A", r => r
+                    .Rule('a', "B"))
+                .Production("B", r => r
+                    .Rule("A")
+                    .Rule('b')))
+            .GetGrammar();
+            const string input = "aaab";
+            Recognize(grammar, input);
+        }
+
+        private static void Recognize(Grammar grammar, string input)
+        {
+            var recognizer = new PulseRecognizer(grammar);
+            Recognize(recognizer, input);
+        }
+
+        private static void Recognize(PulseRecognizer recognizer, string input)
+        {
+            foreach (var c in input)
+                Assert.IsTrue(recognizer.Pulse(c));
+
+            Assert.IsTrue(recognizer.IsAccepted());
         }
     }
 }

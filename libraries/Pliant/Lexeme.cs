@@ -63,5 +63,11 @@ namespace Pliant
                 throw new NotImplementedException();
             }
         }
+
+
+        public bool IsSource(ISymbol searchSymbol)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

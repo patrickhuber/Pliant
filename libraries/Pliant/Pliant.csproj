@@ -83,6 +83,7 @@
     <Compile Include="InternalNode.cs" />
     <Compile Include="NodeSet.cs" />
     <Compile Include="NodeType.cs" />
+    <Compile Include="Optimizer.cs" />
     <Compile Include="ReadWriteList.cs" />
     <Compile Include="RegexGrammar.cs" />
     <Compile Include="SetTerminal.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="TerminalNode.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TransitionState.cs" />
+    <Compile Include="VirtualNode.cs" />
     <Compile Include="WhitespaceTerminal.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

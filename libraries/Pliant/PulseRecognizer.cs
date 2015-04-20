@@ -136,6 +136,7 @@ namespace Pliant
 
         private void PredictProduction(IState evidence, int j, IProduction production)
         {
+            // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
             var predictedState = new State(production, 0, j);
             if (Chart.Enqueue(j, predictedState))
                 Log("Predict", j, predictedState);
@@ -178,10 +179,10 @@ namespace Pliant
             
             OptimizeReductionPath(searchSymbol, completed.Origin, Chart);
             
-            var transitiveState = FindTransitiveState(earleySet, searchSymbol);
-            if (transitiveState != null)
+            var transitionState = earleySet.FindTransitionState(searchSymbol);
+            if (transitionState != null)
             {
-                LeoComplete(completed, k, transitiveState);
+                LeoComplete(completed, k, transitionState);
             }
             else
             {
@@ -189,24 +190,20 @@ namespace Pliant
             }
         }
 
-        private void LeoComplete(IState completed, int k, IState transitiveState)
+        private void LeoComplete(IState completed, int k, ITransitionState transitionState)
         {
-            // TODO: Find the Predicted state from Origin that produced the item
-            INode parseNode = null;
-            //CreateParseNode(
-            //     transitiveState,
-            //     transitiveState.ParseNode,
-            //     null,
-            //     k);
+            var virtualParseNode = new VirtualNode(k, transitionState);
+            
             var topmostItem = new State(
-                transitiveState.Production,
-                transitiveState.DottedRule.Position,
-                transitiveState.Origin,
-                parseNode);
+                transitionState.Production,
+                transitionState.DottedRule.Position,
+                transitionState.Origin,
+                virtualParseNode);
+            
             if (Chart.Enqueue(k, topmostItem))
                 Log("Complete", k, topmostItem);
         }
-
+        
         private void EarleyComplete(IState completed, int k)
         {
             int j = completed.Origin;
@@ -214,7 +211,7 @@ namespace Pliant
             for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
             {
                 var prediction = sourceEarleySet.Predictions[p];
-                if (!IsSourceState(completed.Production.LeftHandSide, prediction))
+                if (!prediction.IsSource(completed.Production.LeftHandSide))
                     continue;
 
                 var i = prediction.Origin;
@@ -240,14 +237,13 @@ namespace Pliant
         private void OptimizeReductionPathRecursive(ISymbol searchSymbol, int k, Chart chart, ref IState t_rule)
         {
             var earleySet = chart.EarleySets[k];
-            var transitiveState = FindTransitiveState(earleySet, searchSymbol);
+            var transitiveState = earleySet.FindTransitionState(searchSymbol);
             if (transitiveState != null)
             {
                 t_rule = transitiveState;
                 return;
             }
-
-            var sourceState = FindSourceState(earleySet, searchSymbol);
+            var sourceState = earleySet.FindSourceState(searchSymbol);
             if (sourceState == null)
                 return;
 
@@ -264,10 +260,11 @@ namespace Pliant
             
             if (t_rule == null)
                 return;
-            
+
             var transitionItem = new TransitionState(
                 searchSymbol,
-                t_rule);
+                t_rule,
+                sourceState);
             
             if (chart.Enqueue(k, transitionItem))
                 Log("Transition", k, transitionItem);            
@@ -283,44 +280,6 @@ namespace Pliant
             // currently we only check for completeness, but a test case should
             // be developed to check for quasi completeness
             return state.DottedRule.IsComplete;
-        }
-
-        private IState FindSourceState(IEarleySet earleySet, ISymbol searchSymbol)
-        {
-            // TODO: speed up by using a index lookup
-            var sourceItemCount = 0;
-            IState sourceItem = null;
-            for (int s = 0; s < earleySet.Predictions.Count; s++)
-            {
-                var state = earleySet.Predictions[s];
-                if (IsSourceState(searchSymbol, state))
-                {
-                    bool moreThanOneSourceItemExists = sourceItemCount > 0;
-                    if (moreThanOneSourceItemExists)
-                        return null;
-                    sourceItemCount++;
-                    sourceItem = state;
-                }
-            }
-            return sourceItem;
-        }
-
-        private bool IsSourceState(ISymbol searchSymbol, IState state)
-        {
-            if (state.DottedRule.IsComplete)
-                return false;
-            return state.DottedRule.PostDotSymbol.Value.Equals(searchSymbol);
-        }
-
-        private IState FindTransitiveState(IEarleySet earleySet, ISymbol searchSymbol)
-        {
-            for (int t = 0; t < earleySet.Transitions.Count; t++)
-            {
-                var transitionState = earleySet.Transitions[t] as TransitionState;
-                if (transitionState.Recognized.Equals(searchSymbol))
-                    return transitionState;
-            }
-            return null;
         }
         
         public void Reset()
@@ -367,7 +326,7 @@ namespace Pliant
                         nextState.Origin,
                         location);
             }
-            else // should this be the trigger state or the source state ??
+            else 
             {
                 internalNode = _nodeSet
                     .AddOrGetExistingIntermediateNode(

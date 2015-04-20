@@ -109,6 +109,6 @@ namespace Pliant
             if (DottedRule.IsComplete)
                 return false;
             return DottedRule.PostDotSymbol.Value.Equals(searchSymbol);
-        }
+        }                
     }
 }

@@ -181,11 +181,11 @@ namespace Pliant.Tests.Unit
              *  A_0_2 -> a_0_1 A_1_2
              *  A_1_2 -> b_1_2
              */
-            var S_0_4 = parser.ParseTree() as IInternalNode;
-            Assert.IsNotNull(S_0_4);
-            Assert.AreEqual(1, S_0_4.Children.Count);
+            var S_0_2 = parser.ParseTree() as IInternalNode;
+            Assert.IsNotNull(S_0_2);
+            Assert.AreEqual(1, S_0_2.Children.Count);
             
-            var S_0_4_1 = S_0_4.Children[0] as IAndNode;
+            var S_0_4_1 = S_0_2.Children[0] as IAndNode;
             Assert.IsNotNull(S_0_4_1);
 
             var A_0_4 = S_0_4_1.Children[0] as IInternalNode;

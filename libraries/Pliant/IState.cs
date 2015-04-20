@@ -12,5 +12,6 @@ namespace Pliant
         IState NextState(int newOrigin, INode parseNode);
         IDottedRule DottedRule { get; }
         INode ParseNode { get; set; }
+        bool IsSource(ISymbol searchSymbol);
     }
 }
