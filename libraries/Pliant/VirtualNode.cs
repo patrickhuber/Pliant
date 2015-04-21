@@ -12,19 +12,16 @@ namespace Pliant
 
         private ReadWriteList<IAndNode> _children;
         /// <summary>
-        /// A single and node. Virtual nodes are leo nodes and by nature don't have ambiguity.
+        /// A single AND node. Virtual nodes are leo nodes and by nature don't have ambiguity.
         /// </summary>
         private AndNode _andNode;
 
         public int Location { get; private set; }
-
-
+        
         public VirtualNode(int location, ITransitionState transitionState)
         {
             _transitionState = transitionState;
             _children = new ReadWriteList<IAndNode>();
-            _andNode = new AndNode();
-            _children.Add(_andNode);
             Location = location;
         }
 
@@ -37,33 +34,56 @@ namespace Pliant
         {
             get { throw new NotImplementedException(); }
         }
-
-        public bool IsEmpty
-        {
-            get { throw new NotImplementedException(); }
-        }
-
+        
         public IReadOnlyList<IAndNode> Children
         {
             get 
             {
-                LazyLoadChildren();
+                if(!ResultCached())
+                    LazyLoadChildren();
                 return _children; 
             }
         }
 
         private void LazyLoadChildren()
         {
+            if (_transitionState.PreviousTransition != null)
+            {
+                var virtualNode = new VirtualNode(Location, _transitionState.PreviousTransition);
+                if (_transitionState.Reduction.ParseNode == null)
+                    AddUniqueFamily(virtualNode);
+                else
+                    AddUniqueFamily(_transitionState.Reduction.ParseNode, virtualNode);
+            }
+            else if (_transitionState.Reduction.ParseNode != null)
+            {
+                AddUniqueFamily(_transitionState.Reduction.ParseNode);
+            }
+            else { throw new Exception("Unreachable code detected. Unable to lazy load children of invalid virtual node."); }
+        }
+
+        private bool ResultCached()
+        {
+            return _andNode != null;
         }
 
         public void AddUniqueFamily(INode trigger)
         {
-            throw new NotImplementedException();
+            if (_andNode != null)
+                return;
+            _andNode = new AndNode();
+            _andNode.AddChild(trigger);
+            _children.Add(_andNode);
         }
 
         public void AddUniqueFamily(INode source, INode trigger)
         {
-            throw new NotImplementedException();
+            if (_andNode != null)
+                return;
+            _andNode = new AndNode();
+            _andNode.AddChild(source);
+            _andNode.AddChild(trigger);
+            _children.Add(_andNode);
         }
     }
 }

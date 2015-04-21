@@ -53,7 +53,7 @@ namespace Pliant
             var transitionItem = new TransitionState(
                 searchSymbol,
                 Transition,
-                sourceState);
+                sourceState, null);
 
             if (_chart.Enqueue(index, transitionItem))
                 Log("Transition", index, transitionItem);

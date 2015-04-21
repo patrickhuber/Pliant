@@ -193,6 +193,35 @@ namespace Pliant.Tests.Unit
             Assert.AreEqual(2, A_0_4.Children.Count);
         }
 
+
+        [TestMethod]
+        public void Test_Parser_That_PassThrough_Recursive_Items_Creates_Virtual_Nodes()
+        {
+            var grammar = new GrammarBuilder("S", p => p
+                .Production("S", r => r
+                    .Rule("A"))
+                .Production("A", r => r
+                    .Rule('a', "B"))
+                .Production("B", r => r
+                    .Rule("A")
+                    .Rule('b')))
+            .GetGrammar();
+            var parser = new Parser(grammar);
+            const string input = "aaab";
+            ParseInput(parser, input);
+
+            var S_0_4 = parser.ParseTree() as IInternalNode;
+            Assert.IsNotNull(S_0_4);
+            Assert.AreEqual(1, S_0_4.Children.Count);
+
+            var S_0_4_1 = S_0_4.Children[0] as IAndNode;
+            Assert.IsNotNull(S_0_4_1);
+            Assert.AreEqual(2, S_0_4_1.Children.Count);
+
+            var A_0_4 = S_0_4_1.Children[0] as IInternalNode;
+            Assert.IsNotNull(A_0_4);
+        }
+
         private void ParseInput(Parser parser, string input)
         {
             foreach (var character in input)

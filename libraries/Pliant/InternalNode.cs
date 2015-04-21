@@ -24,12 +24,7 @@ namespace Pliant
             Location = location;
             _children = new ReadWriteList<IAndNode>();
         }
-
-        public bool IsEmpty
-        {
-            get { return _children.Count == 0; }
-        }
-
+        
         public void AddUniqueFamily(INode trigger)
         {
             AddUniqueAndNode(trigger);

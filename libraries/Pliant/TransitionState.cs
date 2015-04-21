@@ -14,11 +14,10 @@ namespace Pliant
         
         public ITransitionState PreviousTransition { get; private set; }
 
-        public TransitionState(ISymbol recognized, IState transition, IState reduction)
+        public TransitionState(ISymbol recognized, IState transition, IState reduction, ITransitionState previousTransition)
             : base(transition.Production, transition.DottedRule.Position, transition.Origin)
         {
-            if (transition.StateType == StateType.Transitive)
-                PreviousTransition = (transition as ITransitionState);
+            PreviousTransition = previousTransition;
             Reduction = reduction;
             Recognized = recognized;
         }

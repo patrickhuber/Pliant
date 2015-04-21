@@ -231,16 +231,22 @@ namespace Pliant
         private void OptimizeReductionPath(ISymbol searchSymbol, int k, Chart chart)
         {
             IState t_rule = null;
-            OptimizeReductionPathRecursive(searchSymbol, k, chart, ref t_rule);
+            ITransitionState transitionState = null;
+            OptimizeReductionPathRecursive(searchSymbol, k, chart, ref t_rule, out transitionState);
         }
 
-        private void OptimizeReductionPathRecursive(ISymbol searchSymbol, int k, Chart chart, ref IState t_rule)
+        private void OptimizeReductionPathRecursive(
+            ISymbol searchSymbol, 
+            int k, 
+            Chart chart, 
+            ref IState t_rule,
+            out ITransitionState transitionState)
         {
             var earleySet = chart.EarleySets[k];
-            var transitiveState = earleySet.FindTransitionState(searchSymbol);
-            if (transitiveState != null)
+            transitionState = earleySet.FindTransitionState(searchSymbol);
+            if (transitionState != null)
             {
-                t_rule = transitiveState;
+                t_rule = transitionState;
                 return;
             }
             var sourceState = earleySet.FindSourceState(searchSymbol);
@@ -256,18 +262,20 @@ namespace Pliant
                 sourceState.Production.LeftHandSide, 
                 sourceState.Origin, 
                 chart, 
-                ref t_rule);
+                ref t_rule,
+                out transitionState);
             
             if (t_rule == null)
                 return;
 
-            var transitionItem = new TransitionState(
+            transitionState = new TransitionState(
                 searchSymbol,
                 t_rule,
-                sourceState);
-            
-            if (chart.Enqueue(k, transitionItem))
-                Log("Transition", k, transitionItem);            
+                sourceState,
+                transitionState);
+
+            if (chart.Enqueue(k, transitionState))
+                Log("Transition", k, transitionState);            
         }
 
         private bool IsQuasiComplete(IState state)

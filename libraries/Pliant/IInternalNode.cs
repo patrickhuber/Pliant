@@ -11,7 +11,6 @@ namespace Pliant
     /// </summary>
     public interface IInternalNode : INode
     {
-        bool IsEmpty { get; }
         IReadOnlyList<IAndNode> Children { get; }
         void AddUniqueFamily(INode trigger);
         void AddUniqueFamily(INode source, INode trigger);
