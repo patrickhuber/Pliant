@@ -29,7 +29,7 @@ namespace Pliant.Tests.Unit
             var parser = new Parser(grammar);
             ParseInput(parser, input);
                  
-            var S_0_4 = parser.ParseTree() as ISymbolNode;
+            var S_0_4 = parser.ParseForest() as ISymbolNode;
             Assert.IsNotNull(S_0_4);
             Assert.AreEqual(2, S_0_4.Children.Count);
 
@@ -114,7 +114,7 @@ namespace Pliant.Tests.Unit
 
             ParseInput(parser, input);
             
-            var parseNode = parser.ParseTree();
+            var parseNode = parser.ParseForest();
             Assert.IsNotNull(parseNode);
 
             var S_0_1 = parseNode as ISymbolNode;
@@ -143,7 +143,7 @@ namespace Pliant.Tests.Unit
             var parser = new Parser(grammar);
             ParseInput(parser, input);
 
-            var S_0_1 = parser.ParseTree() as IInternalNode;
+            var S_0_1 = parser.ParseForest() as IInternalNode;
             Assert.IsNotNull(S_0_1);
             Assert.AreEqual(1, S_0_1.Children.Count);
             
@@ -181,7 +181,7 @@ namespace Pliant.Tests.Unit
              *  A_0_2 -> a_0_1 A_1_2
              *  A_1_2 -> b_1_2
              */
-            var S_0_2 = parser.ParseTree() as IInternalNode;
+            var S_0_2 = parser.ParseForest() as IInternalNode;
             Assert.IsNotNull(S_0_2);
             Assert.AreEqual(1, S_0_2.Children.Count);
             
@@ -210,7 +210,7 @@ namespace Pliant.Tests.Unit
             const string input = "aaab";
             ParseInput(parser, input);
 
-            var S_0_4 = parser.ParseTree() as IInternalNode;
+            var S_0_4 = parser.ParseForest() as IInternalNode;
             Assert.IsNotNull(S_0_4);
             Assert.AreEqual(1, S_0_4.Children.Count);
 

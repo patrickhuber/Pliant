@@ -31,7 +31,7 @@ namespace Pliant
             return _pulseRecognizer.IsAccepted();
         }
 
-        public INode ParseTree()
+        public INode ParseForest()
         { 
             // thompson construction
             if (!IsAccepted())
