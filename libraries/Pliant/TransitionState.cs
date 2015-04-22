@@ -12,12 +12,11 @@ namespace Pliant
         
         public IState Reduction { get; private set; }
         
-        public ITransitionState PreviousTransition { get; private set; }
+        public ITransitionState NextTransition { get; set; }
 
-        public TransitionState(ISymbol recognized, IState transition, IState reduction, ITransitionState previousTransition)
+        public TransitionState(ISymbol recognized, IState transition, IState reduction)
             : base(transition.Production, transition.DottedRule.Position, transition.Origin)
         {
-            PreviousTransition = previousTransition;
             Reduction = reduction;
             Recognized = recognized;
         }

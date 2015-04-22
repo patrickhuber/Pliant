@@ -216,10 +216,15 @@ namespace Pliant.Tests.Unit
 
             var S_0_4_1 = S_0_4.Children[0] as IAndNode;
             Assert.IsNotNull(S_0_4_1);
-            Assert.AreEqual(2, S_0_4_1.Children.Count);
+            Assert.AreEqual(1, S_0_4_1.Children.Count);
 
             var A_0_4 = S_0_4_1.Children[0] as IInternalNode;
             Assert.IsNotNull(A_0_4);
+            Assert.AreEqual(1, A_0_4.Children.Count);
+
+            var A_0_4_1 = A_0_4.Children[0] as IAndNode;
+            Assert.IsNotNull(A_0_4_1);
+            Assert.AreEqual(2, A_0_4_1.Children.Count);
         }
 
         private void ParseInput(Parser parser, string input)

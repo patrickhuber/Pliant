@@ -47,9 +47,9 @@ namespace Pliant
 
         private void LazyLoadChildren()
         {
-            if (_transitionState.PreviousTransition != null)
+            if (_transitionState.NextTransition != null)
             {
-                var virtualNode = new VirtualNode(Location, _transitionState.PreviousTransition);
+                var virtualNode = new VirtualNode(Location, _transitionState.NextTransition);
                 if (_transitionState.Reduction.ParseNode == null)
                     AddUniqueFamily(virtualNode);
                 else

@@ -7,6 +7,6 @@ namespace Pliant
         
         IState Reduction { get; }
 
-        ITransitionState PreviousTransition { get;  }
+        ITransitionState NextTransition { get;  }
     }
 }

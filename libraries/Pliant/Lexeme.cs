@@ -11,9 +11,6 @@ namespace Pliant
     /// </summary>
     public class Lexeme : IState
     {
-        private StringBuilder _catpure;
-        private PulseRecognizer _recognizer;
-        private ILexerRule _lexerRule;
         
         public IDottedRule DottedRule { get; private set; }
         

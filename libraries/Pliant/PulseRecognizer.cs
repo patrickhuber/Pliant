@@ -177,12 +177,12 @@ namespace Pliant
             var earleySet = Chart.EarleySets[completed.Origin];
             var searchSymbol = completed.Production.LeftHandSide;
             
-            OptimizeReductionPath(searchSymbol, completed.Origin, Chart);
+            OptimizeReductionPath(searchSymbol, completed.Origin);
             
             var transitionState = earleySet.FindTransitionState(searchSymbol);
             if (transitionState != null)
             {
-                LeoComplete(completed, k, transitionState);
+                LeoComplete(transitionState, k);
             }
             else
             {
@@ -190,9 +190,13 @@ namespace Pliant
             }
         }
 
-        private void LeoComplete(IState completed, int k, ITransitionState transitionState)
+        private void LeoComplete(ITransitionState transitionState, int k)
         {
-            var virtualParseNode = new VirtualNode(k, transitionState);
+            var earleySet = Chart.EarleySets[transitionState.Origin];
+            var rootTransitionState = earleySet.FindTransitionState(
+                transitionState.DottedRule.PreDotSymbol.Value);
+            
+            var virtualParseNode = new VirtualNode(k, rootTransitionState);
             
             var topmostItem = new State(
                 transitionState.Production,
@@ -228,22 +232,21 @@ namespace Pliant
             }
         }
         
-        private void OptimizeReductionPath(ISymbol searchSymbol, int k, Chart chart)
+        private void OptimizeReductionPath(ISymbol searchSymbol, int k)
         {
             IState t_rule = null;
-            ITransitionState transitionState = null;
-            OptimizeReductionPathRecursive(searchSymbol, k, chart, ref t_rule, out transitionState);
+            TransitionState previousTransitionState = null;
+            OptimizeReductionPathRecursive(searchSymbol, k, ref t_rule, ref previousTransitionState);
         }
 
         private void OptimizeReductionPathRecursive(
             ISymbol searchSymbol, 
             int k, 
-            Chart chart, 
             ref IState t_rule,
-            out ITransitionState transitionState)
+            ref TransitionState previousTransitionState)
         {
-            var earleySet = chart.EarleySets[k];
-            transitionState = earleySet.FindTransitionState(searchSymbol);
+            var earleySet = Chart.EarleySets[k];
+            var transitionState = earleySet.FindTransitionState(searchSymbol);
             if (transitionState != null)
             {
                 t_rule = transitionState;
@@ -260,22 +263,25 @@ namespace Pliant
             t_rule = sourceStateNext;
             OptimizeReductionPathRecursive(
                 sourceState.Production.LeftHandSide, 
-                sourceState.Origin, 
-                chart, 
-                ref t_rule,
-                out transitionState);
+                sourceState.Origin,
+                ref t_rule, 
+                ref previousTransitionState);
             
             if (t_rule == null)
                 return;
 
-            transitionState = new TransitionState(
+            var currentTransitionState = new TransitionState(
                 searchSymbol,
                 t_rule,
-                sourceState,
-                transitionState);
+                sourceState);
+            
+            if(previousTransitionState != null)
+                previousTransitionState.NextTransition = currentTransitionState;
 
-            if (chart.Enqueue(k, transitionState))
-                Log("Transition", k, transitionState);            
+            if (Chart.Enqueue(k, currentTransitionState))
+                Log("Transition", k, currentTransitionState);
+
+            previousTransitionState = currentTransitionState;
         }
 
         private bool IsQuasiComplete(IState state)
