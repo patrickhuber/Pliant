@@ -11,13 +11,6 @@ namespace Pliant.Tests.Unit
     [TestClass]
     public class ChartTests
     {
-        public ChartTests()
-        {
-            //
-            // TODO: Add constructor logic here
-            //
-        }
-
         public TestContext TestContext { get; set; }
 
         #region Additional test attributes

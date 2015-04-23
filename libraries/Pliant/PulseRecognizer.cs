@@ -24,8 +24,11 @@ namespace Pliant
         /// </summary>
         public int Location { get; private set; }
 
+        private NodeSet _nodeSet;
+
         public PulseRecognizer(IGrammar grammar)
         {
+            _nodeSet = new NodeSet();            
             Grammar = grammar;
             Initialization();
         }
@@ -40,12 +43,12 @@ namespace Pliant
                 if (Chart.Enqueue(0, startState))
                     Log("Start", 0, startState);
             }
-
             ReductionPass(Location);
         }
 
         public bool Pulse(char token)
         {
+            _nodeSet.Clear();
             ScanPass(Location, token);
 
             bool tokenNotRecognized = Chart.EarleySets.Count <= Location + 1;
@@ -56,20 +59,43 @@ namespace Pliant
             Location++;          
             
             ReductionPass(Location);
-            
+
             return true;
         }
         
         private void ScanPass(int location, char token)
         {
             IEarleySet earleySet = Chart.EarleySets[location];
+            var scanNode = new TerminalNode(token, location, location + 1);
             for (int s = 0; s < earleySet.Scans.Count; s++)
             {
                 var scanState = earleySet.Scans[s];
-                Scan(scanState, location, token);
+                Scan(scanState, location, scanNode);
             }
         }
 
+        private void Scan(IState scan, int j, ITerminalNode scanNode)
+        {
+            int i = scan.Origin;
+            var currentSymbol = scan.DottedRule.PostDotSymbol.Value;
+            var terminal = currentSymbol as ITerminal;
+
+            var token = scanNode.Capture;
+            if (terminal.IsMatch(token))
+            {
+                var scanState = scan.NextState();
+                var parseNode = CreateParseNode(
+                    scanState, 
+                    scan.ParseNode, 
+                    scanNode, 
+                    j + 1);
+                scanState.ParseNode = parseNode;
+
+                if (Chart.Enqueue(j + 1, scanState))
+                    LogScan(j + 1, scanState, token);
+            }
+        }
+        
         private void ReductionPass(int location)
         {
             IEarleySet earleySet = Chart.EarleySets[location];
@@ -80,12 +106,14 @@ namespace Pliant
 
             while (resume)
             {
+                // is there a new completion?
                 if (c < earleySet.Completions.Count)
                 {
                     var completion = earleySet.Completions[c];
                     Complete(completion, location);
                     c++;
                 }
+                // is there a new prediction?
                 else if (p < earleySet.Predictions.Count)
                 {
                     var prediction = earleySet.Predictions[p];
@@ -97,96 +125,134 @@ namespace Pliant
             }
         }
 
-        private void Predict(IState sourceState, int j)
+        private void Predict(IState prediction, int j)
         {
-            var nonTerminal = sourceState.DottedRule.Symbol as INonTerminal;
+            var nonTerminal = prediction.DottedRule.PostDotSymbol.Value as INonTerminal;
             foreach (var production in Grammar.RulesFor(nonTerminal))
             {
-                PredictProduction(sourceState, j, production);
+                PredictProduction(prediction, j, production);
             }
         }
 
-        private void PredictProduction(IState sourceState, int j, IProduction production)
+        private void PredictProduction(IState evidence, int j, IProduction production)
         {
-            var state = new State(production, 0, j);
-            if (Chart.Enqueue(j, state))
-                Log("Predict", j, state);
+            // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
+            var predictedState = new State(production, 0, j);
+            if (Chart.Enqueue(j, predictedState))
+                Log("Predict", j, predictedState);
 
-            var stateIsNullable = state.Production.RightHandSide.Count == 0;
+            var stateIsNullable = predictedState.Production.IsEmpty;
             if (stateIsNullable)
             {
-                var aycockHorspoolState = sourceState.NextState(j);
-                Chart.Enqueue(j, aycockHorspoolState);
-                Log("Predict", j, aycockHorspoolState);
+                var aycockHorspoolState = evidence.NextState(j);
+                
+                var predictedParseNode = CreateNullParseNode(
+                    predictedState.Production.LeftHandSide, j);
+
+                aycockHorspoolState.ParseNode 
+                    = CreateParseNode(
+                        aycockHorspoolState,
+                        evidence.ParseNode,
+                        predictedParseNode,
+                        j);
+
+                if(Chart.Enqueue(j, aycockHorspoolState))
+                    Log("Predict", j, aycockHorspoolState);
             }
         }
 
-        private void Scan(IState scan, int j, char token)
+        private INode CreateNullParseNode(ISymbol symbol, int location)
         {
-            int i = scan.Origin;
-            var currentSymbol = scan.DottedRule.Symbol;
-            var terminal = currentSymbol as ITerminal;
-            
-            if (terminal.IsMatch(token))
-            {
-                var scanState = new ScanState(
-                    scan.NextState(),
-                    token);
-                if (Chart.Enqueue(j + 1, scanState))
-                    LogScan(j + 1, scanState, token);
-            }
+            var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(symbol, location, location);
+            var nullNode = new TerminalNode('\0', location, location);
+            symbolNode.AddUniqueFamily(nullNode);
+            return symbolNode;
         }
-        
+
         private void Complete(IState completed, int k)
         {
+            if (completed.ParseNode == null)
+                completed.ParseNode = CreateNullParseNode(completed.Production.LeftHandSide, k);
+
             var earleySet = Chart.EarleySets[completed.Origin];
             var searchSymbol = completed.Production.LeftHandSide;
-            OptimizeReductionPath(searchSymbol, completed.Origin, Chart);
-            var transitiveState = FindTransitiveState(earleySet, searchSymbol);
-            if (transitiveState != null)
+
+            OptimizeReductionPath(searchSymbol, completed.Origin);
+            
+            var transitionState = earleySet.FindTransitionState(searchSymbol);
+            if (transitionState != null)
             {
-                var topmostItem = new State(
-                    transitiveState.Production, 
-                    transitiveState.DottedRule.Position, 
-                    transitiveState.Origin);
-                if (Chart.Enqueue(k, topmostItem))
-                    Log("Complete", k, topmostItem);
+                LeoComplete(transitionState, completed, k);
             }
             else
             {
-                int j = completed.Origin;
-                var sourceEarleySet = Chart.EarleySets[j];
-                for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
-                {
-                    var state = sourceEarleySet.Predictions[p];
-                    if (IsSourceState(completed.Production.LeftHandSide, state))
-                    {
-                        int i = state.Origin;
-                        var nextState = state.NextState();
-                        if (Chart.Enqueue(k, nextState))
-                            Log("Complete", k, nextState);
-                    }
-                }
+                EarleyComplete(completed, k);
             }
         }
 
-        private void OptimizeReductionPath(ISymbol searchSymbol, int k, Chart chart)
+        private void LeoComplete(ITransitionState transitionState, IState completed, int k)
+        {
+            var earleySet = Chart.EarleySets[transitionState.Origin];
+            var rootTransitionState = earleySet.FindTransitionState(
+                transitionState.DottedRule.PreDotSymbol.Value);
+            
+            var virtualParseNode = new VirtualNode(k, rootTransitionState, completed);
+            
+            var topmostItem = new State(
+                transitionState.Production,
+                transitionState.DottedRule.Position,
+                transitionState.Origin,
+                virtualParseNode);
+            
+            if (Chart.Enqueue(k, topmostItem))
+                Log("Complete", k, topmostItem);
+        }
+        
+        private void EarleyComplete(IState completed, int k)
+        {
+            int j = completed.Origin;
+            var sourceEarleySet = Chart.EarleySets[j];
+            for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
+            {
+                var prediction = sourceEarleySet.Predictions[p];
+                if (!prediction.IsSource(completed.Production.LeftHandSide))
+                    continue;
+
+                var i = prediction.Origin;
+                var nextState = prediction.NextState();
+                var parseNode = CreateParseNode(
+                    nextState,
+                    prediction.ParseNode,
+                    completed.ParseNode,
+                    k);
+                nextState.ParseNode = parseNode;
+ 
+                if (Chart.Enqueue(k, nextState))
+                    Log("Complete", k, nextState);                
+            }
+        }
+        
+        private void OptimizeReductionPath(ISymbol searchSymbol, int k)
         {
             IState t_rule = null;
-            OptimizeReductionPathRecursive(searchSymbol, k, chart, ref t_rule);
+            TransitionState previousTransitionState = null;
+            OptimizeReductionPathRecursive(searchSymbol, k, ref t_rule, ref previousTransitionState);
         }
 
-        private void OptimizeReductionPathRecursive(ISymbol searchSymbol, int k, Chart chart, ref IState t_rule)
+        private void OptimizeReductionPathRecursive(
+            ISymbol searchSymbol, 
+            int k, 
+            ref IState t_rule,
+            ref TransitionState previousTransitionState)
         {
-            var earleySet = chart.EarleySets[k];
-            var transitiveState = FindTransitiveState(earleySet, searchSymbol);
-            if (transitiveState != null)
+            var earleySet = Chart.EarleySets[k];
+            var transitionState = earleySet.FindTransitionState(searchSymbol);
+            if (transitionState != null)
             {
-                t_rule = transitiveState;
+                t_rule = transitionState;
                 return;
             }
-
-            var sourceState = FindSourceState(earleySet, searchSymbol);
+            var sourceState = earleySet.FindSourceState(searchSymbol);
             if (sourceState == null)
                 return;
 
@@ -197,61 +263,37 @@ namespace Pliant
             t_rule = sourceStateNext;
             OptimizeReductionPathRecursive(
                 sourceState.Production.LeftHandSide, 
-                sourceState.Origin, 
-                chart, 
-                ref t_rule);
+                sourceState.Origin,
+                ref t_rule, 
+                ref previousTransitionState);
             
             if (t_rule == null)
                 return;
-            
-            var transitionItem = new TransitionState(
+
+            var currentTransitionState = new TransitionState(
                 searchSymbol,
-                t_rule);
+                t_rule,
+                sourceState);
             
-            if (chart.Enqueue(k, transitionItem))
-                Log("Transition", k, transitionItem);            
+            if(previousTransitionState != null)
+                previousTransitionState.NextTransition = currentTransitionState;
+
+            if (Chart.Enqueue(k, currentTransitionState))
+                Log("Transition", k, currentTransitionState);
+
+            previousTransitionState = currentTransitionState;
         }
 
-        bool IsQuasiComplete(IState state)
+        private bool IsQuasiComplete(IState state)
         {
+            // leo has a definition for quasi complete
+            // where the item is either complete or "quasi complete"
+            // "quasi complete" implies that the item has a NonTerminal after the 
+            // post dot rule that is nullable, thereby making the state
+            // complete by association. 
+            // currently we only check for completeness, but a test case should
+            // be developed to check for quasi completeness
             return state.DottedRule.IsComplete;
-        }
-
-        IState FindSourceState(IEarleySet earleySet, ISymbol searchSymbol)
-        {
-            var sourceItemCount = 0;
-            IState sourceItem = null;
-            for (int s = 0; s < earleySet.Predictions.Count; s++)
-            {
-                var state = earleySet.Predictions[s];
-                if (IsSourceState(searchSymbol, state))
-                {
-                    bool moreThanOneSourceItemExists = sourceItemCount > 0;
-                    if (moreThanOneSourceItemExists)
-                        return null;
-                    sourceItemCount++;
-                    sourceItem = state;
-                }
-            }
-            return sourceItem;
-        }
-
-        private bool IsSourceState(ISymbol searchSymbol, IState state)
-        {
-            if (state.DottedRule.IsComplete)
-                return false;
-            return state.DottedRule.Symbol.Equals(searchSymbol);
-        }
-
-        private IState FindTransitiveState(IEarleySet earleySet, ISymbol searchSymbol)
-        {
-            for (int t = 0; t < earleySet.Transitions.Count; t++)
-            {
-                var transitionState = earleySet.Transitions[t] as TransitionState;
-                if (transitionState.Recognized.Equals(searchSymbol))
-                    return transitionState;
-            }
-            return null;
         }
         
         public void Reset()
@@ -268,6 +310,71 @@ namespace Pliant
                 .Any(x =>
                     x.Origin == 0
                     && x.Production.LeftHandSide.Value == startStateSymbol.Value);
+        }
+
+        private INode CreateParseNode(
+            IState nextState,
+            INode w,
+            INode v,
+            int location)
+        {
+            Assert.IsNotNull(v, "v");
+            var anyPreDotRuleNull = true;
+            if (nextState.DottedRule.Position > 1)
+            {
+                var predotPrecursorSymbol = nextState
+                    .Production
+                    .RightHandSide[nextState.DottedRule.Position - 2];
+                anyPreDotRuleNull = IsSymbolNullable(predotPrecursorSymbol);
+            }
+            var anyPostDotRuleNull = IsSymbolNullable(nextState.DottedRule.PostDotSymbol);
+            if (anyPreDotRuleNull && !anyPostDotRuleNull)
+                return v;
+
+            IInternalNode internalNode;
+            if (anyPostDotRuleNull)
+            {
+                internalNode = _nodeSet
+                    .AddOrGetExistingSymbolNode(
+                        nextState.Production.LeftHandSide,
+                        nextState.Origin,
+                        location);
+            }
+            else 
+            {
+                internalNode = _nodeSet
+                    .AddOrGetExistingIntermediateNode(
+                        nextState,
+                        nextState.Origin,
+                        location
+                    );
+            }
+
+            // if w = null and y doesn't have a family of children (v)
+            if (w == null)
+                internalNode.AddUniqueFamily(v);            
+
+            // if w != null and y doesn't have a family of children (w, v)
+            else
+                internalNode.AddUniqueFamily(w, v);            
+
+            return internalNode;            
+        }
+        
+        private bool IsSymbolNullable(INullable<ISymbol> symbol)
+        {
+            if (!symbol.HasValue)
+                return true;
+
+            return IsSymbolNullable(symbol.Value);
+        }
+
+        private bool IsSymbolNullable(ISymbol symbol)
+        {
+            if (symbol.SymbolType != SymbolType.NonTerminal)
+                return false;
+            var rules = Grammar.RulesFor(symbol as INonTerminal);
+            return rules.Any(x => x.IsEmpty);
         }
 
         private void Log(string operation, int origin, IState state)

@@ -7,5 +7,7 @@ namespace Pliant
         INonTerminal LeftHandSide { get; }
 
         IReadOnlyList<ISymbol> RightHandSide { get; }
+
+        bool IsEmpty { get; }
     }
 }

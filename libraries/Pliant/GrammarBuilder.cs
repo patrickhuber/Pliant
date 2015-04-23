@@ -10,14 +10,14 @@ namespace Pliant
     {
         private IList<IProduction> _productions;
         private IList<IProduction> _lexemes;
-        private IList<string> _ignore;
+        private IList<string> _actions;
         private string _start;
 
         public GrammarBuilder(
             string start, 
             Action<IProductionBuilder> productions, 
             Action<ILexemeBuilder> lexemes = null, 
-            Action<ICommandBuilder> ignore = null)
+            Action<ICommandBuilder> action = null)
         {
             _start = start;
             
@@ -31,9 +31,9 @@ namespace Pliant
             _lexemes = lexemeBuilder.GetLexemes();
 
             var ignoreBuilder = new CommandBuilder();
-            if(ignore != null)
-                ignore(ignoreBuilder);
-            _ignore = ignoreBuilder.GetIgnoreList();
+            if(action != null)
+                action(ignoreBuilder);
+            _actions = ignoreBuilder.GetIgnoreList();
         }
                 
         public Grammar GetGrammar()
@@ -45,7 +45,7 @@ namespace Pliant
                 throw new Exception("no start production found for start symbol");
             var start = startProduction.LeftHandSide;
             var ignore = _lexemes
-                .Where(x => _ignore.Contains(x.LeftHandSide.Value))
+                .Where(x => _actions.Contains(x.LeftHandSide.Value))
                 .Select(l=>l.LeftHandSide);
             return new Grammar(start, _productions.ToArray(), _lexemes.ToArray(), ignore.ToArray());
         }

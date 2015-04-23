@@ -18,12 +18,12 @@ namespace Pliant
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return Value.GetHashCode();
         }
 
         public override bool Equals(object obj)
         {
-            var nonTerminal = obj as NonTerminal;
+            var nonTerminal = obj as INonTerminal;
             if (nonTerminal == null)
                 return false;
             return Value.Equals(nonTerminal.Value);

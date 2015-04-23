@@ -46,36 +46,6 @@ namespace Pliant.Tests.Unit
             .GetGrammar();
 
         [TestMethod]
-        public void Test_Recognizer_That_Scan_Moves_Items_To_Next_Tree()
-        {
-            var recognizer = new PulseRecognizer(expressionGrammar);
-            var privateObject = new PrivateObject(recognizer);
-            var scanState = new State(expressionGrammar.Productions[4], 0, 0);
-            var chart = recognizer.Chart;
-            for (int i = 0; i < expressionGrammar.Productions.Count;i++)
-                chart.Enqueue(0, new State(expressionGrammar.Productions[i], 0, 0));
-            var j = 0;
-            privateObject.Invoke("Scan", scanState, j, '2');
-            Assert.AreEqual(1, chart.EarleySets[1].Completions.Count);
-        }
-
-        [TestMethod]
-        public void Test_Recognizer_That_Complete_Only_Adds_States_Related_To_Completed_State()
-        {
-            var recognizer = new PulseRecognizer(expressionGrammar);
-            var privateObject = new PrivateObject(recognizer);
-            var completeState = new State(expressionGrammar.Productions[4], 1, 0);
-            var chart = recognizer.Chart;
-            for (int i = 0; i < expressionGrammar.Productions.Count; i++)
-                chart.Enqueue(0, new State(expressionGrammar.Productions[i], 0, 0));
-            chart.Enqueue(1, completeState);
-            var k = 1;
-            privateObject.Invoke("Complete", completeState, k);
-            Assert.AreEqual(2, chart.Count);
-            Assert.AreEqual(2, chart.EarleySets[1].Completions.Count);
-        }
-
-        [TestMethod]
         public void Test_Recognizer_That_A_B_C_Grammar_Parses_bc()
         {            
             var recognizer = new Recognizer(abcGrammar);
@@ -113,7 +83,7 @@ namespace Pliant.Tests.Unit
                     .Production("A", r => r
                         .Rule('a', "A")
                         .Rule('a', 'b', 'c', "A")), l=>l
-                    .Lexeme("whitespace", x=>x.WhiteSpace()), ignore=>ignore
+                    .Lexeme("whitespace", x=>x.WhiteSpace()), action=>action
                     .Ignore("whitespace"))
                 .GetGrammar();
             var recognizer = new Recognizer(grammar);

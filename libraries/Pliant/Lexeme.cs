@@ -11,12 +11,9 @@ namespace Pliant
     /// </summary>
     public class Lexeme : IState
     {
-        private StringBuilder _catpure;
-        private PulseRecognizer _recognizer;
-        private ILexerRule _lexerRule;
         
         public IDottedRule DottedRule { get; private set; }
-
+        
         public IProduction Production
         {
             get { throw new NotImplementedException(); }
@@ -42,9 +39,32 @@ namespace Pliant
             throw new NotImplementedException();
         }
 
-        public IState Parent
+        public IState NextState(INode parseNode)
         {
-            get { throw new NotImplementedException(); }
+            throw new NotImplementedException();
+        }
+
+        public IState NextState(int newOrigin, INode parseNode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public INode ParseNode
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+            set
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+
+        public bool IsSource(ISymbol searchSymbol)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -70,13 +70,14 @@ namespace Pliant.Tests.Unit
                     .Rule("letter", "identifier", "letterOrDigit"))
                 .Production("letterOrDigit", p=>p
                     .Rule("letter")
-                    .Rule("digit")), l=>l
-                .Lexeme("letter", t=>t
-                    .Range('a', 'z')
-                    .Range('A', 'Z'))
-                .Lexeme("digit", t => t.Digit())
-                .Lexeme("whitespace", t=> t.WhiteSpace()), ignore=>ignore
-                .Ignore("whitespace"));
+                    .Rule("digit"))
+                .Production("letter", p=>p
+                    .Rule(new RangeTerminal('a', 'z'))
+                    .Rule(new RangeTerminal('A', 'Z')))
+                .Production("digit", p=>p
+                    .Rule(new DigitTerminal()))
+                .Production("whitespace", p=>p
+                    .Rule(new WhitespaceTerminal())));
 
             var grammar = grammarBuilder.GetGrammar();
             Assert.IsNotNull(grammar);

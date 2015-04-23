@@ -18,7 +18,8 @@ namespace Pliant
         public bool Enqueue(int index, IState state)
         {
             if (_earleySets.Count <= index)
-                _earleySets.Add(new EarleySet());
+                _earleySets.Add(new EarleySet(index));
+            
             var earleySet = _earleySets[index];
             return earleySet.Enqueue(state);
         }
