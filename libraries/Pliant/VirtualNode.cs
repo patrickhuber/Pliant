@@ -9,7 +9,7 @@ namespace Pliant
     public class VirtualNode : IInternalNode
     {
         private ITransitionState _transitionState;
-
+        private IState _completed;
         private ReadWriteList<IAndNode> _children;
         /// <summary>
         /// A single AND node. Virtual nodes are leo nodes and by nature don't have ambiguity.
@@ -18,9 +18,10 @@ namespace Pliant
 
         public int Location { get; private set; }
         
-        public VirtualNode(int location, ITransitionState transitionState)
+        public VirtualNode(int location, ITransitionState transitionState, IState completed)
         {
             _transitionState = transitionState;
+            _completed = completed;
             _children = new ReadWriteList<IAndNode>();
             Location = location;
         }
@@ -49,7 +50,7 @@ namespace Pliant
         {
             if (_transitionState.NextTransition != null)
             {
-                var virtualNode = new VirtualNode(Location, _transitionState.NextTransition);
+                var virtualNode = new VirtualNode(Location, _transitionState.NextTransition, _completed);
                 if (_transitionState.Reduction.ParseNode == null)
                     AddUniqueFamily(virtualNode);
                 else
@@ -57,9 +58,12 @@ namespace Pliant
             }
             else if (_transitionState.Reduction.ParseNode != null)
             {
-                AddUniqueFamily(_transitionState.Reduction.ParseNode);
+               AddUniqueFamily(_transitionState.Reduction.ParseNode, _completed.ParseNode);
             }
-            else { throw new Exception("Unreachable code detected. Unable to lazy load children of invalid virtual node."); }
+            else
+            {
+                AddUniqueFamily(_completed.ParseNode);
+            }            
         }
 
         private bool ResultCached()

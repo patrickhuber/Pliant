@@ -143,6 +143,9 @@ namespace Pliant.Tests.Unit
             var parser = new Parser(grammar);
             ParseInput(parser, input);
 
+            /*  S_0_1 -> A_0_1
+             *  A_0_1 -> 'a'
+             */
             var S_0_1 = parser.ParseForest() as IInternalNode;
             Assert.IsNotNull(S_0_1);
             Assert.AreEqual(1, S_0_1.Children.Count);
@@ -161,6 +164,7 @@ namespace Pliant.Tests.Unit
 
             var a_0_1 = A_0_1_1.Children[0] as ITerminalNode;
             Assert.IsNotNull(a_0_1);
+            Assert.AreEqual('a', a_0_1.Capture);
         }
 
         [TestMethod]
@@ -185,12 +189,33 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(S_0_2);
             Assert.AreEqual(1, S_0_2.Children.Count);
             
-            var S_0_4_1 = S_0_2.Children[0] as IAndNode;
-            Assert.IsNotNull(S_0_4_1);
+            var S_0_2_1 = S_0_2.Children[0] as IAndNode;
+            Assert.IsNotNull(S_0_2_1);
+            Assert.AreEqual(1, S_0_2_1.Children.Count);
 
-            var A_0_4 = S_0_4_1.Children[0] as IInternalNode;
-            Assert.IsNotNull(A_0_4);
-            Assert.AreEqual(2, A_0_4.Children.Count);
+            var A_0_2 = S_0_2_1.Children[0] as IInternalNode;
+            Assert.IsNotNull(A_0_2);
+            Assert.AreEqual(1, A_0_2.Children.Count);
+
+            var A_0_2_1 = A_0_2.Children[0] as IAndNode;
+            Assert.IsNotNull(A_0_2_1);
+            Assert.AreEqual(2, A_0_2_1.Children.Count);
+
+            var a_0_1 = A_0_2_1.Children[0] as ITerminalNode;
+            Assert.IsNotNull(a_0_1);
+            Assert.AreEqual('a', a_0_1.Capture);
+
+            var A_1_2 = A_0_2_1.Children[1] as IInternalNode;
+            Assert.IsNotNull(A_1_2);
+            Assert.AreEqual(1, A_1_2.Children.Count);
+
+            var A_1_2_1 = A_1_2.Children[0] as IAndNode;
+            Assert.IsNotNull(A_1_2_1);
+            Assert.AreEqual(1, A_1_2_1.Children.Count);
+
+            var b_1_2 = A_1_2_1.Children[0] as ITerminalNode;
+            Assert.IsNotNull(b_1_2);
+            Assert.AreEqual('b', b_1_2.Capture);
         }
 
 
@@ -210,6 +235,14 @@ namespace Pliant.Tests.Unit
             const string input = "aaab";
             ParseInput(parser, input);
 
+            /*  S_0_4 -> A_0_4
+             *  A_0_4 -> 'a' B_1_4
+             *  B_1_4 -> A_1_4
+             *  A_1_4 -> 'a' B_2_4
+             *  B_2_4 -> A_2_4
+             *  A_2_4 -> 'a' B_3_4
+             *  B_3_4 -> 'b'
+             */
             var S_0_4 = parser.ParseForest() as IInternalNode;
             Assert.IsNotNull(S_0_4);
             Assert.AreEqual(1, S_0_4.Children.Count);
@@ -225,6 +258,62 @@ namespace Pliant.Tests.Unit
             var A_0_4_1 = A_0_4.Children[0] as IAndNode;
             Assert.IsNotNull(A_0_4_1);
             Assert.AreEqual(2, A_0_4_1.Children.Count);
+            
+            var a_0_1 = A_0_4_1.Children[0] as ITerminalNode;
+            Assert.IsNotNull(a_0_1);
+            Assert.AreEqual('a', a_0_1.Capture);
+
+            var B_1_4 = A_0_4_1.Children[1] as IInternalNode;
+            Assert.IsNotNull(B_1_4);
+            Assert.AreEqual(1, B_1_4.Children.Count);
+
+            var B_1_4_1 = B_1_4.Children[0] as IAndNode;
+            Assert.IsNotNull(B_1_4_1);
+            Assert.AreEqual(1, B_1_4_1.Children.Count);
+
+            var A_1_4 = B_1_4_1.Children[0] as IInternalNode;
+            Assert.IsNotNull(A_1_4);
+            Assert.AreEqual(1, A_1_4.Children.Count);
+
+            var A_1_4_1 = A_1_4.Children[0] as IAndNode;
+            Assert.IsNotNull(A_1_4_1);
+            Assert.AreEqual(2, A_1_4_1.Children.Count);
+            
+            var a_1_2 = A_1_4_1.Children[0] as ITerminalNode;
+            Assert.IsNotNull(a_1_2);
+            Assert.AreEqual('a', a_1_2.Capture);
+
+            var B_2_4 = A_1_4_1.Children[1] as IInternalNode;
+            Assert.IsNotNull(B_2_4);
+            Assert.AreEqual(1, B_2_4.Children.Count);
+
+            var B_2_4_1 = B_2_4.Children[0] as IAndNode;
+            Assert.IsNotNull(B_2_4_1);
+            Assert.AreEqual(1, B_2_4_1.Children.Count);
+
+            var A_2_4 = B_2_4_1.Children[0] as IInternalNode;
+            Assert.IsNotNull(A_2_4);
+            Assert.AreEqual(1, A_2_4.Children.Count);
+
+            var A_2_4_1 = A_2_4.Children[0] as IAndNode;
+            Assert.IsNotNull(A_2_4_1);
+            Assert.AreEqual(2, A_2_4_1.Children.Count);
+
+            var a_2_3 = A_2_4_1.Children[0] as ITerminalNode;
+            Assert.IsNotNull(a_2_3);
+            Assert.AreEqual('a', a_2_3.Capture);
+
+            var B_3_4 = A_2_4_1.Children[1] as IInternalNode;
+            Assert.IsNotNull(B_3_4);
+            Assert.AreEqual(1, B_3_4.Children.Count);
+
+            var B_3_4_1 = B_3_4.Children[0] as IAndNode;
+            Assert.IsNotNull(B_3_4_1);
+            Assert.AreEqual(1, B_3_4_1.Children.Count);
+
+            var b_3_4 = B_3_4_1.Children[0] as ITerminalNode;
+            Assert.IsNotNull(b_3_4);
+            Assert.AreEqual('b', b_3_4.Capture);
         }
 
         private void ParseInput(Parser parser, string input)

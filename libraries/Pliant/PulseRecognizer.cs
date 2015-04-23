@@ -176,13 +176,13 @@ namespace Pliant
 
             var earleySet = Chart.EarleySets[completed.Origin];
             var searchSymbol = completed.Production.LeftHandSide;
-            
+
             OptimizeReductionPath(searchSymbol, completed.Origin);
             
             var transitionState = earleySet.FindTransitionState(searchSymbol);
             if (transitionState != null)
             {
-                LeoComplete(transitionState, k);
+                LeoComplete(transitionState, completed, k);
             }
             else
             {
@@ -190,13 +190,13 @@ namespace Pliant
             }
         }
 
-        private void LeoComplete(ITransitionState transitionState, int k)
+        private void LeoComplete(ITransitionState transitionState, IState completed, int k)
         {
             var earleySet = Chart.EarleySets[transitionState.Origin];
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.DottedRule.PreDotSymbol.Value);
             
-            var virtualParseNode = new VirtualNode(k, rootTransitionState);
+            var virtualParseNode = new VirtualNode(k, rootTransitionState, completed);
             
             var topmostItem = new State(
                 transitionState.Production,
