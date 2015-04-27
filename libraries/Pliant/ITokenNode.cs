@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Pliant
 {
-    public enum NodeType
+    public interface ITokenNode : INode
     {
-        Intermediate,
-        Symbol,
-        Terminal,
-        Token
+        IToken Capture { get; }
     }
 }

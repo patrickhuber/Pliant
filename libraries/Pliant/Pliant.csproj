@@ -74,6 +74,7 @@
     <Compile Include="ITerminalBuilder.cs" />
     <Compile Include="ITerminalNode.cs" />
     <Compile Include="IToken.cs" />
+    <Compile Include="ITokenNode.cs" />
     <Compile Include="ITransitionState.cs" />
     <Compile Include="Lexeme.cs" />
     <Compile Include="LexemeBuilder.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="TerminalBuilder.cs" />
     <Compile Include="TerminalNode.cs" />
     <Compile Include="Token.cs" />
+    <Compile Include="TokenNode.cs" />
     <Compile Include="TransitionState.cs" />
     <Compile Include="VirtualNode.cs" />
     <Compile Include="WhitespaceTerminal.cs" />
