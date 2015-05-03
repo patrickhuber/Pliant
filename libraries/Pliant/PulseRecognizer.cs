@@ -46,6 +46,18 @@ namespace Pliant
             ReductionPass(Location);
         }
 
+        public bool Pulse(IToken token)
+        {
+            _nodeSet.Clear();
+            ScanPass(Location, token);
+            var tokenRecognized = Chart.EarleySets.Count > Location + 1;
+            if (!tokenRecognized)
+                return false;
+            Location++;
+            ReductionPass(Location);
+            return true;
+        }
+
         public bool Pulse(char token)
         {
             _nodeSet.Clear();
@@ -62,7 +74,23 @@ namespace Pliant
 
             return true;
         }
-        
+
+        private void ScanPass(int location, IToken token)
+        {
+            IEarleySet earleySet = Chart.EarleySets[location];
+            var tokenNode = new TokenNode(token, location, location + 1);
+            for (int s = 0; s < earleySet.Scans.Count; s++)
+            {
+                var scanState = earleySet.Scans[s];
+                Scan(scanState, location, tokenNode);
+            }
+        }
+
+        private void Scan(IState scanState, int j, ITokenNode tokenNode)
+        {
+
+        }
+
         private void ScanPass(int location, char token)
         {
             IEarleySet earleySet = Chart.EarleySets[location];

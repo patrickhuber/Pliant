@@ -8,6 +8,6 @@ namespace Pliant
 {
     public interface ITokenNode : INode
     {
-        IToken Capture { get; }
+        IToken Token { get; }
     }
 }
