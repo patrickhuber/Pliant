@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pliant
 {
@@ -88,7 +84,24 @@ namespace Pliant
 
         private void Scan(IState scanState, int j, ITokenNode tokenNode)
         {
+            int i = scanState.Origin;
+            var currentSymbol = scanState.DottedRule.PostDotSymbol.Value;
+            var lexerRule = currentSymbol as ILexerRule;
 
+            var token = tokenNode.Token;
+            if (token.TokenType == lexerRule.TokenType)
+            {
+                var nextState = scanState.NextState();
+                var parseNode = CreateParseNode(
+                    nextState,
+                    scanState.ParseNode,
+                    tokenNode,
+                    j + 1);
+                scanState.ParseNode = parseNode;
+
+                if (Chart.Enqueue(j + 1, scanState))
+                    LogScan(j + 1, scanState, token);
+            }
         }
 
         private void ScanPass(int location, char token)
@@ -188,15 +201,7 @@ namespace Pliant
                     Log("Predict", j, aycockHorspoolState);
             }
         }
-
-        private INode CreateNullParseNode(ISymbol symbol, int location)
-        {
-            var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(symbol, location, location);
-            var nullNode = new TerminalNode('\0', location, location);
-            symbolNode.AddUniqueFamily(nullNode);
-            return symbolNode;
-        }
-
+        
         private void Complete(IState completed, int k)
         {
             if (completed.ParseNode == null)
@@ -339,6 +344,14 @@ namespace Pliant
                     x.Origin == 0
                     && x.Production.LeftHandSide.Value == startStateSymbol.Value);
         }
+        
+        private INode CreateNullParseNode(ISymbol symbol, int location)
+        {
+            var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(symbol, location, location);
+            var nullNode = new TerminalNode('\0', location, location);
+            symbolNode.AddUniqueFamily(nullNode);
+            return symbolNode;
+        }
 
         private INode CreateParseNode(
             IState nextState,
@@ -412,6 +425,12 @@ namespace Pliant
         }
 
         private void LogScan(int origin, IState state, char token)
+        {
+            Debug.Write(string.Format("{0}\t{1}", origin, state));
+            Debug.WriteLine(string.Format("\t # Scan {0}", token));
+        }
+
+        private void LogScan(int origin, IState state, IToken token)
         {
             Debug.Write(string.Format("{0}\t{1}", origin, state));
             Debug.WriteLine(string.Format("\t # Scan {0}", token));

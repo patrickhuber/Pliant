@@ -42,6 +42,13 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
+        public void Test_Regex_That_Parses_Optional_Character_Class()
+        {
+            var input = "a?";
+            Recognize(input);
+        }
+
+        [TestMethod]
         public void Test_Regex_That_Parses_Whitespace_Character_Class()
         {
             var input = @"[\s]+";

@@ -65,7 +65,6 @@
     <Compile Include="AycockHorspoolAlgorithmTests.cs" />
     <Compile Include="RangeTerminalTests.cs" />
     <Compile Include="ParserTests.cs" />
-    <Compile Include="LexerTests.cs" />
     <Compile Include="LexemeTests.cs" />
     <Compile Include="WhitespaceTerminalTests.cs" />
   </ItemGroup>

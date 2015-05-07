@@ -10,5 +10,6 @@ namespace Pliant
     {
         bool Greedy { get; }
         IGrammar Grammar { get; }
+        TokenType TokenType { get; }
     }
 }

@@ -10,6 +10,6 @@ namespace Pliant
     {
         StringBuilder Value { get; }
         int Origin { get; }
-        int Type { get; }
+        TokenType TokenType { get; }
     }
 }

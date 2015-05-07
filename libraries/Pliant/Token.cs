@@ -12,13 +12,13 @@ namespace Pliant
 
         public int Origin { get; private set; }
 
-        public int Type { get; private set; }
+        public TokenType TokenType { get; private set; }
 
-        public Token(StringBuilder value, int origin, int type)
+        public Token(StringBuilder value, int origin, TokenType tokenType)
         {
             Value = value;
             Origin = origin;
-            Type = type;
+            TokenType = tokenType;
         }
     }
 }

@@ -79,7 +79,6 @@
     <Compile Include="Lexeme.cs" />
     <Compile Include="LexemeBuilder.cs" />
     <Compile Include="CommandBuilder.cs" />
-    <Compile Include="Lexer.cs" />
     <Compile Include="LexerRule.cs" />
     <Compile Include="InternalNode.cs" />
     <Compile Include="NodeSet.cs" />
@@ -113,6 +112,7 @@
     <Compile Include="TerminalNode.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenNode.cs" />
+    <Compile Include="TokenType.cs" />
     <Compile Include="TransitionState.cs" />
     <Compile Include="VirtualNode.cs" />
     <Compile Include="WhitespaceTerminal.cs" />
