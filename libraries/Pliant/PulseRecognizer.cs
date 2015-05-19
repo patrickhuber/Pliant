@@ -41,36 +41,22 @@ namespace Pliant
             }
             ReductionPass(Location);
         }
-
+        
         public bool Pulse(IToken token)
         {
             _nodeSet.Clear();
             ScanPass(Location, token);
+
             var tokenRecognized = Chart.EarleySets.Count > Location + 1;
             if (!tokenRecognized)
                 return false;
+
             Location++;
             ReductionPass(Location);
-            return true;
-        }
-
-        public bool Pulse(char token)
-        {
-            _nodeSet.Clear();
-            ScanPass(Location, token);
-
-            bool tokenNotRecognized = Chart.EarleySets.Count <= Location + 1;
-            if (tokenNotRecognized)
-                return false;  
-
-            // Move to next earleySet
-            Location++;          
-            
-            ReductionPass(Location);
 
             return true;
         }
-
+        
         private void ScanPass(int location, IToken token)
         {
             IEarleySet earleySet = Chart.EarleySets[location];
@@ -102,6 +88,22 @@ namespace Pliant
                 if (Chart.Enqueue(j + 1, nextState))
                     LogScan(j + 1, nextState, token);
             }
+        }
+
+        public bool Pulse(char token)
+        {
+            _nodeSet.Clear();
+            ScanPass(Location, token);
+
+            var tokenNotRecognized = Chart.EarleySets.Count <= Location + 1;
+            if (tokenNotRecognized)
+                return false;
+
+            // Move to next earleySet
+            Location++;
+            ReductionPass(Location);
+
+            return true;
         }
 
         private void ScanPass(int location, char token)
