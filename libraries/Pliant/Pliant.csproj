@@ -84,6 +84,7 @@
     <Compile Include="NodeSet.cs" />
     <Compile Include="NodeType.cs" />
     <Compile Include="Optimizer.cs" />
+    <Compile Include="ParseRunner.cs" />
     <Compile Include="ReadWriteList.cs" />
     <Compile Include="RegexGrammar.cs" />
     <Compile Include="SetTerminal.cs" />

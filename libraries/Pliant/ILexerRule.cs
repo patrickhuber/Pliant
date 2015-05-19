@@ -8,7 +8,6 @@ namespace Pliant
 {
     public interface ILexerRule : ISymbol
     {
-        bool Greedy { get; }
         IGrammar Grammar { get; }
         TokenType TokenType { get; }
     }

@@ -8,7 +8,9 @@ namespace Pliant
 {
     public interface ILexeme
     {
+        ILexerRule LexerRule { get; }
         string Capture { get; }
         bool Scan(char c);
+        bool IsAccepted();
     }
 }

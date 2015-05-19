@@ -82,25 +82,25 @@ namespace Pliant
             }
         }
 
-        private void Scan(IState scanState, int j, ITokenNode tokenNode)
+        private void Scan(IState scan, int j, ITokenNode tokenNode)
         {
-            int i = scanState.Origin;
-            var currentSymbol = scanState.DottedRule.PostDotSymbol.Value;
+            int i = scan.Origin;
+            var currentSymbol = scan.DottedRule.PostDotSymbol.Value;
             var lexerRule = currentSymbol as ILexerRule;
 
             var token = tokenNode.Token;
             if (token.TokenType == lexerRule.TokenType)
             {
-                var nextState = scanState.NextState();
+                var nextState = scan.NextState();
                 var parseNode = CreateParseNode(
                     nextState,
-                    scanState.ParseNode,
+                    scan.ParseNode,
                     tokenNode,
                     j + 1);
-                scanState.ParseNode = parseNode;
+                nextState.ParseNode = parseNode;
 
-                if (Chart.Enqueue(j + 1, scanState))
-                    LogScan(j + 1, scanState, token);
+                if (Chart.Enqueue(j + 1, nextState))
+                    LogScan(j + 1, nextState, token);
             }
         }
 

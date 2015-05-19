@@ -21,6 +21,26 @@ namespace Pliant
             return _pulseRecognizer.Pulse(token);
         }
 
+        public bool Pulse(IToken token)
+        {
+            return _pulseRecognizer.Pulse(token);
+        }
+
+        public IEnumerable<ILexerRule> GetLexerRules()
+        {
+            var chart = _pulseRecognizer.Chart;
+            var earleySets = chart.EarleySets;
+            var currentIndex = earleySets.Count - 1;
+            var currentEarleySet = earleySets[currentIndex];
+            var scanStates = currentEarleySet.Scans;
+            
+            foreach (var scanState in scanStates)
+                yield return scanState
+                    .DottedRule
+                    .PostDotSymbol
+                    .Value as ILexerRule;
+        }
+
         public void Reset()
         {
             _pulseRecognizer.Reset();
