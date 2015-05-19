@@ -34,11 +34,10 @@ namespace Pliant
             var currentEarleySet = earleySets[currentIndex];
             var scanStates = currentEarleySet.Scans;
             
-            foreach (var scanState in scanStates)
-                yield return scanState
-                    .DottedRule
-                    .PostDotSymbol
-                    .Value as ILexerRule;
+            return from scanState in scanStates
+                   let lexerRule = scanState.DottedRule.PostDotSymbol.Value as ILexerRule
+                   group lexerRule by lexerRule.TokenType into rulesByTokenType
+                   select rulesByTokenType.First();
         }
 
         public void Reset()
