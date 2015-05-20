@@ -10,18 +10,22 @@ namespace Pliant
     {
         public IReadOnlyList<IProduction> Productions { get; private set; }
         
-        public IReadOnlyList<IProduction> Lexemes { get; private set; }
+        public IReadOnlyList<ILexerRule> LexerRules { get; private set; }
+
+        public INonTerminal Start { get; private set; }
+
+        public IReadOnlyList<ILexerRule> Ignores { get; private set; }
 
         private IDictionary<INonTerminal, IList<IProduction>> _productionIndex;
 
-        public Grammar(INonTerminal start, IProduction[] productions, IProduction[] lexemes, INonTerminal[] ignore)
+        public Grammar(INonTerminal start, IProduction[] productions, ILexerRule[] lexerRules, ILexerRule[] ignore)
         {
             Assert.IsNotNullOrEmpty(productions, "productions");
             Assert.IsNotNull(start, "start");
             CreateProductionIndex(productions);
             Productions = new ReadOnlyList<IProduction>(productions);
-            Lexemes = new ReadOnlyList<IProduction>(lexemes);
-            Ignores = new ReadOnlyList<INonTerminal>(ignore);
+            LexerRules = new ReadOnlyList<ILexerRule>(lexerRules);
+            Ignores = new ReadOnlyList<ILexerRule>(ignore);
             Start = start; 
         }
 
@@ -42,20 +46,15 @@ namespace Pliant
             return _productionIndex[symbol];
         }
 
-        public IEnumerable<IProduction> LexemesFor(INonTerminal symbol)
+        public IEnumerable<ILexerRule> LexerRulesFor(INonTerminal symbol)
         {
-            foreach (var lexeme in Lexemes)
+            foreach (var lexerRule in LexerRules)
             {
-                var leftHandSide = lexeme.LeftHandSide;
-                if (leftHandSide.SymbolType == symbol.SymbolType
-                    && leftHandSide.Value.Equals(symbol.Value))
-                    yield return lexeme;
+                if (lexerRule.SymbolType == symbol.SymbolType
+                    && lexerRule.TokenType.Id.Equals(symbol.Value))
+                    yield return lexerRule;
             }
         }
-
-        public INonTerminal Start { get; private set; }
-
-        public IReadOnlyList<INonTerminal> Ignores { get; private set; }
 
         public IEnumerable<IProduction> StartProductions()
         {

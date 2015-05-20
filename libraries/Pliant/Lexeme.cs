@@ -28,7 +28,7 @@ namespace Pliant
                 Capture += c;
             return result;
         }
-
+        
         public bool IsAccepted()
         {
             return _pulseRecognizer.IsAccepted();

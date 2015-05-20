@@ -74,22 +74,7 @@ namespace Pliant.Tests.Unit
             Assert.IsTrue(recognizer.Recognize(new StringReader(input)));
         }
 
-        [TestMethod]
-        public void Test_Recognizer_That_Whitespace_Is_Ignored()
-        {
-            // a <word boundary> abc <word boundary> a <word boundary> a
-            const string input = "a abc a a";
-            var grammar = new GrammarBuilder("A", p => p
-                    .Production("A", r => r
-                        .Rule('a', "A")
-                        .Rule('a', 'b', 'c', "A")), l=>l
-                    .Lexeme("whitespace", x=>x.WhiteSpace()), action=>action
-                    .Ignore("whitespace"))
-                .GetGrammar();
-            var recognizer = new Recognizer(grammar);
-            Assert.IsTrue(recognizer.Recognize(new StringReader(input)));            
-        }
-
+       
         [TestMethod]
         public void Test_PulseRecognizer_That_Invalid_Input_Exists_Parse()
         {

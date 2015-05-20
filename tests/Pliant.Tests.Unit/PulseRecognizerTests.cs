@@ -15,26 +15,7 @@ namespace Pliant.Tests.Unit
         public TestContext TestContext { get; set; }
         
         [TestMethod]
-        public void Test_PulseRecognizer_That_Single_Token_Increments_Parse()
-        {
-            //  S   -> W
-            //  W   -> [\s]+
-            var grammar = new GrammarBuilder("S", p=>p
-                .Production("S", r=>r
-                    .Rule("whitespace`"))
-                .Production("whitespace`", r=>r
-                    .Rule(new WhitespaceTerminal(), "whitespace"))
-                .Production("whitespace", r=>r
-                    .Rule(new WhitespaceTerminal())
-                    .Lambda()))
-                .GetGrammar();
-            
-            const string input = "\t\f\r\n ";
-            Recognize(grammar, input);
-        }
-
-        [TestMethod]
-        public void Test_PulseRecognizer_That_Ambiguous_Right_Recursive_Is_ReWritten()
+        public void Test_PulseRecognizer_That_Right_Recursive_Quasi_Complete_Items_Are_Leo_Optimized()
         {
             var grammar = new GrammarBuilder("S", p => p
                     .Production("S", r => r

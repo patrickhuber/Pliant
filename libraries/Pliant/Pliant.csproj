@@ -42,6 +42,7 @@
     <Compile Include="AndNode.cs" />
     <Compile Include="AnyTerminal.cs" />
     <Compile Include="Assert.cs" />
+    <Compile Include="CharacterClassTerminal.cs" />
     <Compile Include="Chart.cs" />
     <Compile Include="DigitTerminal.cs" />
     <Compile Include="DottedRule.cs" />
@@ -55,7 +56,7 @@
     <Compile Include="IGrammarBuilder.cs" />
     <Compile Include="IIntermediateNode.cs" />
     <Compile Include="ILexeme.cs" />
-    <Compile Include="ILexemeBuilder.cs" />
+    <Compile Include="ILexerRuleBuilder.cs" />
     <Compile Include="ICommandBuilder.cs" />
     <Compile Include="ILexerRule.cs" />
     <Compile Include="INode.cs" />
@@ -77,7 +78,7 @@
     <Compile Include="ITokenNode.cs" />
     <Compile Include="ITransitionState.cs" />
     <Compile Include="Lexeme.cs" />
-    <Compile Include="LexemeBuilder.cs" />
+    <Compile Include="LexerRuleBuilder.cs" />
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="LexerRule.cs" />
     <Compile Include="InternalNode.cs" />

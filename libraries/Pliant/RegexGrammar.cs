@@ -18,7 +18,7 @@ namespace Pliant
             get { return _regexGrammar.Start; }
         }
 
-        public IReadOnlyList<INonTerminal> Ignores
+        public IReadOnlyList<ILexerRule> Ignores
         {
             get { return _regexGrammar.Ignores; }
         }
@@ -28,9 +28,9 @@ namespace Pliant
             return _regexGrammar.RulesFor(nonTerminal);
         }
 
-        public IEnumerable<IProduction> LexemesFor(INonTerminal nonTerminal)
+        public IEnumerable<ILexerRule> LexerRulesFor(INonTerminal nonTerminal)
         {
-            return _regexGrammar.LexemesFor(nonTerminal);
+            return _regexGrammar.LexerRulesFor(nonTerminal);
         }
 
         public IEnumerable<IProduction> StartProductions()

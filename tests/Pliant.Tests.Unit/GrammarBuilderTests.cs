@@ -73,13 +73,15 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_GrammarBuilder_That_Lexeme_With_Two_Calls_To_Range_Lexeme_Method_Creates_Two_Lexemes()
+        public void Test_GrammarBuilder_That_LexerRule_With_Two_Calls_To_Range_Terminal_Method_Creates_One_LexerRule()
         {
             var grammarBuilder = new GrammarBuilder("A", p => p
                 .Production("A", r => r.Rule("B").Rule("C")), l => l
-                .Lexeme("M", r => r.Range('a', 'z').Range('A', 'Z')));
+                .LexerRule("M", new CharacterClassTerminal(
+                    new RangeTerminal('a', 'z'), 
+                    new RangeTerminal('A', 'Z'))));
             var grammar = grammarBuilder.GetGrammar();
-            Assert.AreEqual(2, grammar.Lexemes.Count);
+            Assert.AreEqual(1, grammar.LexerRules.Count);
         }
     }
 }
