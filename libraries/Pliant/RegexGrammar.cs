@@ -57,16 +57,16 @@ namespace Pliant
              *                                  Atom Iterator
              *  
              *  Atom                       ->   . |
-             *                                  Char | 
+             *                                  Character | 
              *                                  '(' Expression ')' | 
              *                                  Set
              *  
              *  Set                        ->   PositiveSet |
              *                                  NegativeSet
              *  
-             *  PositiveSet                ->   '[' CharacterSet ']'
+             *  PositiveSet                ->   '[' CharacterClass ']'
              *  
-             *  NegativeSet                ->   '[^' CharacterSet ']'
+             *  NegativeSet                ->   '[^' CharacterClass ']'
              *  
              *  CharacterClass             ->   CharacterRange |
              *                                  CharacterRange CharacterClass
@@ -105,7 +105,8 @@ namespace Pliant
                     .Rule('^', Expression, '$'))
                 .Production(Expression, r => r
                     .Rule(Term)
-                    .Rule(Term, '|', Expression))
+                    .Rule(Term, '|', Expression)
+                    .Lambda())
                 .Production(Term, r => r
                     .Rule(Factor)
                     .Rule(Factor, Term))
@@ -116,8 +117,7 @@ namespace Pliant
                     .Rule('.')
                     .Rule(Character)
                     .Rule('(', Expression, ')')
-                    .Rule(Set)
-                    .Lambda())
+                    .Rule(Set))
                 .Production(Iterator, r => r
                     .Rule(new SetTerminal('*', '+', '?')))
                 .Production(Set, r => r
