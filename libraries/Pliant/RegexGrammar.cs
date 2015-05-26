@@ -49,6 +49,7 @@ namespace Pliant
              *              
              *  Expresion                  ->   Term |   
              *                                  Term '|' Expression
+             *                                  λ
              *              
              *  Term                       ->   Factor |   
              *                                  Factor Term
@@ -140,7 +141,7 @@ namespace Pliant
                     .Rule(NotCloseBracket)
                     .Rule('\\', new AnyTerminal()))
                 .Production(NotMetaCharacter, r => r
-                    .Rule(new NegationTerminal(new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?'))))
+                    .Rule(new NegationTerminal(new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\'))))
                 .Production(NotCloseBracket, r => r
                     .Rule(new NegationTerminal(new Terminal(']')))));
             _regexGrammar = grammarBuilder.GetGrammar();
