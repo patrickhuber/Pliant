@@ -230,10 +230,10 @@ namespace Pliant
             var earleySet = Chart.EarleySets[transitionState.Origin];
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.DottedRule.PreDotSymbol.Value);
-
-            // TODO: What if the rootTransitionState is null?
+            
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
+
             var virtualParseNode = new VirtualNode(k, rootTransitionState, completed);
             
             var topmostItem = new State(
