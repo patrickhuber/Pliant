@@ -88,6 +88,7 @@
     <Compile Include="ParseRunner.cs" />
     <Compile Include="ReadWriteList.cs" />
     <Compile Include="RegexGrammar.cs" />
+    <Compile Include="RegexParser.cs" />
     <Compile Include="SetTerminal.cs" />
     <Compile Include="NegationTerminal.cs" />
     <Compile Include="NonTerminal.cs" />

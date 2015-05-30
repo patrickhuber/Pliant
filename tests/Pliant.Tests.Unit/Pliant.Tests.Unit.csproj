@@ -59,6 +59,7 @@
     <Compile Include="PulseRecognizerTests.cs" />
     <Compile Include="RecognizerTests.cs" />
     <Compile Include="ProductionTests.cs" />
+    <Compile Include="RegexParserTests.cs" />
     <Compile Include="RegexTests.cs" />
     <Compile Include="StateTests.cs" />
     <Compile Include="GrammarTests.cs" />

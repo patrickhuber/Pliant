@@ -37,5 +37,14 @@ namespace Pliant
             _lexerRules.Add(lexerRule);
             return this;
         }
+
+        public ILexerRuleBuilder LexerRule(string name, string regularExpression)
+        {
+            var regexParser = new RegexParser();
+            var grammar = regexParser.Parse(regularExpression);
+            var lexerRule = new LexerRule(new NonTerminal(name), grammar);
+            _lexerRules.Add(lexerRule);
+            return this;
+        }
     }
 }

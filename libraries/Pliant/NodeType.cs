@@ -11,6 +11,7 @@ namespace Pliant
         Intermediate,
         Symbol,
         Terminal,
-        Token
+        Token,
+        Virtual
     }
 }

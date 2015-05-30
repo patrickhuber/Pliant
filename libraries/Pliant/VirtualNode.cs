@@ -33,7 +33,7 @@ namespace Pliant
              
         public NodeType NodeType
         {
-            get { throw new NotImplementedException(); }
+            get { return NodeType.Virtual; }
         }
         
         public IReadOnlyList<IAndNode> Children
@@ -58,7 +58,7 @@ namespace Pliant
             }
             else if (_transitionState.Reduction.ParseNode != null)
             {
-               AddUniqueFamily(_transitionState.Reduction.ParseNode, _completed.ParseNode);
+                AddUniqueFamily(_transitionState.Reduction.ParseNode, _completed.ParseNode);
             }
             else
             {

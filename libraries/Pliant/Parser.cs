@@ -11,6 +11,8 @@ namespace Pliant
     {
         private PulseRecognizer _pulseRecognizer;
         
+        public int Location { get { return _pulseRecognizer.Location; } }
+
         public Parser(IGrammar grammar)
         {
             _pulseRecognizer = new PulseRecognizer(grammar);
