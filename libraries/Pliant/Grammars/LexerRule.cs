@@ -1,4 +1,5 @@
-﻿using Pliant.Tokens;
+﻿using Pliant.Regex;
+using Pliant.Tokens;
 
 namespace Pliant.Grammars
 {
