@@ -10,5 +10,7 @@ namespace Pliant
     {
         string Capture { get; }
         bool Scan(char c);
+        bool IsAccepted();
+        TokenType TokenType { get; }
     }
 }

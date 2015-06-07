@@ -21,3 +21,5 @@ Pliant is a table driven parser that implements the Earley algorithm. Two optimi
 * [detailed description of leo optimizations and internals of marpa](https://github.com/jeffreykegler/kollos/blob/master/notes/misc/leo2.md)
 * [theory of Marpa Algorithm](https://docs.google.com/file/d/0B9_mR_M2zOc4Ni1zSW5IYzk3TGc/edit)
 * [parse tree forest creation](http://www.sciencedirect.com/science/article/pii/S1571066108001497)
+* [cs theory stackexchange, leo optimization parse tree creation](http://cstheory.stackexchange.com/q/31182/32787)
+* [insights on lexer creation](https://youtu.be/XaScLywH2CI)

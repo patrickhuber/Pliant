@@ -59,14 +59,16 @@
     <Compile Include="PulseRecognizerTests.cs" />
     <Compile Include="RecognizerTests.cs" />
     <Compile Include="ProductionTests.cs" />
+    <Compile Include="RegexParserTests.cs" />
     <Compile Include="RegexTests.cs" />
     <Compile Include="StateTests.cs" />
     <Compile Include="GrammarTests.cs" />
     <Compile Include="AycockHorspoolAlgorithmTests.cs" />
     <Compile Include="RangeTerminalTests.cs" />
     <Compile Include="ParserTests.cs" />
-    <Compile Include="LexerTests.cs" />
     <Compile Include="LexemeTests.cs" />
+    <Compile Include="ParseRunnerTests.cs" />
+    <Compile Include="TerminalLexemeTests.cs" />
     <Compile Include="WhitespaceTerminalTests.cs" />
   </ItemGroup>
   <ItemGroup>

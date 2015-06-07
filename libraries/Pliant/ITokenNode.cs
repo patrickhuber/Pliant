@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Pliant
 {
-    public interface ILexemeBuilder
+    public interface ITokenNode : INode
     {
-        ILexemeBuilder Lexeme(string name, Action<ITerminalBuilder> terminals);
+        IToken Token { get; }
     }
 }

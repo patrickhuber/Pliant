@@ -8,11 +8,11 @@ namespace Pliant
                 
         INonTerminal Start { get; }
         
-        IReadOnlyList<INonTerminal> Ignores { get; }
+        IReadOnlyList<ILexerRule> Ignores { get; }
 
         IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal);
 
-        IEnumerable<IProduction> LexemesFor(INonTerminal nonTerminal);
+        IEnumerable<ILexerRule> LexerRulesFor(INonTerminal nonTerminal);
 
         IEnumerable<IProduction> StartProductions();
     }

@@ -8,8 +8,8 @@ namespace Pliant
 {
     public interface IToken
     {
-        StringBuilder Value { get; }
+        string Value { get; }
         int Origin { get; }
-        int Type { get; }
+        TokenType TokenType { get; }
     }
 }

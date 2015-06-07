@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace Pliant
 {
     public class Recognizer
     {
         private IGrammar _grammar;
+        private const int EndOfRead = -1;
 
         public Recognizer(IGrammar grammar)
         {
@@ -20,8 +16,8 @@ namespace Pliant
         public bool Recognize(TextReader textReader)
         {
             var pulseRecognizer = new PulseRecognizer(_grammar);
-
-            while(textReader.Peek() != -1)
+            
+            while(textReader.Peek() != EndOfRead)
             {
                 var token = (char)textReader.Read();
                 if (!pulseRecognizer.Pulse(token))

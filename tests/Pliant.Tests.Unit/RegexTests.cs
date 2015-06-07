@@ -42,6 +42,13 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
+        public void Test_Regex_That_Parses_Optional_Character_Class()
+        {
+            var input = "a?";
+            Recognize(input);
+        }
+
+        [TestMethod]
         public void Test_Regex_That_Parses_Whitespace_Character_Class()
         {
             var input = @"[\s]+";
@@ -51,6 +58,7 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_Regex_That_Parses_Range_Character_Class()
         {
+            // TODO: Check to make sure the parse node is binary. This invocation appears to have 3 children.
             var input = @"[a-z]";
             Recognize(input);
         }

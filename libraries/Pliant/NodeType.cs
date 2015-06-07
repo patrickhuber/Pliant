@@ -10,6 +10,8 @@ namespace Pliant
     {
         Intermediate,
         Symbol,
-        Terminal
+        Terminal,
+        Token,
+        Virtual
     }
 }

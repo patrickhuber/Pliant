@@ -18,7 +18,7 @@ namespace Pliant
             get { return _regexGrammar.Start; }
         }
 
-        public IReadOnlyList<INonTerminal> Ignores
+        public IReadOnlyList<ILexerRule> Ignores
         {
             get { return _regexGrammar.Ignores; }
         }
@@ -28,9 +28,9 @@ namespace Pliant
             return _regexGrammar.RulesFor(nonTerminal);
         }
 
-        public IEnumerable<IProduction> LexemesFor(INonTerminal nonTerminal)
+        public IEnumerable<ILexerRule> LexerRulesFor(INonTerminal nonTerminal)
         {
-            return _regexGrammar.LexemesFor(nonTerminal);
+            return _regexGrammar.LexerRulesFor(nonTerminal);
         }
 
         public IEnumerable<IProduction> StartProductions()
@@ -49,6 +49,7 @@ namespace Pliant
              *              
              *  Expresion                  ->   Term |   
              *                                  Term '|' Expression
+             *                                  λ
              *              
              *  Term                       ->   Factor |   
              *                                  Factor Term
@@ -57,16 +58,16 @@ namespace Pliant
              *                                  Atom Iterator
              *  
              *  Atom                       ->   . |
-             *                                  Char | 
+             *                                  Character | 
              *                                  '(' Expression ')' | 
              *                                  Set
              *  
              *  Set                        ->   PositiveSet |
              *                                  NegativeSet
              *  
-             *  PositiveSet                ->   '[' CharacterSet ']'
+             *  PositiveSet                ->   '[' CharacterClass ']'
              *  
-             *  NegativeSet                ->   '[^' CharacterSet ']'
+             *  NegativeSet                ->   '[^' CharacterClass ']'
              *  
              *  CharacterClass             ->   CharacterRange |
              *                                  CharacterRange CharacterClass
@@ -105,7 +106,8 @@ namespace Pliant
                     .Rule('^', Expression, '$'))
                 .Production(Expression, r => r
                     .Rule(Term)
-                    .Rule(Term, '|', Expression))
+                    .Rule(Term, '|', Expression)
+                    .Lambda())
                 .Production(Term, r => r
                     .Rule(Factor)
                     .Rule(Factor, Term))
@@ -116,8 +118,7 @@ namespace Pliant
                     .Rule('.')
                     .Rule(Character)
                     .Rule('(', Expression, ')')
-                    .Rule(Set)
-                    .Lambda())
+                    .Rule(Set))
                 .Production(Iterator, r => r
                     .Rule(new SetTerminal('*', '+', '?')))
                 .Production(Set, r => r
@@ -140,7 +141,7 @@ namespace Pliant
                     .Rule(NotCloseBracket)
                     .Rule('\\', new AnyTerminal()))
                 .Production(NotMetaCharacter, r => r
-                    .Rule(new NegationTerminal(new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?'))))
+                    .Rule(new NegationTerminal(new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\'))))
                 .Production(NotCloseBracket, r => r
                     .Rule(new NegationTerminal(new Terminal(']')))));
             _regexGrammar = grammarBuilder.GetGrammar();

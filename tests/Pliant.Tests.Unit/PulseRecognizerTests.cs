@@ -12,56 +12,10 @@ namespace Pliant.Tests.Unit
     [TestClass]
     public class PulseRecognizerTests
     {
-
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
         public TestContext TestContext { get; set; }
-
-        #region Additional test attributes
-        //
-        // You can use the following additional attributes as you write your tests:
-        //
-        // Use ClassInitialize to run code before running the first test in the class
-        // [ClassInitialize()]
-        // public static void MyClassInitialize(TestContext testContext) { }
-        //
-        // Use ClassCleanup to run code after all tests in a class have run
-        // [ClassCleanup()]
-        // public static void MyClassCleanup() { }
-        //
-        // Use TestInitialize to run code before running each test 
-        // [TestInitialize()]
-        // public void MyTestInitialize() { }
-        //
-        // Use TestCleanup to run code after each test has run
-        // [TestCleanup()]
-        // public void MyTestCleanup() { }
-        //
-        #endregion
-
+        
         [TestMethod]
-        public void Test_PulseRecognizer_That_Single_Token_Increments_Parse()
-        {
-            //  S   -> W
-            //  W   -> [\s]+
-            var grammar = new GrammarBuilder("S", p=>p
-                .Production("S", r=>r
-                    .Rule("whitespace`"))
-                .Production("whitespace`", r=>r
-                    .Rule(new WhitespaceTerminal(), "whitespace"))
-                .Production("whitespace", r=>r
-                    .Rule(new WhitespaceTerminal())
-                    .Lambda()))
-                .GetGrammar();
-            
-            const string input = "\t\f\r\n ";
-            Recognize(grammar, input);
-        }
-
-        [TestMethod]
-        public void Test_PulseRecognizer_That_Ambiguous_Right_Recursive_Is_ReWritten()
+        public void Test_PulseRecognizer_That_Right_Recursive_Quasi_Complete_Items_Are_Leo_Optimized()
         {
             var grammar = new GrammarBuilder("S", p => p
                     .Production("S", r => r

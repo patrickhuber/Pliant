@@ -9,14 +9,14 @@ namespace Pliant
     public class GrammarBuilder : IGrammarBuilder
     {
         private IList<IProduction> _productions;
-        private IList<IProduction> _lexemes;
+        private IList<ILexerRule> _lexerRules;
         private IList<string> _actions;
         private string _start;
 
         public GrammarBuilder(
             string start, 
             Action<IProductionBuilder> productions, 
-            Action<ILexemeBuilder> lexemes = null, 
+            Action<ILexerRuleBuilder> lexerRules = null, 
             Action<ICommandBuilder> action = null)
         {
             _start = start;
@@ -25,10 +25,10 @@ namespace Pliant
             productions(productionBuilder);
             _productions = productionBuilder.GetProductions();
 
-            var lexemeBuilder = new LexemeBuilder();
-            if(lexemes != null)
-                lexemes(lexemeBuilder);
-            _lexemes = lexemeBuilder.GetLexemes();
+            var lexerRuleBuilder = new LexerRuleBuilder();
+            if(lexerRules != null)
+                lexerRules(lexerRuleBuilder);
+            _lexerRules = lexerRuleBuilder.GetLexerRules();
 
             var ignoreBuilder = new CommandBuilder();
             if(action != null)
@@ -44,10 +44,10 @@ namespace Pliant
             if (startProduction == null)
                 throw new Exception("no start production found for start symbol");
             var start = startProduction.LeftHandSide;
-            var ignore = _lexemes
-                .Where(x => _actions.Contains(x.LeftHandSide.Value))
-                .Select(l=>l.LeftHandSide);
-            return new Grammar(start, _productions.ToArray(), _lexemes.ToArray(), ignore.ToArray());
+            var ignore = _lexerRules
+                .Where(x => _actions.Contains(x.TokenType.Id));
+
+            return new Grammar(start, _productions.ToArray(), _lexerRules.ToArray(), ignore.ToArray());
         }
     }
 }
