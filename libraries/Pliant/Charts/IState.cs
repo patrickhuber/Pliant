@@ -1,7 +1,7 @@
 ﻿using Pliant.Grammars;
 using Pliant.Nodes;
-using System;
-namespace Pliant
+
+namespace Pliant.Charts
 {
     public interface IState
     {

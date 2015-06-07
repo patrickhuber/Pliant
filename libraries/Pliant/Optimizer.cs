@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Charts;
+using Pliant.Grammars;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -1,4 +1,5 @@
-﻿using Pliant.Collections;
+﻿using Pliant.Charts;
+using Pliant.Collections;
 using System.Collections.Generic;
 
 namespace Pliant.Nodes

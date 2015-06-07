@@ -2,7 +2,7 @@
 using Pliant.Nodes;
 using System.Text;
 
-namespace Pliant
+namespace Pliant.Charts
 {
     public class State : IState
     {

@@ -1,4 +1,6 @@
-﻿namespace Pliant.Nodes
+﻿using Pliant.Charts;
+
+namespace Pliant.Nodes
 {
     public class IntermediateNode : InternalNode, IIntermediateNode
     {

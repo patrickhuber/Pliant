@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Pliant.Charts;
 using Pliant.Grammars;
 
 namespace Pliant.Tests.Unit

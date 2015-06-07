@@ -1,7 +1,7 @@
 ﻿using Pliant.Collections;
 using System.Collections.Generic;
 
-namespace Pliant
+namespace Pliant.Charts
 {
     public class Chart
     {

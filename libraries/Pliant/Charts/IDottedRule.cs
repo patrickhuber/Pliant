@@ -1,6 +1,6 @@
 ﻿using Pliant.Grammars;
 
-namespace Pliant
+namespace Pliant.Charts
 {
     public interface IDottedRule
     {

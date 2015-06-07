@@ -1,6 +1,6 @@
 ﻿using Pliant.Grammars;
-using System;
-namespace Pliant
+
+namespace Pliant.Charts
 {
     public interface ITransitionState : IState
     {
