@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Text;
 using System.IO;
 using System.Linq;
+using Pliant.Terminals;
 
 namespace Pliant.Tests.Unit
 {

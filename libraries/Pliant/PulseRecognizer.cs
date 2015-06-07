@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Pliant.Terminals;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Pliant
