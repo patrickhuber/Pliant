@@ -39,7 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AndNode.cs" />
+    <Compile Include="Nodes\AndNode.cs" />
     <Compile Include="Terminals\AnyTerminal.cs" />
     <Compile Include="Assert.cs" />
     <Compile Include="Terminals\CharacterClassTerminal.cs" />
@@ -50,21 +50,21 @@
     <Compile Include="EarleySet.cs" />
     <Compile Include="Grammar.cs" />
     <Compile Include="GrammarBuilder.cs" />
-    <Compile Include="IAndNode.cs" />
+    <Compile Include="Nodes\IAndNode.cs" />
     <Compile Include="IDottedRule.cs" />
     <Compile Include="IEarleySet.cs" />
     <Compile Include="IGrammar.cs" />
     <Compile Include="IGrammarBuilder.cs" />
-    <Compile Include="IIntermediateNode.cs" />
+    <Compile Include="Nodes\IIntermediateNode.cs" />
     <Compile Include="ILexeme.cs" />
     <Compile Include="ILexerRuleBuilder.cs" />
     <Compile Include="ICommandBuilder.cs" />
     <Compile Include="ILexerRule.cs" />
-    <Compile Include="INode.cs" />
+    <Compile Include="Nodes\INode.cs" />
     <Compile Include="INonTerminal.cs" />
-    <Compile Include="IntermediateNode.cs" />
+    <Compile Include="Nodes\IntermediateNode.cs" />
     <Compile Include="INullable.cs" />
-    <Compile Include="IInternalNode.cs" />
+    <Compile Include="Nodes\IInternalNode.cs" />
     <Compile Include="IParseEngine.cs" />
     <Compile Include="IParseInterface.cs" />
     <Compile Include="IProduction.cs" />
@@ -72,20 +72,20 @@
     <Compile Include="IRuleBuilder.cs" />
     <Compile Include="IState.cs" />
     <Compile Include="ISymbol.cs" />
-    <Compile Include="ISymbolNode.cs" />
+    <Compile Include="Nodes\ISymbolNode.cs" />
     <Compile Include="Terminals\ITerminal.cs" />
     <Compile Include="ITerminalBuilder.cs" />
-    <Compile Include="ITerminalNode.cs" />
+    <Compile Include="Nodes\ITerminalNode.cs" />
     <Compile Include="IToken.cs" />
-    <Compile Include="ITokenNode.cs" />
+    <Compile Include="Nodes\ITokenNode.cs" />
     <Compile Include="ITransitionState.cs" />
     <Compile Include="Lexeme.cs" />
     <Compile Include="LexerRuleBuilder.cs" />
     <Compile Include="CommandBuilder.cs" />
     <Compile Include="LexerRule.cs" />
-    <Compile Include="InternalNode.cs" />
-    <Compile Include="NodeSet.cs" />
-    <Compile Include="NodeType.cs" />
+    <Compile Include="Nodes\InternalNode.cs" />
+    <Compile Include="Nodes\NodeSet.cs" />
+    <Compile Include="Nodes\NodeType.cs" />
     <Compile Include="Optimizer.cs" />
     <Compile Include="ParseEngine.cs" />
     <Compile Include="ParseInterface.cs" />
@@ -111,19 +111,19 @@
     <Compile Include="State.cs" />
     <Compile Include="StateQueue.cs" />
     <Compile Include="StateType.cs" />
-    <Compile Include="SymbolNode.cs" />
+    <Compile Include="Nodes\SymbolNode.cs" />
     <Compile Include="SymbolType.cs" />
     <Compile Include="Symbol.cs" />
     <Compile Include="Terminals\Terminal.cs" />
     <Compile Include="TerminalBuilder.cs" />
     <Compile Include="TerminalLexeme.cs" />
     <Compile Include="TerminalLexerRule.cs" />
-    <Compile Include="TerminalNode.cs" />
+    <Compile Include="Nodes\TerminalNode.cs" />
     <Compile Include="Token.cs" />
-    <Compile Include="TokenNode.cs" />
+    <Compile Include="Nodes\TokenNode.cs" />
     <Compile Include="TokenType.cs" />
     <Compile Include="TransitionState.cs" />
-    <Compile Include="VirtualNode.cs" />
+    <Compile Include="Nodes\VirtualNode.cs" />
     <Compile Include="Terminals\WhitespaceTerminal.cs" />
   </ItemGroup>
   <ItemGroup>

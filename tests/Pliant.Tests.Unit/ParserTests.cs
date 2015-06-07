@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Pliant.Nodes;
 
 namespace Pliant.Tests.Unit
 {
