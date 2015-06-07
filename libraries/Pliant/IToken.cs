@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pliant
+namespace Pliant.Tokens
 {
     public interface IToken
     {

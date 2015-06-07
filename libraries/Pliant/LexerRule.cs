@@ -1,4 +1,6 @@
-﻿namespace Pliant
+﻿using Pliant.Tokens;
+
+namespace Pliant
 {
     public class LexerRule : ILexerRule
     {

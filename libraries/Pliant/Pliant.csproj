@@ -119,9 +119,9 @@
     <Compile Include="TerminalLexeme.cs" />
     <Compile Include="TerminalLexerRule.cs" />
     <Compile Include="Nodes\TerminalNode.cs" />
-    <Compile Include="Token.cs" />
+    <Compile Include="Tokens\Token.cs" />
     <Compile Include="Nodes\TokenNode.cs" />
-    <Compile Include="TokenType.cs" />
+    <Compile Include="Tokens\TokenType.cs" />
     <Compile Include="TransitionState.cs" />
     <Compile Include="Nodes\VirtualNode.cs" />
     <Compile Include="Terminals\WhitespaceTerminal.cs" />

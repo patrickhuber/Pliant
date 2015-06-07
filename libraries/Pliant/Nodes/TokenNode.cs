@@ -1,4 +1,6 @@
-﻿namespace Pliant.Nodes
+﻿using Pliant.Tokens;
+
+namespace Pliant.Nodes
 {
     public class TokenNode : ITokenNode
     {
