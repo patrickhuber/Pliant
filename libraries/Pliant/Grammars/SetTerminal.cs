@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Pliant.Terminals
+namespace Pliant.Grammars
 {
     public class SetTerminal : ITerminal
     {

@@ -40,20 +40,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Nodes\AndNode.cs" />
-    <Compile Include="Terminals\AnyTerminal.cs" />
+    <Compile Include="Grammars\AnyTerminal.cs" />
     <Compile Include="Assert.cs" />
-    <Compile Include="Terminals\CharacterClassTerminal.cs" />
-    <Compile Include="Chart.cs" />
+    <Compile Include="Grammars\CharacterClassTerminal.cs" />
+    <Compile Include="Charts\Chart.cs" />
     <Compile Include="Collections\IEnumerableExtensions.cs" />
-    <Compile Include="Terminals\DigitTerminal.cs" />
-    <Compile Include="DottedRule.cs" />
-    <Compile Include="EarleySet.cs" />
-    <Compile Include="Grammar.cs" />
+    <Compile Include="Grammars\DigitTerminal.cs" />
+    <Compile Include="Charts\DottedRule.cs" />
+    <Compile Include="Charts\EarleySet.cs" />
+    <Compile Include="Grammars\Grammar.cs" />
     <Compile Include="GrammarBuilder.cs" />
     <Compile Include="Nodes\IAndNode.cs" />
-    <Compile Include="IDottedRule.cs" />
-    <Compile Include="IEarleySet.cs" />
-    <Compile Include="IGrammar.cs" />
+    <Compile Include="Charts\IDottedRule.cs" />
+    <Compile Include="Charts\IEarleySet.cs" />
+    <Compile Include="Grammars\IGrammar.cs" />
     <Compile Include="IGrammarBuilder.cs" />
     <Compile Include="Nodes\IIntermediateNode.cs" />
     <Compile Include="ILexeme.cs" />
@@ -61,24 +61,24 @@
     <Compile Include="ICommandBuilder.cs" />
     <Compile Include="ILexerRule.cs" />
     <Compile Include="Nodes\INode.cs" />
-    <Compile Include="INonTerminal.cs" />
+    <Compile Include="Grammars\INonTerminal.cs" />
     <Compile Include="Nodes\IntermediateNode.cs" />
     <Compile Include="INullable.cs" />
     <Compile Include="Nodes\IInternalNode.cs" />
     <Compile Include="IParseEngine.cs" />
     <Compile Include="IParseInterface.cs" />
-    <Compile Include="IProduction.cs" />
+    <Compile Include="Grammars\IProduction.cs" />
     <Compile Include="IProductionBuilder.cs" />
     <Compile Include="IRuleBuilder.cs" />
-    <Compile Include="IState.cs" />
-    <Compile Include="ISymbol.cs" />
+    <Compile Include="Charts\IState.cs" />
+    <Compile Include="Grammars\ISymbol.cs" />
     <Compile Include="Nodes\ISymbolNode.cs" />
-    <Compile Include="Terminals\ITerminal.cs" />
+    <Compile Include="Grammars\ITerminal.cs" />
     <Compile Include="ITerminalBuilder.cs" />
     <Compile Include="Nodes\ITerminalNode.cs" />
-    <Compile Include="IToken.cs" />
+    <Compile Include="Tokens\IToken.cs" />
     <Compile Include="Nodes\ITokenNode.cs" />
-    <Compile Include="ITransitionState.cs" />
+    <Compile Include="Charts\ITransitionState.cs" />
     <Compile Include="Lexeme.cs" />
     <Compile Include="LexerRuleBuilder.cs" />
     <Compile Include="CommandBuilder.cs" />
@@ -93,28 +93,28 @@
     <Compile Include="Collections\ReadWriteList.cs" />
     <Compile Include="RegexGrammar.cs" />
     <Compile Include="RegexParser.cs" />
-    <Compile Include="Terminals\SetTerminal.cs" />
-    <Compile Include="Terminals\NegationTerminal.cs" />
-    <Compile Include="NonTerminal.cs" />
+    <Compile Include="Grammars\SetTerminal.cs" />
+    <Compile Include="Grammars\NegationTerminal.cs" />
+    <Compile Include="Grammars\NonTerminal.cs" />
     <Compile Include="Observable.cs" />
     <Compile Include="Observer.cs" />
     <Compile Include="Parser.cs" />
-    <Compile Include="Production.cs" />
+    <Compile Include="Grammars\Production.cs" />
     <Compile Include="ProductionBuilder.cs" />
     <Compile Include="PulseRecognizer.cs" />
-    <Compile Include="Terminals\RangeTerminal.cs" />
+    <Compile Include="Grammars\RangeTerminal.cs" />
     <Compile Include="Repetition.cs" />
     <Compile Include="RuleBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Collections\ReadOnlyList.cs" />
     <Compile Include="Recognizer.cs" />
-    <Compile Include="State.cs" />
-    <Compile Include="StateQueue.cs" />
-    <Compile Include="StateType.cs" />
+    <Compile Include="Charts\State.cs" />
+    <Compile Include="Charts\StateQueue.cs" />
+    <Compile Include="Charts\StateType.cs" />
     <Compile Include="Nodes\SymbolNode.cs" />
-    <Compile Include="SymbolType.cs" />
-    <Compile Include="Symbol.cs" />
-    <Compile Include="Terminals\Terminal.cs" />
+    <Compile Include="Grammars\SymbolType.cs" />
+    <Compile Include="Grammars\Symbol.cs" />
+    <Compile Include="Grammars\Terminal.cs" />
     <Compile Include="TerminalBuilder.cs" />
     <Compile Include="TerminalLexeme.cs" />
     <Compile Include="TerminalLexerRule.cs" />
@@ -122,13 +122,11 @@
     <Compile Include="Tokens\Token.cs" />
     <Compile Include="Nodes\TokenNode.cs" />
     <Compile Include="Tokens\TokenType.cs" />
-    <Compile Include="TransitionState.cs" />
+    <Compile Include="Charts\TransitionState.cs" />
     <Compile Include="Nodes\VirtualNode.cs" />
-    <Compile Include="Terminals\WhitespaceTerminal.cs" />
+    <Compile Include="Grammars\WhitespaceTerminal.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Charts\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

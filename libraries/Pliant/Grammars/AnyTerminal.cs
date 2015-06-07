@@ -1,4 +1,4 @@
-﻿namespace Pliant.Terminals
+﻿namespace Pliant.Grammars
 {
     public class AnyTerminal : ITerminal
     {

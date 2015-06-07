@@ -1,5 +1,5 @@
 ﻿using System;
-namespace Pliant.Terminals
+namespace Pliant.Grammars
 {
     public interface ITerminal : ISymbol
     {
