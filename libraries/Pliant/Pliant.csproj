@@ -112,6 +112,8 @@
     <Compile Include="Symbol.cs" />
     <Compile Include="Terminal.cs" />
     <Compile Include="TerminalBuilder.cs" />
+    <Compile Include="TerminalLexeme.cs" />
+    <Compile Include="TerminalLexerRule.cs" />
     <Compile Include="TerminalNode.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="TokenNode.cs" />

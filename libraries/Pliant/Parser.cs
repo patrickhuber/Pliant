@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pliant
 {
@@ -54,7 +51,6 @@ namespace Pliant
 
         public INode ParseForest()
         { 
-            // thompson construction
             if (!IsAccepted())
                 throw new Exception("Unable to parse expression.");
             var chart = _pulseRecognizer.Chart;

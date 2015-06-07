@@ -70,9 +70,9 @@ namespace Pliant.Tests.Unit
             const string input = "a abc a a";
             var grammar = new GrammarBuilder("A", p => p
                     .Production("A", r => r
-                        .Rule('a', "A")
-                        .Rule('a', 'b', 'c', "A")), l => l
-                    .LexerRule(_whitespaceRule), action => action
+                        .Rule(_wordRule, "A")), l => l
+                    .LexerRule(_whitespaceRule)
+                    .LexerRule(_wordRule), action => action
                     .Ignore(_whitespaceRule.TokenType.Id))
                 .GetGrammar();
             var parseRunner = new ParseRunner(grammar, input);

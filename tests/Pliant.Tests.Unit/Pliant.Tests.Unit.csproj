@@ -68,6 +68,7 @@
     <Compile Include="ParserTests.cs" />
     <Compile Include="LexemeTests.cs" />
     <Compile Include="ParseRunnerTests.cs" />
+    <Compile Include="TerminalLexemeTests.cs" />
     <Compile Include="WhitespaceTerminalTests.cs" />
   </ItemGroup>
   <ItemGroup>

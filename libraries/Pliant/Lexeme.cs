@@ -8,17 +8,17 @@ namespace Pliant
 {
     public class Lexeme : ILexeme
     {
-        public ILexerRule LexerRule { get; private set; }
-
         public string Capture { get; private set; }
+
+        public TokenType TokenType { get; private set; }
 
         private PulseRecognizer _pulseRecognizer;
 
         public Lexeme(ILexerRule lexerRule)
         {
-            LexerRule = lexerRule;
             Capture = string.Empty;
-            _pulseRecognizer = new PulseRecognizer(LexerRule.Grammar);
+            TokenType = lexerRule.TokenType;
+            _pulseRecognizer = new PulseRecognizer(lexerRule.Grammar);
         }
         
         public bool Scan(char c)

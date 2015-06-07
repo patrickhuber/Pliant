@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Pliant
 {
@@ -24,6 +23,10 @@ namespace Pliant
                     if (symbol is char)
                     {
                         var terminal = new Terminal((char)symbol);
+                        var terminalLexerRule = new TerminalLexerRule(
+                            terminal, 
+                            new TokenType(terminal.ToString()));
+                        // TODO: add the terminalLexerRule instead of the Terminal
                         symbolList.Add(terminal);
                     }
                     else if (symbol is ITerminal)

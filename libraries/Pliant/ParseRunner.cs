@@ -15,7 +15,8 @@ namespace Pliant
         private bool _shouldReadCharacter;
         private int _position;
         private IEnumerable<ILexeme> _lexemes;
-
+        private IEnumerable<ILexeme> _ignoreRules;
+        
         public Parser Parser { get; private set; }
 
         public ParseRunner(IGrammar grammar, string input)
@@ -41,19 +42,20 @@ namespace Pliant
                 .ToArray();
         }
 
+
         public bool Pulse()
         {
             // end of stream
             if (_textReader.Peek() == -1)
                 return false;
-
+            
             var c = ReadCharacter();
 
             IEnumerable<ILexeme> nextLexemes = _lexemes
                 .Where(l => l.Scan(c))
                 .ToArray();
-            var passingLexemesRemain = nextLexemes.Count() > 0 && _textReader.Peek() != -1;
 
+            var passingLexemesRemain = nextLexemes.Count() > 0 && _textReader.Peek() != -1;
             if (passingLexemesRemain)
             {
                 SetPassingLexemes(nextLexemes);
@@ -63,16 +65,31 @@ namespace Pliant
             // fail if no accepted lexemes were found in the current set
             var firstValidLexeme = GetLongestAcceptableMatchLexeme();
             if (firstValidLexeme == null)
-                return false;
+            {
+                var ignoreLexemes = _ignoreRules == null || _ignoreRules.Count() == 0
+                    ? _grammar
+                        .Ignores
+                        .Select(i => new Lexeme(i))
+                    : _ignoreRules;
+                var nextIgnoreRules = ignoreLexemes
+                    .Where(x => x.Scan(c))
+                    .ToArray();
+                if(nextIgnoreRules.Count() == 0)
+                    return false;
+                _ignoreRules = nextIgnoreRules;
+                return true;
+            }
 
             // emit the token to the parser
             var token = new Token(firstValidLexeme.Capture, 
                 _position - ( firstValidLexeme.Capture.Length + 1), 
-                firstValidLexeme.LexerRule.TokenType);
+                firstValidLexeme.TokenType);
 
             var parseResult = Parser.Pulse(token);
             if (!parseResult)
+            {
                 return false;
+            }
 
             // set the next wave of lexemes
             SetCurrentLexemes();
