@@ -56,10 +56,10 @@
     <Compile Include="Grammars\IGrammar.cs" />
     <Compile Include="IGrammarBuilder.cs" />
     <Compile Include="Nodes\IIntermediateNode.cs" />
-    <Compile Include="ILexeme.cs" />
+    <Compile Include="Lexemes\ILexeme.cs" />
     <Compile Include="ILexerRuleBuilder.cs" />
     <Compile Include="ICommandBuilder.cs" />
-    <Compile Include="ILexerRule.cs" />
+    <Compile Include="Grammars\ILexerRule.cs" />
     <Compile Include="Nodes\INode.cs" />
     <Compile Include="Grammars\INonTerminal.cs" />
     <Compile Include="Nodes\IntermediateNode.cs" />
@@ -79,10 +79,10 @@
     <Compile Include="Tokens\IToken.cs" />
     <Compile Include="Nodes\ITokenNode.cs" />
     <Compile Include="Charts\ITransitionState.cs" />
-    <Compile Include="Lexeme.cs" />
+    <Compile Include="Lexemes\Lexeme.cs" />
     <Compile Include="LexerRuleBuilder.cs" />
     <Compile Include="CommandBuilder.cs" />
-    <Compile Include="LexerRule.cs" />
+    <Compile Include="Grammars\LexerRule.cs" />
     <Compile Include="Nodes\InternalNode.cs" />
     <Compile Include="Nodes\NodeSet.cs" />
     <Compile Include="Nodes\NodeType.cs" />
@@ -116,8 +116,8 @@
     <Compile Include="Grammars\Symbol.cs" />
     <Compile Include="Grammars\Terminal.cs" />
     <Compile Include="TerminalBuilder.cs" />
-    <Compile Include="TerminalLexeme.cs" />
-    <Compile Include="TerminalLexerRule.cs" />
+    <Compile Include="Lexemes\TerminalLexeme.cs" />
+    <Compile Include="Grammars\TerminalLexerRule.cs" />
     <Compile Include="Nodes\TerminalNode.cs" />
     <Compile Include="Tokens\Token.cs" />
     <Compile Include="Nodes\TokenNode.cs" />

@@ -1,7 +1,7 @@
 ﻿using Pliant.Grammars;
 using Pliant.Tokens;
 
-namespace Pliant
+namespace Pliant.Lexemes
 {
     public class TerminalLexeme : ILexeme
     {
