@@ -70,7 +70,8 @@ namespace Pliant.Tests.Unit
             const string input = "a abc a a";
             var grammar = new GrammarBuilder("A", p => p
                     .Production("A", r => r
-                        .Rule(_wordRule, "A")), l => l
+                        .Rule(_wordRule, "A")
+                        .Rule(_wordRule)), l => l
                     .LexerRule(_whitespaceRule)
                     .LexerRule(_wordRule), action => action
                     .Ignore(_whitespaceRule.TokenType.Id))
@@ -80,7 +81,6 @@ namespace Pliant.Tests.Unit
 
             while (parseRunner.Pulse() && count < 100) // look for runaway
             { count++; }
-
             Assert.IsTrue(parseRunner.Parser.IsAccepted());
         }
     }

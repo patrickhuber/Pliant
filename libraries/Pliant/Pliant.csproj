@@ -44,6 +44,7 @@
     <Compile Include="Assert.cs" />
     <Compile Include="CharacterClassTerminal.cs" />
     <Compile Include="Chart.cs" />
+    <Compile Include="Collections\IEnumerableExtensions.cs" />
     <Compile Include="DigitTerminal.cs" />
     <Compile Include="DottedRule.cs" />
     <Compile Include="EarleySet.cs" />
