@@ -65,6 +65,8 @@
     <Compile Include="IntermediateNode.cs" />
     <Compile Include="INullable.cs" />
     <Compile Include="IInternalNode.cs" />
+    <Compile Include="IParseEngine.cs" />
+    <Compile Include="IParseInterface.cs" />
     <Compile Include="IProduction.cs" />
     <Compile Include="IProductionBuilder.cs" />
     <Compile Include="IReadOnlyList.cs" />
@@ -86,6 +88,8 @@
     <Compile Include="NodeSet.cs" />
     <Compile Include="NodeType.cs" />
     <Compile Include="Optimizer.cs" />
+    <Compile Include="ParseEngine.cs" />
+    <Compile Include="ParseInterface.cs" />
     <Compile Include="ParseRunner.cs" />
     <Compile Include="ReadWriteList.cs" />
     <Compile Include="RegexGrammar.cs" />
