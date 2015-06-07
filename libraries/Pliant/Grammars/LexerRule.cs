@@ -1,5 +1,4 @@
-﻿using Pliant.Regex;
-using Pliant.Tokens;
+﻿using Pliant.Tokens;
 
 namespace Pliant.Grammars
 {
@@ -14,12 +13,7 @@ namespace Pliant.Grammars
             Grammar = grammar;
             TokenType = new TokenType(leftHandSide.Value);
         }
-
-        private LexerRule(INonTerminal leftHandSide, string regularExpression)
-        {
-            var regexGrammar = new RegexGrammar();
-        }
-
+        
         public SymbolType SymbolType
         {
             get { return SymbolType.LexerRule; }
