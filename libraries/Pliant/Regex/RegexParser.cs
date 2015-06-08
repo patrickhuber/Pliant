@@ -16,18 +16,7 @@ namespace Pliant.Regex
 
         public IGrammar Parse(string regularExpression)
         {
-            var parser = new Parser(_grammar);
-            for (int i = 0; i < regularExpression.Length; i++)
-            {
-                var character = regularExpression[i];
-                var result = parser.Pulse(character);
-                if (!result)
-                    throw new Exception(
-                        string.Format(
-                            "Invalid character in regular expression. Position: {0}", 
-                            parser.Location));
-            }
-            return Compile(parser.ParseForest());
+            return null;
         }
 
         private IGrammar Compile(INode parseForest)

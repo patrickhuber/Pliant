@@ -11,5 +11,6 @@ namespace Pliant
         bool Read();
         int Position { get; }
         IParseEngine ParseEngine { get; }
+        bool EndOfStream();
     }
 }

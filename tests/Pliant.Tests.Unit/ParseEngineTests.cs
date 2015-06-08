@@ -405,6 +405,112 @@ namespace Pliant.Tests.Unit
             Assert.AreEqual("+", plus_1_2.Token.Value);
         }
 
+        [TestMethod]
+        public void Test_ParseEngine_That_Simple_Substitution_Grammar_Parses()
+        {
+            var b = new TerminalLexerRule(new Terminal('b'), new TokenType("b"));
+            var c = new TerminalLexerRule(new Terminal('c'), new TokenType("c"));
+            var grammar = new GrammarBuilder("A", p => p
+                .Production("A", r => r
+                    .Rule("B", "C"))
+                .Production("B", r => r
+                    .Rule(b))
+                .Production("C", r => r
+                    .Rule(c)))
+            .GetGrammar();
+            var tokens = Tokenize("bc");
+            var parseEngine = new ParseEngine(grammar);
+            ParseInput(parseEngine, tokens);
+        }
+
+        [TestMethod]
+        public void Test_ParseEngine_That_Expression_Grammar_Parses_Expression()
+        {
+            var expressionGrammar = CreateExpressionGrammar();
+
+            var tokens = new[]
+            {
+                CreateDigitToken(2, 0),
+                CreateCharacterToken('+', 1),
+                CreateDigitToken(3, 2),
+                CreateCharacterToken('*', 3),
+                CreateDigitToken(4, 4)
+            };
+            var parseEngine = new ParseEngine(expressionGrammar);
+            ParseInput(parseEngine, tokens);
+        }
+
+        [TestMethod]
+        public void Test_ParseEngine_That_Invalid_Input_Exists_Parse()
+        {
+            var grammar = CreateExpressionGrammar();
+            var tokens = new[]
+            {
+                CreateDigitToken(1, 0),
+                CreateCharacterToken('+', 1),
+                CreateCharacterToken('b', 2), 
+                CreateCharacterToken('*', 3),
+                CreateDigitToken(3, 4)
+            };
+            var parseEngine = new ParseEngine(grammar);
+            Assert.IsTrue(parseEngine.Pulse(tokens[0]));
+            Assert.IsTrue(parseEngine.Pulse(tokens[1]));
+            Assert.IsFalse(parseEngine.Pulse(tokens[2]));
+        }
+
+        [TestMethod]
+        public void Test_ParseEngine_That_Unmarked_Middle_Recursion_Parses()
+        {
+            var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
+
+            var grammar = new GrammarBuilder("S", p => p
+                    .Production("S", r => r
+                        .Rule(a, "S", a)
+                        .Rule(a)))
+                .GetGrammar();
+
+            var parseEngine = new ParseEngine(grammar);
+
+            var tokens = Tokenize("aaaaaaaaa");
+            ParseInput(parseEngine, tokens);
+        }
+
+        private static IGrammar CreateExpressionGrammar()
+        {
+            var plus = new TerminalLexerRule(
+                            new Terminal('+'),
+                            new TokenType("+"));
+            var star = new TerminalLexerRule(
+                new Terminal('*'),
+                new TokenType("*"));
+            var digit = new TerminalLexerRule(
+                new DigitTerminal(),
+                new TokenType("digit"));
+
+            var expressionGrammar = new GrammarBuilder(
+                "S", p => p
+                .Production("S", r => r
+                    .Rule("S", plus, "M")
+                    .Rule("M"))
+                .Production("M", r => r
+                    .Rule("M", star, "T")
+                    .Rule("T"))
+                .Production("T", r => r
+                    .Rule(digit)))
+            .GetGrammar();
+            return expressionGrammar;
+        }
+
+        private IToken CreateDigitToken(int value, int position)
+        {
+            return new Token(value.ToString(), position, new TokenType("digit"));
+        }
+
+        private IToken CreateCharacterToken(char character, int position)
+        {
+            return new Token(character.ToString(), position, new TokenType(character.ToString()));
+        }
+
         private IEnumerable<IToken> Tokenize(string input)
         {
             return input.Select((x, i) =>

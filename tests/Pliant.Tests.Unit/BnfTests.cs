@@ -97,10 +97,14 @@ namespace Pliant.Tests.Unit
             digit       ->  '[\d]'
             any         ->  '.'";
             var parseEngine = new ParseEngine(grammar);
-            var parseRunner = new ParseInterface(parseEngine, sampleBnf);
-            var recognizer = new Recognizer(grammar);
+            var parseInterface = new ParseInterface(parseEngine, sampleBnf);
             var stringReader = new StringReader(sampleBnf);
-            Assert.IsTrue(recognizer.Recognize(stringReader));
+
+            while (parseInterface.Read())
+            {
+                Assert.IsFalse(parseInterface.EndOfStream());
+            }
+            Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
         }
     }
 }

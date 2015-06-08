@@ -72,7 +72,7 @@ namespace Pliant
             return ignoreLexemes.Any();
         }
         
-        private bool EndOfStream()
+        public bool EndOfStream()
         {
             return _textReader.Peek() == -1;
         }
