@@ -97,7 +97,6 @@
     <Compile Include="Grammars\NonTerminal.cs" />
     <Compile Include="Reactive\Observable.cs" />
     <Compile Include="Reactive\Observer.cs" />
-    <Compile Include="Parser.cs" />
     <Compile Include="Grammars\Production.cs" />
     <Compile Include="Builders\ProductionBuilder.cs" />
     <Compile Include="PulseRecognizer.cs" />
