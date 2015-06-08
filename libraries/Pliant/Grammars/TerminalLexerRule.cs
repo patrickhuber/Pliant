@@ -5,6 +5,8 @@ namespace Pliant.Grammars
 {
     public class TerminalLexerRule : ILexerRule
     {
+        private ITerminal _terminal;
+
         public IGrammar Grammar { get; private set; }
 
         public SymbolType SymbolType { get { return SymbolType.LexerRule; } }
@@ -13,7 +15,8 @@ namespace Pliant.Grammars
 
         public TerminalLexerRule(ITerminal terminal, TokenType tokenType)
         {
-            Grammar = CreateGrammarForTerminal(terminal);
+            _terminal = terminal;
+            Grammar = CreateGrammarForTerminal(_terminal);
             TokenType = tokenType;
         }
 
@@ -29,6 +32,11 @@ namespace Pliant.Grammars
                 new ILexerRule[] { },
                 new ILexerRule[] { });
             return grammar;
+        }
+
+        public override string ToString()
+        {
+            return _terminal.ToString();
         }
     }
 }

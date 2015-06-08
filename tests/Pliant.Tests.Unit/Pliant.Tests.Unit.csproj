@@ -55,7 +55,6 @@
     <Compile Include="Charts\ChartTests.cs" />
     <Compile Include="Grammars\DigitTerminalTests.cs" />
     <Compile Include="Builders\GrammarBuilderTests.cs" />
-    <Compile Include="ParseEngineTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PulseRecognizerTests.cs" />
     <Compile Include="RecognizerTests.cs" />
@@ -66,7 +65,7 @@
     <Compile Include="Grammars\GrammarTests.cs" />
     <Compile Include="AycockHorspoolAlgorithmTests.cs" />
     <Compile Include="Grammars\RangeTerminalTests.cs" />
-    <Compile Include="ParserTests.cs" />
+    <Compile Include="ParseEngineTests.cs" />
     <Compile Include="Lexemes\LexemeTests.cs" />
     <Compile Include="ParseRunnerTests.cs" />
     <Compile Include="Lexemes\TerminalLexemeTests.cs" />
