@@ -96,7 +96,8 @@ namespace Pliant.Tests.Unit
             letter      ->  '[a-zA-Z]'
             digit       ->  '[\d]'
             any         ->  '.'";
-            var parseRunner = new ParseRunner(grammar, sampleBnf);
+            var parseEngine = new ParseEngine(grammar);
+            var parseRunner = new ParseInterface(parseEngine, sampleBnf);
             var recognizer = new Recognizer(grammar);
             var stringReader = new StringReader(sampleBnf);
             Assert.IsTrue(recognizer.Recognize(stringReader));

@@ -67,9 +67,8 @@
     <Compile Include="Grammars\RangeTerminalTests.cs" />
     <Compile Include="ParseEngineTests.cs" />
     <Compile Include="Lexemes\LexemeTests.cs" />
-    <Compile Include="ParseRunnerTests.cs" />
-    <Compile Include="Lexemes\TerminalLexemeTests.cs" />
     <Compile Include="ParseInterfaceTests.cs" />
+    <Compile Include="Lexemes\TerminalLexemeTests.cs" />
     <Compile Include="Grammars\WhitespaceTerminalTests.cs" />
   </ItemGroup>
   <ItemGroup>

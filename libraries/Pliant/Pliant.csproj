@@ -89,7 +89,6 @@
     <Compile Include="Charts\Optimizer.cs" />
     <Compile Include="ParseEngine.cs" />
     <Compile Include="ParseInterface.cs" />
-    <Compile Include="ParseRunner.cs" />
     <Compile Include="Collections\ReadWriteList.cs" />
     <Compile Include="Regex\RegexGrammar.cs" />
     <Compile Include="Regex\RegexParser.cs" />
