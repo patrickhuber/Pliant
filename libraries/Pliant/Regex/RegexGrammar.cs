@@ -1,5 +1,6 @@
 ﻿using Pliant.Builders;
 using Pliant.Grammars;
+using Pliant.Tokens;
 using System.Collections.Generic;
 
 namespace Pliant.Regex
@@ -95,16 +96,36 @@ namespace Pliant.Regex
             const string CharacterClassCharacter = "CharacterClassCharacter";
             const string NotCloseBracket = "NotCloseBracket";
             const string NotMetaCharacter = "NotMetaCharacter";
+            
+            var caret = new TerminalLexerRule('^');
+            var dollar = new TerminalLexerRule('$');
+            var pipe = new TerminalLexerRule('|');
+            var dot = new TerminalLexerRule('.');
+            var openParen = new TerminalLexerRule('(');
+            var closeParen = new TerminalLexerRule(')');
+            var star = new TerminalLexerRule('*');
+            var plus = new TerminalLexerRule('+');
+            var question = new TerminalLexerRule('?');
+            var openBracket = new TerminalLexerRule('[');
+            var closeBracket = new TerminalLexerRule(']');
+            var notCloseBracket = new TerminalLexerRule(new NegationTerminal(new Terminal(']')), new TokenType("!]"));
+            var dash = new TerminalLexerRule('-');
+            var backslash = new TerminalLexerRule('\\');
+            var notMeta = new TerminalLexerRule(
+                new NegationTerminal(
+                    new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')), 
+                new TokenType("not-meta"));
+            var any = new TerminalLexerRule(new AnyTerminal(), new TokenType("any"));
 
             var grammarBuilder = new GrammarBuilder(Regex, p => p
                 .Production(Regex, r => r
                     .Rule(Expression)
-                    .Rule('^', Expression)
-                    .Rule(Expression, '$')
-                    .Rule('^', Expression, '$'))
+                    .Rule(caret, Expression)
+                    .Rule(Expression, dollar)
+                    .Rule(caret, Expression, dollar))
                 .Production(Expression, r => r
                     .Rule(Term)
-                    .Rule(Term, '|', Expression)
+                    .Rule(Term, pipe, Expression)
                     .Lambda())
                 .Production(Term, r => r
                     .Rule(Factor)
@@ -113,35 +134,53 @@ namespace Pliant.Regex
                     .Rule(Atom)
                     .Rule(Atom, Iterator))
                 .Production(Atom, r => r
-                    .Rule('.')
+                    .Rule(dot)
                     .Rule(Character)
-                    .Rule('(', Expression, ')')
+                    .Rule(openParen, Expression, closeParen)
                     .Rule(Set))
                 .Production(Iterator, r => r
-                    .Rule(new SetTerminal('*', '+', '?')))
+                    .Rule(star)
+                    .Rule(plus)
+                    .Rule(question))
                 .Production(Set, r => r
                     .Rule(PositiveSet)
                     .Rule(NegativeSet))
                 .Production(PositiveSet, r => r
-                    .Rule('[', CharacterClass, ']'))
+                    .Rule(openBracket, CharacterClass, closeBracket))
                 .Production(NegativeSet, r => r
-                    .Rule('[', '^', CharacterClass, ']'))
+                    .Rule(openBracket, caret, CharacterClass, closeBracket))
                 .Production(CharacterClass, r => r
                     .Rule(CharacterRange)
                     .Rule(CharacterRange, CharacterClass))
                 .Production(CharacterRange, r => r
                     .Rule(CharacterClassCharacter)
-                    .Rule(CharacterClassCharacter, '-', CharacterClassCharacter))
+                    .Rule(CharacterClassCharacter, dash, CharacterClassCharacter))
                 .Production(Character, r => r
                     .Rule(NotMetaCharacter)
-                    .Rule('\\', new AnyTerminal()))
+                    .Rule(backslash, any))
                 .Production(CharacterClassCharacter, r => r
                     .Rule(NotCloseBracket)
-                    .Rule('\\', new AnyTerminal()))
+                    .Rule(backslash, any))
                 .Production(NotMetaCharacter, r => r
-                    .Rule(new NegationTerminal(new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\'))))
+                    .Rule(notMeta))
                 .Production(NotCloseBracket, r => r
-                    .Rule(new NegationTerminal(new Terminal(']')))));
+                    .Rule(notCloseBracket)), l=>l
+                .LexerRule(caret)
+                .LexerRule(dollar)
+                .LexerRule(pipe)
+                .LexerRule(dot)
+                .LexerRule(openParen)
+                .LexerRule(closeParen)
+                .LexerRule(star)
+                .LexerRule(plus)
+                .LexerRule(question)
+                .LexerRule(openBracket)
+                .LexerRule(closeBracket)
+                .LexerRule(notCloseBracket)
+                .LexerRule(dash)
+                .LexerRule(backslash)
+                .LexerRule(notMeta)
+                .LexerRule(any));
             _regexGrammar = grammarBuilder.GetGrammar();
         }
     }

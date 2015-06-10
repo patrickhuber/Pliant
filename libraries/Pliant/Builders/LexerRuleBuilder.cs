@@ -1,5 +1,6 @@
 ﻿using Pliant.Grammars;
 using Pliant.Regex;
+using Pliant.Tokens;
 using System.Collections.Generic;
 
 namespace Pliant.Builders
@@ -20,14 +21,9 @@ namespace Pliant.Builders
         
         public ILexerRuleBuilder LexerRule(string name, ITerminal terminal)
         {
-            var production = new Production(name, terminal);
-            var grammar = new Grammar(
-                new NonTerminal(name), 
-                new[] { production }, 
-                new ILexerRule[] { }, 
-                new ILexerRule[] { });
-            var lexerRule = new LexerRule(new NonTerminal(name), grammar);
-            return LexerRule(lexerRule);
+            var lexerRule = new TerminalLexerRule(terminal, new TokenType(name));
+            _lexerRules.Add(lexerRule);
+            return this;
         }
 
         public ILexerRuleBuilder LexerRule(ILexerRule lexerRule)

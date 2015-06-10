@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders;
+using Pliant.Charts;
 using Pliant.Grammars;
 
 namespace Pliant.Tests.Unit
@@ -55,14 +56,7 @@ namespace Pliant.Tests.Unit
 
             var input = "this is input";
             var parseEngine = new ParseEngine(grammar);
-            var parseInterface = new ParseInterface(parseEngine, input);
-            var count = 0;
-            while (parseInterface.Read() && count < 100)
-            {
-                count++;
-            }
-
-            Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
+            RunParse(parseEngine, input);
         }
 
         [TestMethod]
@@ -78,13 +72,40 @@ namespace Pliant.Tests.Unit
                     .LexerRule(_wordRule), action => action
                     .Ignore(_whitespaceRule.TokenType.Id))
                 .GetGrammar();
+
+            var parseEngine = new ParseEngine(grammar);
+            RunParse(parseEngine, input);
+        }
+
+
+        [TestMethod]
+        public void Test_ParseInterface_That_Emits_Token_Between_Lexer_Rules_And_Eof()
+        {
+            const string input = "aa";
+            var a = new TerminalLexerRule('a');
+            var grammar = new GrammarBuilder("S", p => p
+                    .Production("S", r => r
+                        .Rule(a, "S")
+                        .Rule(a)), l => l
+                    .LexerRule(a))
+                .GetGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
-            int count = 0;
 
-            while (parseInterface.Read() && count < 100) // look for runaway
-            { count++; }
+            var chart = new PrivateObject(parseEngine).GetField("_chart") as Chart;
+            Assert.IsTrue(parseInterface.Read());
+            Assert.AreEqual(1, chart.EarleySets.Count);
+            Assert.IsTrue(parseInterface.Read());
+            Assert.AreEqual(3, chart.EarleySets.Count);
+        }
+
+        private static void RunParse(ParseEngine parseEngine, string input)
+        {
+            var parseInterface = new ParseInterface(parseEngine, input);
+            for (int i = 0; i < input.Length; i++)
+                Assert.IsTrue(parseInterface.Read());
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
         }
+
     }
 }

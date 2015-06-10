@@ -56,7 +56,6 @@
     <Compile Include="Grammars\DigitTerminalTests.cs" />
     <Compile Include="Builders\GrammarBuilderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PulseRecognizerTests.cs" />
     <Compile Include="Grammars\ProductionTests.cs" />
     <Compile Include="Regex\RegexTests.cs" />
     <Compile Include="Charts\StateTests.cs" />

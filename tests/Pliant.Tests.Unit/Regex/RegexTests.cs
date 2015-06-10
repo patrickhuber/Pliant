@@ -13,13 +13,13 @@ namespace Pliant.Tests.Unit
     [TestClass]
     public class RegexTests
     {
-        PulseRecognizer _pulseRecognizer;
+        IParseEngine _parseEngine;
         IGrammar _regexGrammar;
 
         [TestInitialize]
         public void Initialize_Regex_Tests()
         {
-            _pulseRecognizer = new PulseRecognizer(_regexGrammar);
+            _parseEngine = new ParseEngine(_regexGrammar);
         }
 
         public RegexTests()
@@ -33,92 +33,108 @@ namespace Pliant.Tests.Unit
         public void Test_Regex_That_Parses_Single_Character()
         {
             var input = "a";
-            Recognize(input);
+            ParseAndAcceptInput(input);
         }
 
         [TestMethod]
         public void Test_Regex_That_Parses_String_Literal()
         {
             var input = "abc";
-            Recognize(input);
+            ParseAndAcceptInput(input);
         }
 
         [TestMethod]
         public void Test_Regex_That_Parses_Optional_Character_Class()
         {
             var input = "a?";
-            Recognize(input);
+            ParseAndAcceptInput(input);
         }
 
         [TestMethod]
         public void Test_Regex_That_Parses_Whitespace_Character_Class()
         {
             var input = @"[\s]+";
-            Recognize(input);
+            ParseAndAcceptInput(input);
         }
 
         [TestMethod]
         public void Test_Regex_That_Parses_Range_Character_Class()
         {
-            // TODO: Check to make sure the parse node is binary. This invocation appears to have 3 children.
             var input = @"[a-z]";
-            Recognize(input);
+            ParseAndAcceptInput(input);
         }
 
         [TestMethod]
         public void Test_Regex_That_Parses_Any_Character_Class()
         {
             var input = @".*";
-            Recognize(input);
+            ParseAndAcceptInput(input);
         }
 
         [TestMethod]
         public void Test_Regex_That_Fails_On_MisMatched_Parenthesis()
         {
             var input = "(a";
-            Assert.IsTrue(_pulseRecognizer.Pulse(input[0]));
-            Assert.IsTrue(_pulseRecognizer.Pulse(input[1]));
-            Assert.IsFalse(_pulseRecognizer.IsAccepted());
+            ParseAndNotAcceptInput(input);
         }
-
         [TestMethod]
         public void Test_Regex_That_Fails_On_MisMatched_Brackets()
         {
             var input = "[abc";
-            foreach (var c in input)
-                Assert.IsTrue(_pulseRecognizer.Pulse(c));
-            Assert.IsFalse(_pulseRecognizer.IsAccepted());
+            ParseAndNotAcceptInput(input);
         }
 
         [TestMethod]
         public void Test_Regex_That_Parses_Empty_Group()
         {
             var input = "()";
-            Recognize(input);
+            ParseAndAcceptInput(input);
         }
 
         [TestMethod]
         public void Test_Regex_That_Parses_Empty_String()
         {
             var input = "";
-            Recognize(input);
+            ParseAndAcceptInput(input);
         }
 
         [TestMethod]
         public void Test_Regex_That_Parses_Negative_Character_Class()
         {
             var input = "[^abc]";
-            Recognize(input);
+            ParseAndAcceptInput(input);
+        }
+        
+        private void ParseAndAcceptInput(string input)
+        {
+            ParseInput(input);
+            Accept();
         }
 
-        private void Recognize(string input)
+        private void ParseAndNotAcceptInput(string input)
         {
-            foreach (var c in input)
-                Assert.IsTrue(_pulseRecognizer.Pulse(c),
+            ParseInput(input);
+            NotAccept();
+        }
+
+        private void ParseInput(string input)
+        {
+            var parseInterface = new ParseInterface(_parseEngine, input);
+            for (int i = 0; i < input.Length; i++)
+                Assert.IsTrue(parseInterface.Read(),
                     string.Format("Line 0, Column {1} : Invalid Character '{0}'",
-                        c,
-                        _pulseRecognizer.Location));
-            Assert.IsTrue(_pulseRecognizer.IsAccepted(), "input is not recognized.");
+                        input[i],
+                        _parseEngine.Location));
+        }
+
+        private void Accept()
+        {
+            Assert.IsTrue(_parseEngine.IsAccepted(), "input was not recognized");
+        }
+
+        private void NotAccept()
+        {
+            Assert.IsFalse(_parseEngine.IsAccepted(), "input was recognized");
         }
     }
 }

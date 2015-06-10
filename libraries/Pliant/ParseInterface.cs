@@ -48,30 +48,43 @@ namespace Pliant
             if (ShouldIgnoreCharacter(character))
                 return true;
 
-            var nextLexemes = GetNextLexemesForCharacter(character);
-            if (ShouldEmitToken(nextLexemes))
+            var currentPassingLexemes = GetPassingLexemesForCharacter(character);
+            if (currentPassingLexemes.Any())
             {
-                var token = CreateToken(nextLexemes);
-                if (token == null)
-                    return false;
-
-                _lexemes = nextLexemes;
-
+                if (!EndOfStream())
+                {
+                    SetNextLexemes(currentPassingLexemes);
+                    return true;
+                }
+                var token = CreateToken(currentPassingLexemes);
+                return ParseEngine.Pulse(token);
+            }
+            else if(_lexemes.Any())
+            {
+                var token = CreateToken(_lexemes);
                 var parseResult = ParseEngine.Pulse(token);
                 if (!parseResult)
                     return false;
+
+                currentPassingLexemes = GetPredictedLexemesForCharacter(character);
+                
+                if (currentPassingLexemes.Any())
+                {
+                    SetNextLexemes(currentPassingLexemes);
+                    if (EndOfStream())
+                    {
+                        token = CreateToken(currentPassingLexemes);
+                        return ParseEngine.Pulse(token);
+                    }
+                    return true;
+                }
             }
 
-            if (nextLexemes.Any())
-            {
-                _lexemes = nextLexemes;
-                return true;
-            }
-
-            var ignoreLexemes = CreateIgnoreRulesForCharacter(character);
+            var ignoreLexemes = GetIgnoreRulesForCharacter(character);
+            SetIgnoreRules(ignoreLexemes);
             return ignoreLexemes.Any();
         }
-        
+                
         public bool EndOfStream()
         {
             return _textReader.Peek() == -1;
@@ -96,33 +109,53 @@ namespace Pliant
             return _ignoreLexemes.Any();
         }
 
-        private IEnumerable<ILexeme> GetNextLexemesForCharacter(char character)
+        private static readonly ILexeme[] EmptyLexemeArray = new ILexeme[] { };
+
+        private IEnumerable<ILexeme> GetPassingLexemesForCharacter(char character)
         {
-            return (_lexemes.IsNullOrEmpty()
-                    ? ParseEngine
-                        .GetExpectedLexerRules()
-                        .Select(lexerRule => new Lexeme(lexerRule))
-                    : _lexemes)
+            if (_lexemes.IsNullOrEmpty())
+                return EmptyLexemeArray;
+            return _lexemes
                 .Where(lexeme => lexeme.Scan(character))
                 .ToArray();
         }
 
-        private bool ShouldEmitToken(IEnumerable<ILexeme> nextLexemes)
+        private IEnumerable<ILexeme> GetPredictedLexemesForCharacter(char character)
         {
-            return ShouldEmitTokenFromPreviousLexemes(nextLexemes) 
-                || ShouldEmitTokenFromNextLexemes(nextLexemes);
+            return ParseEngine
+                .GetExpectedLexerRules()
+                .Select(lexerRule => new Lexeme(lexerRule))
+                .Where(lexeme => lexeme.Scan(character))
+                .ToArray();
+        }
+        
+        private void SetNextLexemes(IEnumerable<ILexeme> nextLexemes)
+        {
+            _lexemes = nextLexemes;
         }
 
+        private IEnumerable<ILexeme> GetNextLexemesForCharacter(char character)
+        {
+            if (!_lexemes.IsNullOrEmpty())
+            {
+                var passedLexemes = _lexemes
+                    .Where(lexeme => lexeme.Scan(character))
+                    .ToArray();
+                if (passedLexemes.Length > 0)
+                    return passedLexemes;
+            }
+            return ParseEngine
+                .GetExpectedLexerRules()
+                .Select(lexerRule => new Lexeme(lexerRule))
+                .Where(lexeme => lexeme.Scan(character))
+                .ToArray();
+        }
+        
         private bool ShouldEmitTokenFromNextLexemes(IEnumerable<ILexeme> nextLexemes)
         {
             return EndOfStream() && nextLexemes.Any();
         }
-
-        private bool ShouldEmitTokenFromPreviousLexemes(IEnumerable<ILexeme> nextLexemes)
-        {
-            return _lexemes.Any() && !nextLexemes.Any();
-        }
-
+                
         private IToken CreateToken(IEnumerable<ILexeme> nextLexemes)
         {
             if (ShouldEmitTokenFromNextLexemes(nextLexemes))
@@ -149,14 +182,18 @@ namespace Pliant
                 lexeme.TokenType);
         }
 
-        private IEnumerable<ILexeme> CreateIgnoreRulesForCharacter(char character)
+        private IEnumerable<ILexeme> GetIgnoreRulesForCharacter(char character)
         {
-            _ignoreLexemes = ParseEngine.Grammar
+            return ParseEngine.Grammar
                 .Ignores
                 .Select(lexerRule => new Lexeme(lexerRule))
                 .Where(lexeme => lexeme.Scan(character))
                 .ToArray();
-            return _ignoreLexemes;
+        }
+
+        private void SetIgnoreRules(IEnumerable<ILexeme> ignoreRules)
+        {
+            _ignoreLexemes = ignoreRules;
         }
     }
 }

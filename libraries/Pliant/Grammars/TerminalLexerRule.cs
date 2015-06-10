@@ -13,6 +13,11 @@ namespace Pliant.Grammars
 
         public TokenType TokenType { get; private set; }
 
+        public TerminalLexerRule(char character)
+            : this(new Terminal(character), new TokenType(character.ToString()))
+        {
+        }
+
         public TerminalLexerRule(ITerminal terminal, TokenType tokenType)
         {
             _terminal = terminal;

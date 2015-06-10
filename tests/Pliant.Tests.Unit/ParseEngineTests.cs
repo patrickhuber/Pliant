@@ -5,6 +5,7 @@ using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Linq;
 using System.Collections.Generic;
+using Pliant.Charts;
 
 namespace Pliant.Tests.Unit
 {
@@ -475,6 +476,95 @@ namespace Pliant.Tests.Unit
             ParseInput(parseEngine, tokens);
         }
 
+        [TestMethod]
+        public void Test_ParseEngine_That_Right_Recursive_Quasi_Complete_Items_Are_Leo_Optimized()
+        {
+            var a_to_z = new TerminalLexerRule(
+                new RangeTerminal('a', 'z'),
+                new TokenType("range"));
+
+            var grammar = new GrammarBuilder("S", p => p
+                    .Production("S", r => r
+                        .Rule("S", "L")
+                        .Lambda())
+                    .Production("L", r => r
+                        .Rule(a_to_z, "L`"))
+                    .Production("L`", r => r
+                        .Rule(a_to_z, "L`")
+                        .Lambda()))
+                .GetGrammar();
+
+            var input = Tokenize("thisisonelonginputstring");
+            var parseEngine = new ParseEngine(grammar);
+            ParseInput(parseEngine, input);
+            Chart chart = GetChartFromParseEngine(parseEngine);
+            // when this count is < 10 we know that quasi complete items are being processed successfully
+            Assert.IsTrue(chart.EarleySets[23].Completions.Count < 10);
+        }
+
+
+        [TestMethod]
+        public void Test_ParseEngine_That_Right_Recursion_Is_Not_O_N_3()
+        {
+            var a = new TerminalLexerRule(
+                new Terminal('a'),
+                new TokenType("a"));
+            var grammar = new GrammarBuilder("A", p => p
+                .Production("A", r => r
+                    .Rule(a, "A")
+                    .Lambda()))
+            .GetGrammar();
+
+            var input = Tokenize("aaaaa");
+            var recognizer = new ParseEngine(grammar);
+            ParseInput(recognizer, input);
+
+            var chart = GetChartFromParseEngine(recognizer);
+            // -- 0 --
+            // A ->.a A		    (0)	 # Start
+            // A ->.			(0)	 # Start
+            //
+            // ...
+            // -- n --
+            // n	A -> a.A		(n-1)	 # Scan a
+            // n	A ->.a A		(n)	 # Predict
+            // n	A ->.			(n)	 # Predict
+            // n	A -> a A.		(n)	 # Predict
+            // n	A : A -> a A.	(0)	 # Transition
+            // n	A -> a A.		(0)	 # Complete
+            Assert.AreEqual(input.Count() + 1, chart.Count);
+            var lastEarleySet = chart.EarleySets[chart.EarleySets.Count - 1];
+            Assert.AreEqual(3, lastEarleySet.Completions.Count);
+            Assert.AreEqual(1, lastEarleySet.Transitions.Count);
+            Assert.AreEqual(1, lastEarleySet.Predictions.Count);
+            Assert.AreEqual(1, lastEarleySet.Scans.Count);
+        }
+        
+        [TestMethod]
+        public void Test_ParseEngine_That_Intermediate_Step_Creates_Transition_Items()
+        {
+            var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
+            var b = new TerminalLexerRule(new Terminal('b'), new TokenType("b"));
+
+            var grammar = new GrammarBuilder("S", p => p
+                .Production("S", r => r
+                    .Rule("A"))
+                .Production("A", r => r
+                    .Rule(a, "B"))
+                .Production("B", r => r
+                    .Rule("A")
+                    .Rule(b)))
+            .GetGrammar();
+            var input = Tokenize("aaab");
+            var parseEngine = new ParseEngine(grammar);
+            ParseInput(parseEngine, input);
+        }
+
+        private static Chart GetChartFromParseEngine(ParseEngine parseEngine)
+        {
+            return new PrivateObject(parseEngine).GetField("_chart") as Chart;
+        }
+
         private static IGrammar CreateExpressionGrammar()
         {
             var plus = new TerminalLexerRule(
@@ -515,6 +605,12 @@ namespace Pliant.Tests.Unit
         {
             return input.Select((x, i) =>
                 new Token(x.ToString(), i, new TokenType(x.ToString())));
+        }
+
+        private IEnumerable<IToken> Tokenize(string input, string tokenType)
+        {
+            return input.Select((x, i) =>
+                new Token(x.ToString(), i, new TokenType(tokenType)));
         }
 
         private void ParseInput(IParseEngine parseEngine, IEnumerable<IToken> tokens)

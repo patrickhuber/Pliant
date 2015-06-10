@@ -22,5 +22,10 @@ namespace Pliant.Grammars
         }
 
         public SymbolType SymbolType { get { return SymbolType.Terminal; } }
+
+        public override string ToString()
+        {
+            return string.Join(", ", string.Format("'{0}'",  _characterSet));
+        }
     }
 }
