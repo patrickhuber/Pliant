@@ -9,7 +9,14 @@ namespace Pliant.Lexemes
 
         public TokenType TokenType { get; private set; }
 
+        private IParseEngine _parseEngine;
         private PulseRecognizer _pulseRecognizer;
+
+        public Lexeme(TokenType tokenType, IParseEngine lexicalParseEngine)
+        {
+            TokenType = tokenType;
+            _parseEngine = lexicalParseEngine;
+        }
 
         public Lexeme(ILexerRule lexerRule)
         {

@@ -1,4 +1,5 @@
 ﻿using Pliant.Collections;
+using Pliant.Grammars;
 using Pliant.Lexemes;
 using Pliant.Tokens;
 using System;
@@ -34,7 +35,7 @@ namespace Pliant
         private void SetCurrentLexemes()
         {
             _lexemes = ParseEngine.GetExpectedLexerRules()
-                .Select(RuleBuilder => new Lexeme(RuleBuilder))
+                .Select(CreateLexemeForLexerRule)
                 .ToArray();
         }
 
@@ -124,7 +125,7 @@ namespace Pliant
         {
             return ParseEngine
                 .GetExpectedLexerRules()
-                .Select(lexerRule => new Lexeme(lexerRule))
+                .Select(CreateLexemeForLexerRule)
                 .Where(lexeme => lexeme.Scan(character))
                 .ToArray();
         }
@@ -146,11 +147,21 @@ namespace Pliant
             }
             return ParseEngine
                 .GetExpectedLexerRules()
-                .Select(lexerRule => new Lexeme(lexerRule))
+                .Select(CreateLexemeForLexerRule)
                 .Where(lexeme => lexeme.Scan(character))
                 .ToArray();
         }
-        
+
+        private static ILexeme CreateLexemeForLexerRule(ILexerRule lexerRule)
+        {
+            return new Lexeme(lexerRule);
+            /*
+            return new Lexeme(
+                lexerRule.TokenType,
+                new ParseEngine(lexerRule.Grammar));
+            */
+        }
+
         private bool ShouldEmitTokenFromNextLexemes(IEnumerable<ILexeme> nextLexemes)
         {
             return EndOfStream() && nextLexemes.Any();
@@ -186,7 +197,7 @@ namespace Pliant
         {
             return ParseEngine.Grammar
                 .Ignores
-                .Select(lexerRule => new Lexeme(lexerRule))
+                .Select(CreateLexemeForLexerRule)
                 .Where(lexeme => lexeme.Scan(character))
                 .ToArray();
         }
