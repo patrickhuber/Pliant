@@ -39,6 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Grammars\IGrammarLexerRule.cs" />
+    <Compile Include="Grammars\ITerminalLexerRule.cs" />
+    <Compile Include="Grammars\LexerRuleType.cs" />
     <Compile Include="Nodes\AndNode.cs" />
     <Compile Include="Grammars\AnyTerminal.cs" />
     <Compile Include="Assert.cs" />
@@ -79,10 +82,10 @@
     <Compile Include="Tokens\IToken.cs" />
     <Compile Include="Nodes\ITokenNode.cs" />
     <Compile Include="Charts\ITransitionState.cs" />
-    <Compile Include="Lexemes\Lexeme.cs" />
+    <Compile Include="ParseEngineLexeme.cs" />
     <Compile Include="Builders\LexerRuleBuilder.cs" />
     <Compile Include="Builders\CommandBuilder.cs" />
-    <Compile Include="Grammars\LexerRule.cs" />
+    <Compile Include="Grammars\GrammarLexerRule.cs" />
     <Compile Include="Nodes\InternalNode.cs" />
     <Compile Include="Nodes\NodeSet.cs" />
     <Compile Include="Nodes\NodeType.cs" />

@@ -16,14 +16,17 @@ namespace Pliant.Grammars
 
         private IDictionary<INonTerminal, IList<IProduction>> _productionIndex;
 
+        private static readonly IProduction[] EmptyProductionArray = new IProduction[] { };
+        private static readonly ILexerRule[] EmptyLexerRuleArray = new ILexerRule[] { };
+
         public Grammar(INonTerminal start, IProduction[] productions, ILexerRule[] lexerRules, ILexerRule[] ignore)
         {
             Assert.IsNotNullOrEmpty(productions, "productions");
             Assert.IsNotNull(start, "start");
             CreateProductionIndex(productions);
-            Productions = new ReadOnlyList<IProduction>(productions);
-            LexerRules = new ReadOnlyList<ILexerRule>(lexerRules);
-            Ignores = new ReadOnlyList<ILexerRule>(ignore);
+            Productions = new ReadOnlyList<IProduction>(productions ?? EmptyProductionArray);
+            LexerRules = new ReadOnlyList<ILexerRule>(lexerRules ?? EmptyLexerRuleArray);
+            Ignores = new ReadOnlyList<ILexerRule>(ignore ?? EmptyLexerRuleArray);
             Start = start; 
         }
 

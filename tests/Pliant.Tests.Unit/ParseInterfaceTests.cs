@@ -8,8 +8,8 @@ namespace Pliant.Tests.Unit
     [TestClass]
     public class ParseInterfaceTests
     {
-        ILexerRule _whitespaceRule;
-        ILexerRule _wordRule;
+        IGrammarLexerRule _whitespaceRule;
+        IGrammarLexerRule _wordRule;
 
         public ParseInterfaceTests()
         {
@@ -17,7 +17,7 @@ namespace Pliant.Tests.Unit
             _wordRule = CreateWordRule();            
         }
         
-        private static ILexerRule CreateWhitespaceRule()
+        private static IGrammarLexerRule CreateWhitespaceRule()
         {
             var whitespaceGrammar = new GrammarBuilder("S", p => p
                     .Production("S", r => r
@@ -26,10 +26,10 @@ namespace Pliant.Tests.Unit
                     .Production("whitespace", r=>r
                         .Rule(new WhitespaceTerminal())))
                 .GetGrammar();
-            return new LexerRule(new NonTerminal("whitespace"), whitespaceGrammar);
+            return new GrammarLexerRule("whitespace", whitespaceGrammar);
         }
 
-        private static ILexerRule CreateWordRule()
+        private static IGrammarLexerRule CreateWordRule()
         {
             var wordGrammar = new GrammarBuilder("W", p => p
                     .Production("W", r => r
@@ -40,7 +40,7 @@ namespace Pliant.Tests.Unit
                         .Rule(new RangeTerminal('A', 'Z'))
                         .Rule(new RangeTerminal('0', '9'))))
                 .GetGrammar();
-            return new LexerRule(new NonTerminal("word"), wordGrammar);
+            return new GrammarLexerRule("word", wordGrammar);
         }
 
         [TestMethod]

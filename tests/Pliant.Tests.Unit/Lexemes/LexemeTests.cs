@@ -2,6 +2,7 @@
 using Pliant.Builders;
 using Pliant.Grammars;
 using Pliant.Lexemes;
+using Pliant.Tokens;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -21,11 +22,12 @@ namespace Pliant.Tests.Unit
                         .Rule(new WhitespaceTerminal())))
                 .GetGrammar();
 
-            var lexerRule = new LexerRule(
-                new NonTerminal("whitespace"),
+            var lexerRule = new GrammarLexerRule(
+                "whitespace",
                 grammar);
 
-            var lexeme = new Lexeme(lexerRule);
+            var parseEngine = new ParseEngine(lexerRule.Grammar);
+            var lexeme = new ParseEngineLexeme(parseEngine, new TokenType("whitespace"));
             var input = "\t\r\n\v\f ";
             for (int i = 0; i < input.Length; i++)
                 Assert.IsTrue(lexeme.Scan(input[i]));
@@ -35,16 +37,14 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_Lexeme_That_Consumes_Character_Sequence()
         {
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
+            var grammar = new GrammarBuilder("sequence", p => p
+                    .Production("sequence", r => r
                         .Rule('a', 'b', 'c', '1', '2', '3')))
                 .GetGrammar();
 
-            var lexerRule = new LexerRule(
-                new NonTerminal("sequence"),
-                grammar);
-
-            var lexeme = new Lexeme(lexerRule);
+            
+            var parseEngine = new ParseEngine(grammar);
+            var lexeme = new ParseEngineLexeme(parseEngine, new TokenType("sequence"));
             var input = "abc123";
             for (int i = 0; i < input.Length; i++)
                 Assert.IsTrue(lexeme.Scan(input[i]));
@@ -54,26 +54,24 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_Lexeme_That_Matches_Longest_Acceptable_Token_When_Given_Ambiguity()
         {
-            var lexemeList = new List<Lexeme>();
+            var lexemeList = new List<ParseEngineLexeme>();
 
-            var thereGrammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
+            const string There = "there";
+            var thereGrammar = new GrammarBuilder(There, p => p
+                    .Production(There, r => r
                         .Rule('t', 'h', 'e', 'r', 'e')))
                 .GetGrammar();
-            var thereLexerRule = new LexerRule(
-                new NonTerminal("there"), 
-                thereGrammar);
-            var thereLexeme = new Lexeme(thereLexerRule);
+            var thereParseEngine = new ParseEngine(thereGrammar);
+            var thereLexeme = new ParseEngineLexeme(thereParseEngine, new TokenType(There));
             lexemeList.Add(thereLexeme);
 
-            var thereforeGrammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
+            const string Therefore = "therefore";
+            var thereforeGrammar = new GrammarBuilder(Therefore, p => p
+                    .Production(Therefore, r => r
                         .Rule('t', 'h', 'e', 'r', 'e', 'f', 'o', 'r', 'e')))
                 .GetGrammar();
-            var thereforeLexerRule = new LexerRule(
-                new NonTerminal("therefore"), 
-                thereforeGrammar);
-            var thereforeLexeme = new Lexeme(thereforeLexerRule);
+            var parseEngine = new ParseEngine(thereforeGrammar);
+            var thereforeLexeme = new ParseEngineLexeme(parseEngine, new TokenType(Therefore));
             lexemeList.Add(thereforeLexeme);
             
             var input = "therefore";

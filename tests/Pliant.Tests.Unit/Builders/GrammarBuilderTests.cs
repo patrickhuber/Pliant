@@ -41,7 +41,7 @@ namespace Pliant.Tests.Unit
 
             var symbol = production.RightHandSide[0];
             Assert.IsNotNull(symbol);
-            Assert.AreEqual(SymbolType.Terminal, symbol.SymbolType);
+            Assert.AreEqual(SymbolType.LexerRule, symbol.SymbolType);
         }
 
         [TestMethod]

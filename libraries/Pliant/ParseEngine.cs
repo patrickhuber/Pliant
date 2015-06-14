@@ -33,10 +33,12 @@ namespace Pliant
             var scanStates = currentEarleySet.Scans;
 
             return from scanState in scanStates
-                   let lexerRule = scanState.DottedRule.PostDotSymbol.Value as ILexerRule
+                   let postDotSymbol = scanState.DottedRule.PostDotSymbol
+                   where postDotSymbol.HasValue && 
+                         postDotSymbol.Value.SymbolType == SymbolType.LexerRule
+                   let lexerRule = postDotSymbol.Value as ILexerRule
                    group lexerRule by lexerRule.TokenType into rulesByTokenType
                    select rulesByTokenType.First();
-
         }
 
         public INode GetParseForest()

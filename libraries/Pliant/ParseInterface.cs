@@ -34,7 +34,7 @@ namespace Pliant
 
         private void SetCurrentLexemes()
         {
-            _lexemes = ParseEngine.GetExpectedLexerRules()
+            _lexemes = GetExpectedLexerRules()
                 .Select(CreateLexemeForLexerRule)
                 .ToArray();
         }
@@ -123,8 +123,7 @@ namespace Pliant
 
         private IEnumerable<ILexeme> GetPredictedLexemesForCharacter(char character)
         {
-            return ParseEngine
-                .GetExpectedLexerRules()
+            return GetExpectedLexerRules()
                 .Select(CreateLexemeForLexerRule)
                 .Where(lexeme => lexeme.Scan(character))
                 .ToArray();
@@ -145,23 +144,36 @@ namespace Pliant
                 if (passedLexemes.Length > 0)
                     return passedLexemes;
             }
-            return ParseEngine
-                .GetExpectedLexerRules()
-                .Select(CreateLexemeForLexerRule)
-                .Where(lexeme => lexeme.Scan(character))
-                .ToArray();
+            return (from grammarRule in GetExpectedLexerRules()
+                    let lexeme = CreateLexemeForLexerRule(grammarRule)
+                    where lexeme.Scan(character)
+                    select lexeme)
+                   .ToArray();
+        }
+
+        private IEnumerable<ILexerRule> GetExpectedLexerRules()
+        {
+            return ParseEngine.GetExpectedLexerRules();
+        }
+
+        private IEnumerable<ILexerRule> GetIgnoreLexerRules()
+        {
+            return ParseEngine.Grammar.Ignores; ;
         }
 
         private static ILexeme CreateLexemeForLexerRule(ILexerRule lexerRule)
         {
-            return new Lexeme(lexerRule);
-            /*
-            return new Lexeme(
-                lexerRule.TokenType,
-                new ParseEngine(lexerRule.Grammar));
-            */
+            if (lexerRule.LexerRuleType == LexerRuleType.Grammar)
+            {
+                var grammarLexerRule = lexerRule as IGrammarLexerRule;
+                var parseEngine = new ParseEngine(grammarLexerRule.Grammar);
+                return new ParseEngineLexeme(parseEngine, lexerRule.TokenType);
+            }
+
+            return new TerminalLexeme(lexerRule as ITerminalLexerRule);
         }
 
+        
         private bool ShouldEmitTokenFromNextLexemes(IEnumerable<ILexeme> nextLexemes)
         {
             return EndOfStream() && nextLexemes.Any();
@@ -195,8 +207,7 @@ namespace Pliant
 
         private IEnumerable<ILexeme> GetIgnoreRulesForCharacter(char character)
         {
-            return ParseEngine.Grammar
-                .Ignores
+            return GetIgnoreLexerRules()
                 .Select(CreateLexemeForLexerRule)
                 .Where(lexeme => lexeme.Scan(character))
                 .ToArray();

@@ -76,7 +76,7 @@ namespace Pliant
         {
             int i = scan.Origin;
             var currentSymbol = scan.DottedRule.PostDotSymbol.Value;
-            var lexerRule = currentSymbol as ILexerRule;
+            var lexerRule = currentSymbol as IGrammarLexerRule;
 
             var token = tokenNode.Token;
             if (token.TokenType == lexerRule.TokenType)

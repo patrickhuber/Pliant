@@ -4,7 +4,7 @@ namespace Pliant.Grammars
 {
     public interface ILexerRule : ISymbol
     {
-        IGrammar Grammar { get; }
+        LexerRuleType LexerRuleType { get; }
         TokenType TokenType { get; }
     }
 }

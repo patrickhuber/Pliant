@@ -18,6 +18,11 @@ namespace Pliant.Lexemes
             Capture = string.Empty;
         }
 
+        public TerminalLexeme(ITerminalLexerRule terminalRule)
+            : this(terminalRule.Terminal, terminalRule.TokenType)
+        {
+        }
+
         public bool IsAccepted()
         {
             return Capture.Length > 0;
