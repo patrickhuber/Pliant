@@ -92,7 +92,7 @@ namespace Pliant.Tests.Unit
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
 
-            var chart = new PrivateObject(parseEngine).GetField("_chart") as Chart;
+            var chart = GetParseEngineChart(parseEngine);
             Assert.IsTrue(parseInterface.Read());
             Assert.AreEqual(1, chart.EarleySets.Count);
             Assert.IsTrue(parseInterface.Read());
@@ -117,7 +117,7 @@ namespace Pliant.Tests.Unit
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
 
-            var chart = new PrivateObject(parseEngine).GetField("_chart") as Chart;
+            var chart = GetParseEngineChart(parseEngine);
             Assert.IsTrue(parseInterface.Read());
             Assert.AreEqual(1, chart.EarleySets.Count);
             Assert.IsTrue(parseInterface.Read());
@@ -143,7 +143,7 @@ namespace Pliant.Tests.Unit
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
 
-            var chart = new PrivateObject(parseEngine).GetField("_chart") as Chart;
+            var chart = GetParseEngineChart(parseEngine);
             for(int i=0;i<3;i++)
                 Assert.IsTrue(parseInterface.Read());
             Assert.AreEqual(2, chart.EarleySets.Count);
@@ -156,28 +156,63 @@ namespace Pliant.Tests.Unit
             var grammar = new GrammarBuilder("S", p => p
                     .Production("S", r => r
                         .Rule(_wordRule, "S")
-                        .Rule(_wordRule)), l=>l
+                        .Rule(_wordRule)), l => l
                     .LexerRule(_whitespaceRule)
-                    .LexerRule(_wordRule), i=>i
+                    .LexerRule(_wordRule), i => i
                     .Ignore(_whitespaceRule.TokenType.Id))
                 .GetGrammar();
 
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
-
-            var chart = new PrivateObject(parseEngine).GetField("_chart") as Chart;
+            Chart chart = GetParseEngineChart(parseEngine);
             for (int i = 0; i < 2; i++)
                 Assert.IsTrue(parseInterface.Read());
             Assert.IsTrue(parseInterface.Read());
             Assert.AreEqual(2, chart.EarleySets.Count);
         }
 
-        [TestMethod]
-        public void Test_ParseInterface_When_Character_Is_Not_Matched_And_Not_Ignored_Then_Fails_Parse()
+        private static Chart GetParseEngineChart(ParseEngine parseEngine)
         {
-            Assert.Fail();
+            return new PrivateObject(parseEngine).GetField("_chart") as Chart;
         }
 
+        [TestMethod]
+        public void Test_ParseInterface_When_Character_Matches_Next_Production_Then_Emits_Token()
+        {
+            const string input = "aabb";
+            var aGrammar = new GrammarBuilder("A", p => p
+                    .Production("A", r => r
+                        .Rule('a', "A")
+                        .Rule('a')))
+                .GetGrammar();
+            var a = new GrammarLexerRule("a", aGrammar);
+
+            var bGrammar = new GrammarBuilder("B", p => p
+                    .Production("B", r => r
+                        .Rule('b', "B")
+                        .Rule('b')))
+                .GetGrammar();
+            var b = new GrammarLexerRule("b", bGrammar);
+
+            var grammar = new GrammarBuilder("S", p => p
+                    .Production("S", r => r
+                        .Rule(a, b)))
+                .GetGrammar();
+
+            var parseEngine = new ParseEngine(grammar);
+            var chart = GetParseEngineChart(parseEngine);
+            var parseInterface = new ParseInterface(parseEngine, input);
+            for (int i = 0; i < input.Length; i++)
+            {
+                Assert.IsTrue(parseInterface.Read());
+                if (i < 2)
+                    Assert.AreEqual(1, chart.Count);
+                else if (i < 3)
+                    Assert.AreEqual(2, chart.Count);
+                else
+                    Assert.AreEqual(3, chart.Count);
+            }
+        }
 
         private static void RunParse(ParseEngine parseEngine, string input)
         {
