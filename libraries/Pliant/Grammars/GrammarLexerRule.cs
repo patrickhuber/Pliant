@@ -26,5 +26,9 @@ namespace Pliant.Grammars
             get { return SymbolType.LexerRule; }
         }
 
+        public override string ToString()
+        {
+            return TokenType.Id;
+        }
     }
 }

@@ -54,12 +54,30 @@ namespace Pliant.Tests.Unit
                         .Rule(new WhitespaceTerminal())))
                 .GetGrammar());
 
+            var identifier = new GrammarLexerRule(
+                "identifier",
+                new GrammarBuilder("identifier", p => p
+                        .Production("identifier", r=>r
+                            .Rule("letter", "zeroOrManyLetterOrDigit"))
+                        .Production("zeroOrManyLetterOrDigit", r=>r
+                            .Rule("letterOrDigit", "zeroOrManyLetterOrDigit")
+                            .Lambda())
+                        .Production("letterOrDigit", r=>r
+                            .Rule("letter")
+                            .Rule("digit"))
+                        .Production("letter", r => r
+                            .Rule(new RangeTerminal('a', 'z'))
+                            .Rule(new RangeTerminal('A', 'Z')))
+                        .Production("digit", r=>r
+                            .Rule(new DigitTerminal())))
+                    .GetGrammar());
+            
             var grammarBuilder = new GrammarBuilder("syntax", g=>g
                 .Production("syntax", r=>r
                     .Rule("syntax", "rule")
                     .Lambda())
                 .Production("rule", r=>r
-                    .Rule("identifier", '-', '>', "expression"))
+                    .Rule(identifier, '-', '>', "expression"))
                 .Production("expression", r=>r
                     .Rule("term")
                     .Rule("term", "expression", '|', "term"))
@@ -67,21 +85,13 @@ namespace Pliant.Tests.Unit
                     .Rule("factor")
                     .Rule("factor", "term", "factor"))
                 .Production("factor", r=>r
-                    .Rule("identifier")
+                    .Rule(identifier)
+                    .Rule("quoted")
                     .Rule('(', "expression", ')')
                     .Rule('[', "expression", ']')
                     .Rule('{', "expression", '}'))
-                .Production("identifier", r=>r
-                    .Rule("letter")
-                    .Rule("letter", "identifier", "letterOrDigit"))
-                .Production("letterOrDigit", r=>r
-                    .Rule("letter")
-                    .Rule("digit"))
-                .Production("letter", r=>r
-                    .Rule(new RangeTerminal('a', 'z'))
-                    .Rule(new RangeTerminal('A', 'Z')))
-                .Production("digit", r=>r
-                    .Rule(new DigitTerminal())), l=>l
+                .Production("quoted", r=>r
+                    .Rule("\"", "\"")), l=>l
                 .LexerRule(whitespace), i=>i
                 .Ignore("whitespace"));
 
@@ -90,31 +100,33 @@ namespace Pliant.Tests.Unit
 
             var sampleBnf = @"
             syntax      ->  { rule }
-            rule        ->  identifier '->' expression
-            expression  ->  term { '|' }
+            rule        ->  identifier ""->"" expression
+            expression  ->  term { ""|"" }
             term        ->  factor { factor }
             factor      ->  identifier | 
                             quoted | 
-                            '(' expression ')'
-                            '[' expression ']'
-                            '{' expression '}'
+                            ""("" expression "")""
+                            ""["" expression ""]""
+                            ""{"" expression ""}""
             identifier  ->  letter { letter | digit }
-            quoted      ->  '""' { any } '""'
+            quoted      ->  """""" { any } """"""
             letter      ->  '[a-zA-Z]'
-            digit       ->  '[\d]'
+            digit       ->  '[0-9]'
             any         ->  '.'";
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, sampleBnf);
             var stringReader = new StringReader(sampleBnf);
 
-            while (parseInterface.Read())
+            while (!parseInterface.EndOfStream())
             {
-                Assert.IsFalse(parseInterface.EndOfStream());
+                Assert.IsTrue(
+                    parseInterface.Read(), 
+                    string.Format(
+                        "Error parsing input string at position {0}",
+                        parseInterface.Position));
             }
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted(), 
-                string.Format(
-                    "Error parsing input string at position {0}", 
-                    parseInterface.Position));
+                "parser is not accepted");
         }
     }
 }
