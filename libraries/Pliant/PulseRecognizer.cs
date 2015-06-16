@@ -1,4 +1,8 @@
-﻿using System.Diagnostics;
+﻿using Pliant.Charts;
+using Pliant.Grammars;
+using Pliant.Nodes;
+using Pliant.Tokens;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Pliant
@@ -72,7 +76,7 @@ namespace Pliant
         {
             int i = scan.Origin;
             var currentSymbol = scan.DottedRule.PostDotSymbol.Value;
-            var lexerRule = currentSymbol as ILexerRule;
+            var lexerRule = currentSymbol as IGrammarLexerRule;
 
             var token = tokenNode.Token;
             if (token.TokenType == lexerRule.TokenType)

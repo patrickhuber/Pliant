@@ -50,26 +50,23 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="AnyTerminalTests.cs" />
+    <Compile Include="Grammars\AnyTerminalTests.cs" />
     <Compile Include="BnfTests.cs" />
-    <Compile Include="ChartTests.cs" />
-    <Compile Include="DigitTerminalTests.cs" />
-    <Compile Include="GrammarBuilderTests.cs" />
+    <Compile Include="Charts\ChartTests.cs" />
+    <Compile Include="Grammars\DigitTerminalTests.cs" />
+    <Compile Include="Builders\GrammarBuilderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PulseRecognizerTests.cs" />
-    <Compile Include="RecognizerTests.cs" />
-    <Compile Include="ProductionTests.cs" />
-    <Compile Include="RegexParserTests.cs" />
-    <Compile Include="RegexTests.cs" />
-    <Compile Include="StateTests.cs" />
-    <Compile Include="GrammarTests.cs" />
+    <Compile Include="Grammars\ProductionTests.cs" />
+    <Compile Include="Regex\RegexTests.cs" />
+    <Compile Include="Charts\StateTests.cs" />
+    <Compile Include="Grammars\GrammarTests.cs" />
     <Compile Include="AycockHorspoolAlgorithmTests.cs" />
-    <Compile Include="RangeTerminalTests.cs" />
-    <Compile Include="ParserTests.cs" />
-    <Compile Include="LexemeTests.cs" />
-    <Compile Include="ParseRunnerTests.cs" />
-    <Compile Include="TerminalLexemeTests.cs" />
-    <Compile Include="WhitespaceTerminalTests.cs" />
+    <Compile Include="Grammars\RangeTerminalTests.cs" />
+    <Compile Include="ParseEngineTests.cs" />
+    <Compile Include="Lexemes\LexemeTests.cs" />
+    <Compile Include="ParseInterfaceTests.cs" />
+    <Compile Include="Lexemes\TerminalLexemeTests.cs" />
+    <Compile Include="Grammars\WhitespaceTerminalTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj">
@@ -80,6 +77,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
