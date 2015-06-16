@@ -46,37 +46,44 @@ namespace Pliant.Tests.Unit
              *  identifier      ->  letter { letter | digit }
              *  quoted_symbol   ->  '"' { any_character } '"'
              */
+            var whitespace = new GrammarLexerRule(
+                "whitespace", 
+                new GrammarBuilder("whitespace", p=>p
+                    .Production("whitespace", r=>r
+                        .Rule(new WhitespaceTerminal(), "whitespace")
+                        .Rule(new WhitespaceTerminal())))
+                .GetGrammar());
+
             var grammarBuilder = new GrammarBuilder("syntax", g=>g
-                .Production("syntax", p=>p
+                .Production("syntax", r=>r
                     .Rule("syntax", "rule")
                     .Lambda())
-                .Production("rule", p=>p
+                .Production("rule", r=>r
                     .Rule("identifier", '-', '>', "expression"))
-                .Production("expression", p=>p
+                .Production("expression", r=>r
                     .Rule("term")
                     .Rule("term", "expression", '|', "term"))
-                .Production("term", p=>p
+                .Production("term", r=>r
                     .Rule("factor")
                     .Rule("factor", "term", "factor"))
-                .Production("factor", p=>p
+                .Production("factor", r=>r
                     .Rule("identifier")
-                    .Rule("quoted")
                     .Rule('(', "expression", ')')
                     .Rule('[', "expression", ']')
                     .Rule('{', "expression", '}'))
-                .Production("identifier", p=>p
+                .Production("identifier", r=>r
                     .Rule("letter")
                     .Rule("letter", "identifier", "letterOrDigit"))
-                .Production("letterOrDigit", p=>p
+                .Production("letterOrDigit", r=>r
                     .Rule("letter")
                     .Rule("digit"))
-                .Production("letter", p=>p
+                .Production("letter", r=>r
                     .Rule(new RangeTerminal('a', 'z'))
                     .Rule(new RangeTerminal('A', 'Z')))
-                .Production("digit", p=>p
-                    .Rule(new DigitTerminal()))
-                .Production("whitespace", p=>p
-                    .Rule(new WhitespaceTerminal())));
+                .Production("digit", r=>r
+                    .Rule(new DigitTerminal())), l=>l
+                .LexerRule(whitespace), i=>i
+                .Ignore("whitespace"));
 
             var grammar = grammarBuilder.GetGrammar();
             Assert.IsNotNull(grammar);
@@ -104,7 +111,10 @@ namespace Pliant.Tests.Unit
             {
                 Assert.IsFalse(parseInterface.EndOfStream());
             }
-            Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
+            Assert.IsTrue(parseInterface.ParseEngine.IsAccepted(), 
+                string.Format(
+                    "Error parsing input string at position {0}", 
+                    parseInterface.Position));
         }
     }
 }

@@ -99,11 +99,91 @@ namespace Pliant.Tests.Unit
             Assert.AreEqual(3, chart.EarleySets.Count);
         }
 
+        [TestMethod]
+        public void Test_ParseInterface_Given_Existing_Lexemes_When_Character_Matches_Then_It_Is_Added()
+        {
+            const string input = "aaaa";
+            var aGrammar = new GrammarBuilder("A", p => p
+                    .Production("A", r => r
+                        .Rule('a', 'a')))
+                .GetGrammar();
+            var a = new GrammarLexerRule("a", aGrammar);
+            var grammar = new GrammarBuilder("S", p => p
+                    .Production("S", r => r
+                        .Rule(a, "S")
+                        .Rule(a)), l=>l
+                    .LexerRule(a))
+                .GetGrammar();
+            var parseEngine = new ParseEngine(grammar);
+            var parseInterface = new ParseInterface(parseEngine, input);
+
+            var chart = new PrivateObject(parseEngine).GetField("_chart") as Chart;
+            Assert.IsTrue(parseInterface.Read());
+            Assert.AreEqual(1, chart.EarleySets.Count);
+            Assert.IsTrue(parseInterface.Read());
+            Assert.AreEqual(1, chart.EarleySets.Count);
+        }
+
+
+        [TestMethod]
+        public void Test_ParseInterface_Given_No_Existing_Lexemes_When_Character_Matches_Then_It_Is_Added_To_New_Lexeme()
+        {
+            const string input = "aaaa";
+            var aGrammar = new GrammarBuilder("A", p => p
+                    .Production("A", r => r
+                        .Rule('a', 'a')))
+                .GetGrammar();
+            var a = new GrammarLexerRule("a", aGrammar);
+            var grammar = new GrammarBuilder("S", p => p
+                    .Production("S", r => r
+                        .Rule(a, "S")
+                        .Rule(a)), l => l
+                    .LexerRule(a))
+                .GetGrammar();
+            var parseEngine = new ParseEngine(grammar);
+            var parseInterface = new ParseInterface(parseEngine, input);
+
+            var chart = new PrivateObject(parseEngine).GetField("_chart") as Chart;
+            for(int i=0;i<3;i++)
+                Assert.IsTrue(parseInterface.Read());
+            Assert.AreEqual(2, chart.EarleySets.Count);
+        }
+
+        [TestMethod]
+        public void Test_ParseInterface_When_Character_Should_Be_Ignored_Then_Emits_Token()
+        {
+            const string input = "aa aa";
+            var grammar = new GrammarBuilder("S", p => p
+                    .Production("S", r => r
+                        .Rule(_wordRule, "S")
+                        .Rule(_wordRule)), l=>l
+                    .LexerRule(_whitespaceRule)
+                    .LexerRule(_wordRule), i=>i
+                    .Ignore(_whitespaceRule.TokenType.Id))
+                .GetGrammar();
+
+            var parseEngine = new ParseEngine(grammar);
+            var parseInterface = new ParseInterface(parseEngine, input);
+
+            var chart = new PrivateObject(parseEngine).GetField("_chart") as Chart;
+            for (int i = 0; i < 2; i++)
+                Assert.IsTrue(parseInterface.Read());
+            Assert.IsTrue(parseInterface.Read());
+            Assert.AreEqual(2, chart.EarleySets.Count);
+        }
+
+        [TestMethod]
+        public void Test_ParseInterface_When_Character_Is_Not_Matched_And_Not_Ignored_Then_Fails_Parse()
+        {
+            Assert.Fail();
+        }
+
+
         private static void RunParse(ParseEngine parseEngine, string input)
         {
             var parseInterface = new ParseInterface(parseEngine, input);
             for (int i = 0; i < input.Length; i++)
-                Assert.IsTrue(parseInterface.Read());
+                Assert.IsTrue(parseInterface.Read(), string.Format("Error parsing at position {0}", i));
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
         }
 
