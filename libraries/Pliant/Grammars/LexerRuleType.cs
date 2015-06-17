@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pliant.Grammars
+﻿namespace Pliant.Grammars
 {
     public class LexerRuleType
     {
@@ -26,6 +20,16 @@ namespace Pliant.Grammars
         public override int GetHashCode()
         {
             return Id.GetHashCode();
+        }
+
+        public static bool operator ==(LexerRuleType first, LexerRuleType second)
+        {
+            return first.Equals(second);
+        }
+
+        public static bool operator !=(LexerRuleType first, LexerRuleType second)
+        {
+            return !first.Equals(second);
         }
     }
 }

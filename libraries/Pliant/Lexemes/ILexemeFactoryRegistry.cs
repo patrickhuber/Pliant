@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Pliant.Lexemes
 {
-    public interface ILexemeFactory
+    public interface ILexemeFactoryRegistry
     {
-        LexerRuleType LexerRuleType { get; }
-        ILexeme Create(ILexerRule lexerRule);
+        ILexemeFactory Get(LexerRuleType lexerRuleType);
+        void Register(ILexemeFactory factory);
     }
 }

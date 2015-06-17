@@ -47,6 +47,9 @@
     <Compile Include="Grammars\ITerminalLexerRule.cs" />
     <Compile Include="Grammars\LexerRuleType.cs" />
     <Compile Include="Lexemes\ILexemeFactory.cs" />
+    <Compile Include="Lexemes\ILexemeFactoryRegistry.cs" />
+    <Compile Include="Lexemes\LexemeFactoryRegistry.cs" />
+    <Compile Include="Lexemes\TerminalLexemeFactory.cs" />
     <Compile Include="Nodes\AndNode.cs" />
     <Compile Include="Grammars\AnyTerminal.cs" />
     <Compile Include="Assert.cs" />
@@ -84,6 +87,7 @@
     <Compile Include="Grammars\ITerminal.cs" />
     <Compile Include="Builders\ITerminalBuilder.cs" />
     <Compile Include="Nodes\ITerminalNode.cs" />
+    <Compile Include="ParseEngineLexemeFactory.cs" />
     <Compile Include="Tokens\IToken.cs" />
     <Compile Include="Nodes\ITokenNode.cs" />
     <Compile Include="Charts\ITransitionState.cs" />
