@@ -169,7 +169,7 @@ namespace Pliant
         
         private static ILexeme CreateLexemeForLexerRule(ILexerRule lexerRule)
         {
-            if (lexerRule.LexerRuleType == LexerRuleType.Grammar)
+            if (lexerRule.LexerRuleType == GrammarLexerRule.GrammarLexerRuleType)
             {
                 var grammarLexerRule = lexerRule as IGrammarLexerRule;
                 var parseEngine = new ParseEngine(grammarLexerRule.Grammar);

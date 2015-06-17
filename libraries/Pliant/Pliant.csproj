@@ -39,9 +39,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dfa\DfaEdge.cs" />
+    <Compile Include="Dfa\DfaState.cs" />
+    <Compile Include="Dfa\IDfaEdge.cs" />
+    <Compile Include="Dfa\IDfaState.cs" />
     <Compile Include="Grammars\IGrammarLexerRule.cs" />
     <Compile Include="Grammars\ITerminalLexerRule.cs" />
     <Compile Include="Grammars\LexerRuleType.cs" />
+    <Compile Include="Lexemes\ILexemeFactory.cs" />
     <Compile Include="Nodes\AndNode.cs" />
     <Compile Include="Grammars\AnyTerminal.cs" />
     <Compile Include="Assert.cs" />

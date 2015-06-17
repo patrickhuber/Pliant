@@ -27,7 +27,7 @@ namespace Pliant
             // get expected lexemes
             var expectedLexemes  =  
                 from rule in _parseEngine.GetExpectedLexerRules()
-                where rule.LexerRuleType == LexerRuleType.Terminal
+                where rule.LexerRuleType == TerminalLexerRule.TerminalLexerRuleType
                 let terminalRule = rule as ITerminalLexerRule
                 select new TerminalLexeme(terminalRule);
 
