@@ -33,6 +33,7 @@ namespace Pliant
             _lexemeFactoryRegistry = new LexemeFactoryRegistry();
             _lexemeFactoryRegistry.Register(new TerminalLexemeFactory());
             _lexemeFactoryRegistry.Register(new ParseEngineLexemeFactory());
+            _lexemeFactoryRegistry.Register(new StringLiteralLexemeFactory());
             Position = -1;
             ParseEngine = parseEngine;
         }
