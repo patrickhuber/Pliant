@@ -38,7 +38,19 @@ namespace Pliant.Tests.Unit.Dfa
             var indentifierLexeme = new DfaLexeme(dfa, new TokenType("Identifier"));
             for (int i = 0; i < wordInput.Length; i++)
                 Assert.IsTrue(indentifierLexeme.Scan(wordInput[i]));
+        }
 
+        [TestMethod]
+        public void Test_DfaLexeme_Given_Number_When_Character_Lexeme_Then_Failes_Match()
+        {
+            var numberInput = "029232843293842929348";
+            var dfa = new DfaState();
+            var final = new DfaState(true);
+            dfa.AddEdge(new DfaEdge(new RangeTerminal('a', 'z'), final));
+            final.AddEdge(new DfaEdge(new RangeTerminal('a', 'z'), final));
+            var letterLexeme = new DfaLexeme(dfa, new TokenType("lowerCase"));
+            Assert.IsFalse(letterLexeme.Scan(numberInput[0]));
+            Assert.AreEqual(string.Empty, letterLexeme.Capture);
         }
     }
 }
