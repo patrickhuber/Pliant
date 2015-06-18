@@ -11,16 +11,16 @@ namespace Pliant.Lexemes
 
         public TokenType TokenType { get; private set; }
 
+        public TerminalLexeme(ITerminalLexerRule lexerRule)
+            : this(lexerRule.Terminal, lexerRule.TokenType)
+        {
+        }
+
         public TerminalLexeme(ITerminal terminal, TokenType tokenType)
         {
             Terminal = terminal;
             TokenType = tokenType;
             Capture = string.Empty;
-        }
-
-        public TerminalLexeme(ITerminalLexerRule terminalRule)
-            : this(terminalRule.Terminal, terminalRule.TokenType)
-        {
         }
 
         public bool IsAccepted()
