@@ -12,7 +12,9 @@
         public override bool Equals(object obj)
         {
             var other = obj as LexerRuleType;
-            if (other == null)
+            // order is important here, null must preceed obj 
+            // to make sure the == operator is not called
+            if (null == obj)
                 return false;
             return other.Id == Id;
         }
@@ -22,12 +24,12 @@
             return Id.GetHashCode();
         }
 
-        public static bool operator ==(LexerRuleType first, LexerRuleType second)
+        public static bool operator == (LexerRuleType first, LexerRuleType second)
         {
             return first.Equals(second);
         }
 
-        public static bool operator !=(LexerRuleType first, LexerRuleType second)
+        public static bool operator != (LexerRuleType first, LexerRuleType second)
         {
             return !first.Equals(second);
         }

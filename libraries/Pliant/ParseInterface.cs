@@ -18,6 +18,7 @@ namespace Pliant
         private TextReader _textReader;
         private IEnumerable<ILexeme> _existingLexemes;
         private IEnumerable<ILexeme> _ignoreLexemes;
+        private ILexemeFactoryRegistry _lexemeFactoryRegistry;
 
         private static readonly ILexeme[] EmptyLexemeArray = new ILexeme[] { };
 
@@ -29,6 +30,9 @@ namespace Pliant
         public ParseInterface(IParseEngine parseEngine, TextReader input)
         {
             _textReader = input;
+            _lexemeFactoryRegistry = new LexemeFactoryRegistry();
+            _lexemeFactoryRegistry.Register(new TerminalLexemeFactory());
+            _lexemeFactoryRegistry.Register(new ParseEngineLexemeFactory());
             Position = -1;
             ParseEngine = parseEngine;
         }
@@ -167,16 +171,11 @@ namespace Pliant
             return character;
         }
         
-        private static ILexeme CreateLexemeForLexerRule(ILexerRule lexerRule)
+        private ILexeme CreateLexemeForLexerRule(ILexerRule lexerRule)
         {
-            if (lexerRule.LexerRuleType == GrammarLexerRule.GrammarLexerRuleType)
-            {
-                var grammarLexerRule = lexerRule as IGrammarLexerRule;
-                var parseEngine = new ParseEngine(grammarLexerRule.Grammar);
-                return new ParseEngineLexeme(parseEngine, lexerRule.TokenType);
-            }
-
-            return new TerminalLexeme(lexerRule as ITerminalLexerRule);
+            return _lexemeFactoryRegistry
+                .Get(lexerRule.LexerRuleType)
+                .Create(lexerRule);
         }
         
         private IToken CreateTokenFromLexeme(ILexeme lexeme)
