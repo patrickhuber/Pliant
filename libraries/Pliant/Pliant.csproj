@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dfa\DfaEdge.cs" />
+    <Compile Include="Dfa\DfaLexeme.cs" />
     <Compile Include="Dfa\DfaState.cs" />
     <Compile Include="Dfa\IDfaEdge.cs" />
     <Compile Include="Dfa\IDfaState.cs" />

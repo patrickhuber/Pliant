@@ -10,6 +10,7 @@ namespace Pliant.Dfa
         public DfaEdge(ITerminal terminal, IDfaState target)
         {
             Target = target;
+            Terminal = terminal;
         }
     }
 }
