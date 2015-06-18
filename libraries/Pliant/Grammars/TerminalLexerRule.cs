@@ -9,8 +9,10 @@ namespace Pliant.Grammars
         public SymbolType SymbolType { get { return SymbolType.LexerRule; } }
 
         public TokenType TokenType { get; private set; }
+        
+        public static readonly LexerRuleType TerminalLexerRuleType = new LexerRuleType("Terminal");
 
-        public LexerRuleType LexerRuleType { get { return LexerRuleType.Terminal; } }
+        public LexerRuleType LexerRuleType { get { return TerminalLexerRuleType; } }
 
         public TerminalLexerRule(char character)
             : this(new Terminal(character), new TokenType(character.ToString()))

@@ -1,7 +1,7 @@
 ﻿using Pliant.Grammars;
 using System.Collections.Generic;
 
-namespace Pliant
+namespace Pliant.Builders
 {
     public class TerminalBuilder : ITerminalBuilder
     {

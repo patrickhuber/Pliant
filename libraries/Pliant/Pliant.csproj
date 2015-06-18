@@ -39,9 +39,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dfa\DfaEdge.cs" />
+    <Compile Include="Dfa\DfaLexeme.cs" />
+    <Compile Include="Dfa\DfaState.cs" />
+    <Compile Include="Dfa\IDfaEdge.cs" />
+    <Compile Include="Dfa\IDfaState.cs" />
     <Compile Include="Grammars\IGrammarLexerRule.cs" />
     <Compile Include="Grammars\ITerminalLexerRule.cs" />
     <Compile Include="Grammars\LexerRuleType.cs" />
+    <Compile Include="Lexemes\ILexemeFactory.cs" />
+    <Compile Include="Lexemes\ILexemeFactoryRegistry.cs" />
+    <Compile Include="Lexemes\LexemeFactoryRegistry.cs" />
+    <Compile Include="Lexemes\TerminalLexemeFactory.cs" />
     <Compile Include="Nodes\AndNode.cs" />
     <Compile Include="Grammars\AnyTerminal.cs" />
     <Compile Include="Assert.cs" />
@@ -79,6 +88,7 @@
     <Compile Include="Grammars\ITerminal.cs" />
     <Compile Include="Builders\ITerminalBuilder.cs" />
     <Compile Include="Nodes\ITerminalNode.cs" />
+    <Compile Include="ParseEngineLexemeFactory.cs" />
     <Compile Include="Tokens\IToken.cs" />
     <Compile Include="Nodes\ITokenNode.cs" />
     <Compile Include="Charts\ITransitionState.cs" />

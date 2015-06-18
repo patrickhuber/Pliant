@@ -8,7 +8,9 @@ namespace Pliant.Grammars
 
         public TokenType TokenType { get; private set; }
 
-        public LexerRuleType LexerRuleType { get { return LexerRuleType.Grammar; } }
+        public static readonly LexerRuleType GrammarLexerRuleType = new LexerRuleType("Grammar");
+
+        public LexerRuleType LexerRuleType { get { return GrammarLexerRuleType; } }
 
         public GrammarLexerRule(string tokenType, IGrammar grammar)
             : this(new TokenType(tokenType), grammar)
