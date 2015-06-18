@@ -43,7 +43,7 @@ namespace Pliant.Tests.Unit.Dfa
         [TestMethod]
         public void Test_DfaLexeme_Given_Number_When_Character_Lexeme_Then_Failes_Match()
         {
-            var numberInput = "029232843293842929348";
+            var numberInput = "0";
             var dfa = new DfaState();
             var final = new DfaState(true);
             dfa.AddEdge(new DfaEdge(new RangeTerminal('a', 'z'), final));
