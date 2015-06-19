@@ -26,7 +26,7 @@ namespace Pliant.Tests.Unit
                    .Rule("E"))
                 .Production("E", r => r
                    .Lambda()))
-            .GetGrammar();
+            .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
             parseEngine.Pulse(new Token("a", 0, a.TokenType));

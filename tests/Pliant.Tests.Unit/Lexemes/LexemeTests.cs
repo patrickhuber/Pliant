@@ -20,7 +20,7 @@ namespace Pliant.Tests.Unit
                         .Rule("W", "S"))
                     .Production("W", r => r
                         .Rule(new WhitespaceTerminal())))
-                .GetGrammar();
+                .ToGrammar();
 
             var lexerRule = new GrammarLexerRule(
                 "whitespace",
@@ -40,7 +40,7 @@ namespace Pliant.Tests.Unit
             var grammar = new GrammarBuilder("sequence", p => p
                     .Production("sequence", r => r
                         .Rule('a', 'b', 'c', '1', '2', '3')))
-                .GetGrammar();
+                .ToGrammar();
 
             
             var parseEngine = new ParseEngine(grammar);
@@ -60,7 +60,7 @@ namespace Pliant.Tests.Unit
             var thereGrammar = new GrammarBuilder(There, p => p
                     .Production(There, r => r
                         .Rule('t', 'h', 'e', 'r', 'e')))
-                .GetGrammar();
+                .ToGrammar();
             var thereParseEngine = new ParseEngine(thereGrammar);
             var thereLexeme = new ParseEngineLexeme(thereParseEngine, new TokenType(There));
             lexemeList.Add(thereLexeme);
@@ -69,7 +69,7 @@ namespace Pliant.Tests.Unit
             var thereforeGrammar = new GrammarBuilder(Therefore, p => p
                     .Production(Therefore, r => r
                         .Rule('t', 'h', 'e', 'r', 'e', 'f', 'o', 'r', 'e')))
-                .GetGrammar();
+                .ToGrammar();
             var parseEngine = new ParseEngine(thereforeGrammar);
             var thereforeLexeme = new ParseEngineLexeme(parseEngine, new TokenType(Therefore));
             lexemeList.Add(thereforeLexeme);

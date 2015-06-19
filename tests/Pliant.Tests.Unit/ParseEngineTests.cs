@@ -31,7 +31,7 @@ namespace Pliant.Tests.Unit
                         .Lambda())
                     .Production("T", r=>r
                         .Rule(b, b, b)))
-                .GetGrammar();
+                .ToGrammar();
             var T_Production = grammar.Productions[3];
 
             var parseEngine = new ParseEngine(grammar);
@@ -118,7 +118,7 @@ namespace Pliant.Tests.Unit
             var grammar = new GrammarBuilder("S", p => p
                     .Production("S", r => r
                         .Rule(a)))
-                .GetGrammar();
+                .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
@@ -149,7 +149,7 @@ namespace Pliant.Tests.Unit
                         .Rule("A"))
                     .Production("A", r => r
                         .Rule(a)))
-                .GetGrammar();
+                .ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
@@ -188,7 +188,7 @@ namespace Pliant.Tests.Unit
                     .Production("A", r => r
                         .Rule(a, "A")
                         .Rule(b)))
-                .GetGrammar();
+                .ToGrammar();
             var tokens = Tokenize( "ab");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
@@ -245,7 +245,7 @@ namespace Pliant.Tests.Unit
                 .Production("B", r => r
                     .Rule("A")
                     .Rule(b)))
-            .GetGrammar();
+            .ToGrammar();
             var tokens = Tokenize( "aaab");
 
             var parseEngine = new ParseEngine(grammar);
@@ -353,7 +353,7 @@ namespace Pliant.Tests.Unit
                         .Rule(plus)
                         .Rule(question)
                         .Rule(star)))
-                .GetGrammar();
+                .ToGrammar();
 
             var tokens = Tokenize(".+");
             var parseEngine = new ParseEngine(grammar);
@@ -418,7 +418,7 @@ namespace Pliant.Tests.Unit
                     .Rule(b))
                 .Production("C", r => r
                     .Rule(c)))
-            .GetGrammar();
+            .ToGrammar();
             var tokens = Tokenize("bc");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
@@ -468,7 +468,7 @@ namespace Pliant.Tests.Unit
                     .Production("S", r => r
                         .Rule(a, "S", a)
                         .Rule(a)))
-                .GetGrammar();
+                .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
 
@@ -492,7 +492,7 @@ namespace Pliant.Tests.Unit
                     .Production("L`", r => r
                         .Rule(a_to_z, "L`")
                         .Lambda()))
-                .GetGrammar();
+                .ToGrammar();
 
             var input = Tokenize("thisisonelonginputstring");
             var parseEngine = new ParseEngine(grammar);
@@ -513,7 +513,7 @@ namespace Pliant.Tests.Unit
                 .Production("A", r => r
                     .Rule(a, "A")
                     .Lambda()))
-            .GetGrammar();
+            .ToGrammar();
 
             var input = Tokenize("aaaaa");
             var recognizer = new ParseEngine(grammar);
@@ -554,7 +554,7 @@ namespace Pliant.Tests.Unit
                 .Production("B", r => r
                     .Rule("A")
                     .Rule(b)))
-            .GetGrammar();
+            .ToGrammar();
             var input = Tokenize("aaab");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
@@ -587,7 +587,7 @@ namespace Pliant.Tests.Unit
                     .Rule("T"))
                 .Production("T", r => r
                     .Rule(digit)))
-            .GetGrammar();
+            .ToGrammar();
             return expressionGrammar;
         }
 

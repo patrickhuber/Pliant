@@ -25,7 +25,7 @@ namespace Pliant.Tests.Unit
                         .Rule("whitespace", "S"))
                     .Production("whitespace", r=>r
                         .Rule(new WhitespaceTerminal())))
-                .GetGrammar();
+                .ToGrammar();
             return new GrammarLexerRule("whitespace", whitespaceGrammar);
         }
 
@@ -39,7 +39,7 @@ namespace Pliant.Tests.Unit
                         .Rule(new RangeTerminal('a', 'z'))
                         .Rule(new RangeTerminal('A', 'Z'))
                         .Rule(new RangeTerminal('0', '9'))))
-                .GetGrammar();
+                .ToGrammar();
             return new GrammarLexerRule("word", wordGrammar);
         }
 
@@ -52,7 +52,7 @@ namespace Pliant.Tests.Unit
                         .Rule(_whitespaceRule, "S")
                         .Rule(_wordRule)
                         .Rule(_wordRule, "S")))
-                .GetGrammar();
+                .ToGrammar();
 
             var input = "this is input";
             var parseEngine = new ParseEngine(grammar);
@@ -71,7 +71,7 @@ namespace Pliant.Tests.Unit
                     .LexerRule(_whitespaceRule)
                     .LexerRule(_wordRule), action => action
                     .Ignore(_whitespaceRule.TokenType.Id))
-                .GetGrammar();
+                .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
             RunParse(parseEngine, input);
@@ -88,7 +88,7 @@ namespace Pliant.Tests.Unit
                         .Rule(a, "S")
                         .Rule(a)), l => l
                     .LexerRule(a))
-                .GetGrammar();
+                .ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
 
@@ -106,14 +106,14 @@ namespace Pliant.Tests.Unit
             var aGrammar = new GrammarBuilder("A", p => p
                     .Production("A", r => r
                         .Rule('a', 'a')))
-                .GetGrammar();
+                .ToGrammar();
             var a = new GrammarLexerRule("a", aGrammar);
             var grammar = new GrammarBuilder("S", p => p
                     .Production("S", r => r
                         .Rule(a, "S")
                         .Rule(a)), l=>l
                     .LexerRule(a))
-                .GetGrammar();
+                .ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
 
@@ -132,14 +132,14 @@ namespace Pliant.Tests.Unit
             var aGrammar = new GrammarBuilder("A", p => p
                     .Production("A", r => r
                         .Rule('a', 'a')))
-                .GetGrammar();
+                .ToGrammar();
             var a = new GrammarLexerRule("a", aGrammar);
             var grammar = new GrammarBuilder("S", p => p
                     .Production("S", r => r
                         .Rule(a, "S")
                         .Rule(a)), l => l
                     .LexerRule(a))
-                .GetGrammar();
+                .ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
 
@@ -160,7 +160,7 @@ namespace Pliant.Tests.Unit
                     .LexerRule(_whitespaceRule)
                     .LexerRule(_wordRule), i => i
                     .Ignore(_whitespaceRule.TokenType.Id))
-                .GetGrammar();
+                .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
@@ -184,20 +184,20 @@ namespace Pliant.Tests.Unit
                     .Production("A", r => r
                         .Rule('a', "A")
                         .Rule('a')))
-                .GetGrammar();
+                .ToGrammar();
             var a = new GrammarLexerRule("a", aGrammar);
 
             var bGrammar = new GrammarBuilder("B", p => p
                     .Production("B", r => r
                         .Rule('b', "B")
                         .Rule('b')))
-                .GetGrammar();
+                .ToGrammar();
             var b = new GrammarLexerRule("b", bGrammar);
 
             var grammar = new GrammarBuilder("S", p => p
                     .Production("S", r => r
                         .Rule(a, b)))
-                .GetGrammar();
+                .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
             var chart = GetParseEngineChart(parseEngine);

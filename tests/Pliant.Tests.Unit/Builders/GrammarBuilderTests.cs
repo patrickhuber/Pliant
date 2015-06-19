@@ -15,7 +15,7 @@ namespace Pliant.Tests.Unit
             var grammarBuilder = new GrammarBuilder("A", p=>p
                 .Production("A", r=>r.Lambda()));
             
-            var grammar = grammarBuilder.GetGrammar();
+            var grammar = grammarBuilder.ToGrammar();
             Assert.IsNotNull(grammar);
             Assert.AreEqual(1, grammar.Productions.Count);
             
@@ -32,7 +32,7 @@ namespace Pliant.Tests.Unit
                 "A", p => p
                 .Production("A", r => r.Rule('a')));
             
-            var grammar = grammarBuilder.GetGrammar();
+            var grammar = grammarBuilder.ToGrammar();
             Assert.IsNotNull(grammar);
             Assert.AreEqual(1, grammar.Productions.Count);
             
@@ -50,7 +50,7 @@ namespace Pliant.Tests.Unit
             var grammarBuilder = new GrammarBuilder("A", p=>p
                 .Production("A", r=>r.Rule("B")));
 
-            var grammar = grammarBuilder.GetGrammar();
+            var grammar = grammarBuilder.ToGrammar();
             Assert.IsNotNull(grammar);
             Assert.AreEqual(1, grammar.Productions.Count);
 
@@ -67,7 +67,7 @@ namespace Pliant.Tests.Unit
         {
             var grammarBuilder = new GrammarBuilder("A", p=>p
                 .Production("A", r=>r.Rule("B").Rule("C")));
-            var grammar = grammarBuilder.GetGrammar();
+            var grammar = grammarBuilder.ToGrammar();
             Assert.AreEqual(2, grammar.Productions.Count);
         }
 
@@ -79,7 +79,7 @@ namespace Pliant.Tests.Unit
                 .LexerRule("M", new CharacterClassTerminal(
                     new RangeTerminal('a', 'z'), 
                     new RangeTerminal('A', 'Z'))));
-            var grammar = grammarBuilder.GetGrammar();
+            var grammar = grammarBuilder.ToGrammar();
             Assert.AreEqual(1, grammar.LexerRules.Count);
         }
     }

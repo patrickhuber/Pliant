@@ -23,6 +23,7 @@ namespace Pliant.Lexemes
         {
             Literal = literal;
             TokenType = tokenType;
+            _capture = new StringBuilder();
         }
 
         public StringLiteralLexeme(IStringLiteralLexerRule lexerRule)
@@ -36,7 +37,7 @@ namespace Pliant.Lexemes
 
         public bool Scan(char c)
         {
-            if (_index > Literal.Length)
+            if (_index >= Literal.Length)
                 return false;
             if (Literal[_index] != c)
                 return false;

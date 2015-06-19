@@ -181,7 +181,7 @@ namespace Pliant.Regex
                 .LexerRule(backslash)
                 .LexerRule(notMeta)
                 .LexerRule(any));
-            _regexGrammar = grammarBuilder.GetGrammar();
+            _regexGrammar = grammarBuilder.ToGrammar();
         }
     }
 }

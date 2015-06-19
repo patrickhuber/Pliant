@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders;
 using Pliant.Grammars;
+using Pliant.Tokens;
 using System.IO;
 
 namespace Pliant.Tests.Unit
@@ -43,19 +44,19 @@ namespace Pliant.Tests.Unit
              *  <term>           ::= <literal> | "<" <rule-name> ">"
              *  <literal>        ::= '"' <text> '"' | "'" <text> 
              */
-            var whitespaceTerminal = new SetTerminal(' ', '\t');
+            var whitespaceTerminal = new WhitespaceTerminal();
             var whitespace = new GrammarLexerRule(
                 "whitespace",
                 new GrammarBuilder("whitespace", p => p
                     .Production("whitespace", r => r
                         .Rule(whitespaceTerminal, "whitespace")
                         .Rule(whitespaceTerminal)))
-                .GetGrammar());
+                .ToGrammar());
 
-            var identifier = new GrammarLexerRule(
-                "identifier",
-                new GrammarBuilder("identifier", p => p
-                        .Production("identifier", r => r
+            var ruleName = new GrammarLexerRule(
+                "rule-name",
+                new GrammarBuilder("rule-name", p => p
+                        .Production("rule-name", r => r
                             .Rule("letter", "zeroOrManyLetterOrDigit"))
                         .Production("zeroOrManyLetterOrDigit", r => r
                             .Rule("letterOrDigit", "zeroOrManyLetterOrDigit")
@@ -68,15 +69,36 @@ namespace Pliant.Tests.Unit
                             .Rule(new RangeTerminal('A', 'Z')))
                         .Production("digit", r => r
                             .Rule(new DigitTerminal())))
-                    .GetGrammar());
+                    .ToGrammar());
 
-            var grammarBuilder = new GrammarBuilder("syntax", p => p
+            var implements = new StringLiteralLexerRule("::=", new TokenType("implements"));
+            var eol = new StringLiteralLexerRule("\r\n", new TokenType("eol"));
+
+            var grammarBuilder = new GrammarBuilder("syntax")
                 .Production("syntax", r => r
                     .Rule("syntax")
                     .Rule("rule", "syntax"))
                 .Production("rule", r=>r
-                    .Rule("identifier", ':', ':', '=', "expression", "line-end")));
-            var grammar = grammarBuilder.GetGrammar();
+                    .Rule("identifier", implements, "expression", "line-end"))
+                .Production("expression", r=>r
+                    .Rule("list")
+                    .Rule("list", '|', "expression"))
+                .Production("line-end", r=>r
+                    .Rule(eol, "line-end", "line-end"))
+                .Production("list", r=>r
+                    .Rule("term")
+                    .Rule("term", "list"))
+                .Production("term", r=>r
+                    .Rule("literal")
+                    .Rule("identifier"))
+                .Production("identifier", r=>r
+                    .Rule('<', ruleName, '>'))
+                .Production("literal", r=>r
+                    .Rule('"', "text", '"')
+                    .Rule('\'', "text", '\''))
+                .LexerRule(whitespace)
+                .Ignore("whitespace");
+            var grammar = grammarBuilder.ToGrammar();
             Assert.IsNotNull(grammar);
 
             var sampleBnf = @"
