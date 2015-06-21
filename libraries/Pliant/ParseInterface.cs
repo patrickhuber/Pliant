@@ -45,33 +45,31 @@ namespace Pliant
 
             var character = ReadCharacter();
 
-            if (MatchesExistingIgnoreLexemes(character))
-                return true;
-            else
-                ClearExistingIngoreLexemes();
-
             if (MatchesExistingLexemes(character))
             {
                 if (!EndOfStream())
                     return true;
                 return TryParseExistingToken();
             }
-            else
+            
+            if (AnyExistingLexemes())
+                if (!TryParseExistingToken())
+                    return false;
+
+            if (MatchesNextLexemes(character))
             {
-                if (AnyExistingLexemes())
-                    if (!TryParseExistingToken())
-                        return false;
-
-                if (MatchesIgnoreLexemes(character))
+                if (!EndOfStream())
                     return true;
-
-                if (MatchesNextLexemes(character))
-                {
-                    if (!EndOfStream())
-                        return true;
-                    return TryParseExistingToken();
-                }
+                return TryParseExistingToken();
             }
+
+            if (MatchesExistingIgnoreLexemes(character))
+                return true;
+            else
+                ClearExistingIngoreLexemes();
+                        
+            if (MatchesIgnoreLexemes(character))
+                return true;            
 
             return false;
         }

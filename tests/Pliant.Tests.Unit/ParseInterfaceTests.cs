@@ -223,7 +223,6 @@ namespace Pliant.Tests.Unit
             var grammar = new GrammarBuilder("S")
                 .Production("S", r => r
                     .Rule(_wordRule, endOfLine, _wordRule))
-                .LexerRule(_whitespaceRule)
                 .Ignore(_whitespaceRule)
                 .ToGrammar();
 
