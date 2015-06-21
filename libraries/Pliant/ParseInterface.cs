@@ -124,9 +124,13 @@ namespace Pliant
         {
             if (_existingLexemes.IsNullOrEmpty())
                 return false;
-            return _existingLexemes
+            var matchedLexemes = _existingLexemes
                 .Where(x => x.Scan(character))
-                .Any();
+                .ToArray();
+            if (!matchedLexemes.Any())
+                return false;
+            _existingLexemes = matchedLexemes;
+            return true;
         }
 
         private void ClearExistingLexemes()
