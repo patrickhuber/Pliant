@@ -11,6 +11,8 @@ namespace Pliant.Grammars
         
         IReadOnlyList<ILexerRule> Ignores { get; }
 
+        IReadOnlyList<ILexerRule> LexerRules { get; }
+
         IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal);
 
         IEnumerable<ILexerRule> LexerRulesFor(INonTerminal nonTerminal);

@@ -22,6 +22,11 @@ namespace Pliant.Regex
             get { return _regexGrammar.Ignores; }
         }
 
+        public IReadOnlyList<ILexerRule> LexerRules
+        {
+            get { return _regexGrammar.LexerRules; }
+        }
+
         public IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal)
         {
             return _regexGrammar.RulesFor(nonTerminal);
@@ -117,7 +122,7 @@ namespace Pliant.Regex
                 new TokenType("not-meta"));
             var any = new TerminalLexerRule(new AnyTerminal(), new TokenType("any"));
 
-            var grammarBuilder = new GrammarBuilder(Regex, p => p
+            var grammarBuilder = new GrammarBuilder(Regex)
                 .Production(Regex, r => r
                     .Rule(Expression)
                     .Rule(caret, Expression)
@@ -164,7 +169,7 @@ namespace Pliant.Regex
                 .Production(NotMetaCharacter, r => r
                     .Rule(notMeta))
                 .Production(NotCloseBracket, r => r
-                    .Rule(notCloseBracket)), l=>l
+                    .Rule(notCloseBracket))
                 .LexerRule(caret)
                 .LexerRule(dollar)
                 .LexerRule(pipe)
@@ -180,7 +185,7 @@ namespace Pliant.Regex
                 .LexerRule(dash)
                 .LexerRule(backslash)
                 .LexerRule(notMeta)
-                .LexerRule(any));
+                .LexerRule(any);
             _regexGrammar = grammarBuilder.ToGrammar();
         }
     }

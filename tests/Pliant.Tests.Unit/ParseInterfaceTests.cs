@@ -2,6 +2,8 @@
 using Pliant.Builders;
 using Pliant.Charts;
 using Pliant.Grammars;
+using Pliant.Tokens;
+using System;
 
 namespace Pliant.Tests.Unit
 {
@@ -19,26 +21,26 @@ namespace Pliant.Tests.Unit
         
         private static IGrammarLexerRule CreateWhitespaceRule()
         {
-            var whitespaceGrammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule("whitespace")
-                        .Rule("whitespace", "S"))
-                    .Production("whitespace", r=>r
-                        .Rule(new WhitespaceTerminal())))
+            var whitespaceGrammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule("whitespace")
+                    .Rule("whitespace", "S"))
+                .Production("whitespace", r=>r
+                    .Rule(new WhitespaceTerminal()))
                 .ToGrammar();
             return new GrammarLexerRule("whitespace", whitespaceGrammar);
         }
 
         private static IGrammarLexerRule CreateWordRule()
         {
-            var wordGrammar = new GrammarBuilder("W", p => p
-                    .Production("W", r => r
-                        .Rule("word")
-                        .Rule("word", "W"))
-                    .Production("word", r => r
-                        .Rule(new RangeTerminal('a', 'z'))
-                        .Rule(new RangeTerminal('A', 'Z'))
-                        .Rule(new RangeTerminal('0', '9'))))
+            var wordGrammar = new GrammarBuilder("W")
+                .Production("W", r => r
+                    .Rule("word")
+                    .Rule("word", "W"))
+                .Production("word", r => r
+                    .Rule(new RangeTerminal('a', 'z'))
+                    .Rule(new RangeTerminal('A', 'Z'))
+                    .Rule(new RangeTerminal('0', '9')))
                 .ToGrammar();
             return new GrammarLexerRule("word", wordGrammar);
         }
@@ -46,12 +48,12 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParserInterface_That_Parses_Simple_Word_Sequence()
         {
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule(_whitespaceRule)
-                        .Rule(_whitespaceRule, "S")
-                        .Rule(_wordRule)
-                        .Rule(_wordRule, "S")))
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule(_whitespaceRule)
+                    .Rule(_whitespaceRule, "S")
+                    .Rule(_wordRule)
+                    .Rule(_wordRule, "S"))
                 .ToGrammar();
 
             var input = "this is input";
@@ -64,13 +66,13 @@ namespace Pliant.Tests.Unit
         {
             // a <word boundary> abc <word boundary> a <word boundary> a
             const string input = "a abc a a";
-            var grammar = new GrammarBuilder("A", p => p
-                    .Production("A", r => r
-                        .Rule(_wordRule, "A")
-                        .Rule(_wordRule)), l => l
-                    .LexerRule(_whitespaceRule)
-                    .LexerRule(_wordRule), action => action
-                    .Ignore(_whitespaceRule.TokenType.Id))
+            var grammar = new GrammarBuilder("A")
+                .Production("A", r => r
+                    .Rule(_wordRule, "A")
+                    .Rule(_wordRule))
+                .LexerRule(_whitespaceRule)
+                .LexerRule(_wordRule)
+                .Ignore(_whitespaceRule)
                 .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
@@ -83,11 +85,11 @@ namespace Pliant.Tests.Unit
         {
             const string input = "aa";
             var a = new TerminalLexerRule('a');
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule(a, "S")
-                        .Rule(a)), l => l
-                    .LexerRule(a))
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule(a, "S")
+                    .Rule(a))
+                .LexerRule(a)
                 .ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
@@ -103,16 +105,16 @@ namespace Pliant.Tests.Unit
         public void Test_ParseInterface_Given_Existing_Lexemes_When_Character_Matches_Then_It_Is_Added()
         {
             const string input = "aaaa";
-            var aGrammar = new GrammarBuilder("A", p => p
-                    .Production("A", r => r
-                        .Rule('a', 'a')))
+            var aGrammar = new GrammarBuilder("A")
+                .Production("A", r => r
+                    .Rule('a', 'a'))
                 .ToGrammar();
             var a = new GrammarLexerRule("a", aGrammar);
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule(a, "S")
-                        .Rule(a)), l=>l
-                    .LexerRule(a))
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule(a, "S")
+                    .Rule(a))
+                .LexerRule(a)
                 .ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
@@ -129,16 +131,16 @@ namespace Pliant.Tests.Unit
         public void Test_ParseInterface_Given_No_Existing_Lexemes_When_Character_Matches_Then_It_Is_Added_To_New_Lexeme()
         {
             const string input = "aaaa";
-            var aGrammar = new GrammarBuilder("A", p => p
-                    .Production("A", r => r
-                        .Rule('a', 'a')))
+            var aGrammar = new GrammarBuilder("A")
+                .Production("A", r => r
+                    .Rule('a', 'a'))
                 .ToGrammar();
             var a = new GrammarLexerRule("a", aGrammar);
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule(a, "S")
-                        .Rule(a)), l => l
-                    .LexerRule(a))
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule(a, "S")
+                    .Rule(a))
+                .LexerRule(a)
                 .ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
@@ -153,13 +155,13 @@ namespace Pliant.Tests.Unit
         public void Test_ParseInterface_When_Character_Should_Be_Ignored_Then_Emits_Token()
         {
             const string input = "aa aa";
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule(_wordRule, "S")
-                        .Rule(_wordRule)), l => l
-                    .LexerRule(_whitespaceRule)
-                    .LexerRule(_wordRule), i => i
-                    .Ignore(_whitespaceRule.TokenType.Id))
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule(_wordRule, "S")
+                    .Rule(_wordRule))
+                .LexerRule(_whitespaceRule)
+                .LexerRule(_wordRule)
+                .Ignore(_whitespaceRule)
                 .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
@@ -170,33 +172,28 @@ namespace Pliant.Tests.Unit
             Assert.IsTrue(parseInterface.Read());
             Assert.AreEqual(2, chart.EarleySets.Count);
         }
-
-        private static Chart GetParseEngineChart(ParseEngine parseEngine)
-        {
-            return new PrivateObject(parseEngine).GetField("_chart") as Chart;
-        }
-
+                
         [TestMethod]
         public void Test_ParseInterface_When_Character_Matches_Next_Production_Then_Emits_Token()
         {
             const string input = "aabb";
-            var aGrammar = new GrammarBuilder("A", p => p
-                    .Production("A", r => r
-                        .Rule('a', "A")
-                        .Rule('a')))
+            var aGrammar = new GrammarBuilder("A")
+                .Production("A", r => r
+                    .Rule('a', "A")
+                    .Rule('a'))
                 .ToGrammar();
             var a = new GrammarLexerRule("a", aGrammar);
 
-            var bGrammar = new GrammarBuilder("B", p => p
-                    .Production("B", r => r
-                        .Rule('b', "B")
-                        .Rule('b')))
+            var bGrammar = new GrammarBuilder("B")
+                .Production("B", r => r
+                    .Rule('b', "B")
+                    .Rule('b'))
                 .ToGrammar();
             var b = new GrammarLexerRule("b", bGrammar);
 
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule(a, b)))
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule(a, b))
                 .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
@@ -214,6 +211,31 @@ namespace Pliant.Tests.Unit
             }
         }
 
+        [TestMethod]
+        public void Test_ParseInterface_Given_Ignore_Characters_When_Overlap_With_Terminal_Then_Chooses_Terminal()
+        {
+            var input = "word \t\r\n word";
+            
+            var endOfLine = new StringLiteralLexerRule(
+                Environment.NewLine, 
+                new TokenType("EOL"));
+
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule(_wordRule, endOfLine, _wordRule))
+                .LexerRule(_whitespaceRule)
+                .Ignore(_whitespaceRule)
+                .ToGrammar();
+
+            var parseEngine = new ParseEngine(grammar);
+            RunParse(parseEngine, input);
+        }
+
+        private static Chart GetParseEngineChart(ParseEngine parseEngine)
+        {
+            return new PrivateObject(parseEngine).GetField("_chart") as Chart;
+        }
+
         private static void RunParse(ParseEngine parseEngine, string input)
         {
             var parseInterface = new ParseInterface(parseEngine, input);
@@ -221,6 +243,5 @@ namespace Pliant.Tests.Unit
                 Assert.IsTrue(parseInterface.Read(), string.Format("Error parsing at position {0}", i));
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
         }
-
     }
 }

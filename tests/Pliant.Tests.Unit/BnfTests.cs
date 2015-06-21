@@ -47,28 +47,28 @@ namespace Pliant.Tests.Unit
             var whitespaceTerminal = new WhitespaceTerminal();
             var whitespace = new GrammarLexerRule(
                 "whitespace",
-                new GrammarBuilder("whitespace", p => p
+                new GrammarBuilder("whitespace")
                     .Production("whitespace", r => r
                         .Rule(whitespaceTerminal, "whitespace")
-                        .Rule(whitespaceTerminal)))
-                .ToGrammar());
+                        .Rule(whitespaceTerminal))
+                    .ToGrammar());
 
             var ruleName = new GrammarLexerRule(
                 "rule-name",
-                new GrammarBuilder("rule-name", p => p
-                        .Production("rule-name", r => r
-                            .Rule("letter", "zeroOrManyLetterOrDigit"))
-                        .Production("zeroOrManyLetterOrDigit", r => r
-                            .Rule("letterOrDigit", "zeroOrManyLetterOrDigit")
-                            .Lambda())
-                        .Production("letterOrDigit", r => r
-                            .Rule("letter")
-                            .Rule("digit"))
-                        .Production("letter", r => r
-                            .Rule(new RangeTerminal('a', 'z'))
-                            .Rule(new RangeTerminal('A', 'Z')))
-                        .Production("digit", r => r
-                            .Rule(new DigitTerminal())))
+                new GrammarBuilder("rule-name")
+                    .Production("rule-name", r => r
+                        .Rule("letter", "zeroOrManyLetterOrDigit"))
+                    .Production("zeroOrManyLetterOrDigit", r => r
+                        .Rule("letterOrDigit", "zeroOrManyLetterOrDigit")
+                        .Lambda())
+                    .Production("letterOrDigit", r => r
+                        .Rule("letter")
+                        .Rule("digit"))
+                    .Production("letter", r => r
+                        .Rule(new RangeTerminal('a', 'z'))
+                        .Rule(new RangeTerminal('A', 'Z')))
+                    .Production("digit", r => r
+                        .Rule(new DigitTerminal()))
                     .ToGrammar());
 
             var implements = new StringLiteralLexerRule("::=", new TokenType("implements"));
@@ -94,10 +94,15 @@ namespace Pliant.Tests.Unit
                 .Production("identifier", r=>r
                     .Rule('<', ruleName, '>'))
                 .Production("literal", r=>r
-                    .Rule('"', "text", '"')
-                    .Rule('\'', "text", '\''))
-                .LexerRule(whitespace)
-                .Ignore("whitespace");
+                    .Rule('"', "doubleQuoteText", '"')
+                    .Rule('\'', "singleQuoteText", '\''))
+                .Production("dobuleQuoteText", r=>r
+                    .Rule("doubleQuoteText", new NegationTerminal(new Terminal('"')))
+                    .Lambda())
+                .Production("singleQuoteText", r=>r
+                    .Rule("signleQuoteText", new NegationTerminal(new Terminal('\'')))
+                    .Lambda())
+                .Ignore(whitespace);
             var grammar = grammarBuilder.ToGrammar();
             Assert.IsNotNull(grammar);
 
@@ -113,17 +118,17 @@ namespace Pliant.Tests.Unit
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, sampleBnf);
             var stringReader = new StringReader(sampleBnf);
-
+            
             while (!parseInterface.EndOfStream())
-            {
-                Assert.IsTrue(
-                    parseInterface.Read(),
-                    string.Format(
-                        "Error parsing input string at position {0}",
-                        parseInterface.Position));
+            {                 
+                if (!parseInterface.Read())
+                {
+                    var position = parseInterface.Position;
+                    Assert.Fail(string.Format(
+                        "Error parsing input string at position {0}. \r\n",
+                        parseInterface.Position) + sampleBnf.Substring(position, 10));
+                }
             }
-            Assert.IsTrue(parseInterface.ParseEngine.IsAccepted(),
-                "parser is not accepted");
         }
     }
 }

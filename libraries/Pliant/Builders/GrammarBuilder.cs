@@ -1,4 +1,5 @@
 ﻿using Pliant.Grammars;
+using Pliant.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Pliant.Builders
     {
         private IList<IProduction> _productions;
         private IList<ILexerRule> _lexerRules;
-        private IList<string> _actions;
+        private IList<ILexerRule> _ignoreRules;
         private string _start;
 
         public GrammarBuilder(string start)
@@ -17,33 +18,10 @@ namespace Pliant.Builders
             _start = start;
             _productions = new List<IProduction>();
             _lexerRules = new List<ILexerRule>();
-            _actions = new List<string>();
+            _ignoreRules = new List<ILexerRule>();
         }
-
-        public GrammarBuilder(
-            string start, 
-            Action<IProductionBuilder> productions, 
-            Action<ILexerRuleBuilder> lexerRules = null, 
-            Action<ICommandBuilder> action = null)
-        {
-            _start = start;
-            
-            var productionBuilder = new ProductionBuilder();
-            productions(productionBuilder);
-            _productions = productionBuilder.GetProductions();
-
-            var lexerRuleBuilder = new LexerRuleBuilder();
-            if(lexerRules != null)
-                lexerRules(lexerRuleBuilder);
-            _lexerRules = lexerRuleBuilder.GetLexerRules();
-
-            var ignoreBuilder = new CommandBuilder();
-            if(action != null)
-                action(ignoreBuilder);
-            _actions = ignoreBuilder.GetIgnoreList();
-        }
-                
-        public Grammar ToGrammar()
+                        
+        public IGrammar ToGrammar()
         {
             if (_start == null)
                 throw new Exception("no start production specified");
@@ -51,13 +29,15 @@ namespace Pliant.Builders
             if (startProduction == null)
                 throw new Exception("no start production found for start symbol");
             var start = startProduction.LeftHandSide;
-            var ignore = _lexerRules
-                .Where(x => _actions.Contains(x.TokenType.Id));
 
-            return new Grammar(start, _productions.ToArray(), _lexerRules.ToArray(), ignore.ToArray());
+            return new Grammar(
+                start, 
+                _productions.ToArray(), 
+                _lexerRules.ToArray(), 
+                _ignoreRules.ToArray());
         }
 
-        public GrammarBuilder Production(string name, Action<IRuleBuilder> rules)
+        public IGrammarBuilder Production(string name, Action<IRuleBuilder> rules)
         {
             if (rules == null)
                 _productions.Add(new Production(name));
@@ -74,15 +54,22 @@ namespace Pliant.Builders
             return this;
         }
 
-        public GrammarBuilder LexerRule(ILexerRule lexerRule)
+        public IGrammarBuilder LexerRule(string name, ITerminal terminal)
         {
+            var lexerRule = new TerminalLexerRule(terminal, new TokenType(name));
             _lexerRules.Add(lexerRule);
             return this;
         }
 
-        public GrammarBuilder Ignore(string name)
+        public IGrammarBuilder LexerRule(ILexerRule lexerRule)
         {
-            _actions.Add(name);
+            _lexerRules.Add(lexerRule);
+            return this;
+        }
+        
+        public IGrammarBuilder Ignore(ILexerRule lexerRule)
+        {
+            _ignoreRules.Add(lexerRule);
             return this;
         }
     }

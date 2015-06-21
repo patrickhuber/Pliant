@@ -14,12 +14,12 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_Lexeme_That_Consumes_Whitespace()
         {
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r=>r
-                        .Rule("W")
-                        .Rule("W", "S"))
-                    .Production("W", r => r
-                        .Rule(new WhitespaceTerminal())))
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r=>r
+                    .Rule("W")
+                    .Rule("W", "S"))
+                .Production("W", r => r
+                    .Rule(new WhitespaceTerminal()))
                 .ToGrammar();
 
             var lexerRule = new GrammarLexerRule(
@@ -37,9 +37,9 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_Lexeme_That_Consumes_Character_Sequence()
         {
-            var grammar = new GrammarBuilder("sequence", p => p
-                    .Production("sequence", r => r
-                        .Rule('a', 'b', 'c', '1', '2', '3')))
+            var grammar = new GrammarBuilder("sequence")
+                .Production("sequence", r => r
+                    .Rule('a', 'b', 'c', '1', '2', '3'))
                 .ToGrammar();
 
             
@@ -57,18 +57,18 @@ namespace Pliant.Tests.Unit
             var lexemeList = new List<ParseEngineLexeme>();
 
             const string There = "there";
-            var thereGrammar = new GrammarBuilder(There, p => p
-                    .Production(There, r => r
-                        .Rule('t', 'h', 'e', 'r', 'e')))
+            var thereGrammar = new GrammarBuilder(There)
+                .Production(There, r => r
+                    .Rule('t', 'h', 'e', 'r', 'e'))
                 .ToGrammar();
             var thereParseEngine = new ParseEngine(thereGrammar);
             var thereLexeme = new ParseEngineLexeme(thereParseEngine, new TokenType(There));
             lexemeList.Add(thereLexeme);
 
             const string Therefore = "therefore";
-            var thereforeGrammar = new GrammarBuilder(Therefore, p => p
-                    .Production(Therefore, r => r
-                        .Rule('t', 'h', 'e', 'r', 'e', 'f', 'o', 'r', 'e')))
+            var thereforeGrammar = new GrammarBuilder(Therefore)
+                .Production(Therefore, r => r
+                    .Rule('t', 'h', 'e', 'r', 'e', 'f', 'o', 'r', 'e'))
                 .ToGrammar();
             var parseEngine = new ParseEngine(thereforeGrammar);
             var thereforeLexeme = new ParseEngineLexeme(parseEngine, new TokenType(Therefore));

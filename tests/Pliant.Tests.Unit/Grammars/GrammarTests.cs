@@ -15,14 +15,14 @@ namespace Pliant.Tests.Unit
             var B = new NonTerminal("B");
             var A = new NonTerminal("A");
             var S = new NonTerminal("S");
-            var grammarBuilder = new GrammarBuilder("S", p => p
+            var grammarBuilder = new GrammarBuilder("S")
                 .Production("S", r => r
                     .Rule("A")
                     .Rule("B"))
                 .Production("A", r => r
                     .Rule('a'))
                 .Production("B", r => r
-                    .Rule('b')));
+                    .Rule('b'));
             var grammar = grammarBuilder.ToGrammar();
             var rules = grammar.RulesFor(A).ToList();
             Assert.AreEqual(1, rules.Count);

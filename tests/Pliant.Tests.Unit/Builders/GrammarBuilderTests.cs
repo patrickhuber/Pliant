@@ -12,8 +12,8 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_GrammarBuilder_That_Production_With_No_RHS_Adds_Empty_Production_To_List()
         {
-            var grammarBuilder = new GrammarBuilder("A", p=>p
-                .Production("A", r=>r.Lambda()));
+            var grammarBuilder = new GrammarBuilder("A")
+                .Production("A", r=>r.Lambda());
             
             var grammar = grammarBuilder.ToGrammar();
             Assert.IsNotNull(grammar);
@@ -28,9 +28,8 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_GrammarBuilder_That_Production_With_Character_RHS_Adds_Terminal()
         {
-            var grammarBuilder = new GrammarBuilder(
-                "A", p => p
-                .Production("A", r => r.Rule('a')));
+            var grammarBuilder = new GrammarBuilder("A")
+                .Production("A", r => r.Rule('a'));
             
             var grammar = grammarBuilder.ToGrammar();
             Assert.IsNotNull(grammar);
@@ -47,8 +46,9 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_GrammarBuilder_That_Production_With_String_RHS_Adds_NonTerminal()
         {
-            var grammarBuilder = new GrammarBuilder("A", p=>p
-                .Production("A", r=>r.Rule("B")));
+            var grammarBuilder = new GrammarBuilder("A")
+                .Production("A", r=>r
+                    .Rule("B"));
 
             var grammar = grammarBuilder.ToGrammar();
             Assert.IsNotNull(grammar);
@@ -65,8 +65,10 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_GrammarBuilder_That_Production_With_Two_Calls_To_RuleBuilder_Rule_Method_Creates_Two_Productions()
         {
-            var grammarBuilder = new GrammarBuilder("A", p=>p
-                .Production("A", r=>r.Rule("B").Rule("C")));
+            var grammarBuilder = new GrammarBuilder("A")
+                .Production("A", r=>r
+                    .Rule("B")
+                    .Rule("C"));
             var grammar = grammarBuilder.ToGrammar();
             Assert.AreEqual(2, grammar.Productions.Count);
         }
@@ -74,11 +76,13 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_GrammarBuilder_That_LexerRule_With_Two_Calls_To_Range_Terminal_Method_Creates_One_LexerRule()
         {
-            var grammarBuilder = new GrammarBuilder("A", p => p
-                .Production("A", r => r.Rule("B").Rule("C")), l => l
+            var grammarBuilder = new GrammarBuilder("A")
+                .Production("A", r => r
+                    .Rule("B")
+                    .Rule("C"))
                 .LexerRule("M", new CharacterClassTerminal(
                     new RangeTerminal('a', 'z'), 
-                    new RangeTerminal('A', 'Z'))));
+                    new RangeTerminal('A', 'Z')));
             var grammar = grammarBuilder.ToGrammar();
             Assert.AreEqual(1, grammar.LexerRules.Count);
         }

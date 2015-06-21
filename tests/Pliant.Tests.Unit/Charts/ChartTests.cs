@@ -38,10 +38,10 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_Chart_That_Enqueue_Avoids_Duplicates()
         {
-            var grammar = new GrammarBuilder("L", p => p
-                    .Production("L", r => r
-                        .Rule("L", new RangeTerminal('a', 'z'))
-                        .Rule(new RangeTerminal('a','z'))))
+            var grammar = new GrammarBuilder("L")
+                .Production("L", r => r
+                    .Rule("L", new RangeTerminal('a', 'z'))
+                    .Rule(new RangeTerminal('a','z')))
                 .ToGrammar();
             var chart = new Chart();
             var firstState = new State(grammar.Productions[0], 0, 1);
