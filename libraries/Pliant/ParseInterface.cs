@@ -56,7 +56,7 @@ namespace Pliant
                 if (!TryParseExistingToken())
                     return false;
 
-            if (MatchesNextLexemes(character))
+            if (MatchesNewLexemes(character))
             {
                 if (!EndOfStream())
                     return true;
@@ -68,24 +68,24 @@ namespace Pliant
             else
                 ClearExistingIngoreLexemes();
                         
-            if (MatchesIgnoreLexemes(character))
+            if (MatchesNewIgnoreLexemes(character))
                 return true;            
 
             return false;
         }
 
-        private bool MatchesNextLexemes(char character)
+        private bool MatchesNewLexemes(char character)
         {
-             var nextLexemes = ParseEngine
+             var newLexemes = ParseEngine
                 .GetExpectedLexerRules()
                 .Select(CreateLexemeForLexerRule)
                 .Where(x=>x.Scan(character))
                 .ToArray();
 
-            if (!nextLexemes.Any())
+            if (!newLexemes.Any())
                 return false;
 
-            _existingLexemes = nextLexemes;
+            _existingLexemes = newLexemes;
             return true;
         }
 
@@ -98,7 +98,7 @@ namespace Pliant
                 .Any();
         }
 
-        private bool MatchesIgnoreLexemes(char character)
+        private bool MatchesNewIgnoreLexemes(char character)
         {
             var ignoreLexerRules = ParseEngine.Grammar.Ignores;
             if (ignoreLexerRules.IsNullOrEmpty())
