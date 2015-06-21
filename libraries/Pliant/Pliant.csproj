@@ -116,7 +116,6 @@
     <Compile Include="Reactive\Observer.cs" />
     <Compile Include="Grammars\Production.cs" />
     <Compile Include="Builders\ProductionBuilder.cs" />
-    <Compile Include="PulseRecognizer.cs" />
     <Compile Include="Grammars\RangeTerminal.cs" />
     <Compile Include="Builders\RuleBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
