@@ -80,7 +80,7 @@ namespace Pliant
                 .GetExpectedLexerRules()
                 .Select(CreateLexemeForLexerRule)
                 .Where(x=>x.Scan(character))
-                .ToArray();
+                .ToList();
 
             if (!newLexemes.Any())
                 return false;
@@ -106,7 +106,7 @@ namespace Pliant
             var matchingIgnoreLexemes = ignoreLexerRules
                 .Select(CreateLexemeForLexerRule)
                 .Where(x => x.Scan(character))
-                .ToArray();
+                .ToList();
             if (matchingIgnoreLexemes.Any())
             {
                 _ignoreLexemes = matchingIgnoreLexemes;
@@ -126,7 +126,7 @@ namespace Pliant
                 return false;
             var matchedLexemes = _existingLexemes
                 .Where(x => x.Scan(character))
-                .ToArray();
+                .ToList();
             if (!matchedLexemes.Any())
                 return false;
             _existingLexemes = matchedLexemes;

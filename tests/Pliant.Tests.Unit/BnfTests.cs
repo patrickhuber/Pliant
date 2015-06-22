@@ -3,6 +3,7 @@ using Pliant.Builders;
 using Pliant.Grammars;
 using Pliant.Tokens;
 using System.IO;
+using System.Text;
 
 namespace Pliant.Tests.Unit
 {
@@ -63,12 +64,15 @@ namespace Pliant.Tests.Unit
                         .Lambda())
                     .Production("letterOrDigit", r => r
                         .Rule("letter")
-                        .Rule("digit"))
+                        .Rule("digit")
+                        .Rule("special"))
                     .Production("letter", r => r
                         .Rule(new RangeTerminal('a', 'z'))
                         .Rule(new RangeTerminal('A', 'Z')))
                     .Production("digit", r => r
                         .Rule(new DigitTerminal()))
+                    .Production("special", r=>r
+                        .Rule(new SetTerminal('-', '_')))
                     .ToGrammar());
 
             var implements = new StringLiteralLexerRule("::=", new TokenType("implements"));
@@ -84,7 +88,8 @@ namespace Pliant.Tests.Unit
                     .Rule("list")
                     .Rule("list", '|', "expression"))
                 .Production("line-end", r=>r
-                    .Rule(eol, "line-end", "line-end"))
+                    .Rule(eol)
+                    .Rule("line-end", "line-end"))
                 .Production("list", r=>r
                     .Rule("term")
                     .Rule("term", "list"))
@@ -96,11 +101,11 @@ namespace Pliant.Tests.Unit
                 .Production("literal", r=>r
                     .Rule('"', "doubleQuoteText", '"')
                     .Rule('\'', "singleQuoteText", '\''))
-                .Production("dobuleQuoteText", r=>r
+                .Production("doubleQuoteText", r=>r
                     .Rule("doubleQuoteText", new NegationTerminal(new Terminal('"')))
                     .Lambda())
                 .Production("singleQuoteText", r=>r
-                    .Rule("signleQuoteText", new NegationTerminal(new Terminal('\'')))
+                    .Rule("singleQuoteText", new NegationTerminal(new Terminal('\'')))
                     .Lambda())
                 .Ignore(whitespace);
             var grammar = grammarBuilder.ToGrammar();
@@ -124,9 +129,28 @@ namespace Pliant.Tests.Unit
                 if (!parseInterface.Read())
                 {
                     var position = parseInterface.Position;
-                    Assert.Fail(string.Format(
-                        "Error parsing input string at position {0}. \r\n",
-                        parseInterface.Position) + sampleBnf.Substring(position, 10));
+                    var startIndex = 0;
+                    for (int i = position; i >= 0; i--)
+                    {
+                        if (sampleBnf[i] == '\n' && i > 0)
+                            if (sampleBnf[i - 1] == '\r')
+                            {
+                                startIndex = i;
+                                break;
+                            }
+                    }
+                    var endIndex = sampleBnf.IndexOf("\r\n", position);
+                    endIndex = endIndex < 0 ? sampleBnf.Length : endIndex;
+                    var length = endIndex - startIndex;
+                    var stringBuilder = new StringBuilder();
+                    stringBuilder
+                        .AppendFormat("Error parsing input string at position {0}.", parseInterface.Position)
+                        .AppendLine()
+                        .AppendFormat("start: {0}", startIndex)
+                        .AppendLine()
+                        .AppendLine(sampleBnf.Substring(startIndex, length));
+
+                    Assert.Fail(stringBuilder.ToString());
                 }
             }
         }
