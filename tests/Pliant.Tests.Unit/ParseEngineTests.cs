@@ -20,18 +20,18 @@ namespace Pliant.Tests.Unit
 
             var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
             var b = new TerminalLexerRule(new Terminal('b'), new TokenType("b"));
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule("A", "T")
-                        .Rule(a, "T"))
-                    .Production("A", r=>r
-                        .Rule(a)
-                        .Rule("B", "A"))
-                    .Production("B", r => r
-                        .Lambda())
-                    .Production("T", r=>r
-                        .Rule(b, b, b)))
-                .GetGrammar();
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule("A", "T")
+                    .Rule(a, "T"))
+                .Production("A", r=>r
+                    .Rule(a)
+                    .Rule("B", "A"))
+                .Production("B", r => r
+                    .Lambda())
+                .Production("T", r=>r
+                    .Rule(b, b, b))
+                .ToGrammar();
             var T_Production = grammar.Productions[3];
 
             var parseEngine = new ParseEngine(grammar);
@@ -115,10 +115,10 @@ namespace Pliant.Tests.Unit
         {
             var tokens = Tokenize("a");
             var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule(a)))
-                .GetGrammar();
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule(a))
+                .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
@@ -144,12 +144,12 @@ namespace Pliant.Tests.Unit
         {
             var tokens = Tokenize("a");
             var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule("A"))
-                    .Production("A", r => r
-                        .Rule(a)))
-                .GetGrammar();
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule("A"))
+                .Production("A", r => r
+                    .Rule(a))
+                .ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
@@ -182,13 +182,13 @@ namespace Pliant.Tests.Unit
         {
             var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
             var b = new TerminalLexerRule(new Terminal('b'), new TokenType("b"));
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule("A"))
-                    .Production("A", r => r
-                        .Rule(a, "A")
-                        .Rule(b)))
-                .GetGrammar();
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule("A"))
+                .Production("A", r => r
+                    .Rule(a, "A")
+                    .Rule(b))
+                .ToGrammar();
             var tokens = Tokenize( "ab");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
@@ -237,15 +237,15 @@ namespace Pliant.Tests.Unit
             var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
             var b = new TerminalLexerRule(new Terminal('b'), new TokenType("b"));
 
-            var grammar = new GrammarBuilder("S", p => p
+            var grammar = new GrammarBuilder("S")
                 .Production("S", r => r
                     .Rule("A"))
                 .Production("A", r => r
                     .Rule(a, "B"))
                 .Production("B", r => r
                     .Rule("A")
-                    .Rule(b)))
-            .GetGrammar();
+                    .Rule(b))
+                .ToGrammar();
             var tokens = Tokenize( "aaab");
 
             var parseEngine = new ParseEngine(grammar);
@@ -340,20 +340,20 @@ namespace Pliant.Tests.Unit
             var question = new TerminalLexerRule(new Terminal('?'), new TokenType("?"));
             var star = new TerminalLexerRule(new Terminal('*'), new TokenType("*"));
 
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule("A")
-                        .Rule("A", "S"))
-                    .Production("A", r => r
-                        .Rule("B")
-                        .Rule("B", "C"))
-                    .Production("B", r => r
-                        .Rule(dot))
-                    .Production("C", r => r
-                        .Rule(plus)
-                        .Rule(question)
-                        .Rule(star)))
-                .GetGrammar();
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule("A")
+                    .Rule("A", "S"))
+                .Production("A", r => r
+                    .Rule("B")
+                    .Rule("B", "C"))
+                .Production("B", r => r
+                    .Rule(dot))
+                .Production("C", r => r
+                    .Rule(plus)
+                    .Rule(question)
+                    .Rule(star))
+                .ToGrammar();
 
             var tokens = Tokenize(".+");
             var parseEngine = new ParseEngine(grammar);
@@ -411,14 +411,14 @@ namespace Pliant.Tests.Unit
         {
             var b = new TerminalLexerRule(new Terminal('b'), new TokenType("b"));
             var c = new TerminalLexerRule(new Terminal('c'), new TokenType("c"));
-            var grammar = new GrammarBuilder("A", p => p
+            var grammar = new GrammarBuilder("A")
                 .Production("A", r => r
                     .Rule("B", "C"))
                 .Production("B", r => r
                     .Rule(b))
                 .Production("C", r => r
-                    .Rule(c)))
-            .GetGrammar();
+                    .Rule(c))
+                .ToGrammar();
             var tokens = Tokenize("bc");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
@@ -464,11 +464,11 @@ namespace Pliant.Tests.Unit
         {
             var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
 
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule(a, "S", a)
-                        .Rule(a)))
-                .GetGrammar();
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule(a, "S", a)
+                    .Rule(a))
+                .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
 
@@ -483,16 +483,16 @@ namespace Pliant.Tests.Unit
                 new RangeTerminal('a', 'z'),
                 new TokenType("range"));
 
-            var grammar = new GrammarBuilder("S", p => p
-                    .Production("S", r => r
-                        .Rule("S", "L")
-                        .Lambda())
-                    .Production("L", r => r
-                        .Rule(a_to_z, "L`"))
-                    .Production("L`", r => r
-                        .Rule(a_to_z, "L`")
-                        .Lambda()))
-                .GetGrammar();
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule("S", "L")
+                    .Lambda())
+                .Production("L", r => r
+                    .Rule(a_to_z, "L`"))
+                .Production("L`", r => r
+                    .Rule(a_to_z, "L`")
+                    .Lambda())
+                .ToGrammar();
 
             var input = Tokenize("thisisonelonginputstring");
             var parseEngine = new ParseEngine(grammar);
@@ -509,11 +509,11 @@ namespace Pliant.Tests.Unit
             var a = new TerminalLexerRule(
                 new Terminal('a'),
                 new TokenType("a"));
-            var grammar = new GrammarBuilder("A", p => p
+            var grammar = new GrammarBuilder("A")
                 .Production("A", r => r
                     .Rule(a, "A")
-                    .Lambda()))
-            .GetGrammar();
+                    .Lambda())
+                .ToGrammar();
 
             var input = Tokenize("aaaaa");
             var recognizer = new ParseEngine(grammar);
@@ -546,15 +546,15 @@ namespace Pliant.Tests.Unit
             var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
             var b = new TerminalLexerRule(new Terminal('b'), new TokenType("b"));
 
-            var grammar = new GrammarBuilder("S", p => p
+            var grammar = new GrammarBuilder("S")
                 .Production("S", r => r
                     .Rule("A"))
                 .Production("A", r => r
                     .Rule(a, "B"))
                 .Production("B", r => r
                     .Rule("A")
-                    .Rule(b)))
-            .GetGrammar();
+                    .Rule(b))
+                .ToGrammar();
             var input = Tokenize("aaab");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
@@ -577,8 +577,7 @@ namespace Pliant.Tests.Unit
                 new DigitTerminal(),
                 new TokenType("digit"));
 
-            var expressionGrammar = new GrammarBuilder(
-                "S", p => p
+            var expressionGrammar = new GrammarBuilder("S")
                 .Production("S", r => r
                     .Rule("S", plus, "M")
                     .Rule("M"))
@@ -586,8 +585,8 @@ namespace Pliant.Tests.Unit
                     .Rule("M", star, "T")
                     .Rule("T"))
                 .Production("T", r => r
-                    .Rule(digit)))
-            .GetGrammar();
+                    .Rule(digit))
+                .ToGrammar();
             return expressionGrammar;
         }
 

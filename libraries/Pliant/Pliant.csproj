@@ -45,11 +45,15 @@
     <Compile Include="Dfa\IDfaEdge.cs" />
     <Compile Include="Dfa\IDfaState.cs" />
     <Compile Include="Grammars\IGrammarLexerRule.cs" />
+    <Compile Include="Grammars\IStringLiteralLexerRule.cs" />
     <Compile Include="Grammars\ITerminalLexerRule.cs" />
     <Compile Include="Grammars\LexerRuleType.cs" />
+    <Compile Include="Grammars\StringLiteralLexerRule.cs" />
     <Compile Include="Lexemes\ILexemeFactory.cs" />
     <Compile Include="Lexemes\ILexemeFactoryRegistry.cs" />
     <Compile Include="Lexemes\LexemeFactoryRegistry.cs" />
+    <Compile Include="Lexemes\StringLiteralLexeme.cs" />
+    <Compile Include="Lexemes\StringLiteralLexemeFactory.cs" />
     <Compile Include="Lexemes\TerminalLexemeFactory.cs" />
     <Compile Include="Nodes\AndNode.cs" />
     <Compile Include="Grammars\AnyTerminal.cs" />
@@ -112,7 +116,6 @@
     <Compile Include="Reactive\Observer.cs" />
     <Compile Include="Grammars\Production.cs" />
     <Compile Include="Builders\ProductionBuilder.cs" />
-    <Compile Include="PulseRecognizer.cs" />
     <Compile Include="Grammars\RangeTerminal.cs" />
     <Compile Include="Builders\RuleBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

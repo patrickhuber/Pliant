@@ -33,6 +33,7 @@ namespace Pliant
             _lexemeFactoryRegistry = new LexemeFactoryRegistry();
             _lexemeFactoryRegistry.Register(new TerminalLexemeFactory());
             _lexemeFactoryRegistry.Register(new ParseEngineLexemeFactory());
+            _lexemeFactoryRegistry.Register(new StringLiteralLexemeFactory());
             Position = -1;
             ParseEngine = parseEngine;
         }
@@ -44,49 +45,47 @@ namespace Pliant
 
             var character = ReadCharacter();
 
-            if (MatchesExistingIgnoreLexemes(character))
-                return true;
-            else
-                ClearExistingIngoreLexemes();
-
             if (MatchesExistingLexemes(character))
             {
                 if (!EndOfStream())
                     return true;
                 return TryParseExistingToken();
             }
-            else
+            
+            if (AnyExistingLexemes())
+                if (!TryParseExistingToken())
+                    return false;
+
+            if (MatchesNewLexemes(character))
             {
-                if (AnyExistingLexemes())
-                    if (!TryParseExistingToken())
-                        return false;
-
-                if (MatchesIgnoreLexemes(character))
+                if (!EndOfStream())
                     return true;
-
-                if (MatchesNextLexemes(character))
-                {
-                    if (!EndOfStream())
-                        return true;
-                    return TryParseExistingToken();
-                }
+                return TryParseExistingToken();
             }
+
+            if (MatchesExistingIgnoreLexemes(character))
+                return true;
+            else
+                ClearExistingIngoreLexemes();
+                        
+            if (MatchesNewIgnoreLexemes(character))
+                return true;            
 
             return false;
         }
 
-        private bool MatchesNextLexemes(char character)
+        private bool MatchesNewLexemes(char character)
         {
-             var nextLexemes = ParseEngine
+             var newLexemes = ParseEngine
                 .GetExpectedLexerRules()
                 .Select(CreateLexemeForLexerRule)
                 .Where(x=>x.Scan(character))
-                .ToArray();
+                .ToList();
 
-            if (!nextLexemes.Any())
+            if (!newLexemes.Any())
                 return false;
 
-            _existingLexemes = nextLexemes;
+            _existingLexemes = newLexemes;
             return true;
         }
 
@@ -99,7 +98,7 @@ namespace Pliant
                 .Any();
         }
 
-        private bool MatchesIgnoreLexemes(char character)
+        private bool MatchesNewIgnoreLexemes(char character)
         {
             var ignoreLexerRules = ParseEngine.Grammar.Ignores;
             if (ignoreLexerRules.IsNullOrEmpty())
@@ -107,7 +106,7 @@ namespace Pliant
             var matchingIgnoreLexemes = ignoreLexerRules
                 .Select(CreateLexemeForLexerRule)
                 .Where(x => x.Scan(character))
-                .ToArray();
+                .ToList();
             if (matchingIgnoreLexemes.Any())
             {
                 _ignoreLexemes = matchingIgnoreLexemes;
@@ -125,9 +124,13 @@ namespace Pliant
         {
             if (_existingLexemes.IsNullOrEmpty())
                 return false;
-            return _existingLexemes
+            var matchedLexemes = _existingLexemes
                 .Where(x => x.Scan(character))
-                .Any();
+                .ToList();
+            if (!matchedLexemes.Any())
+                return false;
+            _existingLexemes = matchedLexemes;
+            return true;
         }
 
         private void ClearExistingLexemes()

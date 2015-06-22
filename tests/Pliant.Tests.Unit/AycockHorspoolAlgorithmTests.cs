@@ -16,17 +16,17 @@ namespace Pliant.Tests.Unit
                 new Terminal('a'),
                 new TokenType("a"));
 
-            var grammar = new GrammarBuilder("S'", p => p
-                .Production("S'", r => r
-                    .Rule("S"))
-                .Production("S", r => r
-                   .Rule("A", "A", "A", "A"))
-                .Production("A", r => r
-                   .Rule(a)
-                   .Rule("E"))
-                .Production("E", r => r
-                   .Lambda()))
-            .GetGrammar();
+            var grammar = new GrammarBuilder("S'")
+            .Production("S'", r => r
+                .Rule("S"))
+            .Production("S", r => r
+                .Rule("A", "A", "A", "A"))
+            .Production("A", r => r
+                .Rule(a)
+                .Rule("E"))
+            .Production("E", r => r
+                .Lambda())
+            .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
             parseEngine.Pulse(new Token("a", 0, a.TokenType));
