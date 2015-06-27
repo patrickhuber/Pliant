@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders;
+using Pliant.Dfa;
 using Pliant.Grammars;
 using Pliant.Tokens;
 using System.IO;
@@ -64,35 +65,22 @@ namespace Pliant.Tests.Unit
              *  <literal>        ::= '"' <text> '"' | "'" <text> 
              */
             var whitespaceTerminal = new WhitespaceTerminal();
-            var whitespace = new GrammarLexerRule(
-                "whitespace",
-                new GrammarBuilder("whitespace")
-                    .Production("whitespace", r => r
-                        .Rule(whitespaceTerminal, "whitespace")
-                        .Rule(whitespaceTerminal))
-                    .ToGrammar());
+            var startWhitespace = new DfaState();
+            var finalWhitespace = new DfaState(true);
+            startWhitespace.AddEdge(new DfaEdge(whitespaceTerminal, finalWhitespace));
+            finalWhitespace.AddEdge(new DfaEdge(whitespaceTerminal, finalWhitespace));
+            var whitespace = new DfaLexerRule(startWhitespace, new TokenType("whitespace"));
 
-            var ruleName = new GrammarLexerRule(
-                "rule-name",
-                new GrammarBuilder("rule-name")
-                    .Production("rule-name", r => r
-                        .Rule("letter", "zeroOrManyLetterOrDigit"))
-                    .Production("zeroOrManyLetterOrDigit", r => r
-                        .Rule("letterOrDigit", "zeroOrManyLetterOrDigit")
-                        .Lambda())
-                    .Production("letterOrDigit", r => r
-                        .Rule("letter")
-                        .Rule("digit")
-                        .Rule("special"))
-                    .Production("letter", r => r
-                        .Rule(new RangeTerminal('a', 'z'))
-                        .Rule(new RangeTerminal('A', 'Z')))
-                    .Production("digit", r => r
-                        .Rule(new DigitTerminal()))
-                    .Production("special", r=>r
-                        .Rule(new SetTerminal('-', '_')))
-                    .ToGrammar());
-
+            var ruleNameState = new DfaState();
+            var zeroOrMoreLetterOrDigit = new DfaState(true);
+            ruleNameState.AddEdge(new DfaEdge(new RangeTerminal('a', 'z'), zeroOrMoreLetterOrDigit));
+            ruleNameState.AddEdge(new DfaEdge(new RangeTerminal('A', 'Z'), zeroOrMoreLetterOrDigit));
+            zeroOrMoreLetterOrDigit.AddEdge(new DfaEdge(new RangeTerminal('a', 'z'), zeroOrMoreLetterOrDigit));
+            zeroOrMoreLetterOrDigit.AddEdge(new DfaEdge(new RangeTerminal('A', 'Z'), zeroOrMoreLetterOrDigit));
+            zeroOrMoreLetterOrDigit.AddEdge(new DfaEdge(new DigitTerminal(), zeroOrMoreLetterOrDigit));
+            zeroOrMoreLetterOrDigit.AddEdge(new DfaEdge(new SetTerminal('-', '_'), zeroOrMoreLetterOrDigit));
+            var ruleName = new DfaLexerRule(ruleNameState, new TokenType("rule-name"));
+            
             var implements = new StringLiteralLexerRule("::=", new TokenType("implements"));
             var eol = new StringLiteralLexerRule("\r\n", new TokenType("eol"));
 

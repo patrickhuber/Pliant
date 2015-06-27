@@ -41,8 +41,11 @@
   <ItemGroup>
     <Compile Include="Dfa\DfaEdge.cs" />
     <Compile Include="Dfa\DfaLexeme.cs" />
+    <Compile Include="Dfa\DfaLexemeFactory.cs" />
+    <Compile Include="Dfa\DfaLexerRule.cs" />
     <Compile Include="Dfa\DfaState.cs" />
     <Compile Include="Dfa\IDfaEdge.cs" />
+    <Compile Include="Dfa\IDfaLexerRule.cs" />
     <Compile Include="Dfa\IDfaState.cs" />
     <Compile Include="Grammars\IGrammarLexerRule.cs" />
     <Compile Include="Grammars\IStringLiteralLexerRule.cs" />

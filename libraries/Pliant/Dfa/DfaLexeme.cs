@@ -16,6 +16,7 @@ namespace Pliant.Dfa
             _currentState = dfaState;
             TokenType = tokenType;
         }
+
         public string Capture
         {
             get { return _capture.ToString(); }

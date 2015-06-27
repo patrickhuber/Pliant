@@ -1,4 +1,5 @@
 ﻿using Pliant.Grammars;
+using System;
 
 namespace Pliant.Charts
 {
@@ -7,15 +8,37 @@ namespace Pliant.Charts
         private IProduction _production;
         
         public int Position { get; private set; }
-        public INullable<ISymbol> PostDotSymbol { get; private set; }
-        public INullable<ISymbol> PreDotSymbol { get; private set; }
+        
+        // PERF: Favor lazy instantiation for objects that are used infrequently and
+        // have high instantiation cost
+        private INullable<ISymbol> _lazyPostDotSymbol = null;
+        public INullable<ISymbol> PostDotSymbol
+        {
+            get
+            {
+                if (_lazyPostDotSymbol == null)
+                    _lazyPostDotSymbol = new NullablePostDotWrapper(this);
+                return _lazyPostDotSymbol;
+            }
+        }
+
+        // PERF: Favor lazy instantiation for objects that are used infrequently and
+        // have high instantiation cost
+        private INullable<ISymbol> _lazyPreDotSymbol = null;
+        public INullable<ISymbol> PreDotSymbol
+        {
+            get
+            {
+                if (_lazyPreDotSymbol == null)
+                    _lazyPreDotSymbol = new NullablePreDotWrapper(this);
+                return _lazyPreDotSymbol;
+            }
+        }
 
         public DottedRule(IProduction production, int position)
         {
             Position = position;
             _production = production;
-            PostDotSymbol = new NullablePostDotWrapper(this);
-            PreDotSymbol = new NullablePreDotWrapper(this);
         }
 
         public ISymbol Symbol

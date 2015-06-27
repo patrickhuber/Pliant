@@ -1,4 +1,5 @@
 ﻿using Pliant.Collections;
+using Pliant.Dfa;
 using Pliant.Grammars;
 using Pliant.Lexemes;
 using Pliant.Tokens;
@@ -34,6 +35,8 @@ namespace Pliant
             _lexemeFactoryRegistry.Register(new TerminalLexemeFactory());
             _lexemeFactoryRegistry.Register(new ParseEngineLexemeFactory());
             _lexemeFactoryRegistry.Register(new StringLiteralLexemeFactory());
+            _lexemeFactoryRegistry.Register(new DfaLexemeFactory());
+
             Position = -1;
             ParseEngine = parseEngine;
         }
