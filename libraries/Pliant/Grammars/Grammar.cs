@@ -15,7 +15,8 @@ namespace Pliant.Grammars
         public IReadOnlyList<ILexerRule> Ignores { get; private set; }
 
         private IDictionary<INonTerminal, IList<IProduction>> _productionIndex;
-
+        private IDictionary<int, IList<ILexerRule>> _lexerRuleIndex;
+        
         private static readonly IProduction[] EmptyProductionArray = new IProduction[] { };
         private static readonly ILexerRule[] EmptyLexerRuleArray = new ILexerRule[] { };
 
@@ -23,43 +24,62 @@ namespace Pliant.Grammars
         {
             Assert.IsNotNullOrEmpty(productions, "productions");
             Assert.IsNotNull(start, "start");
-            CreateProductionIndex(productions);
+            _productionIndex = CreateProductionIndex(productions);
+            _lexerRuleIndex = CreateLexerRuleIndex(lexerRules);
             Productions = new ReadOnlyList<IProduction>(productions ?? EmptyProductionArray);
             LexerRules = new ReadOnlyList<ILexerRule>(lexerRules ?? EmptyLexerRuleArray);
             Ignores = new ReadOnlyList<ILexerRule>(ignore ?? EmptyLexerRuleArray);
             Start = start; 
         }
 
-        private void CreateProductionIndex(IEnumerable<IProduction> productions)
+        private IDictionary<INonTerminal, IList<IProduction>> CreateProductionIndex(IEnumerable<IProduction> productions)
         {
-            _productionIndex = new Dictionary<INonTerminal, IList<IProduction>>();
+            var dictionary = new Dictionary<INonTerminal, IList<IProduction>>();
             foreach (var production in productions)
             {
                 var leftHandSide = production.LeftHandSide;
-                if (!_productionIndex.ContainsKey(leftHandSide))
-                    _productionIndex.Add(leftHandSide, new List<IProduction>());
-                _productionIndex[leftHandSide].Add(production);
+                if (!dictionary.ContainsKey(leftHandSide))
+                    dictionary.Add(leftHandSide, new List<IProduction>());
+                dictionary[leftHandSide].Add(production);
             }
+            return dictionary;
+        }
+
+        private IDictionary<int, IList<ILexerRule>> CreateLexerRuleIndex(IEnumerable<ILexerRule> lexerRules)
+        {
+            var dictionary = new Dictionary<int, IList<ILexerRule>>();
+            foreach (var lexerRule in lexerRules)
+            {
+                var key = lexerRule.SymbolType.GetHashCode()
+                    ^ lexerRule.TokenType.Id.GetHashCode();
+                if (!dictionary.ContainsKey(key))
+                    dictionary.Add(key, new List<ILexerRule>());
+                dictionary[key].Add(lexerRule); 
+            }
+            return dictionary;
         }
 
         public IEnumerable<IProduction> RulesFor(INonTerminal symbol)
         {
-            return _productionIndex[symbol];
+            IList<IProduction> list;
+            if (!_productionIndex.TryGetValue(symbol, out list))
+                return EmptyProductionArray;
+            return list;
         }
 
         public IEnumerable<ILexerRule> LexerRulesFor(INonTerminal symbol)
         {
-            foreach (var lexerRule in LexerRules)
-            {
-                if (lexerRule.SymbolType == symbol.SymbolType
-                    && lexerRule.TokenType.Id.Equals(symbol.Value))
-                    yield return lexerRule;
-            }
+            var key = symbol.SymbolType.GetHashCode()
+                ^ symbol.Value.GetHashCode();
+            IList<ILexerRule> list;
+            if (!_lexerRuleIndex.TryGetValue(key, out list))
+                return EmptyLexerRuleArray;
+            return list;
         }
 
         public IEnumerable<IProduction> StartProductions()
         {
-            return Productions.Where(p => p.LeftHandSide.Equals(Start));
+            return RulesFor(Start);
         }
     }
 }

@@ -76,13 +76,19 @@ namespace Pliant
 
         private bool MatchesNewLexemes(char character)
         {
-             var newLexemes = ParseEngine
-                .GetExpectedLexerRules()
-                .Select(CreateLexemeForLexerRule)
-                .Where(x=>x.Scan(character))
-                .ToList();
+            var newLexemes = new List<ILexeme>();
+            var anyLexemeScanned = false;
+            foreach ( var lexerRule in ParseEngine.GetExpectedLexerRules())
+            {
+                var lexeme = CreateLexemeForLexerRule(lexerRule);
+                if (lexeme.Scan(character))
+                {
+                    anyLexemeScanned = true;
+                    newLexemes.Add(lexeme);
+                }
+            }
 
-            if (!newLexemes.Any())
+            if (!anyLexemeScanned)
                 return false;
 
             _existingLexemes = newLexemes;
@@ -93,9 +99,18 @@ namespace Pliant
         {
             if (_ignoreLexemes.IsNullOrEmpty())
                 return false;
-            return _ignoreLexemes
-                .Where(x => x.Scan(character))
-                .Any();
+
+            var matchedIgnoreLexemes = new List<ILexeme>();
+            var anyMatchedIgnoreLexemes = false;
+            foreach (var existingLexeme in _ignoreLexemes)
+            {
+                if (existingLexeme.Scan(character))
+                {
+                    matchedIgnoreLexemes.Add(existingLexeme);
+                    anyMatchedIgnoreLexemes = true;
+                }
+            }
+            return anyMatchedIgnoreLexemes;
         }
 
         private bool MatchesNewIgnoreLexemes(char character)
@@ -103,11 +118,19 @@ namespace Pliant
             var ignoreLexerRules = ParseEngine.Grammar.Ignores;
             if (ignoreLexerRules.IsNullOrEmpty())
                 return false;
-            var matchingIgnoreLexemes = ignoreLexerRules
-                .Select(CreateLexemeForLexerRule)
-                .Where(x => x.Scan(character))
-                .ToList();
-            if (matchingIgnoreLexemes.Any())
+            var matchingIgnoreLexemes = new List<ILexeme>();
+            var anyMatchingIgnoreLexemes = false;
+            foreach (var ignoreLexerRule in ignoreLexerRules)
+            {
+                var lexeme = CreateLexemeForLexerRule(ignoreLexerRule);
+                if (lexeme.Scan(character))
+                {
+                    matchingIgnoreLexemes.Add(lexeme);
+                    anyMatchingIgnoreLexemes = true;
+                }
+            }
+
+            if (anyMatchingIgnoreLexemes)
             {
                 _ignoreLexemes = matchingIgnoreLexemes;
                 return true;
@@ -124,10 +147,17 @@ namespace Pliant
         {
             if (_existingLexemes.IsNullOrEmpty())
                 return false;
-            var matchedLexemes = _existingLexemes
-                .Where(x => x.Scan(character))
-                .ToList();
-            if (!matchedLexemes.Any())
+            var matchedLexemes = new List<ILexeme>();
+            var anyMatchedLexemes = false;
+            foreach (var existingLexeme in _existingLexemes)
+            {
+                if (existingLexeme.Scan(character))
+                {
+                    matchedLexemes.Add(existingLexeme);
+                    anyMatchedLexemes = true;
+                }
+            }
+            if (!anyMatchedLexemes)
                 return false;
             _existingLexemes = matchedLexemes;
             return true;
