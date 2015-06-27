@@ -15,6 +15,24 @@ namespace Pliant.Tests.Unit
     {
         public TestContext TestContext { get; set; }
 
+        private string _bnfText = @"
+            <syntax>         ::= <rule> | <rule> <syntax>
+            <rule>           ::= <identifier> ""::="" <expression> <line-end>
+            <expression>     ::= <list> | <list> ""|"" <expression>
+            <line-end>       ::= <EOL> | <line-end> <line-end>
+            <list>           ::= <term > | <term> <list>
+            <term>           ::= <literal > | <identifier>
+            <identifier>     ::= ""<"" <rule-name> "">""
+            <literal>        ::= '""' <text> '""' | ""'"" <text> ""'""";
+
+        [TestMethod]
+        public void Test_Bnf_That_String_Iterate_Sets_Baseline()
+        {
+            var stringReader = new StringReader(_bnfText);
+            int c = 0;
+            while ((c = stringReader.Read()) != -1) ;                
+        }
+
         [TestMethod]
         public void Test_Bnf_That_Parse_Produces_Bnf_Chart()
         {
@@ -111,18 +129,9 @@ namespace Pliant.Tests.Unit
             var grammar = grammarBuilder.ToGrammar();
             Assert.IsNotNull(grammar);
 
-            var sampleBnf = @"
-            <syntax>         ::= <rule> | <rule> <syntax>
-            <rule>           ::= <identifier> ""::="" <expression> <line-end>
-            <expression>     ::= <list> | <list> ""|"" <expression>
-            <line-end>       ::= <EOL> | <line-end> <line-end>
-            <list>           ::= <term > | <term> <list>
-            <term>           ::= <literal > | <identifier>
-            <identifier>     ::= ""<"" <rule-name> "">""
-            <literal>        ::= '""' <text> '""' | ""'"" <text> ""'""";
             var parseEngine = new ParseEngine(grammar);
-            var parseInterface = new ParseInterface(parseEngine, sampleBnf);
-            var stringReader = new StringReader(sampleBnf);
+            var parseInterface = new ParseInterface(parseEngine, _bnfText);
+            var stringReader = new StringReader(_bnfText);
             
             while (!parseInterface.EndOfStream())
             {                 
@@ -132,15 +141,15 @@ namespace Pliant.Tests.Unit
                     var startIndex = 0;
                     for (int i = position; i >= 0; i--)
                     {
-                        if (sampleBnf[i] == '\n' && i > 0)
-                            if (sampleBnf[i - 1] == '\r')
+                        if (_bnfText[i] == '\n' && i > 0)
+                            if (_bnfText[i - 1] == '\r')
                             {
                                 startIndex = i;
                                 break;
                             }
                     }
-                    var endIndex = sampleBnf.IndexOf("\r\n", position);
-                    endIndex = endIndex < 0 ? sampleBnf.Length : endIndex;
+                    var endIndex = _bnfText.IndexOf("\r\n", position);
+                    endIndex = endIndex < 0 ? _bnfText.Length : endIndex;
                     var length = endIndex - startIndex;
                     var stringBuilder = new StringBuilder();
                     stringBuilder
@@ -148,7 +157,7 @@ namespace Pliant.Tests.Unit
                         .AppendLine()
                         .AppendFormat("start: {0}", startIndex)
                         .AppendLine()
-                        .AppendLine(sampleBnf.Substring(startIndex, length));
+                        .AppendLine(_bnfText.Substring(startIndex, length));
 
                     Assert.Fail(stringBuilder.ToString());
                 }
