@@ -32,13 +32,20 @@ namespace Pliant
             var currentEarleySet = earleySets[currentIndex];
             var scanStates = currentEarleySet.Scans;
 
-            return from scanState in scanStates
-                   let postDotSymbol = scanState.DottedRule.PostDotSymbol
-                   where postDotSymbol.HasValue && 
-                         postDotSymbol.Value.SymbolType == SymbolType.LexerRule
-                   let lexerRule = postDotSymbol.Value as ILexerRule
-                   group lexerRule by lexerRule.TokenType into rulesByTokenType
-                   select rulesByTokenType.First();
+            // PERF: Avoid Linq Select, Where due to lambda allocation
+            var expectedRuleDictionary = new Dictionary<TokenType, ILexerRule>();
+            foreach (var scanState in scanStates)
+            {
+                var postDotSymbol = scanState.DottedRule.PostDotSymbol;
+                if (postDotSymbol.HasValue
+                    && postDotSymbol.Value.SymbolType == SymbolType.LexerRule)
+                {
+                    var lexerRule = postDotSymbol.Value as ILexerRule;
+                    if (!expectedRuleDictionary.ContainsKey(lexerRule.TokenType))
+                        expectedRuleDictionary.Add(lexerRule.TokenType, lexerRule);
+                }
+            }
+            return expectedRuleDictionary.Values;
         }
 
         public INode GetParseForest()
