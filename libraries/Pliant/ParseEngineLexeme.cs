@@ -32,7 +32,15 @@ namespace Pliant
                 select new TerminalLexeme(terminalRule);
 
             // filter on first rule to pass (since all rules are one character per lexeme)
-            var firstPassingRule = expectedLexemes.FirstOrDefault(x => x.Scan(c));
+            // PERF: Avoid Linq FirstOrDefault due to lambda allocation
+            TerminalLexeme firstPassingRule = null;
+            foreach (var lexeme in expectedLexemes)
+                if (lexeme.Scan(c))
+                {
+                    firstPassingRule = lexeme;
+                    break;
+                }
+
             if (firstPassingRule == null)
                 return false;
 

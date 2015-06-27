@@ -19,7 +19,11 @@ namespace Pliant.Grammars
 
         public bool IsMatch(char character)
         {
-            return _terminals.Any(x => x.IsMatch(character));
+            // PERF: Avoid LINQ Any due to Lambda allocation
+            foreach (var terminal in _terminals)
+                if (terminal.IsMatch(character))
+                    return true;
+            return false;
         }
     }
 }

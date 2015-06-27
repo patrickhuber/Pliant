@@ -57,12 +57,12 @@ namespace Pliant
         {
             var lastEarleySet = _chart.EarleySets[_chart.Count - 1];
             var startStateSymbol = Grammar.Start;
-            return lastEarleySet
-                .Completions
-                .Any(x =>
-                    x.Origin == 0
-                    && x.Production.LeftHandSide.Value == startStateSymbol.Value);
 
+            // PERF: Avoid LINQ Any due to Lambda allocation
+            foreach (var completion in lastEarleySet.Completions)
+                if (completion.Origin == 0 && completion.Production.LeftHandSide.Value == startStateSymbol.Value)
+                    return true;
+            return false;
         }
                 
         private void Initialize()
@@ -391,7 +391,11 @@ namespace Pliant
             if (symbol.SymbolType != SymbolType.NonTerminal)
                 return false;
             var rules = Grammar.RulesFor(symbol as INonTerminal);
-            return rules.Any(x => x.IsEmpty);
+            // PERF: Avoid LINQ Any because allocates a lambda
+            foreach (var rule in rules)
+                if (rule.IsEmpty)
+                    return true;
+            return false;
         }
 
         public void Reset()

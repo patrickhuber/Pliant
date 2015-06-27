@@ -170,9 +170,15 @@ namespace Pliant
 
         private bool TryParseExistingToken()
         {
-            var longestAcceptedMatch = _existingLexemes
-                .FirstOrDefault(x => x.IsAccepted());
-
+            // PERF: Avoid Linq FirstOrDefault due to lambda allocation
+            ILexeme longestAcceptedMatch = null;
+            foreach (var lexeme in _existingLexemes)
+                if (lexeme.IsAccepted())
+                {
+                    longestAcceptedMatch = lexeme;
+                    break;
+                }
+            
             if (longestAcceptedMatch == null)
                 return false;
 
