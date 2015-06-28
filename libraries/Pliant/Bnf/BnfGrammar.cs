@@ -66,10 +66,10 @@ namespace Pliant.Bnf
 
             var implements = new StringLiteralLexerRule("::=", new TokenType("implements"));
             var eol = new StringLiteralLexerRule("\r\n", new TokenType("eol"));
-
+                        
             var grammarBuilder = new GrammarBuilder("syntax")
                 .Production("syntax", r => r
-                    .Rule("syntax")
+                    .Rule("rule")
                     .Rule("rule", "syntax"))
                 .Production("rule", r => r
                     .Rule("identifier", implements, "expression", "line-end"))
