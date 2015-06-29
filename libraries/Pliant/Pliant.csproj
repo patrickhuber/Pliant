@@ -53,6 +53,7 @@
     <Compile Include="Grammars\ITerminalLexerRule.cs" />
     <Compile Include="Grammars\LexerRuleType.cs" />
     <Compile Include="Grammars\StringLiteralLexerRule.cs" />
+    <Compile Include="HashUtil.cs" />
     <Compile Include="Lexemes\ILexemeFactory.cs" />
     <Compile Include="Lexemes\ILexemeFactoryRegistry.cs" />
     <Compile Include="Lexemes\LexemeFactoryRegistry.cs" />

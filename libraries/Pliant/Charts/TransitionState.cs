@@ -25,9 +25,18 @@ namespace Pliant.Charts
             return base.Equals(obj as State) && this.Recognized.Equals(transitionState.Recognized);
         }
 
+        private int _computedHashCode = 0;
+        private bool _isHashCodeComputed = false;
+
         public override int GetHashCode()
         {
-            return this.Recognized.GetHashCode() ^ base.GetHashCode();
+            if (_isHashCodeComputed)
+                return _computedHashCode;
+            _computedHashCode = HashUtil.ComputeHash(
+                this.Recognized.GetHashCode(),
+                base.GetHashCode());
+            _isHashCodeComputed = true;
+            return _computedHashCode;
         }
 
         public override string ToString()

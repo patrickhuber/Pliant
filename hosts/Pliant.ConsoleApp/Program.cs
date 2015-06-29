@@ -24,14 +24,17 @@ namespace Pliant.ConsoleApp
             <literal>        ::= '""' <text> '""' | ""'"" <text> ""'""";
 
             var grammar = new BnfGrammar();
-            var parseEngine = new ParseEngine(grammar);
-            var parseInterface = new ParseInterface(parseEngine, sampleBnf);
-            var stringReader = new StringReader(sampleBnf);
 
-            while (!parseInterface.EndOfStream() && parseInterface.Read()) { }
+            for (long i = 0; i < 10000; i++)
+            {
+                var parseEngine = new ParseEngine(grammar);
+                var parseInterface = new ParseInterface(parseEngine, sampleBnf);
+                var stringReader = new StringReader(sampleBnf);
 
-            var result = parseInterface.ParseEngine.IsAccepted();
-            Console.Write(result);
+                while (!parseInterface.EndOfStream() && parseInterface.Read()) { }
+
+                var result = parseInterface.ParseEngine.IsAccepted();
+            }
         }
     }
 }

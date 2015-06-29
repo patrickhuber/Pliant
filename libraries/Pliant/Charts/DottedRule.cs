@@ -34,7 +34,7 @@ namespace Pliant.Charts
                 return _lazyPreDotSymbol;
             }
         }
-
+        
         public DottedRule(IProduction production, int position)
         {
             Position = position;
@@ -68,15 +68,17 @@ namespace Pliant.Charts
             return new DottedRule(_production, Position + 1);
         }
 
+        // PERF: Cache Execution of Hash Code for costly operations. _proudction.GetHasCode() goes recursive.
+        private int _computedHashCode = 0;
+        private bool _isHashcodeComputed = false;
+
         public override int GetHashCode()
         {
-            unchecked 
-            {
-                int hash = (int)2166136261;
-                hash = hash * 16777619 ^ _production.GetHashCode();
-                hash = hash * 16777619 ^ Position.GetHashCode();
-                return hash;
-            }
+            if (_isHashcodeComputed)
+                return _computedHashCode;
+           _computedHashCode = HashUtil.ComputeHash(_production.GetHashCode(), Position.GetHashCode());
+           _isHashcodeComputed = true;
+           return _computedHashCode;           
         }
 
         public override bool Equals(object obj)
@@ -97,14 +99,19 @@ namespace Pliant.Charts
                 _dottedRule = dottedRule;
             }
 
+            private ISymbol _value;
+
             public ISymbol Value
             {
                 get 
                 {
                     if (!HasValue)
                         return null;
+                    if (_value != null)
+                        return _value;
                     var production = _dottedRule._production;
-                    return production.RightHandSide[_dottedRule.Position];
+                    _value =  production.RightHandSide[_dottedRule.Position];
+                    return _value;
                 }
             }
 
@@ -130,17 +137,26 @@ namespace Pliant.Charts
                 _dottedRule = dottedRule;
             }
 
+            private ISymbol _value;
+
             public ISymbol Value
             {
                 get 
                 {
+                    if (_value != null)
+                        return _value;
+
                     if (!HasValue)
                         return null;
+
                     var production = _dottedRule._production;
                     var position = _dottedRule.Position;
-                    return production.RightHandSide[position - 1];
+                    _value = production.RightHandSide[position - 1];
+                    return _value;
                 }
             }
+
+            private bool _hasValue = false;
 
             public bool HasValue
             {

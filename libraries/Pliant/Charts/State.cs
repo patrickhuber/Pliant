@@ -42,11 +42,19 @@ namespace Pliant.Charts
                 && Production.Equals(state.Production);
         }
 
+        private int _computedHashCode = 0;
+        private bool _isHashCodeComputed = false;
+
         public override int GetHashCode()
         {
-            return DottedRule.Position.GetHashCode()
-                ^ Origin.GetHashCode()
-                ^ Production.GetHashCode();
+            if (_isHashCodeComputed)
+                return _computedHashCode;
+            _computedHashCode = HashUtil.ComputeHash(
+                DottedRule.Position.GetHashCode(),
+                Origin.GetHashCode(),
+                Production.GetHashCode());
+            _isHashCodeComputed = true;
+            return _computedHashCode;
         }
 
         public override string ToString()

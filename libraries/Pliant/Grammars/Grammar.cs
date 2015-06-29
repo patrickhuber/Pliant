@@ -50,8 +50,9 @@ namespace Pliant.Grammars
             var dictionary = new Dictionary<int, IList<ILexerRule>>();
             foreach (var lexerRule in lexerRules)
             {
-                var key = lexerRule.SymbolType.GetHashCode()
-                    ^ lexerRule.TokenType.Id.GetHashCode();
+                var key = HashUtil.ComputeHash(
+                    lexerRule.SymbolType.GetHashCode(),
+                    lexerRule.TokenType.Id.GetHashCode());
                 if (!dictionary.ContainsKey(key))
                     dictionary.Add(key, new List<ILexerRule>());
                 dictionary[key].Add(lexerRule); 
@@ -69,8 +70,9 @@ namespace Pliant.Grammars
 
         public IEnumerable<ILexerRule> LexerRulesFor(INonTerminal symbol)
         {
-            var key = symbol.SymbolType.GetHashCode()
-                ^ symbol.Value.GetHashCode();
+            var key = HashUtil.ComputeHash(
+                symbol.SymbolType.GetHashCode(),
+                symbol.Value.GetHashCode());
             IList<ILexerRule> list;
             if (!_lexerRuleIndex.TryGetValue(key, out list))
                 return EmptyLexerRuleArray;
