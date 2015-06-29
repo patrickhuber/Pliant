@@ -11,7 +11,7 @@ namespace Pliant.Charts
         public ITransitionState NextTransition { get; set; }
 
         public TransitionState(ISymbol recognized, IState transition, IState reduction)
-            : base(transition.Production, transition.DottedRule.Position, transition.Origin)
+            : base(transition.Production, transition.Position, transition.Origin)
         {
             Reduction = reduction;
             Recognized = recognized;

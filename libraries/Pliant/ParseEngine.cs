@@ -36,11 +36,11 @@ namespace Pliant
             var expectedRuleDictionary = new Dictionary<TokenType, ILexerRule>();
             foreach (var scanState in scanStates)
             {
-                var postDotSymbol = scanState.DottedRule.PostDotSymbol;
-                if (postDotSymbol.HasValue
-                    && postDotSymbol.Value.SymbolType == SymbolType.LexerRule)
+                var postDotSymbol = scanState.PostDotSymbol;
+                if (postDotSymbol != null
+                    && postDotSymbol.SymbolType == SymbolType.LexerRule)
                 {
-                    var lexerRule = postDotSymbol.Value as ILexerRule;
+                    var lexerRule = postDotSymbol as ILexerRule;
                     if (!expectedRuleDictionary.ContainsKey(lexerRule.TokenType))
                         expectedRuleDictionary.Add(lexerRule.TokenType, lexerRule);
                 }
@@ -114,7 +114,7 @@ namespace Pliant
         private void Scan(IState scan, int j, ITokenNode tokenNode)
         {
             int i = scan.Origin;
-            var currentSymbol = scan.DottedRule.PostDotSymbol.Value;
+            var currentSymbol = scan.PostDotSymbol;
             var lexerRule = currentSymbol as ILexerRule;
 
             var token = tokenNode.Token;
@@ -164,7 +164,7 @@ namespace Pliant
 
         private void Predict(IState prediction, int j)
         {
-            var nonTerminal = prediction.DottedRule.PostDotSymbol.Value as INonTerminal;
+            var nonTerminal = prediction.PostDotSymbol as INonTerminal;
             foreach (var production in Grammar.RulesFor(nonTerminal))
             {
                 PredictProduction(prediction, j, production);
@@ -223,7 +223,7 @@ namespace Pliant
         {
             var earleySet = _chart.EarleySets[transitionState.Origin];
             var rootTransitionState = earleySet.FindTransitionState(
-                transitionState.DottedRule.PreDotSymbol.Value);
+                transitionState.PreDotSymbol);
 
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
@@ -232,7 +232,7 @@ namespace Pliant
 
             var topmostItem = new State(
                 transitionState.Production,
-                transitionState.DottedRule.Position,
+                transitionState.Position,
                 transitionState.Origin,
                 virtualParseNode);
 
@@ -325,7 +325,7 @@ namespace Pliant
             // complete by association. 
             // currently we only check for completeness, but a test case should
             // be developed to check for quasi completeness
-            return state.DottedRule.IsComplete;
+            return state.IsComplete;
         }
 
         private INode CreateNullParseNode(ISymbol symbol, int location)
@@ -344,14 +344,14 @@ namespace Pliant
         {
             Assert.IsNotNull(v, "v");
             var anyPreDotRuleNull = true;
-            if (nextState.DottedRule.Position > 1)
+            if (nextState.Position > 1)
             {
                 var predotPrecursorSymbol = nextState
                     .Production
-                    .RightHandSide[nextState.DottedRule.Position - 2];
+                    .RightHandSide[nextState.Position - 2];
                 anyPreDotRuleNull = IsSymbolNullable(predotPrecursorSymbol);
             }
-            var anyPostDotRuleNull = IsSymbolNullable(nextState.DottedRule.PostDotSymbol);
+            var anyPostDotRuleNull = IsSymbolNullable(nextState.PostDotSymbol);
             if (anyPreDotRuleNull && !anyPostDotRuleNull)
                 return v;
 
@@ -384,17 +384,11 @@ namespace Pliant
 
             return internalNode;
         }
-
-        private bool IsSymbolNullable(INullable<ISymbol> symbol)
-        {
-            if (!symbol.HasValue)
-                return true;
-
-            return IsSymbolNullable(symbol.Value);
-        }
-
+        
         private bool IsSymbolNullable(ISymbol symbol)
-        {
+        { 
+            if(symbol == null)
+                return true;
             if (symbol.SymbolType != SymbolType.NonTerminal)
                 return false;
             var rules = Grammar.RulesFor(symbol as INonTerminal);
