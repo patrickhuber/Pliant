@@ -7,9 +7,11 @@ namespace Pliant.Charts
     {
         public bool Enqueue(IState state)
         {
-            if (this.Any(x => x.Equals(state) && x.StateType == state.StateType))
-                return false;
-            this.Add(state);
+            // PERF: Avoid Linq Any due to lambda allocation
+            foreach (var value in this)
+                if (value.Equals(state) && value.StateType == state.StateType)
+                    return false;
+            Add(state);
             return true;
         }
     }

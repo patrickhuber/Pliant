@@ -32,13 +32,20 @@ namespace Pliant
             var currentEarleySet = earleySets[currentIndex];
             var scanStates = currentEarleySet.Scans;
 
-            return from scanState in scanStates
-                   let postDotSymbol = scanState.DottedRule.PostDotSymbol
-                   where postDotSymbol.HasValue && 
-                         postDotSymbol.Value.SymbolType == SymbolType.LexerRule
-                   let lexerRule = postDotSymbol.Value as ILexerRule
-                   group lexerRule by lexerRule.TokenType into rulesByTokenType
-                   select rulesByTokenType.First();
+            // PERF: Avoid Linq Select, Where due to lambda allocation
+            var expectedRuleDictionary = new Dictionary<TokenType, ILexerRule>();
+            foreach (var scanState in scanStates)
+            {
+                var postDotSymbol = scanState.PostDotSymbol;
+                if (postDotSymbol != null
+                    && postDotSymbol.SymbolType == SymbolType.LexerRule)
+                {
+                    var lexerRule = postDotSymbol as ILexerRule;
+                    if (!expectedRuleDictionary.ContainsKey(lexerRule.TokenType))
+                        expectedRuleDictionary.Add(lexerRule.TokenType, lexerRule);
+                }
+            }
+            return expectedRuleDictionary.Values;
         }
 
         public INode GetParseForest()
@@ -57,12 +64,12 @@ namespace Pliant
         {
             var lastEarleySet = _chart.EarleySets[_chart.Count - 1];
             var startStateSymbol = Grammar.Start;
-            return lastEarleySet
-                .Completions
-                .Any(x =>
-                    x.Origin == 0
-                    && x.Production.LeftHandSide.Value == startStateSymbol.Value);
 
+            // PERF: Avoid LINQ Any due to Lambda allocation
+            foreach (var completion in lastEarleySet.Completions)
+                if (completion.Origin == 0 && completion.Production.LeftHandSide.Value == startStateSymbol.Value)
+                    return true;
+            return false;
         }
                 
         private void Initialize()
@@ -107,7 +114,7 @@ namespace Pliant
         private void Scan(IState scan, int j, ITokenNode tokenNode)
         {
             int i = scan.Origin;
-            var currentSymbol = scan.DottedRule.PostDotSymbol.Value;
+            var currentSymbol = scan.PostDotSymbol;
             var lexerRule = currentSymbol as ILexerRule;
 
             var token = tokenNode.Token;
@@ -157,7 +164,7 @@ namespace Pliant
 
         private void Predict(IState prediction, int j)
         {
-            var nonTerminal = prediction.DottedRule.PostDotSymbol.Value as INonTerminal;
+            var nonTerminal = prediction.PostDotSymbol as INonTerminal;
             foreach (var production in Grammar.RulesFor(nonTerminal))
             {
                 PredictProduction(prediction, j, production);
@@ -216,7 +223,7 @@ namespace Pliant
         {
             var earleySet = _chart.EarleySets[transitionState.Origin];
             var rootTransitionState = earleySet.FindTransitionState(
-                transitionState.DottedRule.PreDotSymbol.Value);
+                transitionState.PreDotSymbol);
 
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
@@ -225,7 +232,7 @@ namespace Pliant
 
             var topmostItem = new State(
                 transitionState.Production,
-                transitionState.DottedRule.Position,
+                transitionState.Position,
                 transitionState.Origin,
                 virtualParseNode);
 
@@ -318,7 +325,7 @@ namespace Pliant
             // complete by association. 
             // currently we only check for completeness, but a test case should
             // be developed to check for quasi completeness
-            return state.DottedRule.IsComplete;
+            return state.IsComplete;
         }
 
         private INode CreateNullParseNode(ISymbol symbol, int location)
@@ -337,14 +344,14 @@ namespace Pliant
         {
             Assert.IsNotNull(v, "v");
             var anyPreDotRuleNull = true;
-            if (nextState.DottedRule.Position > 1)
+            if (nextState.Position > 1)
             {
                 var predotPrecursorSymbol = nextState
                     .Production
-                    .RightHandSide[nextState.DottedRule.Position - 2];
+                    .RightHandSide[nextState.Position - 2];
                 anyPreDotRuleNull = IsSymbolNullable(predotPrecursorSymbol);
             }
-            var anyPostDotRuleNull = IsSymbolNullable(nextState.DottedRule.PostDotSymbol);
+            var anyPostDotRuleNull = IsSymbolNullable(nextState.PostDotSymbol);
             if (anyPreDotRuleNull && !anyPostDotRuleNull)
                 return v;
 
@@ -377,21 +384,19 @@ namespace Pliant
 
             return internalNode;
         }
-
-        private bool IsSymbolNullable(INullable<ISymbol> symbol)
-        {
-            if (!symbol.HasValue)
-                return true;
-
-            return IsSymbolNullable(symbol.Value);
-        }
-
+        
         private bool IsSymbolNullable(ISymbol symbol)
-        {
+        { 
+            if(symbol == null)
+                return true;
             if (symbol.SymbolType != SymbolType.NonTerminal)
                 return false;
             var rules = Grammar.RulesFor(symbol as INonTerminal);
-            return rules.Any(x => x.IsEmpty);
+            // PERF: Avoid LINQ Any because allocates a lambda
+            foreach (var rule in rules)
+                if (rule.IsEmpty)
+                    return true;
+            return false;
         }
 
         public void Reset()

@@ -34,7 +34,9 @@ namespace Pliant.Grammars
 
         public override int GetHashCode()
         {
-            return Start.GetHashCode() ^ End.GetHashCode();
+            return HashUtil.ComputeHash(
+                Start.GetHashCode(),
+                End.GetHashCode());
         }
 
         public override bool Equals(object obj)

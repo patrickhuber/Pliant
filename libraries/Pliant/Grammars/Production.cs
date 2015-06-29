@@ -19,7 +19,7 @@ namespace Pliant.Grammars
             Assert.IsNotNull(leftHandSide, "leftHandSide");
             Assert.IsNotNull(rightHandSide, "rightHandSide");
             LeftHandSide = leftHandSide;
-            _rightHandSide = new ReadOnlyList<ISymbol>(rightHandSide);
+            _rightHandSide = new ReadOnlyList<ISymbol>(new List<ISymbol>(rightHandSide));
         }
 
         public Production(string leftHandSide, params ISymbol[] rightHandSide)
@@ -42,12 +42,25 @@ namespace Pliant.Grammars
             return true;
         }
 
+        // PERF: Cache Costly Hash Code Computation
+        private bool _isHashCodeComputed = false;
+        private int _computedHashCode = 0;
+
         public override int GetHashCode()
         {
-            var hashCode = LeftHandSide.GetHashCode();
-            foreach (var symbol in RightHandSide)
-                hashCode ^= symbol.GetHashCode();
-            return hashCode;
+            if (_isHashCodeComputed)
+                return _computedHashCode;
+            unchecked
+            {
+                var hash = (int)2166136261;
+                hash *= 16777619 * LeftHandSide.GetHashCode();
+                foreach (var symbol in RightHandSide)
+                    hash *= 16777619 ^ symbol.GetHashCode();
+
+                _computedHashCode = hash;
+                _isHashCodeComputed = true;
+                return _computedHashCode;
+            }
         }
 
         public override string ToString()

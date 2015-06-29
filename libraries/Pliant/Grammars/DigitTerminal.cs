@@ -12,9 +12,10 @@
             get { return SymbolType.Terminal; }
         }
 
+        const string ToStringValue = "[0-9]";
         public override string ToString()
         {
-            return "[0-9]";
+            return ToStringValue;
         }
 
         public override bool Equals(object obj)
@@ -24,7 +25,7 @@
 
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
+            return ToStringValue.GetHashCode();
         }
     }
 }

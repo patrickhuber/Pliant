@@ -25,9 +25,19 @@ namespace Pliant.Builders
         {
             if (_start == null)
                 throw new Exception("no start production specified");
-            var startProduction = _productions.FirstOrDefault(x => x.LeftHandSide.Value == _start);
+
+            // PERF: Avoid Linq FirstOrDefault due to lambda allocation
+            IProduction startProduction = null;
+            foreach (var production in _productions)
+                if (production.LeftHandSide.Value == _start)
+                {
+                    startProduction = production;
+                    break;
+                }
+
             if (startProduction == null)
                 throw new Exception("no start production found for start symbol");
+
             var start = startProduction.LeftHandSide;
 
             return new Grammar(

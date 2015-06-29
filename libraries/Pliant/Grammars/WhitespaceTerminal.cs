@@ -18,9 +18,11 @@ namespace Pliant.Grammars
             get { return SymbolType.Terminal; }
         }
 
+        const string ToStringValue = @"\s";
+
         public override string ToString()
         {
-            return @"\s";
+            return ToStringValue;
         }
 
         public override bool Equals(object obj)
@@ -30,7 +32,7 @@ namespace Pliant.Grammars
 
         public override int GetHashCode()
         {
-            return ToString().GetHashCode();
+            return ToStringValue.GetHashCode();
         }
     }
 }

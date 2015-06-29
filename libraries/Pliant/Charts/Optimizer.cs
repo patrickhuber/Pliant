@@ -30,7 +30,7 @@ namespace Pliant.Charts
                 return;
             
             var sourceStateNext = sourceState.NextState();
-            if (!sourceStateNext.DottedRule.IsComplete)
+            if (!sourceStateNext.IsComplete)
                 return;
             
             Transition = sourceStateNext;

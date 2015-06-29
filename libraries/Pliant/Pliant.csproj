@@ -39,16 +39,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bnf\BnfGrammar.cs" />
     <Compile Include="Dfa\DfaEdge.cs" />
     <Compile Include="Dfa\DfaLexeme.cs" />
+    <Compile Include="Dfa\DfaLexemeFactory.cs" />
+    <Compile Include="Dfa\DfaLexerRule.cs" />
     <Compile Include="Dfa\DfaState.cs" />
     <Compile Include="Dfa\IDfaEdge.cs" />
+    <Compile Include="Dfa\IDfaLexerRule.cs" />
     <Compile Include="Dfa\IDfaState.cs" />
     <Compile Include="Grammars\IGrammarLexerRule.cs" />
     <Compile Include="Grammars\IStringLiteralLexerRule.cs" />
     <Compile Include="Grammars\ITerminalLexerRule.cs" />
     <Compile Include="Grammars\LexerRuleType.cs" />
     <Compile Include="Grammars\StringLiteralLexerRule.cs" />
+    <Compile Include="HashUtil.cs" />
     <Compile Include="Lexemes\ILexemeFactory.cs" />
     <Compile Include="Lexemes\ILexemeFactoryRegistry.cs" />
     <Compile Include="Lexemes\LexemeFactoryRegistry.cs" />
@@ -62,12 +67,10 @@
     <Compile Include="Charts\Chart.cs" />
     <Compile Include="Collections\IEnumerableExtensions.cs" />
     <Compile Include="Grammars\DigitTerminal.cs" />
-    <Compile Include="Charts\DottedRule.cs" />
     <Compile Include="Charts\EarleySet.cs" />
     <Compile Include="Grammars\Grammar.cs" />
     <Compile Include="Builders\GrammarBuilder.cs" />
     <Compile Include="Nodes\IAndNode.cs" />
-    <Compile Include="Charts\IDottedRule.cs" />
     <Compile Include="Charts\IEarleySet.cs" />
     <Compile Include="Grammars\IGrammar.cs" />
     <Compile Include="Builders\IGrammarBuilder.cs" />

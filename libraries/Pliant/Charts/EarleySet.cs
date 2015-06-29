@@ -29,9 +29,9 @@ namespace Pliant.Charts
         
         public bool Enqueue(IState state)
         {
-            if (!state.DottedRule.IsComplete)
+            if (!state.IsComplete)
             {
-                var currentSymbol = state.DottedRule.PostDotSymbol.Value;
+                var currentSymbol = state.PostDotSymbol;
                 if (currentSymbol.SymbolType == SymbolType.NonTerminal)
                     return _predictions.Enqueue(state);
                 else

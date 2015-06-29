@@ -18,7 +18,8 @@ namespace Pliant.Grammars
         
         public override int GetHashCode()
         {
-            return base.GetHashCode() ^ Character.GetHashCode();
+            return HashUtil.ComputeHash(
+                Character.GetHashCode());
         }
 
         public override bool Equals(object obj)

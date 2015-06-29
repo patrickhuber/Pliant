@@ -18,10 +18,17 @@ namespace Pliant.Nodes
 
         public ISymbolNode AddOrGetExistingSymbolNode(ISymbol symbol, int origin, int location)
         {
-            var symbolNode = _symbolNodes.FirstOrDefault(
-                n => n.Origin == origin
-                    && n.Location == location
-                    && n.Symbol.Equals(symbol));
+            // PERF: Avoid Linq FirstOrDefault due to lambda allocation
+            ISymbolNode symbolNode = null;
+            foreach (var node in _symbolNodes)
+                if (node.Origin == origin
+                    && node.Location == location
+                    && node.Symbol.Equals(symbol))
+                { 
+                    symbolNode = node;
+                    break;
+                }
+            
             if (symbolNode == null)
             {
                 symbolNode = new SymbolNode(symbol, origin, location);
@@ -32,8 +39,15 @@ namespace Pliant.Nodes
         
         public IIntermediateNode AddOrGetExistingIntermediateNode(IState trigger, int origin, int location)
         {
-            var intermediateNode = _intermediateNodes.FirstOrDefault(
-                x=> x.State.Equals(trigger));
+            // PERF: Avoid Linq FirstOrDefault due to lambda allocation
+            IIntermediateNode intermediateNode = null;
+            foreach (var node in _intermediateNodes)
+                if (node.State.Equals(trigger))
+                {
+                    intermediateNode = node;
+                    break;
+                }
+
             if (intermediateNode == null)
             {
                 intermediateNode = new IntermediateNode(trigger, origin, location);
