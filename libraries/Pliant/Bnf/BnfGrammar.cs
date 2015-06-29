@@ -71,12 +71,8 @@ namespace Pliant.Bnf
                 new Production(term, literal),
                 new Production(term, identifier),
                 new Production(identifier, new TerminalLexerRule('<'), ruleName, new TerminalLexerRule('>')),
-                new Production(literal, new TerminalLexerRule('"'), doubleQuoteText, new TerminalLexerRule('"')),
-                new Production(literal, new TerminalLexerRule('\''), singleQuoteText, new TerminalLexerRule('\'')),
-                new Production(doubleQuoteText, doubleQuoteText, notDoubleQuote),
-                new Production(doubleQuoteText),
-                new Production(singleQuoteText, singleQuoteText, notSingleQuuote),
-                new Production(singleQuoteText)
+                new Production(literal, new TerminalLexerRule('"'), notDoubleQuote, new TerminalLexerRule('"')),
+                new Production(literal, new TerminalLexerRule('\''), notSingleQuuote, new TerminalLexerRule('\''))
             };
 
             var ignore = new[]
@@ -89,12 +85,24 @@ namespace Pliant.Bnf
 
         private static ILexerRule CreateNotSingleQuoteLexerRule()
         {
-            return new TerminalLexerRule(new NegationTerminal(new Terminal('\'')), new TokenType("note-single-quote"));
+            var start = new DfaState();
+            var final = new DfaState(true);
+            var terminal = new NegationTerminal(new Terminal('\''));
+            var edge = new DfaEdge(terminal, final);
+            start.AddEdge(edge);
+            final.AddEdge(edge);
+            return new DfaLexerRule(start, new TokenType("note-single-quote"));
         }
 
         private static ILexerRule CreateNotDoubleQuoteLexerRule()
         {
-            return new TerminalLexerRule(new NegationTerminal(new Terminal('"')), new TokenType("not-double-quote"));
+            var start = new DfaState();
+            var final = new DfaState(true);
+            var terminal = new NegationTerminal(new Terminal('"'));
+            var edge = new DfaEdge(terminal, final);
+            start.AddEdge(edge);
+            final.AddEdge(edge);
+            return new DfaLexerRule(start, new TokenType("note-double-quote"));            
         }
 
         private static ILexerRule CreateEndOfLineLexerRule()
