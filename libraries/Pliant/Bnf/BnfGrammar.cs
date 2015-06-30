@@ -16,7 +16,7 @@ namespace Pliant.Bnf
              *  Grammar
              *  -------
              *  <syntax>         ::= <rule> | <rule> <syntax>
-             *  <rule>           ::= "<" <rule-name> ">" "::=" <expression> <line-end>
+             *  <rule>           ::= "<" <rule-name> ">" "::=" <expression>
              *  <expression>     ::= <list> | <list> "|" <expression>
              *  <line-end>       ::= <EOL> | <line-end> <line-end>
              *  <list>           ::= <term> | <term> <list>
@@ -45,7 +45,7 @@ namespace Pliant.Bnf
             {
                 new Production(syntax, rule),
                 new Production(syntax, rule, syntax),
-                new Production(rule, identifier, implements, expression, lineEnd),
+                new Production(rule, identifier, implements, expression),
                 new Production(expression, list),
                 new Production(expression, list, new TerminalLexerRule('|'), expression),
                 new Production(lineEnd, eol),
@@ -75,18 +75,33 @@ namespace Pliant.Bnf
             var edge = new DfaEdge(terminal, final);
             start.AddEdge(edge);
             final.AddEdge(edge);
-            return new DfaLexerRule(start, new TokenType("note-single-quote"));
+            return new DfaLexerRule(start, new TokenType("not-single-quote"));
         }
 
         private static ILexerRule CreateNotDoubleQuoteLexerRule()
         {
+            // ( [^"] | (\\ .) ) +
             var start = new DfaState();
+            var escape = new DfaState();
             var final = new DfaState(true);
-            var terminal = new NegationTerminal(new Terminal('"'));
-            var edge = new DfaEdge(terminal, final);
-            start.AddEdge(edge);
-            final.AddEdge(edge);
-            return new DfaLexerRule(start, new TokenType("note-double-quote"));            
+
+            var notQuoteTerminal = new NegationTerminal(
+                new SetTerminal('"', '\\'));
+            var escapeTerminal = new Terminal('\\');
+            var anyTerminal = new AnyTerminal();
+
+            var notQuoteEdge = new DfaEdge(notQuoteTerminal, final);
+            start.AddEdge(notQuoteEdge);
+            final.AddEdge(notQuoteEdge);
+
+            var escapeEdge = new DfaEdge(escapeTerminal, escape);
+            start.AddEdge(escapeEdge);
+            final.AddEdge(escapeEdge);
+
+            var anyEdge = new DfaEdge(anyTerminal, final);
+            escape.AddEdge(anyEdge);
+
+            return new DfaLexerRule(start, new TokenType("not-double-quote"));            
         }
 
         private static ILexerRule CreateEndOfLineLexerRule()

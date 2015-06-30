@@ -1,0 +1,348 @@
+﻿<identifier> ::=	
+	<identifier-nondigit> | 
+  <identifier> <identifier-nondigit> | 
+  <identifier> <digit>
+
+<identifier-nondigit> ::= 
+	<nondigit> | 
+  <universal-character-name>
+
+<nondigit> ::=	
+	'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 
+	'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' | 
+	'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 
+	'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z'
+
+<digit>	::=	
+	'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+
+<universal-character-name> ::=
+	"\u" <hex-quad> | 
+  "\U" <hex-quad> <hex-quad>
+
+<hex-quad> ::= 
+	<hexadecimal-digit> <hexadecimal-digit> <hexadecimal-digit> <hexadecimal-digit>
+
+<constant> ::=	
+	<integer-constant> 
+	| <floating-constant>
+	| <enumeration-constant>
+	| <character-constant>
+
+<integer-constant> ::=
+	<decimal-constant> 
+	| <decimal-constant> <integer-suffix>
+	| <octal-constant>
+	| <octal-constant> <integer-suffix>
+	| <hexadecimal-constant>
+	| <hexadecimal-constant> <integer-suffix>
+
+<decimal-constant> ::=
+	<nonzero-digit>
+	| <decimal-constant> <digit>
+
+<octal-constant> ::=
+	'0'
+	| <octal-constant> <octal-digit>
+
+<hexadecimal-constant> ::=
+	<hexadecimal-prefix> <hexadecimal-digit>
+	| <hexadecimal-constant> <hexadecimal-digit>
+
+<hexadecimal-prefix> ::=
+	"0x"
+	| "0X"
+
+<nonzero-digit> ::=
+	'1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+
+<octal-digit> ::=
+	'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' 
+
+<hexadecimal-digit> ::=
+	'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 
+	'a' | 'b' | 'c' | 'd' | 'e' | 'f' |
+	'A' | 'B' | 'C' | 'D' | 'E' | 'F'
+
+<integer-suffix> ::=
+	<unsigned-suffix>
+	| <unsigned-suffix> <long-suffix>
+	| <unsigned-suffix> <long-long-suffix>
+	| <long-suffix>
+	| <long-suffix> <unsigned-suffix>
+	| <long-long-suffix>
+	| <long-long-suffix> <unsigned-suffix>
+
+<unsigned-suffix> ::= 
+	'u' | 'U'
+
+<long-suffix> ::=
+	'l' | 'L'
+
+<long-long-suffix> ::=
+	"ll" | "LL"
+
+<floating-constant> ::=
+	<decimal-floating-constant>
+	| <hexadecimal-floating-constant>
+
+<decimal-floating-constant> ::=
+	<fractal-constant> <exponant-part> <floating-suffix>
+	| <fractal-constant> <exponant-part>
+	| <fractal-constant> <floating-suffix>
+	| <digit-sequence> <exponant-part>
+	| <digit-sequence> <exponant-part> <floating-suffix>
+
+<hexadecimal-floating-constant> ::=
+	<hexadecimal-prefix> <hexadecimal-fractional-constant> <binary-exponent-part>
+	| <hexadecimal-prefix> <hexadecimal-fractional-constant> <binary-exponent-part> <floating-suffix>
+	| <hexadecimal-prefix> <hexadecimal-digit-squence> <binary-exponent-part>
+	| <hexadecimal-prefix> <hexadecimal-digit-squence> <binary-exponent-part> <floating-suffix>
+
+<fractional-constant> ::=
+	'.' <digit-sequence>
+	| <digit-sequence> '.' <digit-sequence>
+	| <digit-sequence> '.'
+
+<exponent-part> ::=
+	'e' <digit-sequence>
+	| 'e' <sign> <digit-sequence>
+	| 'E' <digit-sequence>
+	| 'E' <sign> <digit-sequence>
+
+<sign> ::=
+	'+' | '-'
+
+<digit-sequence> ::=
+	<digit>
+	| <digit-sequence> <digit>
+
+<hexadecimal-fractional-constant> ::=
+	'.' <hexadecimal-digit-sequence>
+	| <hexadecimal-digit-sequence> '.' <hexadecimal-digit-sequence>
+	| <hexadecimal-digit-sequence> '.'
+
+<binary-exponent-part> ::=
+	'P' <digit-sequence>
+	| 'P' <sign> <digit-sequence>
+	| 'p' <digit-sequence>
+	| 'p' <sign> <digit-sequence>
+
+<hexadecimal-digit-sequence> ::=
+	<hexadecimal-digit>
+	| <hexadecimal-digit-sequence> <hexadecimal-digit>
+
+<floating-suffix> ::=
+	'f' | 'l' | 'F' | 'L'
+
+<enumeration-constant> ::=
+	<identifier>
+
+<character-constant> ::=
+	"'" <c-char-sequence> "'"
+	| "L'" <c-char-sequence> "'"
+	| "u'" <c-char-sequence> "'"
+	| "U'" <c-char-sequence> "'"
+
+<c-char-sequence> ::=
+	<c-char>
+	| <c-char-sequence> <c-char>
+
+<c-char> ::=
+	<non-digit>
+	| <digit>
+	| <escape-sequence>
+
+<escape-sequence> ::=
+	<simple-escape-sequence>
+	| <octal-escape-sequence>
+	| <hexadecimal-escape-sequence>
+	| <universal-character-name>
+
+<simple-escape-sequence> ::=
+	"\\'" | "\\\"" | "\\?" | "\\\\" |
+	"\\a" | "\\b" | "\\f" | "\\n" | "\\r" | "\\t" | "\\v"
+
+<octal-escape-sequence> ::=
+	'\' <octal-digit>
+	| '\' <octal-digit> <octal-digit>
+	| '\' <octal-digit> <octal-digit> <octal-digit>
+
+<hexadecimal-escape-sequence> ::=
+	"\\x" <hexadecimal-digit>
+	| <hexadecimal-escape-sequence> <hexadecimal-digit>
+
+<string-literal> ::=
+	'"' '"'
+	| <encoding-prefix> '"' '"'
+	| <encoding-prefix> '"' <s-char-sequence> '"'
+	| '"' <s-char-sequence> '"'
+
+<encoding-prefix> ::=
+	"u8"
+	| 'u'
+	| 'U'
+	| 'L'
+
+<s-char-sequence> ::=
+	<s-char>
+	| <s-char-sequence> <s-char>
+
+<s-char> ::=
+	<non-digit>
+	| <digit>
+	| <escape-sequence>
+	| ' '
+
+<punctuator> ::=
+	'[' | ']' | '(' | ')' | '{' | '}' | '.' | "->" |
+	"++" | "--" | '&' | '*' | '+' | '-' | '~' | '!' | 
+	'/' | '%' | "<<" | ">>" | '<' | '>' | "<=" | ">=" | "!=" | "^" | "|" | "&&" | "||" |
+	'?' | ':' | ';' | "..." | 
+	'=' | "*=" | "/=" | "%=" | "+=" | "-=" | "<<=" | ">>=" | "&=" | "^=" | "|=" | 
+	',' | '#' | "##" | 
+	"<:" | ":>" | "<%" | "%>" | "%:" | "%:%"
+
+<header-name> ::=
+	'<' <h-char-sequence> '>'
+	| '"' <q-char-sequence> '"'
+
+<h-char-sequence> ::=
+	<h-char>
+	| <h-char-sequence> <h-char>
+
+<h-char> ::=
+	<digit>
+	| <nondigit>
+	| ' ' | '.'
+
+<q-char-sequence> ::=
+	<q-char> 
+	| <q-char-sequence> <q-char>
+
+<q-char> ::=
+	<digit>
+	| <nondigit>
+	| ' ' | '.'
+
+<pp-number> ::=
+	<digit> 
+	| '.' <digit>
+	| <pp-number> <digit>
+	| <pp-number> <identifier-nondigit>
+	| <pp-number> 'e' <sign>
+	| <pp-number> 'E' <sign>
+	| <pp-number> 'p' <sign>
+	| <pp-number> 'P' <sign>
+	| <pp-number> '.'
+
+<primary-expression> ::=
+	<identifier>
+	| <constant>
+	| <string-literal>
+	| '(' <expression> ')'
+
+<generic-selection> ::=
+	"_Generic" '(' <assignment-expression> ',' <generic-assoc-list> ')'
+
+<generic-assoc-list> ::=
+	<generic-association>
+	| <generic-assoc-list> ',' <generic-association>
+
+<generic-association> ::=
+	<type-name> ':' <assignment-expression>
+	| "default" ':' <assignment-expression>
+
+<postfix-expression> ::=
+	<primary-expression>
+	| <postfix-expression> '[' <expression> ']'
+	| <postfix-expression> '(' ')'
+	| <postfix-expression> '(' <argumetn-expression-list> ')'
+	| <postfix-expression> '.' <identifier>
+	| <postfix-expression> "->" <identifier>
+	| <postfix-expression> "++" <identifier>
+	| <postfix-expression> "--"
+	| '(' <type-name> ')' '{' <initializer-list> '}'
+	| '(' <type-name> ')' '{' <initializer-list> ',' '}'
+
+<argument-expression-list> ::=
+	<assignment-expression>
+	| <argument-expression-list> ',' <assignment-expression>
+
+<unary-experssion> ::=
+	<postfix-expression>
+	| "++" <unary-expression>
+	| "--" <unary-expression>
+	| <unary-operator> <cast-expression>
+	| "sizeof" <unary-expression>
+	| "sizeof" '(' <type-name> ')'
+	| "_Alignof" '(' <type-name> ')'
+
+<unary-operator> ::=
+	'&' | '*' | '+' | '-' | '~' | '!'
+
+<cast-expression> ::=
+	<unary-expression>
+	| '(' <type-name> ')' <cast-expression>
+
+<multiplicative-expression> ::=
+	<cast-expression>
+	| <multiplicative-expression> '*' <cast-expression>
+	| <multiplicative-expression> '/' <cast-expression>
+	| <multiplicative-expression> '%' <cast-expression>
+
+<additive-expression> ::=
+	<multiplicative-expression>
+	| <additive-expression> '+' <multiplicative-expression>
+	| <additive-expression> '-' <multiplicative-expression>
+
+<shift-expression> ::=
+	<additive-expression>
+	| <shift-expression> "<<" <additive-expression>
+	| <shift-expression> ">>" <additive-expression>
+
+<relational-expression> ::=
+	<shift-expression>
+	| <relational-expression> '<' <shift-expression>
+	| <relational-expression> '>' <shift-expression>
+	| <relational-expression> "<=" <shift-expression>
+	| <relational-expression> ">=" <shift-expression>
+
+<equality-expression> ::=
+	<relational-expression>
+	| <equality-expression> "==" <relational-expression>
+	| <equality-expression> "!=" <relational-expression>
+
+<AND-expression> ::=
+	<equality-expression>
+	| <AND-expression> '&' <equality-expression>
+
+<exclusive-OR-expression> ::=
+	<AND-expression>
+	| <exclusive-OR-expression> '^' <AND-expression>
+
+<inclusive-OR-expression> ::=
+	<exclusive-OR-expression>
+	| <inclusive-OR-expression> '|' <exclusive-OR-expression>
+
+<logical-AND-expression> ::=
+	<inclusive-OR-expression> 
+	| <logical-AND-expression> "&&" <inclusive-OR-expression>
+	
+<logical-OR-expression> ::=
+	<logical-AND-expression> 
+	| <logical-OR-expression> "||" <logical-AND-expression>
+
+<conditional-expression> ::=
+	<logical-OR-expression>
+	| <logical-OR-expression> '?' <expression> ':' <conditional-expression>
+
+<assignment-operator> ::=
+	'=' | "*=" | "/=" | "%=" | "+=" | "-=" | "<<=" | ">>=" | "&=" | "^=" | "|="
+
+<expression> ::=
+	<assignment-expression> 
+	| <expression> ',' <assignment-expression>
+
+<constant-expression> ::=
+	<conditional-expression>
