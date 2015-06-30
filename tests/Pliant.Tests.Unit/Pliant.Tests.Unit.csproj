@@ -52,7 +52,7 @@
   <ItemGroup>
     <Compile Include="Dfa\DfaLexemeTests.cs" />
     <Compile Include="Grammars\AnyTerminalTests.cs" />
-    <Compile Include="BnfTests.cs" />
+    <Compile Include="Bnf\BnfTests.cs" />
     <Compile Include="Charts\ChartTests.cs" />
     <Compile Include="Grammars\DigitTerminalTests.cs" />
     <Compile Include="Builders\GrammarBuilderTests.cs" />

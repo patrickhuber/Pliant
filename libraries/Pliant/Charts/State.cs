@@ -87,9 +87,8 @@ namespace Pliant.Charts
             var state = obj as State;
             if (state == null)
                 return false;
-            return Position == state.Position
-                && Origin == state.Origin
-                && Production.Equals(state.Production);
+            // PERF: Hash Codes are Cached, so equality performance is cached as well
+            return GetHashCode() == state.GetHashCode();
         }
 
         private int _computedHashCode = 0;
