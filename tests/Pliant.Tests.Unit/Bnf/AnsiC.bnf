@@ -1,11 +1,11 @@
 ﻿<identifier> ::=	
-	<identifier-nondigit> | 
-  <identifier> <identifier-nondigit> | 
-  <identifier> <digit>
+	<identifier-nondigit> 
+  | <identifier> <identifier-nondigit> 
+  | <identifier> <digit>
 
 <identifier-nondigit> ::= 
-	<nondigit> | 
-  <universal-character-name>
+	<nondigit> 
+  | <universal-character-name>
 
 <nondigit> ::=	
 	'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 
@@ -17,8 +17,8 @@
 	'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 
 <universal-character-name> ::=
-	"\u" <hex-quad> | 
-  "\U" <hex-quad> <hex-quad>
+	"\u" <hex-quad> 
+  | "\U" <hex-quad> <hex-quad>
 
 <hex-quad> ::= 
 	<hexadecimal-digit> <hexadecimal-digit> <hexadecimal-digit> <hexadecimal-digit>
@@ -346,3 +346,376 @@
 
 <constant-expression> ::=
 	<conditional-expression>
+
+<declaration> ::=
+	<declaration-specifiers> <init-declarator-list> ';'
+	| <declaration-specifiers> ';'
+	| <static_assert-declaration>
+	
+<declaration-specifiers> ::=
+	<storage-class-specifier> <declaration-specifier> 
+	| <storage-class-specifier>
+	| <type-specifier> 
+	| <type-specifier> <declaration-specifiers>
+	| <type-qualifier> 
+	| <type-qualifier> <declaration-specifiers>
+	| <function-specifier> 
+	| <function-specifier> <declaration-specifiers>
+	| <alignment-specifier> 
+	| <alignment-specifier> <declaration-specifiers>
+	
+<init-declarator-list> ::=
+	<init-declarator-list> ',' <init-declarator>
+	
+<init-declarator> ::=
+	<init-declarator>
+	| <declarator> '=' <initializer>
+	
+<storage-class-specifier> ::=
+	"typedef"
+	| "extern"
+	| "static"
+	| "_Thread_local"
+	| "auto"
+	| "register"
+	
+<type-specifier> ::=
+	"void"
+	| "char"
+	| "short"
+	| "int"
+	| "long"
+	| "float"
+	| "double"
+	| "signed"
+	| "unsigned"
+	| "_Bool"
+	| "_Complex"
+	| <atomic-type-specifier>
+	| <struct-or-union-specifier>
+	| <enum-specifier>
+	| <typedef-name>
+	
+<struct-or-union-specifier> ::=
+	<struct-or-union> '{' <struct-declaration-list> '}'
+	| <struct-or-union> <identifier> '{' <struct-declaration-list> '}'
+	| <struct-or-union> <identifier>
+	
+<struct> ::=
+	"struct"
+	| "union"
+	
+<stuct-declaration-list> ::=
+	<struct-declaration>
+	| <struct-declaration-list> <struct-declaration>
+	
+<struct-declaration> ::=
+	<specifier-qualified-list> ';'
+	| <specifier-qualified-list> <struct-declarator-list> ';'
+	| <static_assert-declaration>
+	
+<specifier-qualified-list> ::=
+	<type-specifier>
+	| <type-specifier> <specifier-qualified-list>
+	| <type-qualifier> 
+	| <type-qualifier> <specifier-qualified-list> 
+	
+<struct-declarator-list> ::=
+	<struct-declarator>
+	| <struct-declarator-list> ',' <struct-declarator>
+	
+<struct-declarator> ::=
+	<declarator>
+	| ':' <constant-expression>
+	| <declarator> ':' <constant-expression>
+	
+<enum-specifier> ::= 
+	"enum" '{' <enumerator-list> '}'
+	| "enum" <identifier> '{' <enumerator-list> '}'
+	| "enum" '{' <enumerator-list> ',' '}'
+	| "enum" <identifier> '{' <enumerator-list> ',' '}'
+	| "enum" <identifier>
+	
+<enumerator-list> ::=
+	<enumerator>
+	| <enumerator-list> ',' <enumerator>
+	
+<enumerator> ::=
+	<enumeration-constant> 
+	| <enumeration-constant> '=' <constant-expression>
+	
+<atomic-type-specifier> ::=
+	"_Atomic" '(' <type-name> ')'
+	
+<type-qualifier> ::=
+	"const"
+	| "restrict"
+	| "volatile"
+	| "_Atomic"
+	
+<function-specifier> ::=
+	"inline"
+	| "_Noreturn"
+	
+<alignment-specifier> ::=
+	"_Alignas" '(' <type-name> ')'
+	| "_Alignas" '(' <constant-expression> ')'
+	
+<declarator> ::=
+	<direct-declarator>
+	| <pointer> <direct-declarator>
+	
+<direct-declarator> ::=
+	<identifier> 
+	| '(' <declarator> ')'
+	| <direct-declarator> '[' ']'
+	| <direct-declarator> '[' <type-qualifier-list> ']'
+	| <direct-declarator> '[' <assignment-expression> ']'
+	| <direct-declarator> '[' <type-qualifier-list> <assignment-expression> ']'
+	| <direct-declarator> '[' "static" <assignment-expression> ']'
+	| <direct-declarator> '[' "static" <type-qualifier-list> <assignment-expression> ']'
+	| <direct-declarator> '[' <type-qualifier-list> "static" <assignment-expression> ']'
+	| <direct-declarator> '[' '*' ']'
+	| <direct-declarator> '[' <type-qualifier-list> '*' ']'
+	| <direct-declarator> '(' <parameter-type-list> ')'
+	| <direct-declarator> '(' ')'
+	| <direct-declarator> '(' <identifier-list> ')'
+	
+<pointer> ::=
+	'*'
+	| '*' <type-qualifier-list>
+	| '*' <pointer>
+	| '*' <type-qualifier-list> <pointer>
+	
+<type-qualifier-list> ::=
+	<type-qualifier> 
+	| <type-qualifier-list> <type-qualifier>
+	
+<parameter-type-list> ::=
+	<parameter-list>
+	| <parameter-list> ',' "..."
+	
+<parameter-list> ::=
+	<parameter-declaration> 
+	| <parameter-list> ',' <parameter-declaration>
+	
+<parameter-declaration> ::=
+	<declaration-specifiers> <declarator>
+	| <declaration-specifiers> 
+	| <declaration-specifiers> <abstract-declarator>
+	
+<identifier-list> ::=
+	<identifier>
+	| <identifier-list> ',' <identifier>
+	
+<type-name> ::=
+	<specifier-qualified-list> 
+	| <specifier-qualified-list> <abstract-declarator>
+	
+<abstract-declarator> ::=
+	<pointer>
+	| <direct-abstract-declarator>
+	| <pointer> <direct-abstract-declarator>
+	
+<direct-abstract-declarator> ::=
+	'(' <abstract-declarator> ')'
+	| '[' ']'
+	| '[' <type-qualifier-list> <assignment-expression> ']'
+	| '[' <assignment-expression> ']'
+	| '[' <type-qualifier-list> ']'
+	| <direct-abstract-declarator> '[' ']'	
+	| <direct-abstract-declarator> '[' <assignment-expression> ']'
+	| <direct-abstract-declarator> '[' <type-qualifier-list> ']'
+	| <direct-abstract-declarator> '[' <type-qualifier-list> <assignment-expression> ']'
+	| '[' "static" <assignment-expression> ']'
+	| '[' "static" <type-qualifier-list> <assignment-expression> ']'
+	| <direct-abstract-declarator> '[' "static" <assignment-expression> ']'
+	| <direct-abstract-declarator> '[' "static" <type-qualifier-list> <assignment-expression> ']'
+	| '[' <type-qualifier-list> "static" <assignment-expression> ']'
+	| <direct-abstract-declarator> '[' <type-qualifier-list> "static" <assignment-expression> ']'
+	| '[' '*' ']'
+	| <direct-abstract-declarator> '[' '*' ']'
+	| '(' ')'
+	| '(' <parameter-type-list> ')'
+	| <direct-abstract-declarator> '(' ')'
+	| <direct-abstract-declarator> '(' <parameter-type-list> ')'
+
+<typedef-name> ::=
+	<identifier>
+	
+<initializer> ::=
+	<assignment-expression> 
+	| '{' <initializer-list> '}'
+	| '{' <initializer-list> ',' '}'
+	
+<initializer-list> ::= 
+	<initializer> 
+	| <designation> <initializer>
+	| <initializer-list> ',' <initializer> 
+	| <initializer-list> ',' <designation> <initializer> 
+	
+<designation> ::=
+	<designation-list> '='
+	
+<designator-list> ::=
+	<designator> 
+	| <designator-list> <designator>
+	
+<designator> ::=
+	'[' <constant-expression> ']'
+	'.' <identifier>
+	
+<static_assert-declaration> ::=
+	"_Static_assert" '(' <constant-expression> ',' <string-literal> ')' ';'
+
+<statement> ::=
+	<labeled-statement>
+	| <compound-statement>
+	| <expression-statement>
+	| <selection-statement>
+	| <iteration-statement> 
+	| <jump-statement>
+	
+<labeled-statement> ::=
+	<identifier> ':' <statement> 
+	| "case" <constant-expression> ':' <statement>
+	| "default" ':' <statement>
+	
+<compound-statement> ::=
+	'{' '}'
+	| '{' <block-item-list> '}'
+	
+<block-item-list> ::=
+	<block-item> 
+	| <block-item-list> <block-item>
+	
+<block-item> ::=
+	<declaration> 
+	| <statement>
+	
+<expression-statement> ::=
+	';'
+	| <expression> ';'
+	
+<selection-statement> ::=
+	"if" '(' <expression> ')' <statement>
+	| "if" '(' <expression> ')' "else" <statement>
+	| "switch" '(' <expression> ')' <statement>
+	
+<iteration-statement> ::=
+	"while" '(' <expression> ')' <statement>
+	| "do" <statement> "while" '(' <expression> ')' ';'
+	| "for" '(' ';' ';' ';' ')' <statement>
+	| "for" '(' ';' ';' <expression> ';' ')' <statement>	
+	| "for" '(' ';' <expression> ';' ';' ')' <statement>
+	| "for" '(' ';' <expression> ';' <expression> ';' ')' <statement>	
+	| "for" '(' <expression> ';' ';' ';' ')' <statement>
+	| "for" '(' <expression> ';' ';' <expression> ';' ')' <statement>
+	| "for" '(' <expression> ';' <expression> ';' ';' ')' <statement>
+	| "for" '(' <expression> ';' <expression> ';' <expression> ';' ')' <statement>
+	| "for" '(' <declaration> ';' ')' <statement>
+	| "for" '(' <declaration> ';' <expression> ')' <statement>
+	| "for" '(' <declaration> <expression> ';' ')' <statement>
+	| "for" '(' <declaration> <expression> ';' <expression> ')' <statement>
+	
+<jump-statement> ::=
+	"goto" <identifier> ';'
+	| "continue" ';'
+	| "break" ';'
+	| "return" ';'
+	| "return" <expression> ';'
+	
+<translation-unit> ::= 
+	<external-declaration>
+	| <translation-unit> <external-declaration>
+	
+<external-declaration> ::=
+	<function-definition>
+	| <declaration>
+	
+<function-definition> ::=
+	<declaration-specifiers> <declarator> <compound-statement>
+	| <declaration-specifiers> <declarator> <declaration-list> <compound-statement>
+	
+<declaration-list> ::= 
+	<declaration> 
+	| <declaration-list> <declaration>
+	
+<preprocessing-file> ::=
+	<group>
+	
+<group> ::=
+	<group-part>
+	| <group> <group-part>
+	
+<group-part> ::=
+	<if-section> 
+	| <control-line>
+	| <text-line>
+	| '#' <non-directive>
+	
+<if-section> ::=
+	<if-group> <endif-line>
+	| <if-group> <else-group> <endif-line>
+	| <if-group> <elif-groups> <endif-line>
+	| <if-group> <elif-groups> <else-group> <endif-line>
+	
+<if-group> ::=
+	'#' "if" <constant-expression> <new-line>
+	| '#' "if" <constant-expression> <new-line> <group>
+	| '#' "ifef" <identifier> <new-line>
+	| '#' "ifdef" <identifier> <new-line> <group>
+	| '#' "ifndef" <identifier> <new-line>
+	| '#' "ifndef" <identifier> <new-line> <group>
+	
+<elif-groups> ::=
+	<elif-groups>
+	| <elif-groups> <elif-group>
+	
+<elif-group> ::=
+	'#' "elif" <constant-expression> <new-line>
+	| '#' "elif" <constant-expression> <new-line> <group>
+	
+<else-group> ::=
+	'#' "else" <new-line>
+	| '#' "else" <new-line> <group>
+	
+<endif-line> ::=
+	'#' "endif" <new-line>
+
+<control-line> ::=
+	'#' "include" <pp-tokens> <new-line>
+	| '#' "define" <identifier> <replacement-list> <new-line>
+	| '#' "define" <identifier> '(' ')' <replacement-list> <new-line>
+	| '#' "define" <identifier> '(' <identifier-list> ')' <replacement-list> <new-line>
+	| '#' "define" <identifier> '(' "..." ')' <replacement-list> <new-line>
+	| '#' "define" <identifier> '(' <identifier-list> ',' "..." ')' <replacement-list> <new-line>
+	| '#' "define" <identifier> <new-line>
+	| '#' "define" <identifier> '(' ')' <new-line>
+	| '#' "define" <identifier> '(' <identifier-list> ')' <new-line>
+	| '#' "define" <identifier> '(' "..." ')' <new-line>
+	| '#' "define" <identifier> '(' <identifier-list> ',' "..." ')' <new-line>
+	| '#' "undef" <identifier> <new-line>
+	| '#' "line" <pp-tokens> <new-line>
+	| '#' "error" <new-line>
+	| '#' "error" <pp-tokens> <new-line>
+	| '#' "pragma" <new-line>
+	| '#' "pragma" <pp-tokens> <new-line>
+	| '#' <new-line>
+	
+<text-line> ::=
+	<new-line>
+	| <pp-tokens> <new-line>
+	
+<lparen> ::=
+	'('
+	
+<replacement-list> ::=
+	<pp-tokens>
+
+<pp-tokens> ::=
+	<preprocessing-tokens> 
+	| <pp-tokens> <preprocessing-tokens>
+	
+<new-line> ::=
+	"\r\n"
