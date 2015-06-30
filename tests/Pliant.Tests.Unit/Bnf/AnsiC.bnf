@@ -160,7 +160,7 @@
 	| <universal-character-name>
 
 <simple-escape-sequence> ::=
-	"\\'" | "\\""" | "\\?" | "\\\\"
+	"\\'" | "\\""" | "\\?" | "\\\\" |
 	"\\a" | "\\b" | "\\f" | "\\n" | "\\r" | "\\t" | "\\v"
 
 <ocatal-escape-sequence> ::=
@@ -177,3 +177,172 @@
 	| <encoding-prefix> '"' '"'
 	| <encoding-prefix> '"' <s-char-sequence> '"'
 	| '"' <s-char-sequence> '"'
+
+<encoding-prefix> ::=
+	"u8"
+	| 'u'
+	| 'U'
+	| 'L'
+
+<s-char-sequence> ::=
+	<s-char>
+	| <s-char-sequence> <s-char>
+
+<s-char> ::=
+	<non-digit>
+	| <digit>
+	| <escape-sequence>
+	| ' '
+
+<punctuator> ::=
+	'[' | ']' | '(' | ')' | '{' | '}' | '.' | "->" |
+	"++" | "--" | '&' | '*' | '+' | '-' | '~' | '!' | 
+	'/' | '%' | "<<" | ">>" | '<' | '>' | "<=" | ">=" | "!=" | "^" | "|" | "&&" | "||" |
+	'?' | ':' | ';' | "..." | 
+	'=' | "*=" | "/=" | "%=" | "+=" | "-=" | "<<=" | ">>=" | "&=" | "^=" | "|=" | 
+	',' | '#' | "##" | 
+	"<:" | ":>" | "<%" | "%>" | "%:" | "%:%"
+
+<header-name> ::=
+	'<' <h-char-sequence> '>'
+	| '"' q-char-sequence '"'
+
+<h-char-sequence> ::=
+	<h-char>
+	| <h-char-sequence> <h-char>
+
+<h-char> ::=
+	<digit>
+	| <nondigit>
+	| ' ' | '.'
+
+<q-char-sequence> ::=
+	<q-char> 
+	| <q-char-sequence> <q-char>
+
+<q-char> ::=
+	<digit>
+	| <nondigit>
+	| ' ' | '.'
+
+<pp-number> ::=
+	<digit> 
+	| '.' <digit>
+	| <pp-number> <digit>
+	| <pp-number> <identifier-nondigit>
+	| <pp-number> 'e' <sign>
+	| <pp-number> 'E' <sign>
+	| <pp-number> 'p' <sign>
+	| <pp-number> 'P' <sign>
+	| <pp-number> '.'
+
+<primary-expression> ::=
+	<identifier>
+	| <constant>
+	| <string-literal>
+	| '(' <expression> ')'
+
+<generic-selection> ::=
+	"_Generic" '(' <assignment-expression> ',' <generic-assoc-list> ')'
+
+<generic-assoc-list> ::=
+	<generic-association>
+	| <generic-assoc-list> ',' <generic-association>
+
+<generic-association> ::=
+	<type-name> ':' <assignment-expression>
+	| "default" ':' <assignment-expression>
+
+<postfix-expression> ::=
+	<primary-expression>
+	| <postfix-expression> '[' <expression> ']'
+	| <postfix-expression> '(' ')'
+	| <postfix-expression> '(' <argumetn-expression-list> ')'
+	| <postfix-expression> '.' <identifier>
+	| <postfix-expression> "->" <identifier>
+	| <postfix-expression> "++" <identifier>
+	| <postfix-expression> "--"
+	| '(' <type-name> ')' '{' <initializer-list> '}'
+	| '(' <type-name> ')' '{' <initializer-list> ',' '}'
+
+<argument-expression-list> ::=
+	<assignment-expression>
+	| <argument-expression-list> ',' <assignment-expression>
+
+<unary-experssion> ::=
+	<postfix-expression>
+	| "++" <unary-expression>
+	| "--" <unary-expression>
+	| <unary-operator> <cast-expression>
+	| "sizeof" <unary-expression>
+	| "sizeof" '(' <type-name> ')'
+	| "_Alignof" '(' <type-name> ')'
+
+<unary-operator> ::=
+	'&' | '*' | '+' | '-' | '~' | '!'
+
+<cast-expression> ::=
+	<unary-expression>
+	| '(' <type-name> ')' <cast-expression>
+
+<multiplicative-expression> ::=
+	<cast-expression>
+	| <multiplicative-expression> '*' <cast-expression>
+	| <multiplicative-expression> '/' <cast-expression>
+	| <multiplicative-expression> '%' <cast-expression>
+
+<additive-expression> ::=
+	<multiplicative-expression>
+	| <additive-expression> '+' <multiplicative-expression>
+	| <additive-expression> '-' <multiplicative-expression>
+
+<shift-expression> ::=
+	<additive-expression>
+	| <shift-expression> "<<" <additive-expression>
+	| <shift-expression> ">>" <additive-expression>
+
+<relational-expression> ::=
+	<shift-expression>
+	| <relational-expression> '<' <shift-expression>
+	| <relational-expression> '>' <shift-expression>
+	| <relational-expression> "<=" <shift-expression>
+	| <relational-expression> ">=" <shift-expression>
+
+<equality-expression> ::=
+	<relational-expression>
+	| <equality-expression> "==" <relational-expression>
+	| <equality-expression> "!=" <relational-expression>
+
+<AND-expression> ::=
+	<equality-expression>
+	| <AND-expression> '&' <equality-expression>
+
+<exclusive-OR-expression> ::=
+	<AND-expression>
+	| <exclusive-OR-expression> '^' <AND-expression>
+
+<inclusive-OR-expression> ::=
+	<exclusive-OR-expression>
+	| <inclusive-OR-expression> '|' <exclusive-OR-expression>
+
+<logical-AND-expression> ::=
+	<inclusive-OR-expression> 
+	| <logical-AND-expression> "&&" <inclusive-OR-expression>
+	
+<logical-OR-expression> ::=
+	<logical-AND-expression> 
+	| <logical-OR-expression> "||" <logical-AND-expression>
+
+<conditional-expression> ::=
+	<logical-OR-expression>
+	| <logical-OR-expression> '?' <expression> ':' <conditional-expression>
+
+<assignment-operator> ::=
+	'=' | "*=" | "/=" | "%=" | "+=" | "-=" | "<<=" | ">>=" | "&=" | "^=" | "|="
+
+<expression> ::=
+	<assignment-expression> 
+	| <expression> ',' <assignment-expression>
+
+<constant-expression> ::=
+	<conditional-expression>
