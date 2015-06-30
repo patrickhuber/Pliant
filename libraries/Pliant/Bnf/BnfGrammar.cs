@@ -12,23 +12,7 @@ namespace Pliant.Bnf
 
         static BnfGrammar()
         {
-            /*  A -> B | C
-             *  equals
-             *  A -> B
-             *  A -> C
-             *  
-             *  A -> { B }
-             *  equals
-             *  A -> A B | <null>
-             *  
-             *  A -> [ B ]
-             *  equals
-             *  A -> B | <null>
-             *  
-             *  A -> B { B }
-             *  equals
-             *  A -> B A | B
-             * 
+            /* 
              *  Grammar
              *  -------
              *  <syntax>         ::= <rule> | <rule> <syntax>

@@ -21,7 +21,8 @@ namespace Pliant.Tests.Unit.Bnf
             <list>           ::= <term > | <term> <list>
             <term>           ::= <literal > | <identifier>
             <identifier>     ::= ""<"" <rule-name> "">""
-            <literal>        ::= '""' <text> '""' | ""'"" <text> ""'""";
+            <literal>        ::= '""' <text> '""' | ""'"" <text> ""'"" 
+            ";
 
         [TestMethod]
         public void Test_Bnf_That_String_Iterate_Sets_Baseline()
@@ -68,6 +69,9 @@ namespace Pliant.Tests.Unit.Bnf
                     Assert.Fail(stringBuilder.ToString());
                 }
             }
+            Assert.IsTrue(
+                parseInterface.ParseEngine.IsAccepted(), 
+                string.Format("error at position {0}", parseInterface.Position));
         }
     }
 }
