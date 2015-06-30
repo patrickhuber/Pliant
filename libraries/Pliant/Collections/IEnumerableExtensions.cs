@@ -7,7 +7,12 @@ namespace Pliant.Collections
     {
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> enumerable)
         {
-            return enumerable == null || !enumerable.Any();
+            if (enumerable == null)
+                return true;
+            // PERF: Removing Linq Any for some reason increased performance
+            foreach (var item in enumerable)
+                return false;
+            return true;
         }
     }
 }
