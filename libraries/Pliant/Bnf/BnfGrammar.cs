@@ -80,7 +80,7 @@ namespace Pliant.Bnf
 
         private static ILexerRule CreateNotDoubleQuoteLexerRule()
         {
-            // ( [^"] | (\\ .) ) +
+            // ( [^"\\] | (\\ .) ) +
             var start = new DfaState();
             var escape = new DfaState();
             var final = new DfaState(true);
