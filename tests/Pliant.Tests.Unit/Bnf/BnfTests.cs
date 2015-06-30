@@ -38,7 +38,6 @@ namespace Pliant.Tests.Unit.Bnf
             var grammar = new BnfGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, _bnfText);
-            var stringReader = new StringReader(_bnfText);
             
             while (!parseInterface.EndOfStream())
             {                 
@@ -71,7 +70,26 @@ namespace Pliant.Tests.Unit.Bnf
             }
             Assert.IsTrue(
                 parseInterface.ParseEngine.IsAccepted(), 
-                string.Format("error at position {0}", parseInterface.Position));
+                "error at position {0}", parseInterface.Position);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Bnf\AnsiC.bnf", "Bnf")]
+        public void Test_Bnf_That_Parses_Large_Grammar_In_File()
+        {
+            var bnf = File.ReadAllText(Path.Combine(TestContext.TestDeploymentDir, "Bnf", "AnsiC.bnf"));
+            Assert.IsFalse(string.IsNullOrEmpty(bnf));
+
+            var grammar = new BnfGrammar();
+            var parseEngine = new ParseEngine(grammar);
+            var parseInterface = new ParseInterface(parseEngine, bnf);
+
+            while (!parseInterface.EndOfStream())
+            {
+                if (!parseInterface.Read())
+                    Assert.Fail("Error Parsing At Position {0}", parseInterface.Position);
+            }
+            Assert.IsTrue(parseEngine.IsAccepted());          
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿<identifier> ::=	
-	<identifier-nondigit>
-	| <identifier> <identifier-nondigit>
-	| <identifier> <digit>
+	<identifier-nondigit> | 
+  <identifier> <identifier-nondigit> | 
+  <identifier> <digit>
 
 <identifier-nondigit> ::= 
-	<nondigit>
-	| <universal-character-name>
+	<nondigit> | 
+  <universal-character-name>
 
 <nondigit> ::=	
 	'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 
@@ -17,8 +17,8 @@
 	'0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
 
 <universal-character-name> ::=
-	"\u" <hex-quad> 
-	| "\U" <hex-quad> <hex-quad>
+	"\u" <hex-quad> | 
+  "\U" <hex-quad> <hex-quad>
 
 <hex-quad> ::= 
 	<hexadecimal-digit> <hexadecimal-digit> <hexadecimal-digit> <hexadecimal-digit>
@@ -149,7 +149,7 @@
 	| <c-char-sequence> <c-char>
 
 <c-char> ::=
-	| <non-digit>
+	<non-digit>
 	| <digit>
 	| <escape-sequence>
 
@@ -160,10 +160,10 @@
 	| <universal-character-name>
 
 <simple-escape-sequence> ::=
-	"\\'" | "\\""" | "\\?" | "\\\\" |
+	"\\'" | "\\\"" | "\\?" | "\\\\" |
 	"\\a" | "\\b" | "\\f" | "\\n" | "\\r" | "\\t" | "\\v"
 
-<ocatal-escape-sequence> ::=
+<octal-escape-sequence> ::=
 	'\' <octal-digit>
 	| '\' <octal-digit> <octal-digit>
 	| '\' <octal-digit> <octal-digit> <octal-digit>
@@ -205,7 +205,7 @@
 
 <header-name> ::=
 	'<' <h-char-sequence> '>'
-	| '"' q-char-sequence '"'
+	| '"' <q-char-sequence> '"'
 
 <h-char-sequence> ::=
 	<h-char>
