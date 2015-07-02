@@ -97,5 +97,10 @@ namespace Pliant.Nodes
             _andNode.AddChild(trigger);
             _children.Add(_andNode);
         }
+        
+        public override string ToString()
+        {
+            return string.Format("({0}, {1}, {2})", Symbol, Origin, Location);
+        }
     }
 }
