@@ -156,7 +156,7 @@ namespace Pliant.Tests.Unit
             /*  S_0_1 -> A_0_1
              *  A_0_1 -> 'a'
              */
-            var S_0_1 = parseEngine.GetParseForest() as IInternalNode;
+            var S_0_1 = parseEngine.GetParseForest() as ISymbolNode;
             Assert.IsNotNull(S_0_1);
             Assert.AreEqual(1, S_0_1.Children.Count);
             
@@ -164,7 +164,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(S_0_1_1);
             Assert.AreEqual(1, S_0_1_1.Children.Count);
 
-            var A_0_1 = S_0_1_1.Children[0] as IInternalNode;
+            var A_0_1 = S_0_1_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_0_1);
             Assert.AreEqual(1, A_0_1.Children.Count);
 
@@ -197,7 +197,7 @@ namespace Pliant.Tests.Unit
              *  A_0_2 -> a_0_1 A_1_2
              *  A_1_2 -> b_1_2
              */
-            var S_0_2 = parseEngine.GetParseForest() as IInternalNode;
+            var S_0_2 = parseEngine.GetParseForest() as ISymbolNode;
             Assert.IsNotNull(S_0_2);
             Assert.AreEqual(1, S_0_2.Children.Count);
             
@@ -205,7 +205,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(S_0_2_1);
             Assert.AreEqual(1, S_0_2_1.Children.Count);
 
-            var A_0_2 = S_0_2_1.Children[0] as IInternalNode;
+            var A_0_2 = S_0_2_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_0_2);
             Assert.AreEqual(1, A_0_2.Children.Count);
 
@@ -217,7 +217,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(a_0_1);
             Assert.AreEqual("a", a_0_1.Token.Value);
 
-            var A_1_2 = A_0_2_1.Children[1] as IInternalNode;
+            var A_1_2 = A_0_2_1.Children[1] as ISymbolNode;
             Assert.IsNotNull(A_1_2);
             Assert.AreEqual(1, A_1_2.Children.Count);
 
@@ -259,7 +259,7 @@ namespace Pliant.Tests.Unit
              *  A_2_4 -> 'a' B_3_4
              *  B_3_4 -> 'b'
              */
-            var S_0_4 = parseEngine.GetParseForest() as IInternalNode;
+            var S_0_4 = parseEngine.GetParseForest() as ISymbolNode;
             Assert.IsNotNull(S_0_4);
             Assert.AreEqual(1, S_0_4.Children.Count);
 
@@ -267,7 +267,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(S_0_4_1);
             Assert.AreEqual(1, S_0_4_1.Children.Count);
 
-            var A_0_4 = S_0_4_1.Children[0] as IInternalNode;
+            var A_0_4 = S_0_4_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_0_4);
             Assert.AreEqual(1, A_0_4.Children.Count);
 
@@ -279,7 +279,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(a_0_1);
             Assert.AreEqual("a", a_0_1.Token.Value);
 
-            var B_1_4 = A_0_4_1.Children[1] as IInternalNode;
+            var B_1_4 = A_0_4_1.Children[1] as ISymbolNode;
             Assert.IsNotNull(B_1_4);
             Assert.AreEqual(1, B_1_4.Children.Count);
 
@@ -287,7 +287,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(B_1_4_1);
             Assert.AreEqual(1, B_1_4_1.Children.Count);
 
-            var A_1_4 = B_1_4_1.Children[0] as IInternalNode;
+            var A_1_4 = B_1_4_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_1_4);
             Assert.AreEqual(1, A_1_4.Children.Count);
 
@@ -299,7 +299,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(a_1_2);
             Assert.AreEqual("a", a_1_2.Token.Value);
 
-            var B_2_4 = A_1_4_1.Children[1] as IInternalNode;
+            var B_2_4 = A_1_4_1.Children[1] as ISymbolNode;
             Assert.IsNotNull(B_2_4);
             Assert.AreEqual(1, B_2_4.Children.Count);
 
@@ -307,7 +307,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(B_2_4_1);
             Assert.AreEqual(1, B_2_4_1.Children.Count);
 
-            var A_2_4 = B_2_4_1.Children[0] as IInternalNode;
+            var A_2_4 = B_2_4_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_2_4);
             Assert.AreEqual(1, A_2_4.Children.Count);
 
@@ -319,7 +319,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(a_2_3);
             Assert.AreEqual("a", a_2_3.Token.Value);
 
-            var B_3_4 = A_2_4_1.Children[1] as IInternalNode;
+            var B_3_4 = A_2_4_1.Children[1] as ISymbolNode;
             Assert.IsNotNull(B_3_4);
             Assert.AreEqual(1, B_3_4.Children.Count);
 
@@ -366,7 +366,7 @@ namespace Pliant.Tests.Unit
             // A_0_2 -> B_0_1 C_1_2
             // B_0_1 -> '.'_0_1
             // C_1_2 -> '+'_1_2
-            var S_0_2 = parseForest as IInternalNode;
+            var S_0_2 = parseForest as ISymbolNode;
             Assert.IsNotNull(S_0_2);
             Assert.AreEqual(1, S_0_2.Children.Count);
 
@@ -374,7 +374,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(S_0_2_1);
             Assert.AreEqual(1, S_0_2_1.Children.Count);
 
-            var A_0_2 = S_0_2_1.Children[0] as IInternalNode;
+            var A_0_2 = S_0_2_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_0_2);
             Assert.AreEqual(1, A_0_2.Children.Count);
 
@@ -382,7 +382,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(A_0_2_1);
             Assert.AreEqual(2, A_0_2_1.Children.Count);
 
-            var B_0_1 = A_0_2_1.Children[0] as IInternalNode;
+            var B_0_1 = A_0_2_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(B_0_1);
             Assert.AreEqual(1, B_0_1.Children.Count);
 
@@ -394,7 +394,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(dot_0_1);
             Assert.AreEqual(".", dot_0_1.Token.Value);
 
-            var C_1_2 = A_0_2_1.Children[1] as IInternalNode;
+            var C_1_2 = A_0_2_1.Children[1] as ISymbolNode;
             Assert.IsNotNull(C_1_2);
 
             var C_1_2_1 = C_1_2.Children[0] as IAndNode;

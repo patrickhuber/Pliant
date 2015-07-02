@@ -1,10 +1,12 @@
 ﻿using Pliant.Charts;
 using Pliant.Collections;
 using System.Collections.Generic;
+using Pliant.Grammars;
+using System;
 
 namespace Pliant.Nodes
 {
-    public class VirtualNode : IInternalNode
+    public class VirtualNode : ISymbolNode
     {
         private ITransitionState _transitionState;
         private IState _completed;
@@ -41,6 +43,14 @@ namespace Pliant.Nodes
                 if(!ResultCached())
                     LazyLoadChildren();
                 return _children; 
+            }
+        }
+
+        public ISymbol Symbol
+        {
+            get
+            {
+                return _transitionState.Recognized;
             }
         }
 

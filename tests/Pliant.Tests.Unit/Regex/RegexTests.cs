@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Grammars;
+using Pliant.Nodes;
 using Pliant.Regex;
 
 namespace Pliant.Tests.Unit
@@ -101,7 +102,39 @@ namespace Pliant.Tests.Unit
             var input = "[^abc]";
             ParseAndAcceptInput(input);
         }
-        
+
+        [TestMethod]
+        public void Test_Regex_That_Parses_Number_And_Generates_Correct_Parse_Tree()
+        {
+            var input = @"[(]\d\d\d[)]-\d\d\d-\d\d\d\d";
+            var parseInterface = new ParseInterface(_parseEngine, input);
+            while (!parseInterface.EndOfStream())
+                if (!parseInterface.Read())
+                    Assert.Fail("failure at position {0}", parseInterface.Position);
+            Assert.IsTrue(_parseEngine.IsAccepted());
+            var root = _parseEngine.GetParseForest();
+            Assert.IsNotNull(root);
+
+            var regex_0_28 = root as ISymbolNode;
+            Assert.IsNotNull(regex_0_28);
+            Assert.AreEqual(1, regex_0_28.Children.Count);
+
+            var regex_0_28_1 = regex_0_28.Children[0] as IAndNode;
+            Assert.IsNotNull(regex_0_28_1);
+            Assert.AreEqual(1, regex_0_28_1.Children.Count);
+
+            var expression_0_28 = regex_0_28_1.Children[0] as ISymbolNode;
+            Assert.IsNotNull(expression_0_28);
+            Assert.AreEqual(1, expression_0_28.Children.Count);
+
+            var expression_0_28_1 = expression_0_28.Children[0] as IAndNode;
+            Assert.IsNotNull(expression_0_28_1);
+            Assert.AreEqual(1, expression_0_28_1.Children.Count);
+
+            var something = expression_0_28_1.Children[0] as ISymbolNode;
+            Assert.IsNotNull(something);
+        }
+
         private void ParseAndAcceptInput(string input)
         {
             ParseInput(input);
