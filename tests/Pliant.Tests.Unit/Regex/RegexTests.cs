@@ -102,53 +102,7 @@ namespace Pliant.Tests.Unit
             var input = "[^abc]";
             ParseAndAcceptInput(input);
         }
-
-        [TestMethod]
-        public void Test_Regex_That_Parses_Sequence_Of_Terms_And_Generates_Appropriate_Parse_Tree()
-        {
-            var input = @"abcdefg";
-            var parseInterface = new ParseInterface(_parseEngine, input);
-            while (!parseInterface.EndOfStream())
-                if (!parseInterface.Read())
-                    Assert.Fail("failure at position {0}", parseInterface.Position);
-            Assert.IsTrue(_parseEngine.IsAccepted());
-            var root = _parseEngine.GetParseForest();
-            Assert.IsNotNull(root);
-
-            var regex_0_7 = root as ISymbolNode;
-            Assert.IsNotNull(regex_0_7);
-            Assert.AreEqual("Regex", (regex_0_7.Symbol as INonTerminal).Value);
-            Assert.AreEqual(1, regex_0_7.Children.Count);
-
-            var regex_0_7_1 = regex_0_7.Children[0] as IAndNode;
-            Assert.IsNotNull(regex_0_7_1);            
-            Assert.AreEqual(1, regex_0_7_1.Children.Count);
-
-            var expression_0_7 = regex_0_7_1.Children[0] as ISymbolNode;
-            Assert.IsNotNull(expression_0_7);
-            Assert.AreEqual(1, expression_0_7.Children.Count);
-
-            var expression_0_7_1 = expression_0_7.Children[0] as IAndNode;
-            Assert.IsNotNull(expression_0_7_1);
-            Assert.AreEqual(1, expression_0_7_1.Children.Count);
-
-            var term_0_7 = expression_0_7_1.Children[0] as ISymbolNode;
-            Assert.IsNotNull(term_0_7);
-            Assert.AreEqual(1, term_0_7.Children.Count);
-
-            var term_0_7_1 = term_0_7.Children[0] as IAndNode;
-            Assert.IsNotNull(term_0_7_1);
-            Assert.AreEqual(2, term_0_7_1.Children.Count);
-
-            var term_1_7 = term_0_7_1.Children[1] as ISymbolNode;
-            Assert.IsNotNull(term_1_7);
-            Assert.AreEqual(1, term_1_7.Children.Count);
-
-            var term_1_7_1 = term_1_7.Children[0] as IAndNode;
-            Assert.IsNotNull(term_1_7_1);
-            Assert.AreEqual(2, term_1_7_1.Children.Count);
-        }
-
+        
         private void ParseAndAcceptInput(string input)
         {
             ParseInput(input);

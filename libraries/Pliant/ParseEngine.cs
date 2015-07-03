@@ -48,7 +48,7 @@ namespace Pliant
             return expectedRuleDictionary.Values;
         }
 
-        public INode GetParseForest()
+        public INode GetRoot()
         {
             if (!IsAccepted())
                 throw new Exception("Unable to parse expression.");
@@ -222,13 +222,14 @@ namespace Pliant
         private void LeoComplete(ITransitionState transitionState, IState completed, int k)
         {
             var earleySet = _chart.EarleySets[transitionState.Origin];
+                        
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.PreDotSymbol);
 
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
 
-            var virtualParseNode = new VirtualNode(k, rootTransitionState, completed);
+            var virtualParseNode = new VirtualNode(k, rootTransitionState, completed.ParseNode);
 
             var topmostItem = new State(
                 transitionState.Production,

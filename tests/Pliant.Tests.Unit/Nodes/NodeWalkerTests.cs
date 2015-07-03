@@ -21,7 +21,7 @@ namespace Pliant.Tests.Unit.Nodes
             Assert.IsTrue(regexParseEngine.IsAccepted());
 
             var nodeWalker = new NodeWalker();
-            var root = regexParseEngine.GetParseForest();
+            var root = regexParseEngine.GetRoot();
             nodeWalker.Walk(root);
         }
     }
