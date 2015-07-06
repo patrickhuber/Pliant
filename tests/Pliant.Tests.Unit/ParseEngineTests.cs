@@ -573,7 +573,8 @@ namespace Pliant.Tests.Unit
                     .Rule("F", "T")
                     .Rule("F"))
                 .Production("F", r => r
-                    .Rule(new Terminal('a'))).ToGrammar();
+                    .Rule(new Terminal('a')))
+                .ToGrammar();
 
             var input = Tokenize("aaaaaaa");
             var parseEngine = new ParseEngine(grammar);
