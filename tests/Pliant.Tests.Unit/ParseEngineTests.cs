@@ -572,7 +572,7 @@ namespace Pliant.Tests.Unit
                 .Production("T", r => r
                     .Rule("F", "T")
                     .Rule("F"))
-                .Production("F", r=>r
+                .Production("F", r => r
                     .Rule(new Terminal('a'))).ToGrammar();
 
             var input = Tokenize("aaaaaaa");
@@ -596,25 +596,45 @@ namespace Pliant.Tests.Unit
             // T_6_7 -> F_6_7
             // F_6_7 -> 'a'
             var R_0_7 = CastAndCountChildren<ISymbolNode>(parseEngine.GetRoot(), 1);
-            Assert.AreEqual("R", (R_0_7.Symbol as INonTerminal).Value);
+            AssertNodeProperties(R_0_7, "R", 0, 7);
             var E_0_7 = GetAndCastChildAtIndex<ISymbolNode>(R_0_7, 0);
+            AssertNodeProperties(E_0_7, "E", 0, 7);
             var T_0_7 = GetAndCastChildAtIndex<ISymbolNode>(E_0_7, 0);
+            AssertNodeProperties(T_0_7, "T", 0, 7);
             var F_0_1 = GetAndCastChildAtIndex<ISymbolNode>(T_0_7, 0);
+            AssertNodeProperties(F_0_1, "F", 0, 1);
             var T_1_7 = GetAndCastChildAtIndex<ISymbolNode>(T_0_7, 1);
+            AssertNodeProperties(T_1_7, "T", 1, 7);
             var F_1_2 = GetAndCastChildAtIndex<ISymbolNode>(T_1_7, 0);
+            AssertNodeProperties(F_1_2, "F", 1, 2);
             var T_2_7 = GetAndCastChildAtIndex<ISymbolNode>(T_1_7, 1);
+            AssertNodeProperties(T_2_7, "T", 2, 7);
             var F_2_3 = GetAndCastChildAtIndex<ISymbolNode>(T_2_7, 0);
+            AssertNodeProperties(F_2_3, "F", 2, 3);
             var T_3_7 = GetAndCastChildAtIndex<ISymbolNode>(T_2_7, 1);
+            AssertNodeProperties(T_3_7, "T", 3, 7);
             var F_3_4 = GetAndCastChildAtIndex<ISymbolNode>(T_3_7, 0);
+            AssertNodeProperties(F_3_4, "F", 3, 4);
             var T_4_7 = GetAndCastChildAtIndex<ISymbolNode>(T_3_7, 1);
+            AssertNodeProperties(T_4_7, "T", 4, 7);
             var F_4_5 = GetAndCastChildAtIndex<ISymbolNode>(T_4_7, 0);
+            AssertNodeProperties(F_4_5, "F", 4, 5);
             var T_5_7 = GetAndCastChildAtIndex<ISymbolNode>(T_4_7, 1);
+            AssertNodeProperties(T_5_7, "T", 5, 7);
             var F_5_6 = GetAndCastChildAtIndex<ISymbolNode>(T_5_7, 0);
+            AssertNodeProperties(F_5_6, "F", 5, 6);
             var T_6_7 = GetAndCastChildAtIndex<ISymbolNode>(T_5_7, 1);
+            AssertNodeProperties(T_6_7, "T", 6, 7);
             var F_6_7 = GetAndCastChildAtIndex<ISymbolNode>(T_6_7, 0);
-
+            AssertNodeProperties(F_6_7, "F", 6, 7);
         }
 
+        private static void AssertNodeProperties(ISymbolNode node, string nodeName, int origin, int location)
+        {
+            Assert.AreEqual(nodeName, (node.Symbol as INonTerminal).Value);
+            Assert.AreEqual(origin, node.Origin);
+            Assert.AreEqual(location, node.Location);
+        }
 
         private T CastAndCountChildren<T>(INode node, int childCount)
             where T : class, IInternalNode

@@ -8,6 +8,6 @@ namespace Pliant.Charts
         
         IState Reduction { get; }
 
-        ITransitionState NextTransition { get;  }
+        ITransitionState NextTransition { get; set; }
     }
 }

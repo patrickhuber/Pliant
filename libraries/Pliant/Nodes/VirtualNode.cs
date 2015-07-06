@@ -28,7 +28,7 @@ namespace Pliant.Nodes
 
         public int Origin
         {
-            get { return _transitionState.Origin; }
+            get { return _transitionState.Reduction.Origin; }
         }
              
         public NodeType NodeType
@@ -50,7 +50,7 @@ namespace Pliant.Nodes
         {
             get
             {
-                return _transitionState.Recognized;
+                return _transitionState.Reduction.Production.LeftHandSide;
             }
         }
 
