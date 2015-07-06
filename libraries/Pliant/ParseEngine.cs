@@ -48,7 +48,7 @@ namespace Pliant
             return expectedRuleDictionary.Values;
         }
 
-        public INode GetParseForest()
+        public INode GetRoot()
         {
             if (!IsAccepted())
                 throw new Exception("Unable to parse expression.");
@@ -222,13 +222,14 @@ namespace Pliant
         private void LeoComplete(ITransitionState transitionState, IState completed, int k)
         {
             var earleySet = _chart.EarleySets[transitionState.Origin];
+                        
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.PreDotSymbol);
 
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
 
-            var virtualParseNode = new VirtualNode(k, rootTransitionState, completed);
+            var virtualParseNode = new VirtualNode(k, rootTransitionState, completed.ParseNode);
 
             var topmostItem = new State(
                 transitionState.Production,
@@ -267,7 +268,7 @@ namespace Pliant
         private void OptimizeReductionPath(ISymbol searchSymbol, int k)
         {
             IState t_rule = null;
-            TransitionState previousTransitionState = null;
+            ITransitionState previousTransitionState = null;
             OptimizeReductionPathRecursive(searchSymbol, k, ref t_rule, ref previousTransitionState);
         }
 
@@ -275,12 +276,13 @@ namespace Pliant
             ISymbol searchSymbol,
             int k,
             ref IState t_rule,
-            ref TransitionState previousTransitionState)
+            ref ITransitionState previousTransitionState)
         {
             var earleySet = _chart.EarleySets[k];
             var transitionState = earleySet.FindTransitionState(searchSymbol);
             if (transitionState != null)
             {
+                previousTransitionState = transitionState;
                 t_rule = transitionState;
                 return;
             }
@@ -288,11 +290,11 @@ namespace Pliant
             if (sourceState == null)
                 return;
 
-            var sourceStateNext = sourceState.NextState();
-            if (!IsQuasiComplete(sourceStateNext))
+            if (!IsNextStateQuasiComplete(sourceState))
                 return;
+            
+            t_rule = sourceState.NextState();
 
-            t_rule = sourceStateNext;
             OptimizeReductionPathRecursive(
                 sourceState.Production.LeftHandSide,
                 sourceState.Origin,
@@ -316,7 +318,7 @@ namespace Pliant
             previousTransitionState = currentTransitionState;
         }
 
-        private bool IsQuasiComplete(IState state)
+        private bool IsNextStateQuasiComplete(IState state)
         {
             // leo has a definition for quasi complete
             // where the item is either complete or "quasi complete"
@@ -325,7 +327,7 @@ namespace Pliant
             // complete by association. 
             // currently we only check for completeness, but a test case should
             // be developed to check for quasi completeness
-            return state.IsComplete;
+            return state.Position == state.Production.RightHandSide.Count - 1;
         }
 
         private INode CreateNullParseNode(ISymbol symbol, int location)

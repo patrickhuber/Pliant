@@ -37,7 +37,7 @@ namespace Pliant.Tests.Unit
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
-            var S_0_4 = parseEngine.GetParseForest() as ISymbolNode;
+            var S_0_4 = parseEngine.GetRoot() as ISymbolNode;
             Assert.IsNotNull(S_0_4);
             Assert.AreEqual(2, S_0_4.Children.Count);
 
@@ -123,7 +123,7 @@ namespace Pliant.Tests.Unit
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
-            var parseNode = parseEngine.GetParseForest();
+            var parseNode = parseEngine.GetRoot();
             Assert.IsNotNull(parseNode);
 
             var S_0_1 = parseNode as ISymbolNode;
@@ -156,7 +156,7 @@ namespace Pliant.Tests.Unit
             /*  S_0_1 -> A_0_1
              *  A_0_1 -> 'a'
              */
-            var S_0_1 = parseEngine.GetParseForest() as IInternalNode;
+            var S_0_1 = parseEngine.GetRoot() as ISymbolNode;
             Assert.IsNotNull(S_0_1);
             Assert.AreEqual(1, S_0_1.Children.Count);
             
@@ -164,7 +164,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(S_0_1_1);
             Assert.AreEqual(1, S_0_1_1.Children.Count);
 
-            var A_0_1 = S_0_1_1.Children[0] as IInternalNode;
+            var A_0_1 = S_0_1_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_0_1);
             Assert.AreEqual(1, A_0_1.Children.Count);
 
@@ -197,7 +197,7 @@ namespace Pliant.Tests.Unit
              *  A_0_2 -> a_0_1 A_1_2
              *  A_1_2 -> b_1_2
              */
-            var S_0_2 = parseEngine.GetParseForest() as IInternalNode;
+            var S_0_2 = parseEngine.GetRoot() as ISymbolNode;
             Assert.IsNotNull(S_0_2);
             Assert.AreEqual(1, S_0_2.Children.Count);
             
@@ -205,7 +205,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(S_0_2_1);
             Assert.AreEqual(1, S_0_2_1.Children.Count);
 
-            var A_0_2 = S_0_2_1.Children[0] as IInternalNode;
+            var A_0_2 = S_0_2_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_0_2);
             Assert.AreEqual(1, A_0_2.Children.Count);
 
@@ -217,7 +217,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(a_0_1);
             Assert.AreEqual("a", a_0_1.Token.Value);
 
-            var A_1_2 = A_0_2_1.Children[1] as IInternalNode;
+            var A_1_2 = A_0_2_1.Children[1] as ISymbolNode;
             Assert.IsNotNull(A_1_2);
             Assert.AreEqual(1, A_1_2.Children.Count);
 
@@ -259,7 +259,7 @@ namespace Pliant.Tests.Unit
              *  A_2_4 -> 'a' B_3_4
              *  B_3_4 -> 'b'
              */
-            var S_0_4 = parseEngine.GetParseForest() as IInternalNode;
+            var S_0_4 = parseEngine.GetRoot() as ISymbolNode;
             Assert.IsNotNull(S_0_4);
             Assert.AreEqual(1, S_0_4.Children.Count);
 
@@ -267,7 +267,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(S_0_4_1);
             Assert.AreEqual(1, S_0_4_1.Children.Count);
 
-            var A_0_4 = S_0_4_1.Children[0] as IInternalNode;
+            var A_0_4 = S_0_4_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_0_4);
             Assert.AreEqual(1, A_0_4.Children.Count);
 
@@ -279,7 +279,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(a_0_1);
             Assert.AreEqual("a", a_0_1.Token.Value);
 
-            var B_1_4 = A_0_4_1.Children[1] as IInternalNode;
+            var B_1_4 = A_0_4_1.Children[1] as ISymbolNode;
             Assert.IsNotNull(B_1_4);
             Assert.AreEqual(1, B_1_4.Children.Count);
 
@@ -287,7 +287,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(B_1_4_1);
             Assert.AreEqual(1, B_1_4_1.Children.Count);
 
-            var A_1_4 = B_1_4_1.Children[0] as IInternalNode;
+            var A_1_4 = B_1_4_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_1_4);
             Assert.AreEqual(1, A_1_4.Children.Count);
 
@@ -299,7 +299,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(a_1_2);
             Assert.AreEqual("a", a_1_2.Token.Value);
 
-            var B_2_4 = A_1_4_1.Children[1] as IInternalNode;
+            var B_2_4 = A_1_4_1.Children[1] as ISymbolNode;
             Assert.IsNotNull(B_2_4);
             Assert.AreEqual(1, B_2_4.Children.Count);
 
@@ -307,7 +307,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(B_2_4_1);
             Assert.AreEqual(1, B_2_4_1.Children.Count);
 
-            var A_2_4 = B_2_4_1.Children[0] as IInternalNode;
+            var A_2_4 = B_2_4_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_2_4);
             Assert.AreEqual(1, A_2_4.Children.Count);
 
@@ -319,7 +319,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(a_2_3);
             Assert.AreEqual("a", a_2_3.Token.Value);
 
-            var B_3_4 = A_2_4_1.Children[1] as IInternalNode;
+            var B_3_4 = A_2_4_1.Children[1] as ISymbolNode;
             Assert.IsNotNull(B_3_4);
             Assert.AreEqual(1, B_3_4.Children.Count);
 
@@ -359,14 +359,14 @@ namespace Pliant.Tests.Unit
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
-            var parseForest = parseEngine.GetParseForest();
+            var parseForest = parseEngine.GetRoot();
             Assert.IsNotNull(parseForest);
 
             // S_0_2 -> A_0_2
             // A_0_2 -> B_0_1 C_1_2
             // B_0_1 -> '.'_0_1
             // C_1_2 -> '+'_1_2
-            var S_0_2 = parseForest as IInternalNode;
+            var S_0_2 = parseForest as ISymbolNode;
             Assert.IsNotNull(S_0_2);
             Assert.AreEqual(1, S_0_2.Children.Count);
 
@@ -374,7 +374,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(S_0_2_1);
             Assert.AreEqual(1, S_0_2_1.Children.Count);
 
-            var A_0_2 = S_0_2_1.Children[0] as IInternalNode;
+            var A_0_2 = S_0_2_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_0_2);
             Assert.AreEqual(1, A_0_2.Children.Count);
 
@@ -382,7 +382,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(A_0_2_1);
             Assert.AreEqual(2, A_0_2_1.Children.Count);
 
-            var B_0_1 = A_0_2_1.Children[0] as IInternalNode;
+            var B_0_1 = A_0_2_1.Children[0] as ISymbolNode;
             Assert.IsNotNull(B_0_1);
             Assert.AreEqual(1, B_0_1.Children.Count);
 
@@ -394,7 +394,7 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(dot_0_1);
             Assert.AreEqual(".", dot_0_1.Token.Value);
 
-            var C_1_2 = A_0_2_1.Children[1] as IInternalNode;
+            var C_1_2 = A_0_2_1.Children[1] as ISymbolNode;
             Assert.IsNotNull(C_1_2);
 
             var C_1_2_1 = C_1_2.Children[0] as IAndNode;
@@ -559,6 +559,105 @@ namespace Pliant.Tests.Unit
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
         }
+
+        [TestMethod]
+        public void Test_ParseEngine_That_Leo_Optimization_Creates_Correct_Parse_Tree()
+        {
+            var grammar = new GrammarBuilder("R")
+                .Production("R", r => r
+                    .Rule("E"))
+                .Production("E", r => r
+                    .Rule("T")
+                    .Lambda())
+                .Production("T", r => r
+                    .Rule("F", "T")
+                    .Rule("F"))
+                .Production("F", r => r
+                    .Rule(new Terminal('a'))).ToGrammar();
+
+            var input = Tokenize("aaaaaaa");
+            var parseEngine = new ParseEngine(grammar);
+            ParseInput(parseEngine, input);
+
+            // R_0_7 -> E_0_7
+            // E_0_7 -> T_0_7
+            // T_0_7 -> F_0_1 T_1_7
+            // F_0_1 -> 'a'
+            // T_1_7 -> F_1_2 T_2_7
+            // F_1_2 -> 'a'
+            // T_2_7 -> F_2_3 T_3_7
+            // F_2_3 -> 'a'
+            // T_3_7 -> F_3_4 T_4_7
+            // F_3_4 -> 'a'
+            // T_4_7 -> F_4_5 T_5_7
+            // F_4_5 -> 'a'
+            // T_5_7 -> F_5_6 T_6_7
+            // F_5_6 -> 'a'
+            // T_6_7 -> F_6_7
+            // F_6_7 -> 'a'
+            var R_0_7 = CastAndCountChildren<ISymbolNode>(parseEngine.GetRoot(), 1);
+            AssertNodeProperties(R_0_7, "R", 0, 7);
+            var E_0_7 = GetAndCastChildAtIndex<ISymbolNode>(R_0_7, 0);
+            AssertNodeProperties(E_0_7, "E", 0, 7);
+            var T_0_7 = GetAndCastChildAtIndex<ISymbolNode>(E_0_7, 0);
+            AssertNodeProperties(T_0_7, "T", 0, 7);
+            var F_0_1 = GetAndCastChildAtIndex<ISymbolNode>(T_0_7, 0);
+            AssertNodeProperties(F_0_1, "F", 0, 1);
+            var T_1_7 = GetAndCastChildAtIndex<ISymbolNode>(T_0_7, 1);
+            AssertNodeProperties(T_1_7, "T", 1, 7);
+            var F_1_2 = GetAndCastChildAtIndex<ISymbolNode>(T_1_7, 0);
+            AssertNodeProperties(F_1_2, "F", 1, 2);
+            var T_2_7 = GetAndCastChildAtIndex<ISymbolNode>(T_1_7, 1);
+            AssertNodeProperties(T_2_7, "T", 2, 7);
+            var F_2_3 = GetAndCastChildAtIndex<ISymbolNode>(T_2_7, 0);
+            AssertNodeProperties(F_2_3, "F", 2, 3);
+            var T_3_7 = GetAndCastChildAtIndex<ISymbolNode>(T_2_7, 1);
+            AssertNodeProperties(T_3_7, "T", 3, 7);
+            var F_3_4 = GetAndCastChildAtIndex<ISymbolNode>(T_3_7, 0);
+            AssertNodeProperties(F_3_4, "F", 3, 4);
+            var T_4_7 = GetAndCastChildAtIndex<ISymbolNode>(T_3_7, 1);
+            AssertNodeProperties(T_4_7, "T", 4, 7);
+            var F_4_5 = GetAndCastChildAtIndex<ISymbolNode>(T_4_7, 0);
+            AssertNodeProperties(F_4_5, "F", 4, 5);
+            var T_5_7 = GetAndCastChildAtIndex<ISymbolNode>(T_4_7, 1);
+            AssertNodeProperties(T_5_7, "T", 5, 7);
+            var F_5_6 = GetAndCastChildAtIndex<ISymbolNode>(T_5_7, 0);
+            AssertNodeProperties(F_5_6, "F", 5, 6);
+            var T_6_7 = GetAndCastChildAtIndex<ISymbolNode>(T_5_7, 1);
+            AssertNodeProperties(T_6_7, "T", 6, 7);
+            var F_6_7 = GetAndCastChildAtIndex<ISymbolNode>(T_6_7, 0);
+            AssertNodeProperties(F_6_7, "F", 6, 7);
+        }
+
+        private static void AssertNodeProperties(ISymbolNode node, string nodeName, int origin, int location)
+        {
+            Assert.AreEqual(nodeName, (node.Symbol as INonTerminal).Value);
+            Assert.AreEqual(origin, node.Origin);
+            Assert.AreEqual(location, node.Location);
+        }
+
+        private T CastAndCountChildren<T>(INode node, int childCount)
+            where T : class, IInternalNode
+        {
+            var tNode = node as T;
+            Assert.IsNotNull(node);            
+            Assert.AreEqual(1, tNode.Children.Count);
+            var firstAndNode = tNode.Children[0];
+            Assert.IsNotNull(firstAndNode);
+            Assert.AreEqual(childCount, firstAndNode.Children.Count);
+            return tNode;
+        }
+
+        private T GetAndCastChildAtIndex<T>(IInternalNode node, int index)
+            where T : class, INode
+        {
+            var firstAndNode = node.Children[0];
+            Assert.IsNotNull(firstAndNode);
+            Assert.IsFalse(index > firstAndNode.Children.Count);
+            var child = firstAndNode.Children[index] as T;
+            Assert.IsNotNull(child);
+            return child;
+        }              
 
         private static Chart GetChartFromParseEngine(ParseEngine parseEngine)
         {

@@ -1,13 +1,15 @@
 ﻿using Pliant.Charts;
 using Pliant.Collections;
 using System.Collections.Generic;
+using Pliant.Grammars;
+using System;
 
 namespace Pliant.Nodes
 {
-    public class VirtualNode : IInternalNode
+    public class VirtualNode : ISymbolNode
     {
         private ITransitionState _transitionState;
-        private IState _completed;
+        private INode _completedParseNode;
         private ReadWriteList<IAndNode> _children;
         /// <summary>
         /// A single AND node. Virtual nodes are leo nodes and by nature don't have ambiguity.
@@ -16,17 +18,17 @@ namespace Pliant.Nodes
 
         public int Location { get; private set; }
         
-        public VirtualNode(int location, ITransitionState transitionState, IState completed)
+        public VirtualNode(int location, ITransitionState transitionState, INode completedParseNode)
         {
             _transitionState = transitionState;
-            _completed = completed;
+            _completedParseNode = completedParseNode;
             _children = new ReadWriteList<IAndNode>();
             Location = location;
         }
 
         public int Origin
         {
-            get { return _transitionState.Origin; }
+            get { return _transitionState.Reduction.Origin; }
         }
              
         public NodeType NodeType
@@ -44,11 +46,19 @@ namespace Pliant.Nodes
             }
         }
 
+        public ISymbol Symbol
+        {
+            get
+            {
+                return _transitionState.Reduction.Production.LeftHandSide;
+            }
+        }
+
         private void LazyLoadChildren()
         {
             if (_transitionState.NextTransition != null)
             {
-                var virtualNode = new VirtualNode(Location, _transitionState.NextTransition, _completed);
+                var virtualNode = new VirtualNode(Location, _transitionState.NextTransition, _completedParseNode);
                 if (_transitionState.Reduction.ParseNode == null)
                     AddUniqueFamily(virtualNode);
                 else
@@ -56,11 +66,11 @@ namespace Pliant.Nodes
             }
             else if (_transitionState.Reduction.ParseNode != null)
             {
-                AddUniqueFamily(_transitionState.Reduction.ParseNode, _completed.ParseNode);
+                AddUniqueFamily(_transitionState.Reduction.ParseNode, _completedParseNode);
             }
             else
             {
-                AddUniqueFamily(_completed.ParseNode);
+                AddUniqueFamily(_completedParseNode);
             }            
         }
 
@@ -86,6 +96,11 @@ namespace Pliant.Nodes
             _andNode.AddChild(source);
             _andNode.AddChild(trigger);
             _children.Add(_andNode);
+        }
+        
+        public override string ToString()
+        {
+            return string.Format("({0}, {1}, {2})", Symbol, Origin, Location);
         }
     }
 }
