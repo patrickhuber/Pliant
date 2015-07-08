@@ -20,9 +20,9 @@ namespace Pliant.Tests.Unit.Nodes
             }
             Assert.IsTrue(regexParseEngine.IsAccepted());
 
-            var nodeWalker = new NodeWalker();
+            var nodeVisitor = new NodeVisitor();
             var root = regexParseEngine.GetRoot();
-            nodeWalker.Walk(root);
+            root.Accept(nodeVisitor);            
         }
     }
 }

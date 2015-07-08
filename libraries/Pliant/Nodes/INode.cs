@@ -1,6 +1,6 @@
 ﻿namespace Pliant.Nodes
 {
-    public interface INode
+    public interface INode : INodeVisitable
     {
         int Origin { get; }
 

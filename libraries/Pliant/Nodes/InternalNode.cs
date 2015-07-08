@@ -21,7 +21,9 @@ namespace Pliant.Nodes
             Location = location;
             _children = new ReadWriteList<IAndNode>();
         }
-        
+
+        public abstract void Accept(INodeVisitor visitor);
+
         public void AddUniqueFamily(INode trigger)
         {
             AddUniqueAndNode(trigger);

@@ -23,5 +23,10 @@ namespace Pliant.Nodes
         {
             return string.Format("({0}, {1}, {2})", Symbol, Origin, Location);
         }
+
+        public override void Accept(INodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

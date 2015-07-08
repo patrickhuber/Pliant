@@ -1,4 +1,5 @@
-﻿using Pliant.Charts;
+﻿using System;
+using Pliant.Charts;
 
 namespace Pliant.Nodes
 {
@@ -17,6 +18,11 @@ namespace Pliant.Nodes
         public override string ToString()
         {
             return string.Format("({0}, {1}, {2})", State, Origin, Location);
+        }
+
+        public override void Accept(INodeVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Pliant.Nodes
              
         public NodeType NodeType
         {
-            get { return NodeType.Virtual; }
+            get { return NodeType.Symbol; }
         }
         
         public IReadOnlyList<IAndNode> Children
@@ -101,6 +101,12 @@ namespace Pliant.Nodes
         public override string ToString()
         {
             return string.Format("({0}, {1}, {2})", Symbol, Origin, Location);
+        }
+
+        public void Accept(INodeVisitor visitor)
+        {
+            visitor.Visit(this);
+
         }
     }
 }

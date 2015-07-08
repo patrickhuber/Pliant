@@ -1,4 +1,5 @@
-﻿using Pliant.Tokens;
+﻿using System;
+using Pliant.Tokens;
 
 namespace Pliant.Nodes
 {
@@ -17,6 +18,11 @@ namespace Pliant.Nodes
             Token = token;
             Origin = origin;
             Location = location;
+        }
+
+        public void Accept(INodeVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 }
