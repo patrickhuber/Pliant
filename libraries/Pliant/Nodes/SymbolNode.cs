@@ -27,6 +27,9 @@ namespace Pliant.Nodes
         public override void Accept(INodeVisitor visitor)
         {
             visitor.Visit(this);
+            foreach (var andNode in Children)
+                foreach (var child in andNode.Children)
+                    child.Accept(visitor);
         }
     }
 }

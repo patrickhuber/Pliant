@@ -561,20 +561,9 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Leo_Optimization_Creates_Correct_Parse_Tree()
+        public void Test_ParseEngine_That_Right_Recursive_To_Normal_Transition_Creates_Correct_Parse_Tree()
         {
-            var grammar = new GrammarBuilder("R")
-                .Production("R", r => r
-                    .Rule("E"))
-                .Production("E", r => r
-                    .Rule("T")
-                    .Lambda())
-                .Production("T", r => r
-                    .Rule("F", "T")
-                    .Rule("F"))
-                .Production("F", r => r
-                    .Rule(new Terminal('a')))
-                .ToGrammar();
+            IGrammar grammar = CreateRegularExpressionStubGrammar();
 
             var input = Tokenize("aaaaaaa");
             var parseEngine = new ParseEngine(grammar);
@@ -628,6 +617,60 @@ namespace Pliant.Tests.Unit
             AssertNodeProperties(T_6_7, "T", 6, 7);
             var F_6_7 = GetAndCastChildAtIndex<ISymbolNode>(T_6_7, 0);
             AssertNodeProperties(F_6_7, "F", 6, 7);
+        }
+
+        [TestMethod]
+        public void Test_ParseEngine_That_Creates_Correct_Parse_Tree_When_Multiple_Leo_Items_Exist_On_Search_Path()
+        {
+            var grammar = CreateRegularExpressionStubGrammar();
+            var input = Tokenize("aaa");
+            var parseEngine = new ParseEngine(grammar);
+            ParseInput(parseEngine, input);
+
+            var R_0_3 = CastAndCountChildren<ISymbolNode>(parseEngine.GetRoot(), 1);
+            AssertNodeProperties(R_0_3, "R", 0, 3);
+            var E_0_3 = GetAndCastChildAtIndex<ISymbolNode>(R_0_3, 0);
+            AssertNodeProperties(E_0_3, "E", 0, 3);
+            var T_0_3 = GetAndCastChildAtIndex<ISymbolNode>(E_0_3, 0);
+            AssertNodeProperties(T_0_3, "T", 0, 3);
+            var F_0_1 = GetAndCastChildAtIndex<ISymbolNode>(T_0_3, 0);
+            AssertNodeProperties(F_0_1, "F", 0, 1);
+            var A_0_1 = GetAndCastChildAtIndex<ISymbolNode>(F_0_1, 0);
+            AssertNodeProperties(A_0_1, "A", 0, 1);
+            var T_1_3 = GetAndCastChildAtIndex<ISymbolNode>(T_0_3, 1);
+            AssertNodeProperties(T_1_3, "T", 1, 3);
+            var F_1_2 = GetAndCastChildAtIndex<ISymbolNode>(T_1_3, 0);
+            AssertNodeProperties(F_1_2, "F", 1, 2);
+            var T_2_3 = GetAndCastChildAtIndex<ISymbolNode>(T_1_3, 1);
+            AssertNodeProperties(T_2_3, "T", 2, 3);
+            var F_2_3 = GetAndCastChildAtIndex<ISymbolNode>(T_2_3, 0);
+            AssertNodeProperties(F_2_3, "F", 2, 3);
+        }
+
+
+        private static IGrammar CreateRegularExpressionStubGrammar()
+        {
+            return new GrammarBuilder("R")
+                .Production("R", r => r
+                    .Rule("E")
+                    .Rule('^', "E")
+                    .Rule("E", '$')
+                    .Rule('^', "E", '$'))
+                .Production("E", r => r
+                    .Rule("T")
+                    .Rule("T", '|', "E")
+                    .Lambda())
+                .Production("T", r => r
+                    .Rule("F", "T")
+                    .Rule("F"))
+                .Production("F", r => r
+                    .Rule("A")
+                    .Rule("A", "I"))
+                .Production("A", r=>r
+                    .Rule('a'))
+                .Production("I", r=>r
+                    .Rule('+', '?', '*'))
+                .ToGrammar();
         }
 
         private static void AssertNodeProperties(ISymbolNode node, string nodeName, int origin, int location)

@@ -12,7 +12,7 @@ namespace Pliant.Tests.Unit.Nodes
         {
             var regexGrammar = new RegexGrammar();
             var regexParseEngine = new ParseEngine(regexGrammar);
-            var regexParseInterface = new ParseInterface(regexParseEngine, @"[(]\d\d\d[)]-\d\d\d-\d\d\d\d");
+            var regexParseInterface = new ParseInterface(regexParseEngine, @"[(]\d[)]");
             while (!regexParseInterface.EndOfStream())
             {
                 if (!regexParseInterface.Read())
@@ -22,7 +22,8 @@ namespace Pliant.Tests.Unit.Nodes
 
             var nodeVisitor = new NodeVisitor();
             var root = regexParseEngine.GetRoot();
-            root.Accept(nodeVisitor);            
-        }
+            root.Accept(nodeVisitor);
+            Assert.AreEqual(34, nodeVisitor.VisitLog.Count);           
+        }        
     }
 }

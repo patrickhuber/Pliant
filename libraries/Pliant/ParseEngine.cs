@@ -222,9 +222,13 @@ namespace Pliant
         private void LeoComplete(ITransitionState transitionState, IState completed, int k)
         {
             var earleySet = _chart.EarleySets[transitionState.Origin];
-                        
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.PreDotSymbol);
+
+            var dynamicNode = new DynamicNode(
+                k, 
+                rootTransitionState, transitionState, 
+                completed.ParseNode);
 
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
@@ -240,7 +244,7 @@ namespace Pliant
             if (_chart.Enqueue(k, topmostItem))
                 Log("Complete", k, topmostItem);
         }
-
+        
         private void EarleyComplete(IState completed, int k)
         {
             int j = completed.Origin;
@@ -253,6 +257,7 @@ namespace Pliant
 
                 var i = prediction.Origin;
                 var nextState = prediction.NextState();
+                
                 var parseNode = CreateParseNode(
                     nextState,
                     prediction.ParseNode,
@@ -318,16 +323,30 @@ namespace Pliant
             previousTransitionState = currentTransitionState;
         }
 
+        /// <summary>
+        /// Implements a check for leo quasi complete items
+        /// </summary>
+        /// <param name="state">the state to check for quasi completeness</param>
+        /// <returns>true if quasi complete, false otherwise</returns>
         private bool IsNextStateQuasiComplete(IState state)
         {
-            // leo has a definition for quasi complete
-            // where the item is either complete or "quasi complete"
-            // "quasi complete" implies that the item has a NonTerminal after the 
-            // post dot rule that is nullable, thereby making the state
-            // complete by association. 
-            // currently we only check for completeness, but a test case should
-            // be developed to check for quasi completeness
-            return state.Position == state.Production.RightHandSide.Count - 1;
+            int ruleCount = state.Production.RightHandSide.Count;
+            if (ruleCount == 0)
+                return true;
+
+            int nextStatePosition = state.Position + 1;
+            bool isComplete = nextStatePosition == state.Production.RightHandSide.Count;
+            if (isComplete)
+                return true;
+
+            for (int i = nextStatePosition; i < state.Production.RightHandSide.Count;i++)
+            {
+                var nextSymbol = state.Production.RightHandSide[nextStatePosition];
+                var isSymbolNullable = IsSymbolNullable(nextSymbol);
+                if (!isSymbolNullable)
+                    return false;
+            }
+            return true;
         }
 
         private INode CreateNullParseNode(ISymbol symbol, int location)

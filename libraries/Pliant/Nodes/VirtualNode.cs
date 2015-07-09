@@ -106,7 +106,9 @@ namespace Pliant.Nodes
         public void Accept(INodeVisitor visitor)
         {
             visitor.Visit(this);
-
+            foreach (var andNode in Children)
+                foreach (var child in andNode.Children)
+                    child.Accept(visitor);
         }
     }
 }
