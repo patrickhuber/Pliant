@@ -224,12 +224,7 @@ namespace Pliant
             var earleySet = _chart.EarleySets[transitionState.Origin];
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.PreDotSymbol);
-
-            var dynamicNode = new DynamicNode(
-                k, 
-                rootTransitionState, transitionState, 
-                completed.ParseNode);
-
+            
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
 
