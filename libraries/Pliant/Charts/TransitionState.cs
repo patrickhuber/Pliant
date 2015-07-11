@@ -1,4 +1,5 @@
 ﻿using Pliant.Grammars;
+using Pliant.Nodes;
 
 namespace Pliant.Charts
 {
@@ -7,16 +8,23 @@ namespace Pliant.Charts
         public ISymbol Recognized { get; private set; }
         
         public IState Reduction { get; private set; }
-        
-        public ITransitionState NextTransition { get; set; }
 
-        public TransitionState(ISymbol recognized, IState transition, IState reduction)
-            : base(transition.Production, transition.Position, transition.Origin)
+        public int Position { get; private set; }
+
+        public ITransitionState NextTransition { get; set; }
+        
+        public TransitionState(
+            ISymbol recognized, 
+            IState transition, 
+            IState reduction,
+            int position)
+            : base(transition.Production, transition.Length, transition.Origin)
         {
             Reduction = reduction;
             Recognized = recognized;
+            Position = position;
         }
-        
+                
         public override bool Equals(object obj)
         {
             var transitionState = obj as TransitionState;

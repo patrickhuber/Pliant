@@ -221,7 +221,7 @@ namespace Pliant
 
         private void LeoComplete(ITransitionState transitionState, IState completed, int k)
         {
-            var earleySet = _chart.EarleySets[transitionState.Origin];
+            var earleySet = _chart.EarleySets[transitionState.Position];
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.PreDotSymbol);
             
@@ -232,7 +232,7 @@ namespace Pliant
 
             var topmostItem = new State(
                 transitionState.Production,
-                transitionState.Position,
+                transitionState.Length,
                 transitionState.Origin,
                 virtualParseNode);
 
@@ -304,13 +304,23 @@ namespace Pliant
             if (t_rule == null)
                 return;
 
-            var currentTransitionState = new TransitionState(
-                searchSymbol,
-                t_rule,
-                sourceState);
-
+            ITransitionState currentTransitionState = null;
             if (previousTransitionState != null)
+            {
+                currentTransitionState = new TransitionState(
+                  searchSymbol,
+                  t_rule,
+                  sourceState,
+                  previousTransitionState.Position);
+                
                 previousTransitionState.NextTransition = currentTransitionState;
+            }
+            else 
+                currentTransitionState = new TransitionState(
+                  searchSymbol,
+                  t_rule,
+                  sourceState,
+                  k);
 
             if (_chart.Enqueue(k, currentTransitionState))
                 Log("Transition", k, currentTransitionState);
@@ -329,7 +339,7 @@ namespace Pliant
             if (ruleCount == 0)
                 return true;
 
-            int nextStatePosition = state.Position + 1;
+            int nextStatePosition = state.Length + 1;
             bool isComplete = nextStatePosition == state.Production.RightHandSide.Count;
             if (isComplete)
                 return true;
@@ -360,11 +370,11 @@ namespace Pliant
         {
             Assert.IsNotNull(v, "v");
             var anyPreDotRuleNull = true;
-            if (nextState.Position > 1)
+            if (nextState.Length > 1)
             {
                 var predotPrecursorSymbol = nextState
                     .Production
-                    .RightHandSide[nextState.Position - 2];
+                    .RightHandSide[nextState.Length - 2];
                 anyPreDotRuleNull = IsSymbolNullable(predotPrecursorSymbol);
             }
             var anyPostDotRuleNull = IsSymbolNullable(nextState.PostDotSymbol);

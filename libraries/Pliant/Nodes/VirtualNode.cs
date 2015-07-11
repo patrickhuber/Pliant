@@ -15,22 +15,25 @@ namespace Pliant.Nodes
         /// A single AND node. Virtual nodes are leo nodes and by nature don't have ambiguity.
         /// </summary>
         private AndNode _andNode;
-
-        public int Location { get; private set; }
         
-        public VirtualNode(int location, ITransitionState transitionState, INode completedParseNode)
+        public int Location { get; private set; }
+
+        public int Origin { get; private set; }
+
+        public ISymbol Symbol { get; private set; }
+
+        public VirtualNode(
+            int location, 
+            ITransitionState transitionState, 
+            INode completedParseNode)
         {
             _transitionState = transitionState;
             _completedParseNode = completedParseNode;
             _children = new ReadWriteList<IAndNode>();
             Location = location;
+            Initialize(transitionState);
         }
 
-        public int Origin
-        {
-            get { return _transitionState.Reduction.Origin; }
-        }
-             
         public NodeType NodeType
         {
             get { return NodeType.Symbol; }
@@ -46,11 +49,17 @@ namespace Pliant.Nodes
             }
         }
 
-        public ISymbol Symbol
+        private void Initialize(ITransitionState transitionState)
         {
-            get
+            if (transitionState.ParseNode != null)
             {
-                return _transitionState.Reduction.Production.LeftHandSide;
+                Symbol = transitionState.Production.LeftHandSide;
+                Origin = transitionState.Origin;
+            }
+            else
+            {
+                Symbol = _transitionState.Reduction.Production.LeftHandSide;
+                Origin = _transitionState.Reduction.Origin;
             }
         }
 
@@ -59,6 +68,7 @@ namespace Pliant.Nodes
             if (_transitionState.NextTransition != null)
             {
                 var virtualNode = new VirtualNode(Location, _transitionState.NextTransition, _completedParseNode);
+                
                 if (_transitionState.Reduction.ParseNode == null)
                     AddUniqueFamily(virtualNode);
                 else
