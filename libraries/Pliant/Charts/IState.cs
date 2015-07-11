@@ -10,7 +10,7 @@ namespace Pliant.Charts
         StateType StateType { get; }
         ISymbol PreDotSymbol { get; }
         ISymbol PostDotSymbol { get; }
-        int Position { get; }
+        int Length { get; }
         bool IsComplete { get; }
         IState NextState();
         IState NextState(int newOrigin);

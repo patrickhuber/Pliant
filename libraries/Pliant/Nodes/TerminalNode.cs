@@ -32,5 +32,10 @@ namespace Pliant.Nodes
                 Origin, 
                 Location);
         }
+
+        public void Accept(INodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

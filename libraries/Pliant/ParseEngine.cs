@@ -221,11 +221,10 @@ namespace Pliant
 
         private void LeoComplete(ITransitionState transitionState, IState completed, int k)
         {
-            var earleySet = _chart.EarleySets[transitionState.Origin];
-                        
+            var earleySet = _chart.EarleySets[transitionState.Position];
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.PreDotSymbol);
-
+            
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
 
@@ -233,14 +232,14 @@ namespace Pliant
 
             var topmostItem = new State(
                 transitionState.Production,
-                transitionState.Position,
+                transitionState.Length,
                 transitionState.Origin,
                 virtualParseNode);
 
             if (_chart.Enqueue(k, topmostItem))
                 Log("Complete", k, topmostItem);
         }
-
+        
         private void EarleyComplete(IState completed, int k)
         {
             int j = completed.Origin;
@@ -253,6 +252,7 @@ namespace Pliant
 
                 var i = prediction.Origin;
                 var nextState = prediction.NextState();
+                
                 var parseNode = CreateParseNode(
                     nextState,
                     prediction.ParseNode,
@@ -304,13 +304,23 @@ namespace Pliant
             if (t_rule == null)
                 return;
 
-            var currentTransitionState = new TransitionState(
-                searchSymbol,
-                t_rule,
-                sourceState);
-
+            ITransitionState currentTransitionState = null;
             if (previousTransitionState != null)
+            {
+                currentTransitionState = new TransitionState(
+                  searchSymbol,
+                  t_rule,
+                  sourceState,
+                  previousTransitionState.Position);
+                
                 previousTransitionState.NextTransition = currentTransitionState;
+            }
+            else 
+                currentTransitionState = new TransitionState(
+                  searchSymbol,
+                  t_rule,
+                  sourceState,
+                  k);
 
             if (_chart.Enqueue(k, currentTransitionState))
                 Log("Transition", k, currentTransitionState);
@@ -318,16 +328,30 @@ namespace Pliant
             previousTransitionState = currentTransitionState;
         }
 
+        /// <summary>
+        /// Implements a check for leo quasi complete items
+        /// </summary>
+        /// <param name="state">the state to check for quasi completeness</param>
+        /// <returns>true if quasi complete, false otherwise</returns>
         private bool IsNextStateQuasiComplete(IState state)
         {
-            // leo has a definition for quasi complete
-            // where the item is either complete or "quasi complete"
-            // "quasi complete" implies that the item has a NonTerminal after the 
-            // post dot rule that is nullable, thereby making the state
-            // complete by association. 
-            // currently we only check for completeness, but a test case should
-            // be developed to check for quasi completeness
-            return state.Position == state.Production.RightHandSide.Count - 1;
+            int ruleCount = state.Production.RightHandSide.Count;
+            if (ruleCount == 0)
+                return true;
+
+            int nextStatePosition = state.Length + 1;
+            bool isComplete = nextStatePosition == state.Production.RightHandSide.Count;
+            if (isComplete)
+                return true;
+
+            for (int i = nextStatePosition; i < state.Production.RightHandSide.Count;i++)
+            {
+                var nextSymbol = state.Production.RightHandSide[nextStatePosition];
+                var isSymbolNullable = IsSymbolNullable(nextSymbol);
+                if (!isSymbolNullable)
+                    return false;
+            }
+            return true;
         }
 
         private INode CreateNullParseNode(ISymbol symbol, int location)
@@ -346,11 +370,11 @@ namespace Pliant
         {
             Assert.IsNotNull(v, "v");
             var anyPreDotRuleNull = true;
-            if (nextState.Position > 1)
+            if (nextState.Length > 1)
             {
                 var predotPrecursorSymbol = nextState
                     .Production
-                    .RightHandSide[nextState.Position - 2];
+                    .RightHandSide[nextState.Length - 2];
                 anyPreDotRuleNull = IsSymbolNullable(predotPrecursorSymbol);
             }
             var anyPostDotRuleNull = IsSymbolNullable(nextState.PostDotSymbol);

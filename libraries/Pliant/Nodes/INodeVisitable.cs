@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Pliant.Nodes
 {
-    public enum NodeType
+    public interface INodeVisitable
     {
-        Intermediate,
-        Symbol,
-        Terminal,
-        Token
+        void Accept(INodeVisitor visitor);
     }
 }

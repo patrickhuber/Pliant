@@ -224,7 +224,7 @@ namespace Pliant
         {
             return new Token(
                 lexeme.Capture,
-                Position - (lexeme.Capture.Length + 1),
+                Position - lexeme.Capture.Length,
                 lexeme.TokenType);
         }
                 

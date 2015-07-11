@@ -21,8 +21,7 @@ namespace Pliant.Tests.Unit.Bnf
             <list>           ::= <term > | <term> <list>
             <term>           ::= <literal > | <identifier>
             <identifier>     ::= ""<"" <rule-name> "">""
-            <literal>        ::= '""' <text> '""' | ""'"" <text> ""'"" 
-            ";
+            <literal>        ::= '""' <text> '""' | ""'"" <text> ""'""";
 
         [TestMethod]
         public void Test_Bnf_That_String_Iterate_Sets_Baseline()
