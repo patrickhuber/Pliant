@@ -591,8 +591,6 @@ namespace Pliant.Tests.Unit
             AssertNodeProperties(E_0_4, "E", 0, 4);
             var T_0_4 = GetAndCastChildAtIndex<ISymbolNode>(E_0_4, 0);
             AssertNodeProperties(T_0_4, "T", 0, 4);
-            // enumerate children here to debug virtual node
-            var array = T_0_4.Children.ToArray();
             var F_0_1 = GetAndCastChildAtIndex<ISymbolNode>(T_0_4, 0);
             AssertNodeProperties(F_0_1, "F", 0, 1);
             var T_1_4 = GetAndCastChildAtIndex<ISymbolNode>(T_0_4, 1);
@@ -622,8 +620,6 @@ namespace Pliant.Tests.Unit
             var E_0_3 = GetAndCastChildAtIndex<ISymbolNode>(R_0_3, 0);
             AssertNodeProperties(E_0_3, "E", 0, 3);
             var T_0_3 = GetAndCastChildAtIndex<ISymbolNode>(E_0_3, 0);
-            // force enumeration... remove this after succesful test
-            T_0_3.Children.ToArray();
             AssertNodeProperties(T_0_3, "T", 0, 3);            
             var F_0_1 = GetAndCastChildAtIndex<ISymbolNode>(T_0_3, 0);
             AssertNodeProperties(F_0_1, "F", 0, 1);
@@ -639,7 +635,31 @@ namespace Pliant.Tests.Unit
             AssertNodeProperties(F_2_3, "F", 2, 3);
         }
 
+        [TestMethod]
+        public void Test_ParseEngine_That_Long_Production_Rule_Produces_Proper_Parse_Tree()
+        {
+            var grammar = new GrammarBuilder("S")
+                .Production("S", r=>r
+                    .Rule("A", "B", "C", "D", "S")
+                    .Rule('|'))
+                .Production("A", r=>r
+                    .Rule('a'))
+                .Production("B", r => r
+                    .Rule('b'))
+                .Production("C", r => r
+                    .Rule('c'))
+                .Production("D", r => r
+                    .Rule('d'))
+                .ToGrammar();
 
+            var input = Tokenize("abcdabcdabcdabcd|");
+            var parseEngine = new ParseEngine(grammar);
+            ParseInput(parseEngine, input);
+            var root = parseEngine.GetRoot();
+
+            var S_0_17 = CastAndCountChildren<ISymbolNode>(root, 2);
+        }
+        
         private static IGrammar CreateRegularExpressionStubGrammar()
         {
             return new GrammarBuilder("R")
