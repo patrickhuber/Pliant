@@ -55,9 +55,18 @@ namespace Pliant
             
             var lastSet = _chart.EarleySets[_chart.Count - 1];
             var start = Grammar.Start;
-            var completed = lastSet.Completions.First(x => x.Production.LeftHandSide.Equals(start));
 
-            return completed.ParseNode;
+            // PERF: Avoid Linq expressions due to delegate instantiation
+            for (int c = 0; c < lastSet.Completions.Count; c++)
+            {
+                var completion = lastSet.Completions[c];
+                if (completion.Production.LeftHandSide.Equals(start)
+                    && completion.Origin == 0)
+                    return completion.ParseNode;
+            }
+
+            // if not accepted, the first check should handle this case
+            return null;
         }
 
         public bool IsAccepted()
