@@ -11,25 +11,16 @@ namespace Pliant.Nodes
     {
         public ISymbol Symbol { get; private set; }
         
-        public override NodeType NodeType { get { return NodeType.Symbol; } }
-
         public SymbolNode(ISymbol symbol, int origin, int location)
             : base(origin, location)
         {            
             Symbol = symbol;
+            NodeType = NodeType.Symbol;
         }
 
         public override string ToString()
         {
             return string.Format("({0}, {1}, {2})", Symbol, Origin, Location);
-        }
-
-        public override void Accept(INodeVisitor visitor)
-        {
-            visitor.Visit(this);
-            foreach (var andNode in Children)
-                foreach (var child in andNode.Children)
-                    child.Accept(visitor);
-        }
+        }        
     }
 }

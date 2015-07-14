@@ -3,27 +3,19 @@ using System.Collections.Generic;
 
 namespace Pliant.Nodes
 {
-    public abstract class InternalNode : IInternalNode
+    public abstract class InternalNode : NodeBase, IInternalNode
     {
         private ReadWriteList<IAndNode> _children;
 
-        public int Origin { get; private set; }
-        
-        public int Location { get; private set; }
-
         public IReadOnlyList<IAndNode> Children { get { return _children; } }
-
-        public abstract NodeType NodeType { get; }
-
+        
         protected InternalNode(int origin, int location)
         {
             Origin = origin;
             Location = location;
             _children = new ReadWriteList<IAndNode>();
         }
-
-        public abstract void Accept(INodeVisitor visitor);
-
+        
         public void AddUniqueFamily(INode trigger)
         {
             AddUniqueAndNode(trigger);

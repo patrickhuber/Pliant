@@ -6,7 +6,7 @@ using System;
 
 namespace Pliant.Nodes
 {
-    public class VirtualNode : ISymbolNode
+    public class VirtualNode : NodeBase, ISymbolNode
     {
         private ITransitionState _transitionState;
         private INode _completedParseNode;
@@ -16,10 +16,6 @@ namespace Pliant.Nodes
         /// </summary>
         private AndNode _andNode;
         
-        public int Location { get; private set; }
-
-        public int Origin { get; private set; }
-
         public ISymbol Symbol { get; private set; }
 
         public VirtualNode(
@@ -31,14 +27,10 @@ namespace Pliant.Nodes
             _completedParseNode = completedParseNode;
             _children = new ReadWriteList<IAndNode>();
             Location = location;
+            NodeType = NodeType.Symbol;
             Initialize(transitionState);
         }
-
-        public NodeType NodeType
-        {
-            get { return NodeType.Symbol; }
-        }
-        
+                
         public IReadOnlyList<IAndNode> Children
         {
             get 
@@ -111,14 +103,6 @@ namespace Pliant.Nodes
         public override string ToString()
         {
             return string.Format("({0}, {1}, {2})", Symbol, Origin, Location);
-        }
-
-        public void Accept(INodeVisitor visitor)
-        {
-            visitor.Visit(this);
-            foreach (var andNode in Children)
-                foreach (var child in andNode.Children)
-                    child.Accept(visitor);
-        }
+        }        
     }
 }
