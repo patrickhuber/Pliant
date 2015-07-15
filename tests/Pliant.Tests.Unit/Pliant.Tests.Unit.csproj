@@ -56,6 +56,7 @@
     <Compile Include="Charts\ChartTests.cs" />
     <Compile Include="Grammars\DigitTerminalTests.cs" />
     <Compile Include="Builders\GrammarBuilderTests.cs" />
+    <Compile Include="Nodes\NodeVisitor.cs" />
     <Compile Include="Nodes\NodeWalkerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Grammars\ProductionTests.cs" />

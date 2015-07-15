@@ -98,7 +98,6 @@
     <Compile Include="Builders\ITerminalBuilder.cs" />
     <Compile Include="Nodes\ITerminalNode.cs" />
     <Compile Include="Nodes\NodeBase.cs" />
-    <Compile Include="Nodes\NodeVisitor.cs" />
     <Compile Include="ParseEngineLexemeFactory.cs" />
     <Compile Include="Tokens\IToken.cs" />
     <Compile Include="Nodes\ITokenNode.cs" />

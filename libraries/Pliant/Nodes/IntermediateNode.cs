@@ -19,13 +19,5 @@ namespace Pliant.Nodes
         {
             return string.Format("({0}, {1}, {2})", State, Origin, Location);
         }
-
-        public override void Accept(INodeVisitor visitor)
-        {
-            visitor.Visit(this);
-            foreach (var andNode in Children)
-                foreach (var child in andNode.Children)
-                    child.Accept(visitor);
-        }
     }
 }

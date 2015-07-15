@@ -23,7 +23,7 @@ namespace Pliant.Tests.Unit.Nodes
             var nodeVisitor = new NodeVisitor();
             var root = regexParseEngine.GetRoot();
             root.Accept(nodeVisitor);
-            Assert.AreEqual(34, nodeVisitor.VisitLog.Count);           
+            Assert.AreEqual(32, nodeVisitor.VisitLog.Count);           
         }        
     }
 }

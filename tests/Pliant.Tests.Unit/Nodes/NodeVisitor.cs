@@ -1,7 +1,8 @@
-﻿using System;
+﻿using Pliant.Nodes;
+using System;
 using System.Collections.Generic;
 
-namespace Pliant.Nodes
+namespace Pliant.Tests.Unit.Nodes
 {
     public class NodeVisitor : INodeVisitor
     {
