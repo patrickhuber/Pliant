@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pliant.Nodes
+﻿namespace Pliant.Nodes
 {
     public abstract class NodeBase : INode
     {
@@ -17,11 +11,11 @@ namespace Pliant.Nodes
         public virtual void Accept(INodeVisitor visitor)
         {
             // don't visit intermediate nodes, just their children
-            if (NodeType != Nodes.NodeType.Intermediate)            
+            if (NodeType != NodeType.Intermediate)            
                 Visit(visitor, this);
 
-            if (NodeType == Nodes.NodeType.Symbol ||
-                NodeType == Nodes.NodeType.Intermediate)
+            if (NodeType == NodeType.Symbol ||
+                NodeType == NodeType.Intermediate)
             { 
                 var internalNode = this as IInternalNode;
                 var firstAndNode = internalNode.Children[0];
@@ -34,16 +28,16 @@ namespace Pliant.Nodes
         {
             switch (node.NodeType)
             {
-                case Nodes.NodeType.Intermediate:
+                case NodeType.Intermediate:
                     visitor.Visit(node as IIntermediateNode);
                     break;
-                case Nodes.NodeType.Symbol:
+                case NodeType.Symbol:
                     visitor.Visit(node as ISymbolNode);
                     break;
-                case Nodes.NodeType.Terminal:
+                case NodeType.Terminal:
                     visitor.Visit(node as ITerminalNode);
                     break;
-                case Nodes.NodeType.Token:
+                case NodeType.Token:
                     visitor.Visit(node as ITokenNode);
                     break;
             }
