@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace Pliant.Tests.Unit.Nodes
 {
-    public class NodeVisitor : INodeVisitor
+    public class LoggingNodeVisitor : INodeVisitor
     {
         public IList<string> VisitLog { get; }
 
-        public NodeVisitor()
+        public LoggingNodeVisitor()
         {
             VisitLog = new List<string>();
         }
