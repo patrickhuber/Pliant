@@ -23,3 +23,4 @@ Pliant is a table driven parser that implements the Earley algorithm. Two optimi
 * [parse tree forest creation](http://www.sciencedirect.com/science/article/pii/S1571066108001497)
 * [cs theory stackexchange, leo optimization parse tree creation](http://cstheory.stackexchange.com/q/31182/32787)
 * [insights on lexer creation](https://youtu.be/XaScLywH2CI)
+* [incremental reparsing](http://www.aclweb.org/anthology/E89-1033.pdf)
