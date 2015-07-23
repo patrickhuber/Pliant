@@ -5,7 +5,7 @@ using Pliant.Nodes;
 namespace Pliant.Tests.Unit.Nodes
 {
     [TestClass]
-    public class NodeWalkerTests
+    public class NodeVisitorTests
     {
         [TestMethod]
         public void Test_NodeWalker_That_Walks_Simple_Regex()
