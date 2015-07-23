@@ -21,8 +21,9 @@ namespace Pliant.Tests.Unit.Nodes
             Assert.IsTrue(regexParseEngine.IsAccepted());
 
             var nodeVisitor = new LoggingNodeVisitor();
+            var nodeVisitorStateManager = new NodeVisitorStateManager();
             var root = regexParseEngine.GetRoot();
-            root.Accept(nodeVisitor);
+            root.Accept(nodeVisitor, nodeVisitorStateManager);
             Assert.AreEqual(32, nodeVisitor.VisitLog.Count);           
         }        
     }

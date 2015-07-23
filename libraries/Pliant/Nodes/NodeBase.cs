@@ -8,7 +8,7 @@
 
         public virtual int Origin { get; protected set; }
 
-        public virtual void Accept(INodeVisitor visitor)
+        public virtual void Accept(INodeVisitor visitor, INodeVisitorStateManager stateManager)
         {
             // don't visit intermediate nodes, just their children
             if (NodeType != NodeType.Intermediate)            
@@ -20,7 +20,7 @@
                 var internalNode = this as IInternalNode;
                 var firstAndNode = internalNode.Children[0];
                 foreach (var child in firstAndNode.Children)
-                    child.Accept(visitor);
+                    child.Accept(visitor, stateManager);
             }
         }
 
