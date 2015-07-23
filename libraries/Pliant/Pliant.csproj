@@ -83,6 +83,7 @@
     <Compile Include="Grammars\INonTerminal.cs" />
     <Compile Include="Nodes\INodeVisitable.cs" />
     <Compile Include="Nodes\INodeVisitor.cs" />
+    <Compile Include="Nodes\INodeVisitorStateManager.cs" />
     <Compile Include="Nodes\IntermediateNode.cs" />
     <Compile Include="INullable.cs" />
     <Compile Include="Nodes\IInternalNode.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="Builders\ITerminalBuilder.cs" />
     <Compile Include="Nodes\ITerminalNode.cs" />
     <Compile Include="Nodes\NodeBase.cs" />
+    <Compile Include="Nodes\NodeVisitorStateManager.cs" />
     <Compile Include="ParseEngineLexemeFactory.cs" />
     <Compile Include="Tokens\IToken.cs" />
     <Compile Include="Nodes\ITokenNode.cs" />
