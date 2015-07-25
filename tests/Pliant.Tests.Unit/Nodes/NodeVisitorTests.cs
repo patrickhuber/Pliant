@@ -52,69 +52,72 @@ namespace Pliant.Tests.Unit.Nodes
         [TestMethod]
         public void Test_NodeVisitor_That_Enumerates_All_Parse_Trees()
         {
-            var and = new StringLiteralLexerRule("and", new TokenType("and"));
-            var a = new StringLiteralLexerRule("a", new TokenType("a"));
-            var an = new StringLiteralLexerRule("an", new TokenType("an"));
-            var panda = new StringLiteralLexerRule("panda", new TokenType("panda"));
-            var shoots = new StringLiteralLexerRule("shoots", new TokenType("shoots"));
-            var eats = new StringLiteralLexerRule("eats", new TokenType("eats"));
-            var leaves = new StringLiteralLexerRule("leaves", new TokenType("leaves"));
+            var and = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule('a', 'n', 'd'))
+                .ToGrammar();
+
+            var panda = new GrammarBuilder("S")
+                .Production("S", r => r
+                    .Rule('p', 'a', 'n', 'd', 'a'))
+                .ToGrammar();
 
             var aAn = new GrammarBuilder("S")
                 .Production("S", r => r
-                    .Rule(a)
-                    .Rule(an))
+                    .Rule('a')
+                    .Rule('a', 'n'))
                 .ToGrammar();
 
             var shootsLeaves = new GrammarBuilder("S")
                 .Production("S", r => r
-                    .Rule(shoots)
-                    .Rule(leaves))
+                    .Rule('s', 'h', 'o', 'o', 't', 's')
+                    .Rule('l', 'e', 'a', 'v', 'e', 's'))
                 .ToGrammar();
 
             var eatsShootsLeaves = new GrammarBuilder("S")
                 .Production("S", r => r
-                    .Rule(eats)
-                    .Rule(shoots)
-                    .Rule(leaves))
+                    .Rule('e', 'a', 't', 's')
+                    .Rule('s', 'h', 'o', 'o', 't', 's')
+                    .Rule('l', 'e', 'a', 'v', 'e', 's'))
                 .ToGrammar();
 
             var grammar = new GrammarBuilder("S")
-                .Production("S", r=>r
+                .Production("S", r => r
                     .Rule("NP", "VP", '.'))
-                .Production("NP", r=>r
+                .Production("NP", r => r
                     .Rule("NN")
                     .Rule("NNS")
                     .Rule("DT", "NN")
                     .Rule("NN", "NNS")
                     .Rule("NNS", "CC", "NNS"))
-                .Production("VP", r=>r
+                .Production("VP", r => r
                     .Rule("VBZ", "NP")
                     .Rule("VP", "VBZ", "NNS")
                     .Rule("VP", "CC", "VP")
                     .Rule("VP", "VP", "CC", "VP")
                     .Rule("VBZ"))
-                .Production("CC", r=>r
-                    .Rule(and))
-                .Production("DT", r=>r
+                .Production("CC", r => r
+                    .Rule(new GrammarLexerRule("CC", and)))
+                .Production("DT", r => r
                     .Rule(new GrammarLexerRule("DT", aAn)))
-                .Production("NN", r=>r
-                    .Rule(panda))
-                .Production("NNS", r=>r
+                .Production("NN", r => r
+                    .Rule(new GrammarLexerRule("NN", panda)))
+                .Production("NNS", r => r
                     .Rule(new GrammarLexerRule("NNS", shootsLeaves)))
-                .Production("VBZ", r=>r
+                .Production("VBZ", r => r
                     .Rule(new GrammarLexerRule("VBZ", eatsShootsLeaves)))
                 .Ignore(_whitespace)
                 .ToGrammar();
 
-            var sentence = "a panda eats shoots and leaves";
+            var sentence = "a panda eats shoots and leaves.";
 
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, sentence);
 
             while (!parseInterface.EndOfStream())
             {
-                Assert.IsTrue(parseInterface.Read());
+                Assert.IsTrue(parseInterface.Read(), 
+                    string.Format("Error parsing position: {0}", parseInterface.Position));
             }
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
         }    
