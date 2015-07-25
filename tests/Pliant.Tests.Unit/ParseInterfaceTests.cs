@@ -70,8 +70,6 @@ namespace Pliant.Tests.Unit
                 .Production("A", r => r
                     .Rule(_wordRule, "A")
                     .Rule(_wordRule))
-                .LexerRule(_whitespaceRule)
-                .LexerRule(_wordRule)
                 .Ignore(_whitespaceRule)
                 .ToGrammar();
 
@@ -89,7 +87,6 @@ namespace Pliant.Tests.Unit
                 .Production("S", r => r
                     .Rule(a, "S")
                     .Rule(a))
-                .LexerRule(a)
                 .ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
@@ -114,7 +111,6 @@ namespace Pliant.Tests.Unit
                 .Production("S", r => r
                     .Rule(a, "S")
                     .Rule(a))
-                .LexerRule(a)
                 .ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
@@ -140,7 +136,6 @@ namespace Pliant.Tests.Unit
                 .Production("S", r => r
                     .Rule(a, "S")
                     .Rule(a))
-                .LexerRule(a)
                 .ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
@@ -159,8 +154,6 @@ namespace Pliant.Tests.Unit
                 .Production("S", r => r
                     .Rule(_wordRule, "S")
                     .Rule(_wordRule))
-                .LexerRule(_whitespaceRule)
-                .LexerRule(_wordRule)
                 .Ignore(_whitespaceRule)
                 .ToGrammar();
 

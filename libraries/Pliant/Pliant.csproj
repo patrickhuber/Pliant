@@ -48,6 +48,7 @@
     <Compile Include="Dfa\IDfaEdge.cs" />
     <Compile Include="Dfa\IDfaLexerRule.cs" />
     <Compile Include="Dfa\IDfaState.cs" />
+    <Compile Include="Dfa\StringExtensions.cs" />
     <Compile Include="Grammars\IGrammarLexerRule.cs" />
     <Compile Include="Grammars\IStringLiteralLexerRule.cs" />
     <Compile Include="Grammars\ITerminalLexerRule.cs" />
@@ -76,8 +77,6 @@
     <Compile Include="Builders\IGrammarBuilder.cs" />
     <Compile Include="Nodes\IIntermediateNode.cs" />
     <Compile Include="Lexemes\ILexeme.cs" />
-    <Compile Include="Builders\ILexerRuleBuilder.cs" />
-    <Compile Include="Builders\ICommandBuilder.cs" />
     <Compile Include="Grammars\ILexerRule.cs" />
     <Compile Include="Nodes\INode.cs" />
     <Compile Include="Grammars\INonTerminal.cs" />
@@ -90,13 +89,11 @@
     <Compile Include="IParseEngine.cs" />
     <Compile Include="IParseInterface.cs" />
     <Compile Include="Grammars\IProduction.cs" />
-    <Compile Include="Builders\IProductionBuilder.cs" />
     <Compile Include="Builders\IRuleBuilder.cs" />
     <Compile Include="Charts\IState.cs" />
     <Compile Include="Grammars\ISymbol.cs" />
     <Compile Include="Nodes\ISymbolNode.cs" />
     <Compile Include="Grammars\ITerminal.cs" />
-    <Compile Include="Builders\ITerminalBuilder.cs" />
     <Compile Include="Nodes\ITerminalNode.cs" />
     <Compile Include="Nodes\NodeBase.cs" />
     <Compile Include="Nodes\NodeVisitorStateManager.cs" />
@@ -105,8 +102,6 @@
     <Compile Include="Nodes\ITokenNode.cs" />
     <Compile Include="Charts\ITransitionState.cs" />
     <Compile Include="ParseEngineLexeme.cs" />
-    <Compile Include="Builders\LexerRuleBuilder.cs" />
-    <Compile Include="Builders\CommandBuilder.cs" />
     <Compile Include="Grammars\GrammarLexerRule.cs" />
     <Compile Include="Nodes\InternalNode.cs" />
     <Compile Include="Nodes\NodeSet.cs" />
@@ -123,7 +118,6 @@
     <Compile Include="Reactive\Observable.cs" />
     <Compile Include="Reactive\Observer.cs" />
     <Compile Include="Grammars\Production.cs" />
-    <Compile Include="Builders\ProductionBuilder.cs" />
     <Compile Include="Grammars\RangeTerminal.cs" />
     <Compile Include="Builders\RuleBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -135,7 +129,6 @@
     <Compile Include="Grammars\SymbolType.cs" />
     <Compile Include="Grammars\Symbol.cs" />
     <Compile Include="Grammars\Terminal.cs" />
-    <Compile Include="Builders\TerminalBuilder.cs" />
     <Compile Include="Lexemes\TerminalLexeme.cs" />
     <Compile Include="Grammars\TerminalLexerRule.cs" />
     <Compile Include="Nodes\TerminalNode.cs" />

@@ -22,21 +22,11 @@ namespace Pliant.Regex
             get { return _regexGrammar.Ignores; }
         }
 
-        public IReadOnlyList<ILexerRule> LexerRules
-        {
-            get { return _regexGrammar.LexerRules; }
-        }
-
         public IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal)
         {
             return _regexGrammar.RulesFor(nonTerminal);
         }
-
-        public IEnumerable<ILexerRule> LexerRulesFor(INonTerminal nonTerminal)
-        {
-            return _regexGrammar.LexerRulesFor(nonTerminal);
-        }
-
+        
         public IEnumerable<IProduction> StartProductions()
         {
             return _regexGrammar.StartProductions();
@@ -169,23 +159,7 @@ namespace Pliant.Regex
                 .Production(NotMetaCharacter, r => r
                     .Rule(notMeta))
                 .Production(NotCloseBracket, r => r
-                    .Rule(notCloseBracket))
-                .LexerRule(caret)
-                .LexerRule(dollar)
-                .LexerRule(pipe)
-                .LexerRule(dot)
-                .LexerRule(openParen)
-                .LexerRule(closeParen)
-                .LexerRule(star)
-                .LexerRule(plus)
-                .LexerRule(question)
-                .LexerRule(openBracket)
-                .LexerRule(closeBracket)
-                .LexerRule(notCloseBracket)
-                .LexerRule(dash)
-                .LexerRule(backslash)
-                .LexerRule(notMeta)
-                .LexerRule(any);
+                    .Rule(notCloseBracket));
             _regexGrammar = grammarBuilder.ToGrammar();
         }
     }

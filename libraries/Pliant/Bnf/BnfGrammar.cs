@@ -64,7 +64,7 @@ namespace Pliant.Bnf
                 whitespace
             };
 
-            _bnfGrammar = new Grammar(syntax, productions, new ILexerRule[] { }, ignore);
+            _bnfGrammar = new Grammar(syntax, productions, ignore);
         }
 
         private static ILexerRule CreateNotSingleQuoteLexerRule()
@@ -161,22 +161,12 @@ namespace Pliant.Bnf
         {
             get { return _bnfGrammar.Ignores; }
         }
-
-        public IReadOnlyList<ILexerRule> LexerRules
-        {
-            get { return _bnfGrammar.LexerRules; }
-        }
-
+        
         public IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal)
         {
             return _bnfGrammar.RulesFor(nonTerminal);
         }
-
-        public IEnumerable<ILexerRule> LexerRulesFor(INonTerminal nonTerminal)
-        {
-            return _bnfGrammar.LexerRulesFor(nonTerminal);
-        }
-
+        
         public IEnumerable<IProduction> StartProductions()
         {
             return _bnfGrammar.StartProductions();

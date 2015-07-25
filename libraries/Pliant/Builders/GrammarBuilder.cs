@@ -9,7 +9,6 @@ namespace Pliant.Builders
     public class GrammarBuilder : IGrammarBuilder
     {
         private IList<IProduction> _productions;
-        private IList<ILexerRule> _lexerRules;
         private IList<ILexerRule> _ignoreRules;
         private string _start;
 
@@ -17,7 +16,6 @@ namespace Pliant.Builders
         {
             _start = start;
             _productions = new List<IProduction>();
-            _lexerRules = new List<ILexerRule>();
             _ignoreRules = new List<ILexerRule>();
         }
                         
@@ -43,7 +41,6 @@ namespace Pliant.Builders
             return new Grammar(
                 start, 
                 _productions.ToArray(), 
-                _lexerRules.ToArray(), 
                 _ignoreRules.ToArray());
         }
 
@@ -63,20 +60,7 @@ namespace Pliant.Builders
             }
             return this;
         }
-
-        public IGrammarBuilder LexerRule(string name, ITerminal terminal)
-        {
-            var lexerRule = new TerminalLexerRule(terminal, new TokenType(name));
-            _lexerRules.Add(lexerRule);
-            return this;
-        }
-
-        public IGrammarBuilder LexerRule(ILexerRule lexerRule)
-        {
-            _lexerRules.Add(lexerRule);
-            return this;
-        }
-        
+                
         public IGrammarBuilder Ignore(ILexerRule lexerRule)
         {
             _ignoreRules.Add(lexerRule);
