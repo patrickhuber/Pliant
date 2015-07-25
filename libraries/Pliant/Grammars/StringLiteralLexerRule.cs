@@ -22,5 +22,10 @@ namespace Pliant.Grammars
             Literal = literal;
             TokenType = tokenType;
         }
+
+        public override string ToString()
+        {
+            return Literal;
+        }
     }
 }
