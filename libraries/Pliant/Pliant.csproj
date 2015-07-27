@@ -40,15 +40,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bnf\BnfGrammar.cs" />
-    <Compile Include="Dfa\DfaEdge.cs" />
-    <Compile Include="Dfa\DfaLexeme.cs" />
-    <Compile Include="Dfa\DfaLexemeFactory.cs" />
-    <Compile Include="Dfa\DfaLexerRule.cs" />
-    <Compile Include="Dfa\DfaState.cs" />
-    <Compile Include="Dfa\IDfaEdge.cs" />
-    <Compile Include="Dfa\IDfaLexerRule.cs" />
-    <Compile Include="Dfa\IDfaState.cs" />
-    <Compile Include="Dfa\StringExtensions.cs" />
+    <Compile Include="Automata\DfaEdge.cs" />
+    <Compile Include="Automata\DfaLexeme.cs" />
+    <Compile Include="Automata\DfaLexemeFactory.cs" />
+    <Compile Include="Automata\DfaLexerRule.cs" />
+    <Compile Include="Automata\DfaState.cs" />
+    <Compile Include="Automata\IDfaEdge.cs" />
+    <Compile Include="Automata\IDfaLexerRule.cs" />
+    <Compile Include="Automata\IDfaState.cs" />
+    <Compile Include="Automata\StringExtensions.cs" />
     <Compile Include="Grammars\IGrammarLexerRule.cs" />
     <Compile Include="Grammars\IStringLiteralLexerRule.cs" />
     <Compile Include="Grammars\ITerminalLexerRule.cs" />

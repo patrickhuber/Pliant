@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pliant.Dfa;
+using Pliant.Automata;
 using Pliant.Grammars;
 using Pliant.Tokens;
 
-namespace Pliant.Tests.Unit.Dfa
+namespace Pliant.Tests.Unit.Automata
 {
     [TestClass]
     public class DfaLexemeTests

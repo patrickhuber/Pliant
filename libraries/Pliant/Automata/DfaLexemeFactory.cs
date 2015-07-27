@@ -2,7 +2,7 @@
 using Pliant.Grammars;
 using Pliant.Lexemes;
 
-namespace Pliant.Dfa
+namespace Pliant.Automata
 {
     public class DfaLexemeFactory : ILexemeFactory
     {

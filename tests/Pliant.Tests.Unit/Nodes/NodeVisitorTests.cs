@@ -4,7 +4,7 @@ using Pliant.Nodes;
 using Pliant.Tokens;
 using Pliant.Builders;
 using Pliant.Grammars;
-using Pliant.Dfa;
+using Pliant.Automata;
 
 namespace Pliant.Tests.Unit.Nodes
 {

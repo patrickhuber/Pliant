@@ -3,7 +3,7 @@ using Pliant.Lexemes;
 using Pliant.Tokens;
 using System.Text;
 
-namespace Pliant.Dfa
+namespace Pliant.Automata
 {
     public class DfaLexeme : ILexeme
     {

@@ -1,5 +1,5 @@
 ﻿using Pliant.Collections;
-using Pliant.Dfa;
+using Pliant.Automata;
 using Pliant.Grammars;
 using Pliant.Lexemes;
 using Pliant.Tokens;

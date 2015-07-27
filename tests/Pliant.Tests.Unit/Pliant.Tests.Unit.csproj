@@ -50,7 +50,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Dfa\DfaLexemeTests.cs" />
+    <Compile Include="Automata\DfaLexemeTests.cs" />
     <Compile Include="Grammars\AnyTerminalTests.cs" />
     <Compile Include="Bnf\BnfTests.cs" />
     <Compile Include="Charts\ChartTests.cs" />

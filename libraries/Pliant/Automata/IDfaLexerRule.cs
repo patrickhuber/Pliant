@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pliant.Dfa
+namespace Pliant.Automata
 {
     public interface IDfaLexerRule : ILexerRule
     {
