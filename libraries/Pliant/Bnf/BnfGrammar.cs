@@ -13,9 +13,7 @@ namespace Pliant.Bnf
         static BnfGrammar()
         {
             /* 
-             *  Grammar
-             *  -------
-             *  <syntax>         ::= <rule> | <rule> <syntax>
+             *  <grammar>        ::= <rule> | <rule> <grammar>
              *  <rule>           ::= "<" <rule-name> ">" "::=" <expression>
              *  <expression>     ::= <list> | <list> "|" <expression>
              *  <line-end>       ::= <EOL> | <line-end> <line-end>
@@ -30,7 +28,7 @@ namespace Pliant.Bnf
             var notDoubleQuote = CreateNotDoubleQuoteLexerRule();
             var notSingleQuuote = CreateNotSingleQuoteLexerRule();
 
-            var syntax = new NonTerminal("syntax");
+            var grammar = new NonTerminal("grammar");
             var rule = new NonTerminal("rule");
             var identifier = new NonTerminal("identifier");
             var expression = new NonTerminal("expression");
@@ -43,8 +41,8 @@ namespace Pliant.Bnf
 
             var productions = new[]
             {
-                new Production(syntax, rule),
-                new Production(syntax, rule, syntax),
+                new Production(grammar, rule),
+                new Production(grammar, rule, grammar),
                 new Production(rule, identifier, implements, expression),
                 new Production(expression, list),
                 new Production(expression, list, new TerminalLexerRule('|'), expression),
@@ -64,7 +62,7 @@ namespace Pliant.Bnf
                 whitespace
             };
 
-            _bnfGrammar = new Grammar(syntax, productions, ignore);
+            _bnfGrammar = new Grammar(grammar, productions, ignore);
         }
 
         private static ILexerRule CreateNotSingleQuoteLexerRule()

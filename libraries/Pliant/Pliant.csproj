@@ -39,6 +39,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Automata\INfa.cs" />
+    <Compile Include="Automata\INfaState.cs" />
+    <Compile Include="Automata\INfaTransition.cs" />
+    <Compile Include="Automata\Nfa.cs" />
+    <Compile Include="Automata\NfaState.cs" />
+    <Compile Include="Automata\NfaTransitionType.cs" />
+    <Compile Include="Automata\NullNfaTransition.cs" />
+    <Compile Include="Automata\TerminalNfaTransition.cs" />
     <Compile Include="Bnf\BnfGrammar.cs" />
     <Compile Include="Automata\DfaEdge.cs" />
     <Compile Include="Automata\DfaLexeme.cs" />
@@ -49,6 +57,7 @@
     <Compile Include="Automata\IDfaLexerRule.cs" />
     <Compile Include="Automata\IDfaState.cs" />
     <Compile Include="Automata\StringExtensions.cs" />
+    <Compile Include="Ebnf\EbnfGrammar.cs" />
     <Compile Include="Grammars\IGrammarLexerRule.cs" />
     <Compile Include="Grammars\IStringLiteralLexerRule.cs" />
     <Compile Include="Grammars\ITerminalLexerRule.cs" />

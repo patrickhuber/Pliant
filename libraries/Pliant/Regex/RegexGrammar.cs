@@ -7,31 +7,6 @@ namespace Pliant.Regex
 {
     public class RegexGrammar : IGrammar
     {
-        public IReadOnlyList<IProduction> Productions
-        {
-            get { return _regexGrammar.Productions; }
-        }
-
-        public INonTerminal Start
-        {
-            get { return _regexGrammar.Start; }
-        }
-
-        public IReadOnlyList<ILexerRule> Ignores
-        {
-            get { return _regexGrammar.Ignores; }
-        }
-
-        public IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal)
-        {
-            return _regexGrammar.RulesFor(nonTerminal);
-        }
-        
-        public IEnumerable<IProduction> StartProductions()
-        {
-            return _regexGrammar.StartProductions();
-        }
-
         private static IGrammar _regexGrammar;
 
         static RegexGrammar()
@@ -161,6 +136,31 @@ namespace Pliant.Regex
                 .Production(NotCloseBracket, r => r
                     .Rule(notCloseBracket));
             _regexGrammar = grammarBuilder.ToGrammar();
+        }
+
+        public IReadOnlyList<IProduction> Productions
+        {
+            get { return _regexGrammar.Productions; }
+        }
+
+        public INonTerminal Start
+        {
+            get { return _regexGrammar.Start; }
+        }
+
+        public IReadOnlyList<ILexerRule> Ignores
+        {
+            get { return _regexGrammar.Ignores; }
+        }
+
+        public IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal)
+        {
+            return _regexGrammar.RulesFor(nonTerminal);
+        }
+
+        public IEnumerable<IProduction> StartProductions()
+        {
+            return _regexGrammar.StartProductions();
         }
     }
 }
