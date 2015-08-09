@@ -2,12 +2,12 @@
 
 namespace Pliant.Automata
 {
-    public class DfaEdge : IDfaEdge
+    public class DfaTransition : IDfaTransition
     {
         public IDfaState Target { get; private set; }
         public ITerminal Terminal { get; private set; }
 
-        public DfaEdge(ITerminal terminal, IDfaState target)
+        public DfaTransition(ITerminal terminal, IDfaState target)
         {
             Target = target;
             Terminal = terminal;

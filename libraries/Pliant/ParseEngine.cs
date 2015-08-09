@@ -288,22 +288,30 @@ namespace Pliant
             ref ITransitionState previousTransitionState)
         {
             var earleySet = _chart.EarleySets[k];
+
+            // if Ii contains a transitive item of the for [B -> b., A, k]
             var transitionState = earleySet.FindTransitionState(searchSymbol);
             if (transitionState != null)
             {
+                // then t_rule := B-> b.; t_pos = k;
                 previousTransitionState = transitionState;
                 t_rule = transitionState;
                 return;
             }
+
+            // else if Ii contains exactly one item of the form [B -> a.Ab, k]
             var sourceState = earleySet.FindSourceState(searchSymbol);
             if (sourceState == null)
                 return;
 
+            // and [B-> aA.b, k] is quasi complete (is b null)
             if (!IsNextStateQuasiComplete(sourceState))
                 return;
             
+            // then t_rule := [B->aAb.]; t_pos=k;
             t_rule = sourceState.NextState();
 
+            // T_Update(I0...Ik, B);
             OptimizeReductionPathRecursive(
                 sourceState.Production.LeftHandSide,
                 sourceState.Origin,
@@ -353,13 +361,29 @@ namespace Pliant
             if (isComplete)
                 return true;
 
+            // if all subsequent symbols are nullable
             for (int i = nextStatePosition; i < state.Production.RightHandSide.Count;i++)
             {
                 var nextSymbol = state.Production.RightHandSide[nextStatePosition];
                 var isSymbolNullable = IsSymbolNullable(nextSymbol);
                 if (!isSymbolNullable)
                     return false;
+
+                // From Page 4 of Leo's paper:
+                // 
+                // "on a non-empty deterministic reduction path there always
+                //  exists a topmost item if S =+> S is impossible.
+                //  The easiest way to avoid problems in this respect is to augment
+                //  the grammar with a new start symbol S'.
+                //  this means adding the rule S'=>S as the start."
+                // 
+                // to fix this, check if S can derive S. Basically if we are in the Start state
+                // and the Start state is found and is nullable, exit with false
+                if (state.Production.LeftHandSide == Grammar.Start &&
+                    nextSymbol == Grammar.Start)
+                    return false;
             }
+
             return true;
         }
 

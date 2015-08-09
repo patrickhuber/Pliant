@@ -66,8 +66,7 @@ namespace Pliant
 
             if (MatchesExistingIgnoreLexemes(character))
                 return true;
-            else
-                ClearExistingIngoreLexemes();
+            ClearExistingIngoreLexemes();
                         
             if (MatchesNewIgnoreLexemes(character))
                 return true;            

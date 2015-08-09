@@ -14,8 +14,8 @@ namespace Pliant.Tests.Unit.Automata
             var randomWhitespace = "\t\f\v \r\n";
             var dfa = new DfaState();
             var final = new DfaState(true);
-            dfa.AddEdge(new DfaEdge(new WhitespaceTerminal(), final));
-            final.AddEdge(new DfaEdge(new WhitespaceTerminal(), final));
+            dfa.AddTransition(new DfaTransition(new WhitespaceTerminal(), final));
+            final.AddTransition(new DfaTransition(new WhitespaceTerminal(), final));
 
             var whitespaceLexeme = new DfaLexeme(dfa, new TokenType("whitespace"));
             for (int i = 0; i < randomWhitespace.Length; i++)
@@ -28,11 +28,11 @@ namespace Pliant.Tests.Unit.Automata
             var wordInput = "t90vAriabl3";
             var dfa = new DfaState();
             var final = new DfaState(true);
-            dfa.AddEdge(new DfaEdge(new RangeTerminal('a', 'z'), final));
-            dfa.AddEdge(new DfaEdge(new RangeTerminal('A', 'Z'), final));
-            final.AddEdge(new DfaEdge(new RangeTerminal('a', 'z'), final));
-            final.AddEdge(new DfaEdge(new RangeTerminal('A', 'Z'), final));
-            final.AddEdge(new DfaEdge(new DigitTerminal(), final));
+            dfa.AddTransition(new DfaTransition(new RangeTerminal('a', 'z'), final));
+            dfa.AddTransition(new DfaTransition(new RangeTerminal('A', 'Z'), final));
+            final.AddTransition(new DfaTransition(new RangeTerminal('a', 'z'), final));
+            final.AddTransition(new DfaTransition(new RangeTerminal('A', 'Z'), final));
+            final.AddTransition(new DfaTransition(new DigitTerminal(), final));
 
             var indentifierLexeme = new DfaLexeme(dfa, new TokenType("Identifier"));
             for (int i = 0; i < wordInput.Length; i++)
@@ -45,8 +45,8 @@ namespace Pliant.Tests.Unit.Automata
             var numberInput = "0";
             var dfa = new DfaState();
             var final = new DfaState(true);
-            dfa.AddEdge(new DfaEdge(new RangeTerminal('a', 'z'), final));
-            final.AddEdge(new DfaEdge(new RangeTerminal('a', 'z'), final));
+            dfa.AddTransition(new DfaTransition(new RangeTerminal('a', 'z'), final));
+            final.AddTransition(new DfaTransition(new RangeTerminal('a', 'z'), final));
             var letterLexeme = new DfaLexeme(dfa, new TokenType("lowerCase"));
             Assert.IsFalse(letterLexeme.Scan(numberInput[0]));
             Assert.AreEqual(string.Empty, letterLexeme.Capture);

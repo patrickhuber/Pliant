@@ -2,7 +2,7 @@
 
 namespace Pliant.Automata
 {
-    public interface IDfaEdge
+    public interface IDfaTransition
     {
         IDfaState Target { get; }
         ITerminal Terminal { get; }

@@ -31,7 +31,7 @@ namespace Pliant.Automata
 
         public bool Scan(char c)
         {
-            foreach (var edge in _currentState.Edges)
+            foreach (var edge in _currentState.Transitions)
             {
                 if (edge.Terminal.IsMatch(c))
                 {

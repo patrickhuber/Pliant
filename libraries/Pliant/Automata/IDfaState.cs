@@ -5,8 +5,9 @@ namespace Pliant.Automata
     public interface IDfaState
     {
         bool IsFinal { get; }
-        IEnumerable<IDfaEdge> Edges { get; }
 
-        void AddEdge(IDfaEdge edge);
+        IEnumerable<IDfaTransition> Transitions { get; }
+
+        void AddTransition(IDfaTransition edge);
     }
 }

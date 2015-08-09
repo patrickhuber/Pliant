@@ -48,12 +48,12 @@
     <Compile Include="Automata\NullNfaTransition.cs" />
     <Compile Include="Automata\TerminalNfaTransition.cs" />
     <Compile Include="Bnf\BnfGrammar.cs" />
-    <Compile Include="Automata\DfaEdge.cs" />
+    <Compile Include="Automata\DfaTransition.cs" />
     <Compile Include="Automata\DfaLexeme.cs" />
     <Compile Include="Automata\DfaLexemeFactory.cs" />
     <Compile Include="Automata\DfaLexerRule.cs" />
     <Compile Include="Automata\DfaState.cs" />
-    <Compile Include="Automata\IDfaEdge.cs" />
+    <Compile Include="Automata\IDfaTransition.cs" />
     <Compile Include="Automata\IDfaLexerRule.cs" />
     <Compile Include="Automata\IDfaState.cs" />
     <Compile Include="Automata\StringExtensions.cs" />

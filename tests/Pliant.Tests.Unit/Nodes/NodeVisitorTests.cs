@@ -17,10 +17,10 @@ namespace Pliant.Tests.Unit.Nodes
         {
             var start = new DfaState();
             var end = new DfaState(true);
-            var startToEnd = new DfaEdge(new WhitespaceTerminal(), end);
-            var endToEnd = new DfaEdge(new WhitespaceTerminal(), end);
-            start.AddEdge(startToEnd);
-            end.AddEdge(endToEnd);
+            var startToEnd = new DfaTransition(new WhitespaceTerminal(), end);
+            var endToEnd = new DfaTransition(new WhitespaceTerminal(), end);
+            start.AddTransition(startToEnd);
+            end.AddTransition(endToEnd);
             return new DfaLexerRule(start, new TokenType("whitespace"));
         }
 

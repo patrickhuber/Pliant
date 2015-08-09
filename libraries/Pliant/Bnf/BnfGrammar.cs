@@ -1,5 +1,4 @@
-﻿using Pliant.Builders;
-using Pliant.Automata;
+﻿using Pliant.Automata;
 using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Collections.Generic;
@@ -70,9 +69,9 @@ namespace Pliant.Bnf
             var start = new DfaState();
             var final = new DfaState(true);
             var terminal = new NegationTerminal(new Terminal('\''));
-            var edge = new DfaEdge(terminal, final);
-            start.AddEdge(edge);
-            final.AddEdge(edge);
+            var edge = new DfaTransition(terminal, final);
+            start.AddTransition(edge);
+            final.AddTransition(edge);
             return new DfaLexerRule(start, new TokenType("not-single-quote"));
         }
 
@@ -88,16 +87,16 @@ namespace Pliant.Bnf
             var escapeTerminal = new Terminal('\\');
             var anyTerminal = new AnyTerminal();
 
-            var notQuoteEdge = new DfaEdge(notQuoteTerminal, final);
-            start.AddEdge(notQuoteEdge);
-            final.AddEdge(notQuoteEdge);
+            var notQuoteEdge = new DfaTransition(notQuoteTerminal, final);
+            start.AddTransition(notQuoteEdge);
+            final.AddTransition(notQuoteEdge);
 
-            var escapeEdge = new DfaEdge(escapeTerminal, escape);
-            start.AddEdge(escapeEdge);
-            final.AddEdge(escapeEdge);
+            var escapeEdge = new DfaTransition(escapeTerminal, escape);
+            start.AddTransition(escapeEdge);
+            final.AddTransition(escapeEdge);
 
-            var anyEdge = new DfaEdge(anyTerminal, final);
-            escape.AddEdge(anyEdge);
+            var anyEdge = new DfaTransition(anyTerminal, final);
+            escape.AddTransition(anyEdge);
 
             return new DfaLexerRule(start, new TokenType("not-double-quote"));            
         }
@@ -116,14 +115,14 @@ namespace Pliant.Bnf
         {
             var ruleNameState = new DfaState();
             var zeroOrMoreLetterOrDigit = new DfaState(true);
-            ruleNameState.AddEdge(
-                new DfaEdge(
+            ruleNameState.AddTransition(
+                new DfaTransition(
                     new CharacterClassTerminal(
                         new RangeTerminal('a', 'z'),
                         new RangeTerminal('A', 'Z')),
                     zeroOrMoreLetterOrDigit));
-            zeroOrMoreLetterOrDigit.AddEdge(
-                new DfaEdge(
+            zeroOrMoreLetterOrDigit.AddTransition(
+                new DfaTransition(
                     new CharacterClassTerminal(
                         new RangeTerminal('a', 'z'),
                         new RangeTerminal('A', 'Z'),
@@ -139,8 +138,8 @@ namespace Pliant.Bnf
             var whitespaceTerminal = new WhitespaceTerminal();
             var startWhitespace = new DfaState();
             var finalWhitespace = new DfaState(true);
-            startWhitespace.AddEdge(new DfaEdge(whitespaceTerminal, finalWhitespace));
-            finalWhitespace.AddEdge(new DfaEdge(whitespaceTerminal, finalWhitespace));
+            startWhitespace.AddTransition(new DfaTransition(whitespaceTerminal, finalWhitespace));
+            finalWhitespace.AddTransition(new DfaTransition(whitespaceTerminal, finalWhitespace));
             var whitespace = new DfaLexerRule(startWhitespace, new TokenType("whitespace"));
             return whitespace;
         }
