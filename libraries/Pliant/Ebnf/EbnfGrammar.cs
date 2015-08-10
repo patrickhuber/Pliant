@@ -13,12 +13,19 @@ namespace Pliant.Ebnf
         static EbnfGrammar()
         {
             /* 
-             *  Grammar        = { Rule } 
-             *  Rule           = RuleName "=" Expression ";"
-             *  Expression     = List { "|" List }
-             *  List           = Term { Term }
-             *  Term           = Literal | RuleName
-             *  Literal        = '"' Text '"' | "'" Text "'"
+             *  Grammar         = { Rule } 
+             *  Rule            = RuleName "=" Expression ";"
+             *  Expression      = Term
+             *  Expression      = Term '|' Expression
+             *  Term            = Factor
+             *  Term            = Factor Term
+             *  Factor          = Identifier
+             *                  | Literal
+             *                  | '[' Expression ']'
+             *                  | '{' Expression '}'
+             *                  | '(' Expression ')'
+             *  Identifier      = r"[a-zA-Z][a-zA-Z0-9_]*"
+             *  Literal         = '"' r"[^\"]" '"' | "'" r"[^']" "'"
              */
             var whitespace = CreateWhitespaceLexerRule();
             var notDoubleQuote = CreateNotDoubleQuoteLexerRule();
@@ -29,19 +36,26 @@ namespace Pliant.Ebnf
             var rule = new NonTerminal("Rule");
             var expression = new NonTerminal("Expression");
             var term = new NonTerminal("Term");
+            var factor = new NonTerminal("Factor");
+            var atom = new NonTerminal("Atom");
             var literal = new NonTerminal("Literal");
             var doubleQuoteText = new NonTerminal("DoubleQuoteText");
             var singleQuoteText = new NonTerminal("SingleQuoteText");
-            var factor = new NonTerminal("Factor");
-            var atom = new NonTerminal("Atom");
 
             var productions = new[]
             {
                 new Production(grammar, rule, grammar),
                 new Production(grammar),
                 new Production(rule, identifier, new TerminalLexerRule('='), expression, new TerminalLexerRule(';')),
-                new Production(expression, identifier),
-                new Production(expression, literal),
+                new Production(expression, term),
+                new Production(expression, term, new TerminalLexerRule('|'), expression),
+                new Production(term, factor),
+                new Production(term, factor, term),
+                new Production(factor, identifier),
+                new Production(factor, literal),
+                new Production(factor, new TerminalLexerRule('{'), expression, new TerminalLexerRule('}')),
+                new Production(factor, new TerminalLexerRule('['), expression, new TerminalLexerRule(']')),
+                new Production(factor, new TerminalLexerRule('('), expression, new TerminalLexerRule(')')),
                 new Production(literal, new TerminalLexerRule('"'), notDoubleQuote, new TerminalLexerRule('"')),
                 new Production(literal, new TerminalLexerRule('\''), notSingleQuuote, new TerminalLexerRule('\''))
             };

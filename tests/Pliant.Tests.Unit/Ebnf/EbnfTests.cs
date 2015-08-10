@@ -119,6 +119,44 @@ namespace Pliant.Tests.Unit.Ebnf
             ParseInput("Rule = r\"[a-zA-Z0-9]\";");
         }
 
+        [TestMethod]
+        public void Test_Ebnf_That_Parses_ZeroOrMore()
+        {
+            ParseInput(@"
+            Rule = { Expression };
+            Expression = Something;");
+        }
+
+        [TestMethod]
+        public void Test_Ebnf_That_Parses_OneOrZero()
+        {
+            ParseInput(@"
+            Rule = [ Expression ];
+            Expression = Something;");
+        }
+
+        [TestMethod]
+        public void Test_Ebnf_That_Parses_Parenthesis()
+        {
+            ParseInput(@"
+            Rule = ( Expression );
+            Expression = Something;");
+        }
+
+        [TestMethod]
+        public void Test_Ebnf_That_Parses_Alteration()
+        {
+            ParseInput(@"
+            Rule = Expression | Other;");
+        }
+
+        [TestMethod]
+        public void Test_Ebnf_That_Parses_Concatenation()
+        {
+            ParseInput(@"
+            Rule = Expression Other;");
+        }
+
         private void ParseInput(string input)
         {
             var parseInterface = new ParseInterface(_parseEngine, input);
