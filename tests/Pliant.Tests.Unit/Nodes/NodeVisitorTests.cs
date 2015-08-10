@@ -46,7 +46,7 @@ namespace Pliant.Tests.Unit.Nodes
             var nodeVisitorStateManager = new NodeVisitorStateManager();
             var root = regexParseEngine.GetRoot();
             root.Accept(nodeVisitor, nodeVisitorStateManager);
-            Assert.AreEqual(32, nodeVisitor.VisitLog.Count);           
+            Assert.AreEqual(30, nodeVisitor.VisitLog.Count);           
         }
 
         [TestMethod]

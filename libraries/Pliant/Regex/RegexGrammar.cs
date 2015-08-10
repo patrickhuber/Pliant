@@ -64,8 +64,6 @@ namespace Pliant.Regex
             const string Character = "Character";
             const string CharacterRange = "CharacterRange";
             const string CharacterClassCharacter = "CharacterClassCharacter";
-            const string NotCloseBracket = "NotCloseBracket";
-            const string NotMetaCharacter = "NotMetaCharacter";
             
             var caret = new TerminalLexerRule('^');
             var dollar = new TerminalLexerRule('$');
@@ -126,15 +124,11 @@ namespace Pliant.Regex
                     .Rule(CharacterClassCharacter)
                     .Rule(CharacterClassCharacter, dash, CharacterClassCharacter))
                 .Production(Character, r => r
-                    .Rule(NotMetaCharacter)
+                    .Rule(notMeta)
                     .Rule(backslash, any))
                 .Production(CharacterClassCharacter, r => r
-                    .Rule(NotCloseBracket)
-                    .Rule(backslash, any))
-                .Production(NotMetaCharacter, r => r
-                    .Rule(notMeta))
-                .Production(NotCloseBracket, r => r
-                    .Rule(notCloseBracket));
+                    .Rule(notCloseBracket)
+                    .Rule(backslash, any));
             _regexGrammar = grammarBuilder.ToGrammar();
         }
 
