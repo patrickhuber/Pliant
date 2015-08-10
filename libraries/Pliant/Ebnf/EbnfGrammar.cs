@@ -42,6 +42,19 @@ namespace Pliant.Ebnf
             var doubleQuoteText = new NonTerminal("DoubleQuoteText");
             var singleQuoteText = new NonTerminal("SingleQuoteText");
 
+            var regex = new NonTerminal("Regex");
+            var regexExpression = new NonTerminal("Regex.Expression");
+            var regexTerm = new NonTerminal("Regex.Term");
+            var regexFactor = new NonTerminal("Regex.Factor");
+            var regexAtom = new NonTerminal("Regex.Atom");
+            var regexIterator = new NonTerminal("Regex.Iterator");
+            var regexCharacter = new NonTerminal("Regex.Character");
+            var regexSet = new NonTerminal("Regex.Set");
+            var regexPositiveSet = new NonTerminal("Regex.PositiveSet");
+            var regexNegativeSet = new NonTerminal("Regex.NegativeSet");
+            var regexCharacterClass = new NonTerminal("Regex.CharacterClass");
+            var regexCharacterClassCharacter = new NonTerminal("Regex.CharacterClassCharacter");
+
             var productions = new[]
             {
                 new Production(grammar, rule, grammar),
@@ -53,9 +66,11 @@ namespace Pliant.Ebnf
                 new Production(term, factor, term),
                 new Production(factor, identifier),
                 new Production(factor, literal),
+                new Production(factor, new TerminalLexerRule('r'), new TerminalLexerRule('"'), regex, new TerminalLexerRule('"')),
                 new Production(factor, new TerminalLexerRule('{'), expression, new TerminalLexerRule('}')),
                 new Production(factor, new TerminalLexerRule('['), expression, new TerminalLexerRule(']')),
                 new Production(factor, new TerminalLexerRule('('), expression, new TerminalLexerRule(')')),
+                new Production(regex, regexExpression),
                 new Production(literal, new TerminalLexerRule('"'), notDoubleQuote, new TerminalLexerRule('"')),
                 new Production(literal, new TerminalLexerRule('\''), notSingleQuuote, new TerminalLexerRule('\''))
             };
@@ -104,7 +119,13 @@ namespace Pliant.Ebnf
 
             return new DfaLexerRule(start, new TokenType("not-double-quote"));
         }
-        
+
+        private static IDfaState CreateNamespaceDfa()
+        {
+            var start = new DfaState();
+            return start;
+        }
+
         private static ILexerRule CreateIdentifierLexerRule()
         {
             var identifierState = new DfaState();
