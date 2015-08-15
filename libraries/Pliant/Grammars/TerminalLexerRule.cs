@@ -24,6 +24,11 @@ namespace Pliant.Grammars
             Terminal = terminal;
             TokenType = tokenType;
         }
+
+        public TerminalLexerRule(ITerminal terminal, string tokenTypeId)
+            : this(terminal, new TokenType(tokenTypeId))
+        {
+        }
         
         public override string ToString()
         {

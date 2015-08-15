@@ -11,47 +11,69 @@ namespace Pliant.Tests.Unit.Ebnf
     public class EbnfTests
     {
         private static readonly string _ebnfText = @"
-        Grammar             = { Rule } ;
-        Rule                = RuleName '=' Expression ';' ;
-        RuleName            = Identifier ;
-        Expression          = Identifier
-                            | Terminal
-                            | '[' Expression ']'
-                            | '{' Expression '}'
-                            | '(' Expression ')'
-                            | Expression '|' Expression
-                            | Expression Expression ;
-        Identifier          = Letter { Letter | Digit | '_' };
-        Terminal            = '""' String '""'
-                            | ""'"" Character ""'""
-                            | 'r' '""' Regex '""' ; 
-        String              = { StringCharacter };
-        StringCharacter     = r""[^\""]""
-                            | '\\' AnyCharacter ;
-        Character           = SingleCharacter
-                            | '\\' SimpleEscape ;
-        SingleCharacter     = r""[^']"";
-        SimpleEscape        = ""'"" | '""' | '\\' | '0' | 'a' | 'b' 
-                            | 'f' | 'n'  | 'r' | 't' | 'v' ;
-        Digit               = r""[0-9]"" ;
-        Letter              = r""[a-zA-Z]"";
-        Whitespace          = r""\w+"";
-
-        Regex               = ['^'] RegexExpression['$']
-        RegexExpression     = [RegexTerm]
-                            | RegexTerm '|' RegexExpression
-        RegexTerm           = RegexFactor[RegexTerm]
-        RegexFactor         = RegexAtom[RegexIterator]
-        RegexAtom           = '.'
-                            | RegexCharacter
-                            | '(' RegexExpression ')'
-                            | RegexSet
-        RegexSet            = PositiveSet
-                            | NegativeSet
-        PositiveSet         = '[' CharacterClass ']'
-                            | ""[^"" CharacterClass ""]""
-        CharacterClass      = CharacterRange { CharacterRange }
-        :ignore             = Whitespace;";
+        Grammar             
+            = { Rule } ;
+        Rule                
+            = RuleName '=' Expression ';' ;
+        RuleName            
+            = Identifier ;
+        Expression          
+            = Identifier
+            | Terminal
+            | '[' Expression ']'
+            | '{' Expression '}'
+            | '(' Expression ')'
+            | Expression '|' Expression
+            | Expression Expression ;
+        Identifier          
+            = Letter { Letter | Digit | '_' };
+        Terminal            
+            = '""' String '""'
+            | ""'"" Character ""'""
+            | 'r' '""' Regex '""' ; 
+        String              
+            = { StringCharacter };
+        StringCharacter     
+            = r""[^\""]""
+            | '\\' AnyCharacter ;
+        Character           
+            = SingleCharacter
+            | '\\' SimpleEscape ;
+        SingleCharacter     
+            = r""[^']"";
+        SimpleEscape        
+            = ""'"" | '""' | '\\' | '0' | 'a' | 'b' 
+            | 'f' | 'n'  | 'r' | 't' | 'v' ;
+        Digit               
+            = r""[0-9]"" ;
+        Letter              
+            = r""[a-zA-Z]"";
+        Whitespace          
+            = r""\w+"";
+        Regex               
+            = ['^'] RegexExpression ['$'] ;
+        RegexExpression     
+            = [RegexTerm]
+            | RegexTerm '|' RegexExpression ;
+        RegexTerm           
+            = RegexFactor [RegexTerm] ;
+        RegexFactor         
+            = RegexAtom [RegexIterator] ;
+        RegexAtom           
+            = '.'
+            | RegexCharacter
+            | '(' RegexExpression ')'
+            | RegexSet ;
+        RegexSet            
+            = PositiveSet
+            | NegativeSet ;
+        PositiveSet         
+            = '[' CharacterClass ']'
+            | ""[^"" CharacterClass ""]""
+        CharacterClass      
+            = CharacterRange { CharacterRange } ;
+        :ignore             
+            = Whitespace;";
 
         private static readonly IGrammar ebnfGrammar;
 
@@ -155,6 +177,14 @@ namespace Pliant.Tests.Unit.Ebnf
         {
             ParseInput(@"
             Rule = Expression Other;");
+        }
+
+        [TestMethod]
+        public void Test_Ebnf_That_Parses_Namespace()
+        {
+            ParseInput(@"
+            RegularExpressions.Regex = RegularExpressions.Expression;
+            RegularExpressions.Expression = RegularExpression.Term;");
         }
 
         private void ParseInput(string input)
