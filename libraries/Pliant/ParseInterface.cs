@@ -1,12 +1,10 @@
 ﻿using Pliant.Collections;
-using Pliant.Dfa;
+using Pliant.Automata;
 using Pliant.Grammars;
 using Pliant.Lexemes;
 using Pliant.Tokens;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Pliant
 {
@@ -68,8 +66,7 @@ namespace Pliant
 
             if (MatchesExistingIgnoreLexemes(character))
                 return true;
-            else
-                ClearExistingIngoreLexemes();
+            ClearExistingIngoreLexemes();
                         
             if (MatchesNewIgnoreLexemes(character))
                 return true;            

@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 
-namespace Pliant.Dfa
+namespace Pliant.Automata
 {
     public class DfaState : IDfaState
     {
-        private IList<IDfaEdge> _edges;
+        private IList<IDfaTransition> _transitions;
         
         public bool IsFinal { get; private set; }
 
-        public IEnumerable<IDfaEdge> Edges { get { return _edges; } }
+        public IEnumerable<IDfaTransition> Transitions { get { return _transitions; } }
 
         public DfaState()
             : this(false)
@@ -17,12 +17,12 @@ namespace Pliant.Dfa
         public DfaState(bool isFinal)
         {
             IsFinal = isFinal;
-            _edges = new List<IDfaEdge>();
+            _transitions = new List<IDfaTransition>();
         }
 
-        public void AddEdge(IDfaEdge edge)
+        public void AddTransition(IDfaTransition edge)
         {
-            _edges.Add(edge);
+            _transitions.Add(edge);
         }
     }
 }

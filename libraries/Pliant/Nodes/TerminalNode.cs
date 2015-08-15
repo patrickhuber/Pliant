@@ -6,21 +6,16 @@ using System.Threading.Tasks;
 
 namespace Pliant.Nodes
 {
-    public class TerminalNode : ITerminalNode
+    public class TerminalNode : NodeBase, ITerminalNode
     {
         public char Capture { get; private set; }
-        
-        public int Location { get; private set; }
-
-        public int Origin { get; private set; }
-
-        public NodeType NodeType { get { return NodeType.Terminal; } }
-
+                
         public TerminalNode(char capture, int origin, int location)
         {
             Capture = capture;
             Origin = origin;
             Location = location;
+            NodeType = NodeType.Terminal;
         }
 
         public override string ToString()
@@ -31,11 +26,6 @@ namespace Pliant.Nodes
                 : Capture.ToString(), 
                 Origin, 
                 Location);
-        }
-
-        public void Accept(INodeVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
+        }        
     }
 }

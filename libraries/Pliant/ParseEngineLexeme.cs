@@ -1,7 +1,7 @@
 ﻿using Pliant.Grammars;
 using Pliant.Lexemes;
 using Pliant.Tokens;
-using System.Linq;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Pliant
@@ -24,13 +24,13 @@ namespace Pliant
                 
         public bool Scan(char c)
         {
-            // get expected lexemes
-            var expectedLexemes  =  
-                from rule in _parseEngine.GetExpectedLexerRules()
-                where rule.LexerRuleType == TerminalLexerRule.TerminalLexerRuleType
-                let terminalRule = rule as ITerminalLexerRule
-                select new TerminalLexeme(terminalRule);
-
+            // get expected lexems
+            // PERF: Avoid Linq where, let and select expressions due to lambda allocation
+            var expectedLexemes = new List<TerminalLexeme>();
+            foreach (var rule in _parseEngine.GetExpectedLexerRules())
+                if (rule.LexerRuleType == TerminalLexerRule.TerminalLexerRuleType)
+                    expectedLexemes.Add(new TerminalLexeme(rule as ITerminalLexerRule));
+            
             // filter on first rule to pass (since all rules are one character per lexeme)
             // PERF: Avoid Linq FirstOrDefault due to lambda allocation
             TerminalLexeme firstPassingRule = null;

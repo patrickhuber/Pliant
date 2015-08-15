@@ -7,41 +7,6 @@ namespace Pliant.Regex
 {
     public class RegexGrammar : IGrammar
     {
-        public IReadOnlyList<IProduction> Productions
-        {
-            get { return _regexGrammar.Productions; }
-        }
-
-        public INonTerminal Start
-        {
-            get { return _regexGrammar.Start; }
-        }
-
-        public IReadOnlyList<ILexerRule> Ignores
-        {
-            get { return _regexGrammar.Ignores; }
-        }
-
-        public IReadOnlyList<ILexerRule> LexerRules
-        {
-            get { return _regexGrammar.LexerRules; }
-        }
-
-        public IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal)
-        {
-            return _regexGrammar.RulesFor(nonTerminal);
-        }
-
-        public IEnumerable<ILexerRule> LexerRulesFor(INonTerminal nonTerminal)
-        {
-            return _regexGrammar.LexerRulesFor(nonTerminal);
-        }
-
-        public IEnumerable<IProduction> StartProductions()
-        {
-            return _regexGrammar.StartProductions();
-        }
-
         private static IGrammar _regexGrammar;
 
         static RegexGrammar()
@@ -99,8 +64,6 @@ namespace Pliant.Regex
             const string Character = "Character";
             const string CharacterRange = "CharacterRange";
             const string CharacterClassCharacter = "CharacterClassCharacter";
-            const string NotCloseBracket = "NotCloseBracket";
-            const string NotMetaCharacter = "NotMetaCharacter";
             
             var caret = new TerminalLexerRule('^');
             var dollar = new TerminalLexerRule('$');
@@ -161,32 +124,37 @@ namespace Pliant.Regex
                     .Rule(CharacterClassCharacter)
                     .Rule(CharacterClassCharacter, dash, CharacterClassCharacter))
                 .Production(Character, r => r
-                    .Rule(NotMetaCharacter)
+                    .Rule(notMeta)
                     .Rule(backslash, any))
                 .Production(CharacterClassCharacter, r => r
-                    .Rule(NotCloseBracket)
-                    .Rule(backslash, any))
-                .Production(NotMetaCharacter, r => r
-                    .Rule(notMeta))
-                .Production(NotCloseBracket, r => r
-                    .Rule(notCloseBracket))
-                .LexerRule(caret)
-                .LexerRule(dollar)
-                .LexerRule(pipe)
-                .LexerRule(dot)
-                .LexerRule(openParen)
-                .LexerRule(closeParen)
-                .LexerRule(star)
-                .LexerRule(plus)
-                .LexerRule(question)
-                .LexerRule(openBracket)
-                .LexerRule(closeBracket)
-                .LexerRule(notCloseBracket)
-                .LexerRule(dash)
-                .LexerRule(backslash)
-                .LexerRule(notMeta)
-                .LexerRule(any);
+                    .Rule(notCloseBracket)
+                    .Rule(backslash, any));
             _regexGrammar = grammarBuilder.ToGrammar();
+        }
+
+        public IReadOnlyList<IProduction> Productions
+        {
+            get { return _regexGrammar.Productions; }
+        }
+
+        public INonTerminal Start
+        {
+            get { return _regexGrammar.Start; }
+        }
+
+        public IReadOnlyList<ILexerRule> Ignores
+        {
+            get { return _regexGrammar.Ignores; }
+        }
+
+        public IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal)
+        {
+            return _regexGrammar.RulesFor(nonTerminal);
+        }
+
+        public IEnumerable<IProduction> StartProductions()
+        {
+            return _regexGrammar.StartProductions();
         }
     }
 }

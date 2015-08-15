@@ -72,19 +72,6 @@ namespace Pliant.Tests.Unit
             var grammar = grammarBuilder.ToGrammar();
             Assert.AreEqual(2, grammar.Productions.Count);
         }
-
-        [TestMethod]
-        public void Test_GrammarBuilder_That_LexerRule_With_Two_Calls_To_Range_Terminal_Method_Creates_One_LexerRule()
-        {
-            var grammarBuilder = new GrammarBuilder("A")
-                .Production("A", r => r
-                    .Rule("B")
-                    .Rule("C"))
-                .LexerRule("M", new CharacterClassTerminal(
-                    new RangeTerminal('a', 'z'), 
-                    new RangeTerminal('A', 'Z')));
-            var grammar = grammarBuilder.ToGrammar();
-            Assert.AreEqual(1, grammar.LexerRules.Count);
-        }
+        
     }
 }

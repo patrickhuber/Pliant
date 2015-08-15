@@ -2,7 +2,7 @@
 using Pliant.Grammars;
 using Pliant.Tokens;
 
-namespace Pliant.Dfa
+namespace Pliant.Automata
 {
     public class DfaLexerRule : IDfaLexerRule
     {

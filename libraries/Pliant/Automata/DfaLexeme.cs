@@ -3,7 +3,7 @@ using Pliant.Lexemes;
 using Pliant.Tokens;
 using System.Text;
 
-namespace Pliant.Dfa
+namespace Pliant.Automata
 {
     public class DfaLexeme : ILexeme
     {
@@ -31,7 +31,7 @@ namespace Pliant.Dfa
 
         public bool Scan(char c)
         {
-            foreach (var edge in _currentState.Edges)
+            foreach (var edge in _currentState.Transitions)
             {
                 if (edge.Terminal.IsMatch(c))
                 {

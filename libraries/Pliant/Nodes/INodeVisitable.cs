@@ -8,6 +8,6 @@ namespace Pliant.Nodes
 {
     public interface INodeVisitable
     {
-        void Accept(INodeVisitor visitor);
+        void Accept(INodeVisitor visitor, INodeVisitorStateManager stateManager);
     }
 }

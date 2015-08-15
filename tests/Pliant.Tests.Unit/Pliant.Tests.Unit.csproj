@@ -45,18 +45,22 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Dfa\DfaLexemeTests.cs" />
+    <Compile Include="Automata\DfaLexemeTests.cs" />
+    <Compile Include="Ebnf\EbnfTests.cs" />
     <Compile Include="Grammars\AnyTerminalTests.cs" />
     <Compile Include="Bnf\BnfTests.cs" />
     <Compile Include="Charts\ChartTests.cs" />
     <Compile Include="Grammars\DigitTerminalTests.cs" />
     <Compile Include="Builders\GrammarBuilderTests.cs" />
-    <Compile Include="Nodes\NodeWalkerTests.cs" />
+    <Compile Include="Nodes\LoggingNodeVisitor.cs" />
+    <Compile Include="Nodes\NodeVisitorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Grammars\ProductionTests.cs" />
     <Compile Include="Regex\RegexTests.cs" />

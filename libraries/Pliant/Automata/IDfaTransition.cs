@@ -1,8 +1,8 @@
 ﻿using Pliant.Grammars;
 
-namespace Pliant.Dfa
+namespace Pliant.Automata
 {
-    public interface IDfaEdge
+    public interface IDfaTransition
     {
         IDfaState Target { get; }
         ITerminal Terminal { get; }

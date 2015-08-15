@@ -22,5 +22,14 @@ namespace Pliant.Grammars
             Literal = literal;
             TokenType = tokenType;
         }
+
+        public StringLiteralLexerRule(string literal)
+            : this(literal, new TokenType(literal))
+        { }
+
+        public override string ToString()
+        {
+            return Literal;
+        }
     }
 }
