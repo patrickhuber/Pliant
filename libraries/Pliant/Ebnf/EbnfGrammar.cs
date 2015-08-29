@@ -12,28 +12,15 @@ namespace Pliant.Ebnf
 
         static EbnfGrammar()
         {
-            /* 
-             *  Grammar         = { Rule } 
-             *  Rule            = RuleName "=" Expression ";"
-             *  Expression      = Term
-             *  Expression      = Term '|' Expression
-             *  Term            = Factor
-             *  Term            = Factor Term
-             *  Factor          = Identifier
-             *                  | Literal
-             *                  | '[' Expression ']'
-             *                  | '{' Expression '}'
-             *                  | '(' Expression ')'
-             *  Identifier      = r"[a-zA-Z][a-zA-Z0-9_]*"
-             *  Literal         = '"' r"[^\"]" '"' | "'" r"[^']" "'"
-             */
             var whitespace = CreateWhitespaceLexerRule();
             var notDoubleQuote = CreateNotDoubleQuoteLexerRule();
             var notSingleQuuote = CreateNotSingleQuoteLexerRule();
             var identifier = CreateIdentifierLexerRule();
+            var settingIdentifier = CreateSettingIdentifierLexerRule();
 
             var grammar = new NonTerminal("Grammar");
             var rule = new NonTerminal("Rule");
+            var setting = new NonTerminal("Setting");
             var expression = new NonTerminal("Expression");
             var term = new NonTerminal("Term");
             var factor = new NonTerminal("Factor");
@@ -42,7 +29,7 @@ namespace Pliant.Ebnf
             var doubleQuoteText = new NonTerminal("DoubleQuoteText");
             var singleQuoteText = new NonTerminal("SingleQuoteText");
             var qualifiedIdentifier = new NonTerminal("QualifiedIdentifier");
-
+           
             var regex = new NonTerminal("Regex");
             var regexExpression = new NonTerminal("Regex.Expression");
             var regexTerm = new NonTerminal("Regex.Term");
@@ -59,21 +46,64 @@ namespace Pliant.Ebnf
 
             var productions = new[]
             {
-                new Production(grammar, rule, grammar),
+                /*  Grammar         
+                        = { Rule } 
+                        | { Setting } 
+                        | λ  ;
+                 */
+                new Production(grammar, rule, grammar),                
+                new Production(grammar, setting, grammar),
                 new Production(grammar),
+                
+                /*  Rule
+                        = QualifiedIdentifier '=' Expression ';' ;
+                 */
                 new Production(rule, qualifiedIdentifier, new TerminalLexerRule('='), expression, new TerminalLexerRule(';')),
+                
+                /*  Setting
+                        = r":[a-zA-Z][a-zA-Z0-9]*" '=' QualifiedIdentifier ';' ;
+                 */
+                new Production(setting, settingIdentifier, new TerminalLexerRule('='), qualifiedIdentifier, new TerminalLexerRule(';')),
+
+                /*  Expression 
+                        = Term
+                        | Term '|' Expression ;
+                 */
                 new Production(expression, term),
                 new Production(expression, term, new TerminalLexerRule('|'), expression),
+
+                /*  Term
+                        = Factor
+                        | Factor Term ;
+                 */
                 new Production(term, factor),
                 new Production(term, factor, term),
+
+                /*  Factor
+                        = QualifiedIdentifier
+                        | Literal
+                        | 'r' '"' Regex '"'
+                        | '{' expresion '}'
+                        | '[' expression ']'
+                        | '(' expresion ')' ;
+                 */
                 new Production(factor, qualifiedIdentifier),
                 new Production(factor, literal),
                 new Production(factor, new TerminalLexerRule('r'), new TerminalLexerRule('"'), regex, new TerminalLexerRule('"')),
                 new Production(factor, new TerminalLexerRule('{'), expression, new TerminalLexerRule('}')),
                 new Production(factor, new TerminalLexerRule('['), expression, new TerminalLexerRule(']')),
                 new Production(factor, new TerminalLexerRule('('), expression, new TerminalLexerRule(')')),
+
+                /*  QualifiedIdentifier
+                        = r"[a-zA-Z0-9][a-zA-Z0-9_-]*" ;
+                 */
                 new Production(qualifiedIdentifier, identifier),
                 new Production(qualifiedIdentifier, identifier, new TerminalLexerRule('.'), qualifiedIdentifier),
+
+                /*  Literal 
+                        = '"' r"[^""]" '"'
+                        | ""'"" r"[^']" ""'"" ;
+                */
                 new Production(literal, new TerminalLexerRule('"'), notDoubleQuote, new TerminalLexerRule('"')),
                 new Production(literal, new TerminalLexerRule('\''), notSingleQuuote, new TerminalLexerRule('\'')),
 
@@ -229,9 +259,36 @@ namespace Pliant.Ebnf
 
             return new DfaLexerRule(start, new TokenType("not-double-quote"));
         }
-        
+
+        private static ILexerRule CreateSettingIdentifierLexerRule()
+        {
+            // :[a-zA-Z][a-zA-Z0-9]*
+            var start = new DfaState();
+            var oneLetter = new DfaState();
+            var zeroOrMoreLetterOrDigit = new DfaState(true);
+            start.AddTransition(
+               new DfaTransition(
+                   new Terminal(':'),
+                   oneLetter));
+            oneLetter.AddTransition(
+                 new DfaTransition(
+                    new CharacterClassTerminal(
+                        new RangeTerminal('a', 'z'),
+                        new RangeTerminal('A', 'Z')),
+                    zeroOrMoreLetterOrDigit));
+            zeroOrMoreLetterOrDigit.AddTransition(
+                new DfaTransition(
+                    new CharacterClassTerminal(
+                        new RangeTerminal('a', 'z'),
+                        new RangeTerminal('A', 'Z'),
+                        new DigitTerminal()),
+                    zeroOrMoreLetterOrDigit));
+            return new DfaLexerRule(start, "settingIdentifier");
+        }
+
         private static ILexerRule CreateIdentifierLexerRule()
         {
+            // [a-zA-Z][a-zA-Z0-9-_]*
             var identifierState = new DfaState();
             var zeroOrMoreLetterOrDigit = new DfaState(true);
             identifierState.AddTransition(
@@ -248,7 +305,7 @@ namespace Pliant.Ebnf
                         new DigitTerminal(),
                         new SetTerminal('-', '_')),
                     zeroOrMoreLetterOrDigit));
-            var identifier = new DfaLexerRule(identifierState, new TokenType("identifier"));
+            var identifier = new DfaLexerRule(identifierState, "identifier");
             return identifier;
         }
 
@@ -259,7 +316,7 @@ namespace Pliant.Ebnf
             var finalWhitespace = new DfaState(true);
             startWhitespace.AddTransition(new DfaTransition(whitespaceTerminal, finalWhitespace));
             finalWhitespace.AddTransition(new DfaTransition(whitespaceTerminal, finalWhitespace));
-            var whitespace = new DfaLexerRule(startWhitespace, new TokenType("whitespace"));
+            var whitespace = new DfaLexerRule(startWhitespace, "whitespace");
             return whitespace;
         }
 

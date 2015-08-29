@@ -51,27 +51,36 @@ namespace Pliant.Tests.Unit.Ebnf
         Whitespace          
             = r""\w+"";
         Regex               
-            = ['^'] RegexExpression ['$'] ;
-        RegexExpression     
-            = [RegexTerm]
-            | RegexTerm '|' RegexExpression ;
-        RegexTerm           
-            = RegexFactor [RegexTerm] ;
-        RegexFactor         
-            = RegexAtom [RegexIterator] ;
-        RegexAtom           
+            = ['^'] Regex.Expression ['$'] ;
+        Regex.Expression     
+            = [Regex.Term]
+            | Regex.Term '|' Regex.Expression ;
+        Regex.Term           
+            = Regex.Factor [Regex.Term] ;
+        Regex.Factor         
+            = Regex.Atom [Regex.Iterator] ;
+        Regex.Atom           
             = '.'
-            | RegexCharacter
-            | '(' RegexExpression ')'
-            | RegexSet ;
-        RegexSet            
-            = PositiveSet
-            | NegativeSet ;
-        PositiveSet         
-            = '[' CharacterClass ']'
-            | ""[^"" CharacterClass ""]""
-        CharacterClass      
-            = CharacterRange { CharacterRange } ;
+            | Regex.Character
+            | '(' Regex.Expression ')'
+            | Regex.Set ;
+        Regex.Set            
+            = Regex.PositiveSet
+            | Regex.NegativeSet ;
+        Regex.PositiveSet         
+            = '[' Regex.CharacterClass ']'
+            | ""[^"" Regex.CharacterClass ""]"" ;
+        Regex.CharacterClass      
+            = Regex.CharacterRange { Regex.CharacterRange } ;
+        Regex.CharacterRange
+            = Regex.CharacterClassCharacter
+            | Regex.CharacterClassCharacter '-' Regex.CharacterClassCharacter;
+        Regex.CharacterClassCharacter
+            = r""[^\]]""
+            | '\\' r""."" ;
+        Regex.Character
+            = r""[^.^$()[\] + *?\\]""
+            | '\\' r""."" ;
         :ignore             
             = Whitespace;";
 
@@ -81,7 +90,7 @@ namespace Pliant.Tests.Unit.Ebnf
         {
             ebnfGrammar = new EbnfGrammar();
         }
-        
+
         /// <summary>
         ///Gets or sets the test context which provides
         ///information about and functionality for the current test run.
@@ -120,7 +129,7 @@ namespace Pliant.Tests.Unit.Ebnf
         {
             ParseInput(@"
             Rule = Expression;
-            Expression = Something;");    
+            Expression = Something;");
         }
 
         [TestMethod]
@@ -185,6 +194,15 @@ namespace Pliant.Tests.Unit.Ebnf
             ParseInput(@"
             RegularExpressions.Regex = RegularExpressions.Expression;
             RegularExpressions.Expression = RegularExpression.Term;");
+        }
+
+        [TestMethod]
+        public void Test_Ebnf_That_Parses_Escape()
+        {
+            ParseInput(@"
+            Regex.CharacterClassCharacter
+            = r""[^\]]""
+            | '\\' r""."";");
         }
 
         private void ParseInput(string input)
