@@ -17,6 +17,7 @@ namespace Pliant.Ebnf
             var notSingleQuuote = CreateNotSingleQuoteLexerRule();
             var identifier = CreateIdentifierLexerRule();
             var settingIdentifier = CreateSettingIdentifierLexerRule();
+            var escapeCharacter = CreateEscapeCharacterLexerRule();
 
             var grammar = new NonTerminal("Grammar");
             var rule = new NonTerminal("Rule");
@@ -51,7 +52,7 @@ namespace Pliant.Ebnf
                         | { Setting } 
                         | λ  ;
                  */
-                new Production(grammar, rule, grammar),                
+                new Production(grammar, rule, grammar),
                 new Production(grammar, setting, grammar),
                 new Production(grammar),
                 
@@ -195,10 +196,10 @@ namespace Pliant.Ebnf
                         | '\\' r"." ;
                  */
                 new Production(
-                    regexCharacter, 
+                    regexCharacter,
                     new TerminalLexerRule(
                         new NegationTerminal(
-                            new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')), 
+                            new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')),
                         "notMeta")),
                 new Production(
                     regexCharacter, new TerminalLexerRule('\\'), new TerminalLexerRule(new AnyTerminal(), "any")),
@@ -207,12 +208,11 @@ namespace Pliant.Ebnf
                         = r"[^\]]"
                         | '\\' r"." ;
                  */
-                new Production(regexCharacterClassCharacter, 
+                new Production(regexCharacterClassCharacter,
                     new TerminalLexerRule(
                         new NegationTerminal(new Terminal(']')), "[^\\]]")),
                 new Production(regexCharacterClassCharacter,
-                    new TerminalLexerRule('\\'),
-                    new TerminalLexerRule(new AnyTerminal(), "any"))                
+                    escapeCharacter)                
             };
 
             var ignore = new[]
@@ -221,6 +221,16 @@ namespace Pliant.Ebnf
             };
 
             _ebnfGrammar = new Grammar(grammar, productions, ignore);
+        }
+
+        private static ILexerRule CreateEscapeCharacterLexerRule()
+        {
+            var start = new DfaState();
+            var escape = new DfaState();
+            var final = new DfaState(true);
+            start.AddTransition(new DfaTransition(new Terminal('\\'), escape));
+            escape.AddTransition(new DfaTransition(new AnyTerminal(), final));
+            return new DfaLexerRule(start, "escape");
         }
 
         private static ILexerRule CreateNotSingleQuoteLexerRule()
