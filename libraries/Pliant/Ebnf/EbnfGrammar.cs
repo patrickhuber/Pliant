@@ -30,7 +30,9 @@ namespace Pliant.Ebnf
             var doubleQuoteText = new NonTerminal("DoubleQuoteText");
             var singleQuoteText = new NonTerminal("SingleQuoteText");
             var qualifiedIdentifier = new NonTerminal("QualifiedIdentifier");
-           
+            var grouping = new NonTerminal("Grouping");
+            var optional = new NonTerminal("Optional");
+            var repetition = new NonTerminal("Repetition");
             var regex = new NonTerminal("Regex");
             var regexExpression = new NonTerminal("Regex.Expression");
             var regexTerm = new NonTerminal("Regex.Term");
@@ -80,23 +82,35 @@ namespace Pliant.Ebnf
                 new Production(term, factor),
                 new Production(term, factor, term),
 
+                /*  Grouping
+                       = '(' Expression ')' ;
+                 */
+                new Production(grouping, new TerminalLexerRule('('), expression, new TerminalLexerRule(')')),
+
+                /*  Repetition
+                        = '{' Expression '}' ;
+                 */
+                new Production(repetition, new TerminalLexerRule('{'), expression, new TerminalLexerRule('}')),
+
+                /*  Optional 
+                        = '[' Expression ']' ;
+                 */
+                new Production(optional, new TerminalLexerRule('['), expression, new TerminalLexerRule(']')),
+
                 /*  Factor
                         = QualifiedIdentifier
                         | Literal
                         | 'r' '"' Regex '"'
                         | Repetition
                         | Optional
-                        | Grouping
-                        | '{' expression '}'
-                        | '[' expression ']'
-                        | '(' expression ')' ;
+                        | Grouping ;
                  */
                 new Production(factor, qualifiedIdentifier),
                 new Production(factor, literal),
                 new Production(factor, new TerminalLexerRule('r'), new TerminalLexerRule('"'), regex, new TerminalLexerRule('"')),
-                new Production(factor, new TerminalLexerRule('{'), expression, new TerminalLexerRule('}')),
-                new Production(factor, new TerminalLexerRule('['), expression, new TerminalLexerRule(']')),
-                new Production(factor, new TerminalLexerRule('('), expression, new TerminalLexerRule(')')),
+                new Production(factor, repetition),
+                new Production(factor, optional),
+                new Production(factor, grouping),
 
                 /*  QualifiedIdentifier
                         = r"[a-zA-Z0-9][a-zA-Z0-9_-]*" ;
