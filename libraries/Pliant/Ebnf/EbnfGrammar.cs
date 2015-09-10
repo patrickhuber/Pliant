@@ -84,9 +84,12 @@ namespace Pliant.Ebnf
                         = QualifiedIdentifier
                         | Literal
                         | 'r' '"' Regex '"'
-                        | '{' expresion '}'
+                        | Repetition
+                        | Optional
+                        | Grouping
+                        | '{' expression '}'
                         | '[' expression ']'
-                        | '(' expresion ')' ;
+                        | '(' expression ')' ;
                  */
                 new Production(factor, qualifiedIdentifier),
                 new Production(factor, literal),

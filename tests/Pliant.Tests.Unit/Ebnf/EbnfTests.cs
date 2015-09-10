@@ -20,11 +20,17 @@ namespace Pliant.Tests.Unit.Ebnf
         Expression          
             = Identifier
             | Terminal
-            | '[' Expression ']'
-            | '{' Expression '}'
-            | '(' Expression ')'
+            | Optional
+            | Repetition
+            | Grouping
             | Expression '|' Expression
             | Expression Expression ;
+        Optional 
+            = '[' Expression ']';
+        Repetition
+            = '{' Expression '}';
+        Grouping 
+            = '(' Expression ')';
         Identifier          
             = Letter { Letter | Digit | '_' };
         Terminal            
