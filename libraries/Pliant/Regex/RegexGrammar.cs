@@ -1,4 +1,5 @@
-﻿using Pliant.Builders;
+﻿using Pliant.Automata;
+using Pliant.Builders;
 using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Collections.Generic;
@@ -78,12 +79,11 @@ namespace Pliant.Regex
             var closeBracket = new TerminalLexerRule(']');
             var notCloseBracket = new TerminalLexerRule(new NegationTerminal(new Terminal(']')), new TokenType("!]"));
             var dash = new TerminalLexerRule('-');
-            var backslash = new TerminalLexerRule('\\');
             var notMeta = new TerminalLexerRule(
                 new NegationTerminal(
                     new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')), 
                 new TokenType("not-meta"));
-            var any = new TerminalLexerRule(new AnyTerminal(), new TokenType("any"));
+            var escape = CreateEscapeCharacterLexerRule();
 
             var grammarBuilder = new GrammarBuilder(Regex)
                 .Production(Regex, r => r
@@ -125,11 +125,20 @@ namespace Pliant.Regex
                     .Rule(CharacterClassCharacter, dash, CharacterClassCharacter))
                 .Production(Character, r => r
                     .Rule(notMeta)
-                    .Rule(backslash, any))
+                    .Rule(escape))
                 .Production(CharacterClassCharacter, r => r
                     .Rule(notCloseBracket)
-                    .Rule(backslash, any));
+                    .Rule(escape));
             _regexGrammar = grammarBuilder.ToGrammar();
+        }
+        private static ILexerRule CreateEscapeCharacterLexerRule()
+        {
+            var start = new DfaState();
+            var escape = new DfaState();
+            var final = new DfaState(true);
+            start.AddTransition(new DfaTransition(new Terminal('\\'), escape));
+            escape.AddTransition(new DfaTransition(new AnyTerminal(), final));
+            return new DfaLexerRule(start, "escape");
         }
 
         public IReadOnlyList<IProduction> Productions

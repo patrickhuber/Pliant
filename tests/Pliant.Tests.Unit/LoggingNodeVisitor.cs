@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Pliant.Tests.Unit.Nodes
+namespace Pliant.Tests.Unit
 {
     public class LoggingNodeVisitor : INodeVisitor
     {

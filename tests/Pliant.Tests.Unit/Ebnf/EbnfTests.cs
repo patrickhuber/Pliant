@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Grammars;
 using Pliant.Ebnf;
+using Pliant.Nodes;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
@@ -20,11 +21,17 @@ namespace Pliant.Tests.Unit.Ebnf
         Expression          
             = Identifier
             | Terminal
-            | '[' Expression ']'
-            | '{' Expression '}'
-            | '(' Expression ')'
+            | Optional
+            | Repetition
+            | Grouping
             | Expression '|' Expression
             | Expression Expression ;
+        Optional 
+            = '[' Expression ']';
+        Repetition
+            = '{' Expression '}';
+        Grouping 
+            = '(' Expression ')';
         Identifier          
             = Letter { Letter | Digit | '_' };
         Terminal            
@@ -51,27 +58,36 @@ namespace Pliant.Tests.Unit.Ebnf
         Whitespace          
             = r""\w+"";
         Regex               
-            = ['^'] RegexExpression ['$'] ;
-        RegexExpression     
-            = [RegexTerm]
-            | RegexTerm '|' RegexExpression ;
-        RegexTerm           
-            = RegexFactor [RegexTerm] ;
-        RegexFactor         
-            = RegexAtom [RegexIterator] ;
-        RegexAtom           
+            = ['^'] Regex.Expression ['$'] ;
+        Regex.Expression     
+            = [Regex.Term]
+            | Regex.Term '|' Regex.Expression ;
+        Regex.Term           
+            = Regex.Factor [Regex.Term] ;
+        Regex.Factor         
+            = Regex.Atom [Regex.Iterator] ;
+        Regex.Atom           
             = '.'
-            | RegexCharacter
-            | '(' RegexExpression ')'
-            | RegexSet ;
-        RegexSet            
-            = PositiveSet
-            | NegativeSet ;
-        PositiveSet         
-            = '[' CharacterClass ']'
-            | ""[^"" CharacterClass ""]""
-        CharacterClass      
-            = CharacterRange { CharacterRange } ;
+            | Regex.Character
+            | '(' Regex.Expression ')'
+            | Regex.Set ;
+        Regex.Set            
+            = Regex.PositiveSet
+            | Regex.NegativeSet ;
+        Regex.PositiveSet         
+            = '[' Regex.CharacterClass ']'
+            | ""[^"" Regex.CharacterClass ""]"" ;
+        Regex.CharacterClass      
+            = Regex.CharacterRange { Regex.CharacterRange } ;
+        Regex.CharacterRange
+            = Regex.CharacterClassCharacter
+            | Regex.CharacterClassCharacter '-' Regex.CharacterClassCharacter;
+        Regex.CharacterClassCharacter
+            = r""[^\]]""
+            | '\\' r""."" ;
+        Regex.Character
+            = r""[^.^$()[\] + *?\\]""
+            | '\\' r""."" ;
         :ignore             
             = Whitespace;";
 
@@ -81,7 +97,7 @@ namespace Pliant.Tests.Unit.Ebnf
         {
             ebnfGrammar = new EbnfGrammar();
         }
-        
+
         /// <summary>
         ///Gets or sets the test context which provides
         ///information about and functionality for the current test run.
@@ -120,7 +136,7 @@ namespace Pliant.Tests.Unit.Ebnf
         {
             ParseInput(@"
             Rule = Expression;
-            Expression = Something;");    
+            Expression = Something;");
         }
 
         [TestMethod]
@@ -187,7 +203,31 @@ namespace Pliant.Tests.Unit.Ebnf
             RegularExpressions.Expression = RegularExpression.Term;");
         }
 
-        private void ParseInput(string input)
+        [TestMethod]
+        public void Test_Ebnf_That_Parses_Escape()
+        {
+            ParseInput(@"
+            Regex.CharacterClassCharacter
+            = r""[^\]]""
+            | '\\' r""."";");
+        }
+
+        [TestMethod]
+        public void Test_Ebnf_That_Parse_Tree_For_Rule_Is_Created_Correctly()
+        {
+            var node = ParseInput(@"
+            SomeRule = 'a' 'b' 'c' ;
+            ") as ISymbolNode;
+            Assert.IsNotNull(node);
+            
+            var visitor = new LoggingNodeVisitor();
+            node.Accept(visitor, new NodeVisitorStateManager());
+
+            var log = visitor.VisitLog;
+            Assert.IsTrue(log.Count > 0);
+        }
+
+        private INode ParseInput(string input)
         {
             var parseInterface = new ParseInterface(_parseEngine, input);
             for (int i = 0; i < input.Length; i++)
@@ -195,6 +235,7 @@ namespace Pliant.Tests.Unit.Ebnf
                 Assert.IsTrue(parseInterface.Read(), "Error found in position {0}", parseInterface.Position);
             }
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
+            return parseInterface.ParseEngine.GetRoot();
         }
     }
 }
