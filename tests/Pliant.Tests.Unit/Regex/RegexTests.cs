@@ -102,7 +102,14 @@ namespace Pliant.Tests.Unit
             var input = "[^abc]";
             ParseAndAcceptInput(input);
         }
-        
+
+        [TestMethod]
+        public void Test_Regex_That_Parses_Open_Bracket_In_Character_Class()
+        {
+            var input = "[\\]]";
+            ParseAndAcceptInput(input);
+        }
+
         private void ParseAndAcceptInput(string input)
         {
             ParseInput(input);

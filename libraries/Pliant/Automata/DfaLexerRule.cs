@@ -18,6 +18,11 @@ namespace Pliant.Automata
 
         public TokenType TokenType { get; private set; }
 
+        public DfaLexerRule(IDfaState state, string tokenType)
+            : this(state, new TokenType(tokenType))
+        {
+        }
+
         public DfaLexerRule(IDfaState state, TokenType tokenType)
         {
             Start = state;
