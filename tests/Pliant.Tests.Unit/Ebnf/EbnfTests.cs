@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Grammars;
 using Pliant.Ebnf;
+using Pliant.Nodes;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
@@ -211,7 +212,22 @@ namespace Pliant.Tests.Unit.Ebnf
             | '\\' r""."";");
         }
 
-        private void ParseInput(string input)
+        [TestMethod]
+        public void Test_Ebnf_That_Parse_Tree_For_Rule_Is_Created_Correctly()
+        {
+            var node = ParseInput(@"
+            SomeRule = 'a' 'b' 'c' ;
+            ") as ISymbolNode;
+            Assert.IsNotNull(node);
+            
+            var visitor = new LoggingNodeVisitor();
+            node.Accept(visitor, new NodeVisitorStateManager());
+
+            var log = visitor.VisitLog;
+            Assert.IsTrue(log.Count > 0);
+        }
+
+        private INode ParseInput(string input)
         {
             var parseInterface = new ParseInterface(_parseEngine, input);
             for (int i = 0; i < input.Length; i++)
@@ -219,6 +235,7 @@ namespace Pliant.Tests.Unit.Ebnf
                 Assert.IsTrue(parseInterface.Read(), "Error found in position {0}", parseInterface.Position);
             }
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
+            return parseInterface.ParseEngine.GetRoot();
         }
     }
 }
