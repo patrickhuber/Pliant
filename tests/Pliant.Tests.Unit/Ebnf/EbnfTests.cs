@@ -120,9 +120,9 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_Empty_Text()
+        public void Test_Ebnf_That_Fails_Empty_Text()
         {
-            ParseInput("");
+            FailParseInput("");
         }
 
         [TestMethod]
@@ -236,6 +236,12 @@ namespace Pliant.Tests.Unit.Ebnf
             }
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
             return parseInterface.ParseEngine.GetRoot();
+        }
+
+        private void FailParseInput(string input)
+        {
+            var parseInterface = new ParseInterface(_parseEngine, input);
+            Assert.IsFalse(parseInterface.ParseEngine.IsAccepted());  
         }
     }
 }
