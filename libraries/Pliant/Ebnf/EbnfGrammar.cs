@@ -22,6 +22,7 @@ namespace Pliant.Ebnf
             var grammar = new NonTerminal("Grammar");
             var rule = new NonTerminal("Rule");
             var setting = new NonTerminal("Setting");
+            var ruleOrSetting = new NonTerminal("RuleOrSetting");
             var expression = new NonTerminal("Expression");
             var term = new NonTerminal("Term");
             var factor = new NonTerminal("Factor");
@@ -50,14 +51,17 @@ namespace Pliant.Ebnf
             var productions = new[]
             {
                 /*  Grammar         
-                        = { Rule } 
-                        | { Setting } 
-                        | λ  ;
+                        = RuleOrSetting { RuleOrSetting } ;
                  */
-                new Production(grammar, rule, grammar),
-                new Production(grammar, setting, grammar),
-                new Production(grammar),
+                new Production(grammar, ruleOrSetting),
+                new Production(grammar, ruleOrSetting, grammar),
                 
+                /*  RuleOrSetting
+                        = Rule | Setting
+                 */
+                new Production(ruleOrSetting, rule),
+                new Production(ruleOrSetting, setting),
+
                 /*  Rule
                         = QualifiedIdentifier '=' Expression ';' ;
                  */

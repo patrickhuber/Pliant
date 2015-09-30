@@ -119,9 +119,9 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_Empty_Text()
+        public void Test_Ebnf_That_Fails_Empty_Text()
         {
-            ParseInput("");
+            FailParseInput("");
         }
 
         [TestMethod]
@@ -219,6 +219,12 @@ namespace Pliant.Tests.Unit.Ebnf
                 Assert.IsTrue(parseInterface.Read(), "Error found in position {0}", parseInterface.Position);
             }
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
+        }
+
+        private void FailParseInput(string input)
+        {
+            var parseInterface = new ParseInterface(_parseEngine, input);
+            Assert.IsFalse(parseInterface.ParseEngine.IsAccepted());  
         }
     }
 }
