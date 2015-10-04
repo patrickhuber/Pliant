@@ -141,9 +141,8 @@ namespace Pliant.Ebnf
                 new Production(regex, regexExpression, new TerminalLexerRule('$')),
 
                 /*  Regex.Expression 
-                        = Regex.Term
-                        | Regex.Term '|' Regex.Expression
-                        | λ ;
+                        = [ Regex.Term 
+                        | Regex.Term '|' Regex.Expression ] ;
                 */
                 new Production(regexExpression, regexTerm),
                 new Production(regexExpression, regexTerm, new TerminalLexerRule('|'), regexExpression),

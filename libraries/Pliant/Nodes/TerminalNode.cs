@@ -26,6 +26,11 @@ namespace Pliant.Nodes
                 : Capture.ToString(), 
                 Origin, 
                 Location);
-        }        
+        }
+
+        public override void Accept(INodeVisitor visitor, INodeVisitorStateManager stateManager)
+        {
+            visitor.Visit(this, stateManager);
+        }
     }
 }

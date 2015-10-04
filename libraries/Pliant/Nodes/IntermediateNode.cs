@@ -19,5 +19,10 @@ namespace Pliant.Nodes
         {
             return string.Format("({0}, {1}, {2})", State, Origin, Location);
         }
+
+        public override void Accept(INodeVisitor visitor, INodeVisitorStateManager stateManager)
+        {
+            visitor.Visit(this, stateManager);
+        }
     }
 }

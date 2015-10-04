@@ -14,5 +14,10 @@ namespace Pliant.Nodes
             Location = location;
             NodeType = NodeType.Token;
         }
+
+        public override void Accept(INodeVisitor visitor, INodeVisitorStateManager stateManager)
+        {
+            visitor.Visit(this, stateManager);
+        }
     }
 }

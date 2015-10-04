@@ -13,25 +13,30 @@ namespace Pliant.Tests.Unit
             VisitLog = new List<string>();
         }
         
-        public void Visit(IIntermediateNode node)
+        public void Visit(IIntermediateNode node, INodeVisitorStateManager stateManager)
         {
             VisitLog.Add(node.ToString());
         }
 
-        public void Visit(ITokenNode node)
+        public void Visit(ITokenNode node, INodeVisitorStateManager stateManager)
         {
             VisitLog.Add(node.ToString());
         }
 
-        public void Visit(ISymbolNode node)
+        public void Visit(ISymbolNode node, INodeVisitorStateManager stateManager)
         {
             VisitLog.Add(node.ToString());
         }
 
-        public void Visit(ITerminalNode node)
+        public void Visit(ITerminalNode node, INodeVisitorStateManager stateManager)
         {
             VisitLog.Add(node.ToString());
         }
 
+        public void Visit(IAndNode node, INodeVisitorStateManager stateManager)
+        {            
+            foreach (var child in node.Children)
+                child.Accept(this, stateManager);
+        }        
     }
 }

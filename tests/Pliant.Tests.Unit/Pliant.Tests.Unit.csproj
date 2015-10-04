@@ -53,6 +53,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Automata\DfaLexemeTests.cs" />
+    <Compile Include="Ebnf\EbnfCompilerTests.cs" />
     <Compile Include="Ebnf\EbnfTests.cs" />
     <Compile Include="Grammars\AnyTerminalTests.cs" />
     <Compile Include="Bnf\BnfTests.cs" />

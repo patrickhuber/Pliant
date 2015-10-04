@@ -1,9 +1,4 @@
 ﻿using Pliant.Grammars;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pliant.Nodes
 {
@@ -21,6 +16,11 @@ namespace Pliant.Nodes
         public override string ToString()
         {
             return string.Format("({0}, {1}, {2})", Symbol, Origin, Location);
-        }        
+        }
+
+        public override void Accept(INodeVisitor visitor, INodeVisitorStateManager stateManager)
+        {
+            visitor.Visit(this, stateManager);
+        }
     }
 }

@@ -57,7 +57,9 @@
     <Compile Include="Automata\IDfaLexerRule.cs" />
     <Compile Include="Automata\IDfaState.cs" />
     <Compile Include="Automata\StringExtensions.cs" />
+    <Compile Include="Ebnf\EbnfCompiler.cs" />
     <Compile Include="Ebnf\EbnfGrammar.cs" />
+    <Compile Include="Ebnf\EbnfVisitor.cs" />
     <Compile Include="Grammars\IGrammarLexerRule.cs" />
     <Compile Include="Grammars\IStringLiteralLexerRule.cs" />
     <Compile Include="Grammars\ITerminalLexerRule.cs" />
