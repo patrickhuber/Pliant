@@ -104,7 +104,7 @@ namespace Pliant.Ebnf
                 /*  Factor
                         = QualifiedIdentifier
                         | Literal
-                        | 'r' '"' Regex '"'
+                        | '/' Regex '/'
                         | Repetition
                         | Optional
                         | Grouping ;
@@ -116,15 +116,15 @@ namespace Pliant.Ebnf
                 new Production(factor, optional),
                 new Production(factor, grouping),
 
-                /*  QualifiedIdentifier
-                        = r"[a-zA-Z0-9][a-zA-Z0-9_-]*" ;
-                 */
+                //  QualifiedIdentifier
+                //        = /[a-zA-Z0-9][a-zA-Z0-9_-]*/ ;
+                //
                 new Production(qualifiedIdentifier, identifier),
                 new Production(qualifiedIdentifier, identifier, new TerminalLexerRule('.'), qualifiedIdentifier),
 
                 /*  Literal 
-                        = '"' r"[^""]" '"'
-                        | ""'"" r"[^']" ""'"" ;
+                        = '"' /[^""]/ '"'
+                        | ""'"" /[^']/ ""'"" ;
                 */
                 new Production(literal, new TerminalLexerRule('"'), notDoubleQuote, new TerminalLexerRule('"')),
                 new Production(literal, new TerminalLexerRule('\''), notSingleQuuote, new TerminalLexerRule('\'')),
@@ -212,8 +212,8 @@ namespace Pliant.Ebnf
                 new Production(regexCharacterRange, regexCharacterClassCharacter, new TerminalLexerRule('-'), regexCharacterClassCharacter),
 
                 /*  Regex.Character
-                        = r"[^.^$()[\]+*?\\]"
-                        | '\\' r"." ;
+                        = /[^.^$()[\]+*?\\]/
+                        | '\\' /./ ;
                  */
                 new Production(
                     regexCharacter,
@@ -225,8 +225,8 @@ namespace Pliant.Ebnf
                     regexCharacter, new TerminalLexerRule('\\'), new TerminalLexerRule(new AnyTerminal(), "any")),
 
                 /*  Regex.CharacterClassCharacter
-                        = r"[^\]]"
-                        | '\\' r"." ;
+                        = /[^\]]/
+                        | '\\' /./ ;
                  */
                 new Production(regexCharacterClassCharacter,
                     new TerminalLexerRule(
@@ -292,7 +292,7 @@ namespace Pliant.Ebnf
 
         private static ILexerRule CreateSettingIdentifierLexerRule()
         {
-            // :[a-zA-Z][a-zA-Z0-9]*
+            // /:[a-zA-Z][a-zA-Z0-9]*/
             var start = new DfaState();
             var oneLetter = new DfaState();
             var zeroOrMoreLetterOrDigit = new DfaState(true);
@@ -318,7 +318,7 @@ namespace Pliant.Ebnf
 
         private static ILexerRule CreateIdentifierLexerRule()
         {
-            // [a-zA-Z][a-zA-Z0-9-_]*
+            // /[a-zA-Z][a-zA-Z0-9-_]*/
             var identifierState = new DfaState();
             var zeroOrMoreLetterOrDigit = new DfaState(true);
             identifierState.AddTransition(
