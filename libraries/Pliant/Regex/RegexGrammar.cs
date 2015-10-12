@@ -10,6 +10,81 @@ namespace Pliant.Regex
     {
         private static IGrammar _regexGrammar;
 
+        static void TestNewBuilder()
+        {
+            var notMeta =  new NegationTerminal(
+                       new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\'));
+
+            var regex = new ProductionBuilder("Regex");
+            var expression = new ProductionBuilder("Expression");
+            var term = new ProductionBuilder("Term");
+            var factor = new ProductionBuilder("Factor");
+            var atom = new ProductionBuilder("Atom");
+            var iterator = new ProductionBuilder("Iterator");
+            var set = new ProductionBuilder("Set");
+            var positiveSet = new ProductionBuilder("PositiveSet");
+            var negativeSet = new ProductionBuilder("NegativeSet");
+            var characterClass = new ProductionBuilder("CharacterClass");
+            var characterRange = new ProductionBuilder("CharacterRange");
+            var character = new ProductionBuilder("Character");
+            var characterClassCharacter = new ProductionBuilder("CharacterClassCharacter");
+
+            var productions = new[] {
+                regex, expression, term, factor, atom, iterator, set, positiveSet, negativeSet, characterClass,
+                characterRange, character, characterClassCharacter };
+            
+            regex
+                .Rule(expression)
+                .Or('^', expression)
+                .Or(expression, '$')
+                .Or('^', expression, '$');
+ 
+            expression
+                .Rule(term)
+                .Or(term, '|', expression)
+                .Or();
+
+            term
+                .Rule(factor)
+                .Or(factor, term);
+
+            factor
+                .Rule(atom)
+                .Or(atom, iterator);
+
+            atom
+                .Rule('.')
+                .Or(character)
+                .Or('(', expression, ')')
+                .Or(set);
+
+            set
+                .Rule(positiveSet)
+                .Or(negativeSet);
+
+            positiveSet
+                .Rule('[', characterClass, ']');
+
+            negativeSet
+                .Rule("[^", characterClass, ']');
+
+            characterClass
+                .Rule(characterRange)
+                .Or(characterRange, characterClass);
+
+            characterRange
+                .Rule(characterClassCharacter)
+                .Or(characterClassCharacter, '-', characterClassCharacter);
+
+            character
+                .Rule(notMeta);
+
+            characterClassCharacter
+                .Rule();
+
+            _regexGrammar = new GrammarBuilder(regex, productions).ToGrammar();
+        }
+
         static RegexGrammar()
         {
             /*  Regex                      ->   Expression |   
@@ -37,7 +112,7 @@ namespace Pliant.Regex
              *  
              *  PositiveSet                ->   '[' CharacterClass ']'
              *  
-             *  NegativeSet                ->   '[^' CharacterClass ']'
+             *  NegativeSet                ->   "[^" CharacterClass ']'
              *  
              *  CharacterClass             ->   CharacterRange |
              *                                  CharacterRange CharacterClass
@@ -45,12 +120,11 @@ namespace Pliant.Regex
              *  CharacterRange             ->   CharacterClassCharacter |
              *                                  CharacterClassCharacter '-' CharacterClassCharacter
              *  
-             *  Character                  ->   NotMetaCharacter
-             *                                  '\' AnyCharacter
+             *  Character                  ->   NotMetaCharacter |
              *                                  EscapeSequence
              *                                  
              *  CharacterClassCharacter    ->   NotCloseBracketCharacter | 
-             *                                  '\' AnyCharacter
+             *                                  EscapeSequence
              */
             const string Regex = "Regex";
             const string Expression = "Expression";

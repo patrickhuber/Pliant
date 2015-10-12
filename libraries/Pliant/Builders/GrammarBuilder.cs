@@ -18,7 +18,19 @@ namespace Pliant.Builders
             _productions = new List<IProduction>();
             _ignoreRules = new List<ILexerRule>();
         }
-                        
+
+        public GrammarBuilder(ProductionBuilder start, ProductionBuilder[] productionBuilder)
+            : this(start.LeftHandSide.Value)
+        {
+            foreach (var production in productionBuilder)
+            {
+                foreach (var alteration in production.Alterations)
+                {
+                    _productions.Add(new Production(production.LeftHandSide, alteration.ToArray()));
+                }                
+            }
+        }
+
         public IGrammar ToGrammar()
         {
             if (_start == null)

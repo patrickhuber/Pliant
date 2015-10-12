@@ -1,5 +1,4 @@
-﻿using Pliant.Collections;
-using Pliant.Grammars;
+﻿using Pliant.Grammars;
 using Pliant.Tokens;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ namespace Pliant.Builders
     public class RuleBuilder : IRuleBuilder
     {
         private IList<IList<ISymbol>> _rules;
-        
+
         public RuleBuilder()
         {
             _rules = new List<IList<ISymbol>>();
@@ -74,7 +73,8 @@ namespace Pliant.Builders
 
         public IList<IList<ISymbol>> GetRules()
         {
-            return _rules.ToArray();
+            return _rules;
         }
+        
     }
 }

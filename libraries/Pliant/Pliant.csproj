@@ -57,6 +57,10 @@
     <Compile Include="Automata\IDfaLexerRule.cs" />
     <Compile Include="Automata\IDfaState.cs" />
     <Compile Include="Automata\StringExtensions.cs" />
+    <Compile Include="Builders\IAlterationBuilder.cs" />
+    <Compile Include="Builders\ProductionBuilder.cs" />
+    <Compile Include="Builders\AlterationBuilder.cs" />
+    <Compile Include="Builders\SymbolBuilder.cs" />
     <Compile Include="Ebnf\EbnfCompiler.cs" />
     <Compile Include="Ebnf\EbnfGrammar.cs" />
     <Compile Include="Ebnf\EbnfVisitor.cs" />
