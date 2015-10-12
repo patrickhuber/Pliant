@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Grammars\BaseLexerRule.cs" />
     <Compile Include="Automata\INfa.cs" />
     <Compile Include="Automata\INfaState.cs" />
     <Compile Include="Automata\INfaTransition.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Ebnf\EbnfCompiler.cs" />
     <Compile Include="Ebnf\EbnfGrammar.cs" />
     <Compile Include="Ebnf\EbnfVisitor.cs" />
+    <Compile Include="Grammars\BaseTerminal.cs" />
     <Compile Include="Grammars\IGrammarLexerRule.cs" />
     <Compile Include="Grammars\IStringLiteralLexerRule.cs" />
     <Compile Include="Grammars\ITerminalLexerRule.cs" />

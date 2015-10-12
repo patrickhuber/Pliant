@@ -2,17 +2,11 @@
 
 namespace Pliant.Grammars
 {
-    public class TerminalLexerRule : ITerminalLexerRule
+    public class TerminalLexerRule : BaseLexerRule, ITerminalLexerRule
     {
         public ITerminal Terminal { get; }
         
-        public SymbolType SymbolType { get { return SymbolType.LexerRule; } }
-
-        public TokenType TokenType { get; private set; }
-        
         public static readonly LexerRuleType TerminalLexerRuleType = new LexerRuleType("Terminal");
-
-        public LexerRuleType LexerRuleType { get { return TerminalLexerRuleType; } }
 
         public TerminalLexerRule(char character)
             : this(new Terminal(character), new TokenType(character.ToString()))
@@ -20,9 +14,9 @@ namespace Pliant.Grammars
         }
 
         public TerminalLexerRule(ITerminal terminal, TokenType tokenType)
+            : base(TerminalLexerRuleType, tokenType)
         {
             Terminal = terminal;
-            TokenType = tokenType;
         }
 
         public TerminalLexerRule(ITerminal terminal, string tokenTypeId)

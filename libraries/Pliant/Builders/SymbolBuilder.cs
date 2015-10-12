@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Automata;
+using Pliant.Grammars;
 
 namespace Pliant.Builders
 {
@@ -29,6 +30,11 @@ namespace Pliant.Builders
         public static implicit operator SymbolBuilder(NegationTerminal terminal)
         {
             return new SymbolBuilder(new TerminalLexerRule(terminal, terminal.ToString()));
+        }
+
+        public static implicit operator SymbolBuilder(BaseLexerRule rule)
+        {
+            return new SymbolBuilder(rule);
         }
     }
 }

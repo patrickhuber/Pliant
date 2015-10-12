@@ -1,6 +1,7 @@
 ﻿using Pliant.Grammars;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Pliant.Builders
 {
@@ -17,9 +18,13 @@ namespace Pliant.Builders
             _alterations = new List<IList<ISymbol>>();
         }
 
-        public AlterationBuilder Rule(params SymbolBuilder[] symbols)
+        public AlterationBuilder Rule(params SymbolBuilder[] symbolBuilders)
         {
-            var alterationBuilder = new AlterationBuilder(_alterations);
+            var symbols = new List<ISymbol>();
+            foreach (var symbolBuilder in symbolBuilders)
+                symbols.Add(symbolBuilder.Symbol);
+            _alterations.Add(symbols);
+            var alterationBuilder = new AlterationBuilder(_alterations);            
             return alterationBuilder;
         }
     }
