@@ -16,6 +16,8 @@ namespace Pliant.Tests.Unit
         public void Visit(IIntermediateNode node, INodeVisitorStateManager stateManager)
         {
             VisitLog.Add(node.ToString());
+            foreach (var child in node.Children)
+                Visit(child, stateManager);
         }
 
         public void Visit(ITokenNode node, INodeVisitorStateManager stateManager)
@@ -26,6 +28,8 @@ namespace Pliant.Tests.Unit
         public void Visit(ISymbolNode node, INodeVisitorStateManager stateManager)
         {
             VisitLog.Add(node.ToString());
+            foreach (var child in node.Children)
+                Visit(child, stateManager);
         }
 
         public void Visit(ITerminalNode node, INodeVisitorStateManager stateManager)
