@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Pliant.Grammars
 {
-    public class Terminal : Symbol, ITerminal
+    public class CharacterTerminal : Symbol, ITerminal
     {
         public char Character { get; private set; }
 
-        public Terminal(char character)
+        public CharacterTerminal(char character)
             : base(SymbolType.Terminal)
         {
             Character = character;
@@ -24,7 +24,7 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            var terminal = obj as Terminal;
+            var terminal = obj as CharacterTerminal;
             if (terminal == null)
                 return false;
             return terminal.Character == Character;

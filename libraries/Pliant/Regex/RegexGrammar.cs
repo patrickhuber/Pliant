@@ -54,7 +54,7 @@ namespace Pliant.Regex
             var notMeta =  new NegationTerminal(
                        new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\'));
             var notCloseBracket = new NegationTerminal(
-                new Terminal(']'));
+                new CharacterTerminal(']'));
             var escape = CreateEscapeCharacterLexerRule();
 
             var regex = new ProductionBuilder("Regex");
@@ -140,7 +140,7 @@ namespace Pliant.Regex
             var start = new DfaState();
             var escape = new DfaState();
             var final = new DfaState(true);
-            start.AddTransition(new DfaTransition(new Terminal('\\'), escape));
+            start.AddTransition(new DfaTransition(new CharacterTerminal('\\'), escape));
             escape.AddTransition(new DfaTransition(new AnyTerminal(), final));
             return new DfaLexerRule(start, "escape");
         }

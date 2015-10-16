@@ -3,12 +3,33 @@ using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Collections.Generic;
 using System;
+using Pliant.Builders;
 
 namespace Pliant.Ebnf
 {
     public class EbnfGrammar : IGrammar
     {
         private static readonly IGrammar _ebnfGrammar;
+
+        static void EbnfGrammar2()
+        {
+            var grammar = new ProductionBuilder("Grammar");
+            var ruleOrSetting = new ProductionBuilder("RuleOrSetting");
+            var rule = new ProductionBuilder("Rule");
+            var setting = new ProductionBuilder("Setting");
+            var productions = new[] { grammar, ruleOrSetting, rule, setting};
+
+            grammar
+                .Rule(ruleOrSetting)
+                .Or(ruleOrSetting, grammar);
+            ruleOrSetting
+                .Rule(rule)
+                .Or(setting);
+
+
+            var grammarBuilder = new GrammarBuilder(grammar, productions);
+            IGrammar g = grammarBuilder.ToGrammar();
+        }
 
         static EbnfGrammar()
         {
@@ -47,7 +68,7 @@ namespace Pliant.Ebnf
             var regexCharacterClass = new NonTerminal("Regex.CharacterClass");
             var regexCharacterRange = new NonTerminal("Regex.CharacterRange");
             var regexCharacterClassCharacter = new NonTerminal("Regex.CharacterClassCharacter");
-
+            
             var productions = new[]
             {
                 /*  Grammar         
@@ -230,7 +251,7 @@ namespace Pliant.Ebnf
                  */
                 new Production(regexCharacterClassCharacter,
                     new TerminalLexerRule(
-                        new NegationTerminal(new Terminal(']')), "[^\\]]")),
+                        new NegationTerminal(new CharacterTerminal(']')), "[^\\]]")),
                 new Production(regexCharacterClassCharacter,
                     escapeCharacter)                
             };
@@ -248,7 +269,7 @@ namespace Pliant.Ebnf
             var start = new DfaState();
             var escape = new DfaState();
             var final = new DfaState(true);
-            start.AddTransition(new DfaTransition(new Terminal('\\'), escape));
+            start.AddTransition(new DfaTransition(new CharacterTerminal('\\'), escape));
             escape.AddTransition(new DfaTransition(new AnyTerminal(), final));
             return new DfaLexerRule(start, "escape");
         }
@@ -257,7 +278,7 @@ namespace Pliant.Ebnf
         {
             var start = new DfaState();
             var final = new DfaState(true);
-            var terminal = new NegationTerminal(new Terminal('\''));
+            var terminal = new NegationTerminal(new CharacterTerminal('\''));
             var edge = new DfaTransition(terminal, final);
             start.AddTransition(edge);
             final.AddTransition(edge);
@@ -273,7 +294,7 @@ namespace Pliant.Ebnf
 
             var notQuoteTerminal = new NegationTerminal(
                 new SetTerminal('"', '\\'));
-            var escapeTerminal = new Terminal('\\');
+            var escapeTerminal = new CharacterTerminal('\\');
             var anyTerminal = new AnyTerminal();
 
             var notQuoteEdge = new DfaTransition(notQuoteTerminal, final);
@@ -298,7 +319,7 @@ namespace Pliant.Ebnf
             var zeroOrMoreLetterOrDigit = new DfaState(true);
             start.AddTransition(
                new DfaTransition(
-                   new Terminal(':'),
+                   new CharacterTerminal(':'),
                    oneLetter));
             oneLetter.AddTransition(
                  new DfaTransition(

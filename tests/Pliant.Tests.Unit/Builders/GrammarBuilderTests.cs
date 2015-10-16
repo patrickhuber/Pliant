@@ -46,13 +46,16 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_GrammarBuilder_That_Production_With_String_RHS_Adds_NonTerminal()
         {
-            var grammarBuilder = new GrammarBuilder("A")
-                .Production("A", r=>r
-                    .Rule("B"));
+            var A = new ProductionBuilder("A");
+            var B = new ProductionBuilder("B");
+
+            A.Definition = B;
+
+            var grammarBuilder = new GrammarBuilder(A, new[] { A, B });
 
             var grammar = grammarBuilder.ToGrammar();
             Assert.IsNotNull(grammar);
-            Assert.AreEqual(1, grammar.Productions.Count);
+            Assert.AreEqual(2, grammar.Productions.Count);
 
             var production = grammar.Productions[0];
             Assert.AreEqual(1, production.RightHandSide.Count);
@@ -65,12 +68,14 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_GrammarBuilder_That_Production_With_Two_Calls_To_RuleBuilder_Rule_Method_Creates_Two_Productions()
         {
-            var grammarBuilder = new GrammarBuilder("A")
-                .Production("A", r=>r
-                    .Rule("B")
-                    .Rule("C"));
+            var A = new ProductionBuilder("A");
+            var B = new ProductionBuilder("B");
+            var C = new ProductionBuilder("C");
+
+            A.Definition = B | C;
+            var grammarBuilder = new GrammarBuilder(A, new[] { A, B, C });
             var grammar = grammarBuilder.ToGrammar();
-            Assert.AreEqual(2, grammar.Productions.Count);
+            Assert.AreEqual(4, grammar.Productions.Count);
         }
         
     }

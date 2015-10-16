@@ -16,11 +16,10 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_Chart_That_Enqueue_Avoids_Duplicates()
         {
-            var grammar = new GrammarBuilder("L")
-                .Production("L", r => r
-                    .Rule("L", new RangeTerminal('a', 'z'))
-                    .Rule(new RangeTerminal('a','z')))
-                .ToGrammar();
+            ProductionBuilder L = "L";
+            var aToZ = new RangeTerminal('a', 'z');
+            L.Definition = L + aToZ | aToZ;
+            var grammar = new GrammarBuilder(L, new[] { L }).ToGrammar();
             var chart = new Chart();
             var firstState = new State(grammar.Productions[0], 0, 1);
             var secondState = new State(grammar.Productions[0], 0, 1);

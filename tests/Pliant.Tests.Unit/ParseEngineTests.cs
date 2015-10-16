@@ -18,8 +18,8 @@ namespace Pliant.Tests.Unit
             // example 3 section 4, Elizabeth Scott
             var tokens = Tokenize("abbb");
 
-            var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
-            var b = new TerminalLexerRule(new Terminal('b'), new TokenType("b"));
+            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
+            var b = new TerminalLexerRule(new CharacterTerminal('b'), new TokenType("b"));
             var grammar = new GrammarBuilder("S")
                 .Production("S", r => r
                     .Rule("A", "T")
@@ -114,7 +114,7 @@ namespace Pliant.Tests.Unit
         public void Test_ParseEngine_That_Completed_Scan_Creates_Internal_And_Terminal_Node()
         {
             var tokens = Tokenize("a");
-            var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
+            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
             var grammar = new GrammarBuilder("S")
                 .Production("S", r => r
                     .Rule(a))
@@ -143,7 +143,7 @@ namespace Pliant.Tests.Unit
         public void Test_ParseEngine_That_Completed_Prediction_Creates_Internal_Node()
         {
             var tokens = Tokenize("a");
-            var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
+            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
             var grammar = new GrammarBuilder("S")
                 .Production("S", r => r
                     .Rule("A"))
@@ -180,8 +180,8 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Leo_Items_Generate_Proper_Parse_Tree()
         {
-            var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
-            var b = new TerminalLexerRule(new Terminal('b'), new TokenType("b"));
+            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
+            var b = new TerminalLexerRule(new CharacterTerminal('b'), new TokenType("b"));
             var grammar = new GrammarBuilder("S")
                 .Production("S", r => r
                     .Rule("A"))
@@ -234,8 +234,8 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_PassThrough_Recursive_Items_Creates_Virtual_Nodes()
         {
-            var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
-            var b = new TerminalLexerRule(new Terminal('b'), new TokenType("b"));
+            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
+            var b = new TerminalLexerRule(new CharacterTerminal('b'), new TokenType("b"));
 
             var grammar = new GrammarBuilder("S")
                 .Production("S", r => r
@@ -335,10 +335,10 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Mid_Grammar_Right_Recursion_Handles_Null_Root_Transition_Item()
         {
-            var dot = new TerminalLexerRule(new Terminal('.'), new TokenType("."));
-            var plus = new TerminalLexerRule(new Terminal('+'), new TokenType("+"));
-            var question = new TerminalLexerRule(new Terminal('?'), new TokenType("?"));
-            var star = new TerminalLexerRule(new Terminal('*'), new TokenType("*"));
+            var dot = new TerminalLexerRule(new CharacterTerminal('.'), new TokenType("."));
+            var plus = new TerminalLexerRule(new CharacterTerminal('+'), new TokenType("+"));
+            var question = new TerminalLexerRule(new CharacterTerminal('?'), new TokenType("?"));
+            var star = new TerminalLexerRule(new CharacterTerminal('*'), new TokenType("*"));
 
             var grammar = new GrammarBuilder("S")
                 .Production("S", r => r
@@ -409,8 +409,8 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Simple_Substitution_Grammar_Parses()
         {
-            var b = new TerminalLexerRule(new Terminal('b'), new TokenType("b"));
-            var c = new TerminalLexerRule(new Terminal('c'), new TokenType("c"));
+            var b = new TerminalLexerRule(new CharacterTerminal('b'), new TokenType("b"));
+            var c = new TerminalLexerRule(new CharacterTerminal('c'), new TokenType("c"));
             var grammar = new GrammarBuilder("A")
                 .Production("A", r => r
                     .Rule("B", "C"))
@@ -462,7 +462,7 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Unmarked_Middle_Recursion_Parses()
         {
-            var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
+            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
 
             var grammar = new GrammarBuilder("S")
                 .Production("S", r => r
@@ -507,7 +507,7 @@ namespace Pliant.Tests.Unit
         public void Test_ParseEngine_That_Right_Recursion_Is_Not_O_N_3()
         {
             var a = new TerminalLexerRule(
-                new Terminal('a'),
+                new CharacterTerminal('a'),
                 new TokenType("a"));
             var grammar = new GrammarBuilder("A")
                 .Production("A", r => r
@@ -543,8 +543,8 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Intermediate_Step_Creates_Transition_Items()
         {
-            var a = new TerminalLexerRule(new Terminal('a'), new TokenType("a"));
-            var b = new TerminalLexerRule(new Terminal('b'), new TokenType("b"));
+            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
+            var b = new TerminalLexerRule(new CharacterTerminal('b'), new TokenType("b"));
 
             var grammar = new GrammarBuilder("S")
                 .Production("S", r => r
@@ -726,10 +726,10 @@ namespace Pliant.Tests.Unit
         private static IGrammar CreateExpressionGrammar()
         {
             var plus = new TerminalLexerRule(
-                            new Terminal('+'),
+                            new CharacterTerminal('+'),
                             new TokenType("+"));
             var star = new TerminalLexerRule(
-                new Terminal('*'),
+                new CharacterTerminal('*'),
                 new TokenType("*"));
             var digit = new TerminalLexerRule(
                 new DigitTerminal(),

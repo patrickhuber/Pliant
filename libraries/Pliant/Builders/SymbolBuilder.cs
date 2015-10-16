@@ -3,7 +3,7 @@ using Pliant.Grammars;
 
 namespace Pliant.Builders
 {
-    public class SymbolBuilder
+    public class SymbolBuilder : BaseBuilder
     {
         public ISymbol Symbol { get; private set; }
 
@@ -27,7 +27,7 @@ namespace Pliant.Builders
             return new SymbolBuilder(new TerminalLexerRule(character));
         }
 
-        public static implicit operator SymbolBuilder(NegationTerminal terminal)
+        public static implicit operator SymbolBuilder(BaseTerminal terminal)
         {
             return new SymbolBuilder(new TerminalLexerRule(terminal, terminal.ToString()));
         }

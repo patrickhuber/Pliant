@@ -68,7 +68,7 @@ namespace Pliant.Bnf
         {
             var start = new DfaState();
             var final = new DfaState(true);
-            var terminal = new NegationTerminal(new Terminal('\''));
+            var terminal = new NegationTerminal(new CharacterTerminal('\''));
             var edge = new DfaTransition(terminal, final);
             start.AddTransition(edge);
             final.AddTransition(edge);
@@ -84,7 +84,7 @@ namespace Pliant.Bnf
 
             var notQuoteTerminal = new NegationTerminal(
                 new SetTerminal('"', '\\'));
-            var escapeTerminal = new Terminal('\\');
+            var escapeTerminal = new CharacterTerminal('\\');
             var anyTerminal = new AnyTerminal();
 
             var notQuoteEdge = new DfaTransition(notQuoteTerminal, final);

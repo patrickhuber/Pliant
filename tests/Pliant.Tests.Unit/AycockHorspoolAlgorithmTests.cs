@@ -13,21 +13,24 @@ namespace Pliant.Tests.Unit
         public void Test_AycockHorspoolAlgorithm_That_Vulnerable_Grammar_Accepts_Input()
         {
             var a = new TerminalLexerRule(
-                new Terminal('a'),
+                new CharacterTerminal('a'),
                 new TokenType("a"));
 
-            var grammar = new GrammarBuilder("S'")
-            .Production("S'", r => r
-                .Rule("S"))
-            .Production("S", r => r
-                .Rule("A", "A", "A", "A"))
-            .Production("A", r => r
-                .Rule(a)
-                .Rule("E"))
-            .Production("E", r => r
-                .Lambda())
-            .ToGrammar();
+            ProductionBuilder SPrime = "S'";
+            ProductionBuilder S = "S";
+            ProductionBuilder A = "A";
+            ProductionBuilder E = "E";
 
+            SPrime.Definition = S;
+            S.Definition = (_) S | A + A + A + A;
+            A.Definition = (_)"a" | E;
+
+            var grammarBuilder = new GrammarBuilder(
+                SPrime, 
+                new[] { SPrime, S, A, E });
+
+            var grammar = grammarBuilder.ToGrammar();
+            
             var parseEngine = new ParseEngine(grammar);
             parseEngine.Pulse(new Token("a", 0, a.TokenType));
 

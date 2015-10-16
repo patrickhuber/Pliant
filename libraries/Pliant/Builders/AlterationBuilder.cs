@@ -9,20 +9,20 @@ namespace Pliant.Builders
 {
     public class AlterationBuilder : IAlterationBuilder
     {
-        public IList<IList<ISymbol>> Alterations;
+        public RuleBuilder RuleBuilder { get; private set; }
 
-        public AlterationBuilder(IList<IList<ISymbol>> alterations)
+        public AlterationBuilder(RuleBuilder ruleBuilder)
         {
-            Alterations = alterations;
+            RuleBuilder = ruleBuilder;
         }
 
         public IAlterationBuilder Or(params SymbolBuilder[] rules)
         {
-            var newAlterations = new List<ISymbol>();
+            var newAlterations = new BaseBuilderList();
             foreach (var rule in rules)
-                newAlterations.Add(rule.Symbol);
-            Alterations.Add(newAlterations);
-            return new AlterationBuilder(Alterations);
+                newAlterations.Add(rule);
+            RuleBuilder.Data.Add(newAlterations);
+            return new AlterationBuilder(RuleBuilder);
         }
     }
 }

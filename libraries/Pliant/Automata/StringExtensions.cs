@@ -24,7 +24,7 @@ namespace Pliant.Automata
                 var character = input[c];
                 var isFinal = c == input.Length - 1;
                 var newState = new DfaState(isFinal);
-                var newEdge = new DfaTransition(new Terminal(character), newState);
+                var newEdge = new DfaTransition(new CharacterTerminal(character), newState);
                 currentState.AddTransition(newEdge);
                 currentState = newState;
             }

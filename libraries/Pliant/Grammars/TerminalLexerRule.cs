@@ -9,7 +9,7 @@ namespace Pliant.Grammars
         public static readonly LexerRuleType TerminalLexerRuleType = new LexerRuleType("Terminal");
 
         public TerminalLexerRule(char character)
-            : this(new Terminal(character), new TokenType(character.ToString()))
+            : this(new CharacterTerminal(character), new TokenType(character.ToString()))
         {
         }
 

@@ -24,10 +24,15 @@ namespace Pliant.Builders
         {
             foreach (var production in productionBuilder)
             {
-                foreach (var alteration in production.Alterations)
+                if (production.Definition == null)
                 {
-                    _productions.Add(new Production(production.LeftHandSide, alteration.ToArray()));
-                }                
+                    _productions.Add(new Production(production.LeftHandSide));
+                    continue;
+                }
+                foreach (var list in production.Definition.Data)
+                {
+                    _productions.Add(GetProductionFromNameAndListOfSymbols(production.LeftHandSide.Value, list));
+                }
             }
         }
 
@@ -64,15 +69,35 @@ namespace Pliant.Builders
             {
                 var ruleBuilder = new RuleBuilder();
                 rules(ruleBuilder);
-                foreach (var rule in ruleBuilder.GetRules())
+
+                var rightHandSide = new List<ISymbol>();
+                foreach (var builderList in ruleBuilder.Data)
                 {
-                    var production = new Production(name, rule.ToArray());
+                    var production = GetProductionFromNameAndListOfSymbols(name, builderList);
                     _productions.Add(production);
-                }
+                }                
             }
             return this;
         }
-                
+
+        private static IProduction GetProductionFromNameAndListOfSymbols(string name, BaseBuilderList builderList)
+        {
+            var symbolList = new List<ISymbol>();
+            foreach (var baseBuilder in builderList)
+            {
+                var symbolBuilder = baseBuilder as SymbolBuilder;
+                if (symbolBuilder != null)                
+                    symbolList.Add(symbolBuilder.Symbol);                
+                else
+                {
+                    var productionBuilder = baseBuilder as ProductionBuilder;
+                    if (productionBuilder != null)
+                        symbolList.Add(productionBuilder.LeftHandSide);
+                }
+            }
+            return new Production(name, symbolList.ToArray());
+        }
+
         public IGrammarBuilder Ignore(ILexerRule lexerRule)
         {
             _ignoreRules.Add(lexerRule);
