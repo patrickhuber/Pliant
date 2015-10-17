@@ -30,5 +30,10 @@ namespace Pliant.Builders
         {
             return new _(productionBuilder);
         }
+
+        public static explicit operator _(BaseLexerRule lexerRule)
+        {
+            return new _(new SymbolBuilder(lexerRule));
+        }
     }
 }

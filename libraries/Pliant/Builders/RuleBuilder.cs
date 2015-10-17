@@ -85,11 +85,24 @@ namespace Pliant.Builders
                     new StringLiteralLexerRule(literal)));
         }
 
+        public static implicit operator RuleBuilder(char literal)
+        {
+            return new RuleBuilder(
+                new SymbolBuilder(
+                    new TerminalLexerRule(literal)));
+        }
+
         public static implicit operator RuleBuilder(BaseTerminal terminal)
         {
             return new RuleBuilder(
                 new SymbolBuilder(
                     new TerminalLexerRule(terminal, terminal.ToString())));
+        }
+
+        public static implicit operator RuleBuilder(BaseLexerRule lexerRule)
+        {
+            return new RuleBuilder(
+                new SymbolBuilder(lexerRule));
         }
     }
 }

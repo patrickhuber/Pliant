@@ -10,8 +10,8 @@ namespace Pliant.Tests.Unit
     [TestClass]
     public class ParseInterfaceTests
     {
-        IGrammarLexerRule _whitespaceRule;
-        IGrammarLexerRule _wordRule;
+        GrammarLexerRule _whitespaceRule;
+        GrammarLexerRule _wordRule;
 
         public ParseInterfaceTests()
         {
@@ -19,7 +19,7 @@ namespace Pliant.Tests.Unit
             _wordRule = CreateWordRule();            
         }
         
-        private static IGrammarLexerRule CreateWhitespaceRule()
+        private static GrammarLexerRule CreateWhitespaceRule()
         {
             var whitespaceGrammar = new GrammarBuilder("S")
                 .Production("S", r => r
@@ -31,7 +31,7 @@ namespace Pliant.Tests.Unit
             return new GrammarLexerRule("whitespace", whitespaceGrammar);
         }
 
-        private static IGrammarLexerRule CreateWordRule()
+        private static GrammarLexerRule CreateWordRule()
         {
             var wordGrammar = new GrammarBuilder("W")
                 .Production("W", r => r
@@ -42,6 +42,13 @@ namespace Pliant.Tests.Unit
                     .Rule(new RangeTerminal('A', 'Z'))
                     .Rule(new RangeTerminal('0', '9')))
                 .ToGrammar();
+
+            ProductionBuilder W = "W", word = "word";
+            W.Definition = word | word + W;
+            word.Definition = (_)
+                new RangeTerminal('a', 'z')
+                | new RangeTerminal('A', 'Z')
+                | new RangeTerminal('0', '9');
             return new GrammarLexerRule("word", wordGrammar);
         }
 
@@ -212,7 +219,8 @@ namespace Pliant.Tests.Unit
             var endOfLine = new StringLiteralLexerRule(
                 Environment.NewLine, 
                 new TokenType("EOL"));
-
+            ProductionBuilder S = "S";
+            S.Definition = (_) _wordRule + endOfLine + _wordRule;
             var grammar = new GrammarBuilder("S")
                 .Production("S", r => r
                     .Rule(_wordRule, endOfLine, _wordRule))

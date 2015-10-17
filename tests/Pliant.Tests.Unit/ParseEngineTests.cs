@@ -18,19 +18,14 @@ namespace Pliant.Tests.Unit
             // example 3 section 4, Elizabeth Scott
             var tokens = Tokenize("abbb");
 
-            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
-            var b = new TerminalLexerRule(new CharacterTerminal('b'), new TokenType("b"));
-            var grammar = new GrammarBuilder("S")
-                .Production("S", r => r
-                    .Rule("A", "T")
-                    .Rule(a, "T"))
-                .Production("A", r=>r
-                    .Rule(a)
-                    .Rule("B", "A"))
-                .Production("B", r => r
-                    .Lambda())
-                .Production("T", r=>r
-                    .Rule(b, b, b))
+            ProductionBuilder B = "B", S = "S", T = "T", A = "A";
+            
+            S.Definition = (_) A + T | 'a' + T;
+            A.Definition = (_) 'a' | B + A;
+            B.Definition = null;
+            T.Definition = (_) 'b' + 'b' + 'b';
+
+            var grammar = new GrammarBuilder(S, new[] { S, A, B, T })
                 .ToGrammar();
             var T_Production = grammar.Productions[3];
 
@@ -113,13 +108,13 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Completed_Scan_Creates_Internal_And_Terminal_Node()
         {
-            var tokens = Tokenize("a");
-            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
-            var grammar = new GrammarBuilder("S")
-                .Production("S", r => r
-                    .Rule(a))
+            ProductionBuilder S = "S";
+            S.Definition = (_)'a';
+
+            var grammar = new GrammarBuilder(S, new[] { S })
                 .ToGrammar();
 
+            var tokens = Tokenize("a");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
@@ -142,14 +137,13 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Completed_Prediction_Creates_Internal_Node()
         {
+            ProductionBuilder S = "S", A = "A";
+            S.Definition = (_) A;
+            A.Definition = (_) 'a';
+
+            var grammar = new GrammarBuilder(S, new[] { S, A }).ToGrammar();
+
             var tokens = Tokenize("a");
-            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
-            var grammar = new GrammarBuilder("S")
-                .Production("S", r => r
-                    .Rule("A"))
-                .Production("A", r => r
-                    .Rule(a))
-                .ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
@@ -180,15 +174,13 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Leo_Items_Generate_Proper_Parse_Tree()
         {
-            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
-            var b = new TerminalLexerRule(new CharacterTerminal('b'), new TokenType("b"));
-            var grammar = new GrammarBuilder("S")
-                .Production("S", r => r
-                    .Rule("A"))
-                .Production("A", r => r
-                    .Rule(a, "A")
-                    .Rule(b))
-                .ToGrammar();
+            ProductionBuilder S = "S", A = "A";
+
+            S.Definition = A;
+            A.Definition = 'a' + A | 'b';
+
+            var grammar = new GrammarBuilder(S, new[] { S, A }).ToGrammar();
+
             var tokens = Tokenize( "ab");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
@@ -234,18 +226,12 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_PassThrough_Recursive_Items_Creates_Virtual_Nodes()
         {
-            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
-            var b = new TerminalLexerRule(new CharacterTerminal('b'), new TokenType("b"));
+            ProductionBuilder S = "S", A = "A", B = "B";
+            S.Definition = A;
+            A.Definition = 'a' + B;
+            B.Definition = A | 'b';
 
-            var grammar = new GrammarBuilder("S")
-                .Production("S", r => r
-                    .Rule("A"))
-                .Production("A", r => r
-                    .Rule(a, "B"))
-                .Production("B", r => r
-                    .Rule("A")
-                    .Rule(b))
-                .ToGrammar();
+            var grammar = new GrammarBuilder(S, new[] { S, A, B }).ToGrammar();
             var tokens = Tokenize( "aaab");
 
             var parseEngine = new ParseEngine(grammar);
@@ -335,26 +321,13 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Mid_Grammar_Right_Recursion_Handles_Null_Root_Transition_Item()
         {
-            var dot = new TerminalLexerRule(new CharacterTerminal('.'), new TokenType("."));
-            var plus = new TerminalLexerRule(new CharacterTerminal('+'), new TokenType("+"));
-            var question = new TerminalLexerRule(new CharacterTerminal('?'), new TokenType("?"));
-            var star = new TerminalLexerRule(new CharacterTerminal('*'), new TokenType("*"));
+            ProductionBuilder S = "S", A = "A", B = "B", C = "C";
+            S.Definition = (_) A | A + S;
+            A.Definition = (_) B | B + C;
+            B.Definition = (_) '.';
+            C.Definition = (_) '+' | '?' | '*';
 
-            var grammar = new GrammarBuilder("S")
-                .Production("S", r => r
-                    .Rule("A")
-                    .Rule("A", "S"))
-                .Production("A", r => r
-                    .Rule("B")
-                    .Rule("B", "C"))
-                .Production("B", r => r
-                    .Rule(dot))
-                .Production("C", r => r
-                    .Rule(plus)
-                    .Rule(question)
-                    .Rule(star))
-                .ToGrammar();
-
+            var grammar = new GrammarBuilder(S, new[] { S, A, B, C }).ToGrammar();
             var tokens = Tokenize(".+");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
@@ -409,18 +382,15 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Simple_Substitution_Grammar_Parses()
         {
-            var b = new TerminalLexerRule(new CharacterTerminal('b'), new TokenType("b"));
-            var c = new TerminalLexerRule(new CharacterTerminal('c'), new TokenType("c"));
-            var grammar = new GrammarBuilder("A")
-                .Production("A", r => r
-                    .Rule("B", "C"))
-                .Production("B", r => r
-                    .Rule(b))
-                .Production("C", r => r
-                    .Rule(c))
-                .ToGrammar();
-            var tokens = Tokenize("bc");
+            ProductionBuilder A = "A", B = "B", C = "C";
+            A.Definition = (_) B + C;
+            B.Definition = (_) 'b';
+            C.Definition = (_) 'c';
+
+            var grammar = new GrammarBuilder(A, new[] { A, B, C }).ToGrammar();
             var parseEngine = new ParseEngine(grammar);
+
+            var tokens = Tokenize("bc");
             ParseInput(parseEngine, tokens);
         }
 
@@ -462,14 +432,10 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Unmarked_Middle_Recursion_Parses()
         {
-            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
+            ProductionBuilder S = "S";
+            S.Definition = 'a' + S + 'a' | 'a';
 
-            var grammar = new GrammarBuilder("S")
-                .Production("S", r => r
-                    .Rule(a, "S", a)
-                    .Rule(a))
-                .ToGrammar();
-
+            var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
             var parseEngine = new ParseEngine(grammar);
 
             var tokens = Tokenize("aaaaaaaaa");
@@ -483,17 +449,16 @@ namespace Pliant.Tests.Unit
                 new RangeTerminal('a', 'z'),
                 new TokenType("range"));
 
-            var grammar = new GrammarBuilder("S")
-                .Production("S", r => r
-                    .Rule("S", "L")
-                    .Lambda())
-                .Production("L", r => r
-                    .Rule(a_to_z, "L`"))
-                .Production("L`", r => r
-                    .Rule(a_to_z, "L`")
-                    .Lambda())
-                .ToGrammar();
-
+            ProductionBuilder S = "S", L = "L", LP = "L`";
+            S.Definition = (_)
+                S + L 
+                | (_)null;
+            L.Definition = (_)
+                a_to_z + LP;
+            LP.Definition = (_)
+                a_to_z + LP 
+                | (_)null;
+            var grammar = new GrammarBuilder(S, new[] {S, L, LP }).ToGrammar();
             var input = Tokenize("thisisonelonginputstring");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
@@ -509,10 +474,12 @@ namespace Pliant.Tests.Unit
             var a = new TerminalLexerRule(
                 new CharacterTerminal('a'),
                 new TokenType("a"));
-            var grammar = new GrammarBuilder("A")
-                .Production("A", r => r
-                    .Rule(a, "A")
-                    .Lambda())
+            ProductionBuilder A = "A";
+            A.Definition = 
+                'a' + A 
+                | (_)null;
+
+            var grammar = new GrammarBuilder(A, new[] { A })
                 .ToGrammar();
 
             var input = Tokenize("aaaaa");
@@ -543,18 +510,11 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Intermediate_Step_Creates_Transition_Items()
         {
-            var a = new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a"));
-            var b = new TerminalLexerRule(new CharacterTerminal('b'), new TokenType("b"));
-
-            var grammar = new GrammarBuilder("S")
-                .Production("S", r => r
-                    .Rule("A"))
-                .Production("A", r => r
-                    .Rule(a, "B"))
-                .Production("B", r => r
-                    .Rule("A")
-                    .Rule(b))
-                .ToGrammar();
+            ProductionBuilder S = "S", A = "A", B = "B";
+            S.Definition = A;
+            A.Definition = 'a' + B;
+            B.Definition = A | 'b';
+            var grammar = new GrammarBuilder(S, new[] { S, A, B }).ToGrammar();
             var input = Tokenize("aaab");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
@@ -638,19 +598,15 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Long_Production_Rule_Produces_Proper_Parse_Tree()
         {
-            var grammar = new GrammarBuilder("S")
-                .Production("S", r=>r
-                    .Rule("A", "B", "C", "D", "S")
-                    .Rule('|'))
-                .Production("A", r=>r
-                    .Rule('a'))
-                .Production("B", r => r
-                    .Rule('b'))
-                .Production("C", r => r
-                    .Rule('c'))
-                .Production("D", r => r
-                    .Rule('d'))
-                .ToGrammar();
+            ProductionBuilder S = "S", A = "A", B = "B", C = "C", D = "D";
+            S.Definition = (_)
+                A + B + C + D + S
+                | '|';
+            A.Definition = 'a';
+            B.Definition = 'b';
+            C.Definition = 'c';
+            D.Definition = 'd';
+            var grammar = new GrammarBuilder(S, new[] { S, A, B, C, D }).ToGrammar();
 
             var input = Tokenize("abcdabcdabcdabcd|");
             var parseEngine = new ParseEngine(grammar);
@@ -662,29 +618,30 @@ namespace Pliant.Tests.Unit
         
         private static IGrammar CreateRegularExpressionStubGrammar()
         {
-            return new GrammarBuilder("R")
-                .Production("R", r => r
-                    .Rule("E")
-                    .Rule('^', "E")
-                    .Rule("E", '$')
-                    .Rule('^', "E", '$'))
-                .Production("E", r => r
-                    .Rule("T")
-                    .Rule("T", '|', "E")
-                    .Lambda())
-                .Production("T", r => r
-                    .Rule("F", "T")
-                    .Rule("F"))
-                .Production("F", r => r
-                    .Rule("A")
-                    .Rule("A", "I"))
-                .Production("A", r=>r
-                    .Rule('a'))
-                .Production("I", r=>r
-                    .Rule('+')
-                    .Rule('?')
-                    .Rule('*'))
-                .ToGrammar();
+            ProductionBuilder R = "R", E = "E", T = "T", F = "F", A = "A", I = "I";
+            R.Definition = (_)
+                E 
+                | '^' + E 
+                | E + '$' 
+                | '^' + E + '$';
+            E.Definition = (_)
+                T 
+                | T + '|' + E
+                | (_)null;
+            T.Definition = (_)
+                F + T 
+                | F;
+            F.Definition = (_)
+                A
+                | A + I;
+            A.Definition = (_)
+                'a';
+            I.Definition = (_)
+                '+' 
+                | '?' 
+                | '*';
+
+            return new GrammarBuilder(R, new[] { R, E, T, F, A, I }).ToGrammar();
         }
 
         private static void AssertNodeProperties(ISymbolNode node, string nodeName, int origin, int location)
@@ -725,27 +682,17 @@ namespace Pliant.Tests.Unit
 
         private static IGrammar CreateExpressionGrammar()
         {
-            var plus = new TerminalLexerRule(
-                            new CharacterTerminal('+'),
-                            new TokenType("+"));
-            var star = new TerminalLexerRule(
-                new CharacterTerminal('*'),
-                new TokenType("*"));
             var digit = new TerminalLexerRule(
                 new DigitTerminal(),
                 new TokenType("digit"));
 
-            var expressionGrammar = new GrammarBuilder("S")
-                .Production("S", r => r
-                    .Rule("S", plus, "M")
-                    .Rule("M"))
-                .Production("M", r => r
-                    .Rule("M", star, "T")
-                    .Rule("T"))
-                .Production("T", r => r
-                    .Rule(digit))
-                .ToGrammar();
-            return expressionGrammar;
+            ProductionBuilder S = "S", M = "M", T = "T";
+            S.Definition = S + '+' + M | M;
+            M.Definition = M + '*' + T | T;
+            T.Definition = digit;
+
+            var grammar = new GrammarBuilder(S, new[] { S, M, T }).ToGrammar();
+            return grammar;
         }
 
         private IToken CreateDigitToken(int value, int position)

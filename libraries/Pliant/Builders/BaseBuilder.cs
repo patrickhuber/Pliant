@@ -44,6 +44,15 @@ namespace Pliant.Builders
             return AddWithAnd(new SymbolBuilder(new TerminalLexerRule(lhs, lhs.ToString())), rhs);
         }
 
+        public static RuleBuilder operator +(BaseBuilder lhs, BaseLexerRule rhs)
+        {
+            return AddWithAnd(lhs, new SymbolBuilder(rhs));
+        }
+
+        public static RuleBuilder operator +(BaseLexerRule lhs, BaseBuilder rhs)
+        {
+            return AddWithAnd(new SymbolBuilder(lhs), rhs);
+        }
 
         public static RuleBuilder operator |(BaseBuilder lhs, BaseBuilder rhs)
         {
@@ -79,7 +88,16 @@ namespace Pliant.Builders
         {
             return AddWithOr(new SymbolBuilder(new TerminalLexerRule(lhs, lhs.ToString())), rhs);
         }
+        
+        public static RuleBuilder operator |(BaseBuilder lhs, BaseLexerRule rhs)
+        {
+            return AddWithOr(lhs, new SymbolBuilder(rhs));
+        }
 
+        public static RuleBuilder operator |(BaseLexerRule lhs, BaseBuilder rhs)
+        {
+            return AddWithOr(new SymbolBuilder(lhs), rhs);
+        }
 
         private static RuleBuilder AddWithAnd(BaseBuilder lhs, BaseBuilder rhs)
         {

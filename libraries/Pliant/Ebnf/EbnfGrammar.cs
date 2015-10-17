@@ -13,21 +13,23 @@ namespace Pliant.Ebnf
 
         static void EbnfGrammar2()
         {
-            var grammar = new ProductionBuilder("Grammar");
-            var ruleOrSetting = new ProductionBuilder("RuleOrSetting");
-            var rule = new ProductionBuilder("Rule");
-            var setting = new ProductionBuilder("Setting");
-            var productions = new[] { grammar, ruleOrSetting, rule, setting};
+            ProductionBuilder 
+                Grammar = "Grammar", 
+                RuleOrSetting = "RuleOrSetting", 
+                Rule = "Rule",
+                Setting = "Setting";
 
-            grammar
-                .Rule(ruleOrSetting)
-                .Or(ruleOrSetting, grammar);
-            ruleOrSetting
-                .Rule(rule)
-                .Or(setting);
+            Grammar.Definition = 
+                RuleOrSetting 
+                | RuleOrSetting + Grammar;
 
+            RuleOrSetting.Definition = 
+                Rule 
+                | Setting;
 
-            var grammarBuilder = new GrammarBuilder(grammar, productions);
+            var grammarBuilder = new GrammarBuilder(
+                Grammar,
+                new[] { Grammar, RuleOrSetting, Rule, Setting });
             IGrammar g = grammarBuilder.ToGrammar();
         }
 
