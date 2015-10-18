@@ -18,7 +18,7 @@ namespace Pliant.Tests.Unit.Builders
         {
             var s = new ProductionBuilder("S");
             var a = new ProductionBuilder("A");
-            s.Rule(a);
+            s.Definition = a;
         }
 
         [TestMethod]

@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Collections;
+using Pliant.Grammars;
 using Pliant.Tokens;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,10 @@ namespace Pliant.Builders
             _ignoreRules = new List<ILexerRule>();
         }
 
-        public GrammarBuilder(ProductionBuilder start, ProductionBuilder[] productionBuilder)
+        public GrammarBuilder(
+            ProductionBuilder start, 
+            ProductionBuilder[] productionBuilder, 
+            ILexerRule[] ignore)
             : this(start.LeftHandSide.Value)
         {
             foreach (var production in productionBuilder)
@@ -34,6 +38,14 @@ namespace Pliant.Builders
                     _productions.Add(GetProductionFromNameAndListOfSymbols(production.LeftHandSide.Value, list));
                 }
             }
+            if (!ignore.IsNullOrEmpty())
+                foreach (var ignoreRule in ignore)
+                    _ignoreRules.Add(ignoreRule);
+        }
+
+        public GrammarBuilder(ProductionBuilder start, ProductionBuilder[] productions)
+            : this(start, productions, null)
+        {
         }
 
         public IGrammar ToGrammar()

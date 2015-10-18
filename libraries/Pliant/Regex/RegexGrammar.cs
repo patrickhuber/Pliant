@@ -56,7 +56,7 @@ namespace Pliant.Regex
             var notCloseBracket = new NegationTerminal(
                 new CharacterTerminal(']'));
             var escape = CreateEscapeCharacterLexerRule();
-
+ 
             var regex = new ProductionBuilder("Regex");
             var expression = new ProductionBuilder("Expression");
             var term = new ProductionBuilder("Term");

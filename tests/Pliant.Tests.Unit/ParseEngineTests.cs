@@ -452,14 +452,14 @@ namespace Pliant.Tests.Unit
             ProductionBuilder S = "S", L = "L", LP = "L`";
             S.Definition = (_)
                 S + L 
-                | (_)null;
+                | (_) null;
             L.Definition = (_)
                 a_to_z + LP;
             LP.Definition = (_)
                 a_to_z + LP 
                 | (_)null;
             var grammar = new GrammarBuilder(S, new[] {S, L, LP }).ToGrammar();
-            var input = Tokenize("thisisonelonginputstring");
+            var input = Tokenize("thisisonelonginputstring", "range");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
             Chart chart = GetChartFromParseEngine(parseEngine);

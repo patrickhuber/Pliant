@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Collections;
+using Pliant.Grammars;
 using Pliant.Tokens;
 using System;
 using System.Collections.Generic;
@@ -18,13 +19,26 @@ namespace Pliant.Builders
         public RuleBuilder(BaseBuilder baseBuilder)
             : this()
         {
-            Data.Add(new BaseBuilderList());
-            Data[0].Add(baseBuilder);
+            AddWithAnd(baseBuilder);
         }
-        
+
+        public void AddWithAnd(BaseBuilder symbolBuilder)
+        {
+            if (Data.Count == 0)
+                Data.Add(new BaseBuilderList());
+            Data[Data.Count - 1].Add(symbolBuilder);
+        }
+
+        public void AddWithOr(BaseBuilder symbolBuilder)
+        {
+            var list = new BaseBuilderList();
+            list.Add(symbolBuilder);
+            Data.Add(list);
+        }
+
         public IRuleBuilder Rule(params object[] symbols)
         {
-            if (symbols != null)
+            if (!symbols.IsNullOrEmpty())
             {
                 var symbolList = new BaseBuilderList();
                 foreach (var symbol in symbols)

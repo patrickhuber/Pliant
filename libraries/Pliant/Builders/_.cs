@@ -35,5 +35,12 @@ namespace Pliant.Builders
         {
             return new _(new SymbolBuilder(lexerRule));
         }
+
+        public static explicit operator _(BaseTerminal terminal)
+        {
+            return new _(
+                new SymbolBuilder(
+                    new TerminalLexerRule(terminal, terminal.ToString())));
+        }
     }
 }
