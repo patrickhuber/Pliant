@@ -32,7 +32,7 @@ namespace Pliant.Tests.Unit
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
-            var S_0_4 = parseEngine.GetRoot() as ISymbolNode;
+            var S_0_4 = parseEngine.GetParseForestRoot() as ISymbolNode;
             Assert.IsNotNull(S_0_4);
             Assert.AreEqual(2, S_0_4.Children.Count);
 
@@ -118,7 +118,7 @@ namespace Pliant.Tests.Unit
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
-            var parseNode = parseEngine.GetRoot();
+            var parseNode = parseEngine.GetParseForestRoot();
             Assert.IsNotNull(parseNode);
 
             var S_0_1 = parseNode as ISymbolNode;
@@ -150,7 +150,7 @@ namespace Pliant.Tests.Unit
             /*  S_0_1 -> A_0_1
              *  A_0_1 -> 'a'
              */
-            var S_0_1 = parseEngine.GetRoot() as ISymbolNode;
+            var S_0_1 = parseEngine.GetParseForestRoot() as ISymbolNode;
             Assert.IsNotNull(S_0_1);
             Assert.AreEqual(1, S_0_1.Children.Count);
             
@@ -189,7 +189,7 @@ namespace Pliant.Tests.Unit
              *  A_0_2 -> a_0_1 A_1_2
              *  A_1_2 -> b_1_2
              */
-            var S_0_2 = parseEngine.GetRoot() as ISymbolNode;
+            var S_0_2 = parseEngine.GetParseForestRoot() as ISymbolNode;
             Assert.IsNotNull(S_0_2);
             Assert.AreEqual(1, S_0_2.Children.Count);
             
@@ -245,7 +245,7 @@ namespace Pliant.Tests.Unit
              *  A_2_4 -> 'a' B_3_4
              *  B_3_4 -> 'b'
              */
-            var S_0_4 = parseEngine.GetRoot() as ISymbolNode;
+            var S_0_4 = parseEngine.GetParseForestRoot() as ISymbolNode;
             Assert.IsNotNull(S_0_4);
             Assert.AreEqual(1, S_0_4.Children.Count);
 
@@ -332,7 +332,7 @@ namespace Pliant.Tests.Unit
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
-            var parseForest = parseEngine.GetRoot();
+            var parseForest = parseEngine.GetParseForestRoot();
             Assert.IsNotNull(parseForest);
 
             // S_0_2 -> A_0_2
@@ -445,11 +445,12 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Right_Recursive_Quasi_Complete_Items_Are_Leo_Optimized()
         {
-            ProductionBuilder S = "S", C = "C";
-            S.Definition = 'a' + S | C;
-            C.Definition = 'a' + C + 'b' | (_)null;
+            ProductionBuilder S = "S", A = "A", B = "B";
+            S.Definition = A + B;
+            A.Definition = 'a' + A | 'a';
+            B.Definition = 'b' + B | (_)null;
 
-            var grammar = new GrammarBuilder(S, new[] {S, C}).ToGrammar();
+            var grammar = new GrammarBuilder(S, new[] { S, A, B }).ToGrammar();
             var input = Tokenize("aaaaaaaaaaaaaaaaaaabbbbbbbbbbb");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
@@ -536,7 +537,7 @@ namespace Pliant.Tests.Unit
             // F_5_6 -> 'a'
             // T_6_7 -> F_6_7
             // F_6_7 -> 'a'
-            var R_0_4 = CastAndCountChildren<ISymbolNode>(parseEngine.GetRoot(), 1);
+            var R_0_4 = CastAndCountChildren<ISymbolNode>(parseEngine.GetParseForestRoot(), 1);
             AssertNodeProperties(R_0_4, "R", 0, 4);
             var E_0_4 = GetAndCastChildAtIndex<ISymbolNode>(R_0_4, 0);
             AssertNodeProperties(E_0_4, "E", 0, 4);
@@ -566,7 +567,7 @@ namespace Pliant.Tests.Unit
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
 
-            var R_0_3 = CastAndCountChildren<ISymbolNode>(parseEngine.GetRoot(), 1);
+            var R_0_3 = CastAndCountChildren<ISymbolNode>(parseEngine.GetParseForestRoot(), 1);
             AssertNodeProperties(R_0_3, "R", 0, 3);
             var E_0_3 = GetAndCastChildAtIndex<ISymbolNode>(R_0_3, 0);
             AssertNodeProperties(E_0_3, "E", 0, 3);
@@ -602,7 +603,7 @@ namespace Pliant.Tests.Unit
             var input = Tokenize("abcdabcdabcdabcd|");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
-            var root = parseEngine.GetRoot();
+            var root = parseEngine.GetParseForestRoot();
 
             var S_0_17 = CastAndCountChildren<ISymbolNode>(root, 2);
         }

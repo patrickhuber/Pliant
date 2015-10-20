@@ -39,7 +39,7 @@ namespace Pliant.Ebnf
                 throw new Exception(
                     "Unable to parse input. No acceptable parse paths found.");
 
-            return parseInterface.ParseEngine.GetRoot();
+            return parseInterface.ParseEngine.GetParseForestRoot();
         }
     }
 }

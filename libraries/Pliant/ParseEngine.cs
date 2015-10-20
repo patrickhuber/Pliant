@@ -47,7 +47,7 @@ namespace Pliant
             return expectedRuleDictionary.Values;
         }
 
-        public INode GetRoot()
+        public INode GetParseForestRoot()
         {
             if (!IsAccepted())
                 throw new Exception("Unable to parse expression.");

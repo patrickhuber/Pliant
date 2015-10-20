@@ -44,7 +44,7 @@ namespace Pliant.Tests.Unit.Nodes
 
             var nodeVisitor = new LoggingNodeVisitor();
             var nodeVisitorStateManager = new NodeVisitorStateManager();
-            var root = regexParseEngine.GetRoot();
+            var root = regexParseEngine.GetParseForestRoot();
             root.Accept(nodeVisitor, nodeVisitorStateManager);
             Assert.AreEqual(31, nodeVisitor.VisitLog.Count);           
         }

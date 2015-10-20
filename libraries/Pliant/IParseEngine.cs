@@ -9,7 +9,7 @@ namespace Pliant
     {
         void Reset();
         bool IsAccepted();
-        INode GetRoot();
+        INode GetParseForestRoot();
         IEnumerable<ILexerRule> GetExpectedLexerRules();
         bool Pulse(IToken token);
         IGrammar Grammar { get; }
