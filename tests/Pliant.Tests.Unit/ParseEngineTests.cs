@@ -445,21 +445,12 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_ParseEngine_That_Right_Recursive_Quasi_Complete_Items_Are_Leo_Optimized()
         {
-            var a_to_z = new TerminalLexerRule(
-                new RangeTerminal('a', 'z'),
-                new TokenType("range"));
+            ProductionBuilder S = "S", C = "C";
+            S.Definition = 'a' + S | C;
+            C.Definition = 'a' + C + 'b' | (_)null;
 
-            ProductionBuilder S = "S", L = "L", LP = "L`";
-            S.Definition = (_)
-                S + L 
-                | (_) null;
-            L.Definition = (_)
-                a_to_z + LP;
-            LP.Definition = (_)
-                a_to_z + LP 
-                | (_)null;
-            var grammar = new GrammarBuilder(S, new[] {S, L, LP }).ToGrammar();
-            var input = Tokenize("thisisonelonginputstring", "range");
+            var grammar = new GrammarBuilder(S, new[] {S, C}).ToGrammar();
+            var input = Tokenize("aaaaaaaaaaaaaaaaaaabbbbbbbbbbb");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
             Chart chart = GetChartFromParseEngine(parseEngine);

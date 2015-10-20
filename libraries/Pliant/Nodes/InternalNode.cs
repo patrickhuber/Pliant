@@ -1,4 +1,5 @@
 ﻿using Pliant.Collections;
+using System;
 using System.Collections.Generic;
 
 namespace Pliant.Nodes
@@ -69,37 +70,39 @@ namespace Pliant.Nodes
             if (parameterNode.Location != compareNode.Location)
                 return false;
 
-            if (parameterNode.NodeType == NodeType.Symbol)
+            switch (parameterNode.NodeType)
             {
-                var symbolParameterNode = parameterNode as ISymbolNode;
-                var symbolCompareNode = compareNode as ISymbolNode;
-                return IsSameSymbolNode(symbolParameterNode, symbolCompareNode);
+                case NodeType.Symbol:
+                    return IsSameNode(parameterNode as ISymbolNode, compareNode as ISymbolNode);
+                case NodeType.Terminal:
+                    return IsSameNode(parameterNode as ITerminalNode, compareNode as ITerminalNode);
+                case NodeType.Token:
+                    return IsSameNode(parameterNode as ITokenNode, compareNode as ITokenNode);
+                case NodeType.Intermediate:
+                    return IsSameNode(parameterNode as IIntermediateNode, compareNode as IIntermediateNode);
             }
-            else if (parameterNode.NodeType == NodeType.Terminal)
-            {
-                var terminalParameterNode = parameterNode as ITerminalNode;
-                var terminalCompareNode = compareNode as ITerminalNode;
-                return IsSameTerminalNode(terminalParameterNode, terminalCompareNode);
-            }
-            
-            var intermediateParameterNode = parameterNode as IIntermediateNode;
-            var intermediateCompareNode = compareNode as IIntermediateNode;
-            return IsSameIntermediateNode(intermediateParameterNode, intermediateCompareNode);
+            throw new InvalidOperationException(
+                string.Format("Unrecognized node type {0} found when comparing nodes.", parameterNode.NodeType));
         }
 
-        private static bool IsSameSymbolNode(ISymbolNode symbolParameterNode, ISymbolNode symbolCompareNode)
+        private static bool IsSameNode(ISymbolNode symbolParameterNode, ISymbolNode symbolCompareNode)
         {
             return symbolParameterNode.Symbol.Equals(symbolCompareNode.Symbol);
         }
 
-        private static bool IsSameTerminalNode(ITerminalNode terminalParameterNode, ITerminalNode terminalCompareNode)
+        private static bool IsSameNode(ITerminalNode terminalParameterNode, ITerminalNode terminalCompareNode)
         {
             return terminalParameterNode.Capture == terminalCompareNode.Capture;
         }
 
-        private static bool IsSameIntermediateNode(IIntermediateNode intermediateParameterNode, IIntermediateNode intermediateCompareNode)
+        private static bool IsSameNode(IIntermediateNode intermediateParameterNode, IIntermediateNode intermediateCompareNode)
         {
             return intermediateParameterNode.State.Equals(intermediateCompareNode.State);
+        }
+
+        private static bool IsSameNode(ITokenNode tokenparameterNode, ITokenNode tokenCompareNode)
+        {
+            return tokenparameterNode.Token.TokenType.Equals(tokenCompareNode.Token.TokenType);
         }
     }
 }
