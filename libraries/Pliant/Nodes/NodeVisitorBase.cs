@@ -20,14 +20,30 @@ namespace Pliant.Nodes
         {
         }
 
-        public abstract void Visit(IIntermediateNode node);
+        public virtual void Visit(IIntermediateNode node)
+        {
+            var currentAndNode = StateManager.GetCurrentAndNode(node);
+            Visit(currentAndNode);
+            StateManager.MarkAsTraversed(node);
+        }
 
-        public abstract void Visit(ITokenNode tokenNode);
+        public virtual void Visit(ITokenNode tokenNode)
+        { }
 
-        public abstract void Visit(IAndNode andNode);
+        public virtual void Visit(IAndNode andNode)
+        {
+            foreach (var child in andNode.Children)
+                child.Accept(this);
+        }
 
-        public abstract void Visit(ISymbolNode node);
+        public  virtual void Visit(ISymbolNode node)
+        {
+            var currentAndNode = StateManager.GetCurrentAndNode(node);
+            Visit(currentAndNode);
+            StateManager.MarkAsTraversed(node);
+        }
 
-        public abstract void Visit(ITerminalNode node);
+        public virtual void Visit(ITerminalNode node)
+        { }
     }
 }

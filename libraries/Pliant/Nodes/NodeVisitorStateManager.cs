@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Pliant.Nodes
 {
@@ -13,23 +14,33 @@ namespace Pliant.Nodes
             _stateStore = new Dictionary<IInternalNode, int>();
         }
 
-        public IAndNode GetCurrentAndNode(IInternalNode internalNode)
+        private int GetTraversalPosition(IInternalNode internalNode)
         {
             int value = 0;
             if (_stateStore.TryGetValue(internalNode, out value))
-                return internalNode.Children[value];
-            return internalNode.Children[0];
+                return value;
+            SetTraversalPosition(internalNode, value);
+            return value;
+        }
+
+        public IAndNode GetCurrentAndNode(IInternalNode internalNode)
+        {
+            int value = GetTraversalPosition(internalNode);
+            return internalNode.Children[value];
         }
 
         public void MarkAsTraversed(IInternalNode internalNode)
         {
-            int value = 0;
-            if (!_stateStore.TryGetValue(internalNode, out value))
-                _stateStore[internalNode] = 0;
-            if (value < internalNode.Children.Count - 1 && TryAcquireLock(internalNode))
-                _stateStore[internalNode] = value + 1;
+            int value = GetTraversalPosition(internalNode);
+            if (HasMoreTransitions(internalNode) && TryAcquireLock(internalNode))
+                SetTraversalPosition(internalNode, value + 1);
             else
                 TryReleaseLock(internalNode);
+        }
+
+        private void SetTraversalPosition(IInternalNode internalNode, int value)
+        {
+            _stateStore[internalNode] = value ;
         }
 
         private bool TryAcquireLock(IInternalNode internalNode)
@@ -46,6 +57,18 @@ namespace Pliant.Nodes
                 return false;
             _lock = null;
             return true;
+        }
+
+        private bool HasMoreTransitions(IInternalNode internalNode)
+        {
+            return HasMoreTransitions(
+                internalNode,
+                GetTraversalPosition(internalNode));
+        }
+
+        private bool HasMoreTransitions(IInternalNode internalNode, int currentPosition)
+        {
+            return currentPosition < internalNode.Children.Count - 1;
         }
     }
 }
