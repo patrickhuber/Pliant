@@ -15,9 +15,9 @@ namespace Pliant.Nodes
             NodeType = NodeType.Token;
         }
 
-        public override void Accept(INodeVisitor visitor, INodeVisitorStateManager stateManager)
+        public override void Accept(INodeVisitor visitor)
         {
-            visitor.Visit(this, stateManager);
+            visitor.Visit(this);
         }
     }
 }

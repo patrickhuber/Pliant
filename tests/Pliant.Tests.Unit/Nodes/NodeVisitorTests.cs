@@ -42,10 +42,10 @@ namespace Pliant.Tests.Unit.Nodes
             }
             Assert.IsTrue(regexParseEngine.IsAccepted());
 
-            var nodeVisitor = new LoggingNodeVisitor();
             var nodeVisitorStateManager = new NodeVisitorStateManager();
+            var nodeVisitor = new LoggingNodeVisitor();
             var root = regexParseEngine.GetParseForestRoot();
-            root.Accept(nodeVisitor, nodeVisitorStateManager);
+            root.Accept(nodeVisitor);
             Assert.AreEqual(31, nodeVisitor.VisitLog.Count);           
         }
 

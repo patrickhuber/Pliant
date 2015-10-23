@@ -114,6 +114,7 @@
     <Compile Include="Grammars\ITerminal.cs" />
     <Compile Include="Nodes\ITerminalNode.cs" />
     <Compile Include="Nodes\NodeBase.cs" />
+    <Compile Include="Nodes\NodeVisitorBase.cs" />
     <Compile Include="Nodes\NodeVisitorStateManager.cs" />
     <Compile Include="ParseEngineLexemeFactory.cs" />
     <Compile Include="Tokens\IToken.cs" />

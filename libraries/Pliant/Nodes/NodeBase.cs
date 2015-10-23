@@ -8,6 +8,6 @@
 
         public virtual int Origin { get; protected set; }
 
-        public abstract void Accept(INodeVisitor visitor, INodeVisitorStateManager stateManager);
+        public abstract void Accept(INodeVisitor visitor);
     }
 }

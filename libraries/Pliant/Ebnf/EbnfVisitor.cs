@@ -1,45 +1,110 @@
-﻿using System;
-using Pliant.Nodes;
+﻿using Pliant.Nodes;
 using Pliant.Grammars;
-using System.Collections.Generic;
+using Pliant.Builders;
 
 namespace Pliant.Ebnf
 {
-    public class EbnfVisitor : INodeVisitor
+    public class EbnfVisitor : NodeVisitorBase
     {
-        public IGrammar Grammar { get; private set; }
-        private IList<IProduction> _productions;
-        private IList<ILexerRule> _ignoreRules;
+        public IGrammar Grammar { get { return _grammarbuilder.ToGrammar(); } }
+
+        private GrammarBuilder _grammarbuilder;
 
         public EbnfVisitor()
+            : base()
         {
-            _productions = new List<IProduction>();
-            _ignoreRules = new List<ILexerRule>();
         }
 
-        public void Visit(IIntermediateNode node, INodeVisitorStateManager stateManager)
+        public EbnfVisitor(INodeVisitorStateManager stateManager)
+            : base(stateManager)
         {
-            throw new NotImplementedException();
+        }
+                        
+        public override void Visit(ISymbolNode node)
+        {
+            switch (node.Symbol.SymbolType)
+            {
+                case SymbolType.NonTerminal:
+                    var leftHandSide = (node.Symbol as INonTerminal);
+                    switch (leftHandSide.Value)
+                    {
+                        case "Grammar":
+                            VisitGrammar(node);
+                            break;
+
+                        case "Rule":
+                            VisitRule(node);
+                            break;
+
+                        case "Setting":
+                            VisitSetting(node);
+                            break;
+
+                        default:
+                            BeginVisitInternalNodeChildren(node);
+                            EndVisitInternalNodeChildren(node);
+                            break;
+                    }
+                    break;
+            }
         }
 
-        public void Visit(ITokenNode tokenNode, INodeVisitorStateManager stateManager)
+        private void VisitGrammar(ISymbolNode node)
         {
-            throw new NotImplementedException();
+            _grammarbuilder = new GrammarBuilder();
+            BeginVisitInternalNodeChildren(node);
+            EndVisitInternalNodeChildren(node);
         }
 
-        public void Visit(ISymbolNode node, INodeVisitorStateManager stateManager)
+        private void VisitRule(ISymbolNode node)
         {
-            throw new NotImplementedException();            
+            ;
         }
 
-        public void Visit(ITerminalNode node, INodeVisitorStateManager stateManager)
+        private void VisitSetting(ISymbolNode node)
         {
-            throw new NotImplementedException();
+
         }
 
-        public void Visit(IAndNode andNode, INodeVisitorStateManager stateManager)
+        public override void Visit(IIntermediateNode node)
         {
-            throw new NotImplementedException();
+            // intermediate nodes are just used to binarize the tree, 
+            // we don't actually process them in any way
+            BeginVisitInternalNodeChildren(node);
+            EndVisitInternalNodeChildren(node);
+        }
+
+        protected virtual void VisitInternalNodeChildren(IIntermediateNode node)
+        {
+
+        }
+
+        protected void BeginVisitInternalNodeChildren(IInternalNode node)
+        {
+            var currentAndNode = StateManager.GetCurrentAndNode(node);
+            foreach (var child in currentAndNode.Children)
+                child.Accept(this);
+        }
+
+        protected virtual void EndVisitInternalNodeChildren(IInternalNode node)
+        {
+            StateManager.MarkAsTraversed(node);
+        }
+
+
+        public override void Visit(ITokenNode tokenNode)
+        {
+            ;
+        }
+
+        public override void Visit(ITerminalNode node)
+        {
+            ;
+        }
+
+        public override void Visit(IAndNode andNode)
+        {
+            ;
         }
     }
 }

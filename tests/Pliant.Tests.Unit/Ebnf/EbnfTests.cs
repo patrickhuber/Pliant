@@ -221,7 +221,7 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsNotNull(node);
             
             var visitor = new LoggingNodeVisitor();
-            node.Accept(visitor, new NodeVisitorStateManager());
+            node.Accept(visitor);
 
             var log = visitor.VisitLog;
             Assert.IsTrue(log.Count > 0);

@@ -6,54 +6,88 @@ namespace Pliant.Grammars
 {
     public class Grammar : IGrammar
     {
-        public IReadOnlyList<IProduction> Productions { get; private set; }
-        
-        public INonTerminal Start { get; private set; }
-
-        public IReadOnlyList<ILexerRule> Ignores { get; private set; }
-
+        protected ReadWriteList<ILexerRule> _ignores;
+        protected ReadWriteList<IProduction> _productions;
         private IDictionary<INonTerminal, IList<IProduction>> _productionIndex;
-        
+        private IDictionary<int, IList<ILexerRule>> _ignoreIndex;
+
         private static readonly IProduction[] EmptyProductionArray = new IProduction[] { };
         private static readonly ILexerRule[] EmptyLexerRuleArray = new ILexerRule[] { };
 
-        public Grammar(INonTerminal start, IProduction[] productions, ILexerRule[] ignore)
+        public Grammar()
         {
-            Assert.IsNotNullOrEmpty(productions, "productions");
-            Assert.IsNotNull(start, "start");
-            _productionIndex = CreateProductionIndex(productions);
-            Productions = new ReadOnlyList<IProduction>(productions ?? EmptyProductionArray);
-            Ignores = new ReadOnlyList<ILexerRule>(ignore ?? EmptyLexerRuleArray);
-            Start = start; 
+            _productions = new ReadWriteList<IProduction>();
+            _ignores = new ReadWriteList<ILexerRule>();
+            _productionIndex = new Dictionary<INonTerminal, IList<IProduction>>();
+            _ignoreIndex = new Dictionary<int, IList<ILexerRule>>();
         }
 
-        private IDictionary<INonTerminal, IList<IProduction>> CreateProductionIndex(IEnumerable<IProduction> productions)
+        public Grammar(
+            INonTerminal start,
+            IProduction[] productions,
+            ILexerRule[] ignoreRules)
+            : this()
         {
-            var dictionary = new Dictionary<INonTerminal, IList<IProduction>>();
+            Start = start;
+            AddProductions(productions ?? EmptyProductionArray);
+            AddIgnoreRules(ignoreRules ?? EmptyLexerRuleArray);
+        }
+
+        private void AddIgnoreRules(ILexerRule[] ignoreRules)
+        {
+            foreach (var ignoreRule in ignoreRules)
+                AddIgnoreRule(ignoreRule);
+        }
+
+        private void AddProductions(IProduction[] productions)
+        {
             foreach (var production in productions)
-            {
-                var leftHandSide = production.LeftHandSide;
-                if (!dictionary.ContainsKey(leftHandSide))
-                    dictionary.Add(leftHandSide, new List<IProduction>());
-                dictionary[leftHandSide].Add(production);
-            }
-            return dictionary;
+                AddProduction(production);
         }
 
-        private IDictionary<int, IList<ILexerRule>> CreateLexerRuleIndex(IEnumerable<ILexerRule> lexerRules)
+        public IReadOnlyList<ILexerRule> Ignores
         {
-            var dictionary = new Dictionary<int, IList<ILexerRule>>();
-            foreach (var lexerRule in lexerRules)
-            {
-                var key = HashUtil.ComputeHash(
-                    lexerRule.SymbolType.GetHashCode(),
-                    lexerRule.TokenType.Id.GetHashCode());
-                if (!dictionary.ContainsKey(key))
-                    dictionary.Add(key, new List<ILexerRule>());
-                dictionary[key].Add(lexerRule); 
-            }
-            return dictionary;
+            get { return _ignores; }
         }
+
+        public IReadOnlyList<IProduction> Productions
+        {
+            get { return _productions; }
+        }
+
+        public void AddProduction(IProduction production)
+        {
+            _productions.Add(production);
+            AddProductionToIndex(production);
+        }
+
+        private void AddProductionToIndex(IProduction production)
+        {
+            var leftHandSide = production.LeftHandSide;
+            if (!_productionIndex.ContainsKey(leftHandSide))
+            {
+                _productionIndex.Add(leftHandSide, new List<IProduction>());
+            }
+            _productionIndex[leftHandSide].Add(production);
+        }
+
+        public void AddIgnoreRule(ILexerRule lexerRule)
+        {
+            _ignores.Add(lexerRule);
+            AddIgnoreRuletoIndex(lexerRule);
+        }
+
+        private void AddIgnoreRuletoIndex(ILexerRule lexerRule)
+        {
+            var key = HashUtil.ComputeHash(
+                                lexerRule.SymbolType.GetHashCode(),
+                                lexerRule.TokenType.Id.GetHashCode());
+            if (!_ignoreIndex.ContainsKey(key))
+                _ignoreIndex.Add(key, new List<ILexerRule>());
+            _ignoreIndex[key].Add(lexerRule);
+        }
+
+        public INonTerminal Start { get; set; }
 
         public IEnumerable<IProduction> RulesFor(INonTerminal symbol)
         {

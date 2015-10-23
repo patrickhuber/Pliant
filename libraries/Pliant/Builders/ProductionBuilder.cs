@@ -1,7 +1,5 @@
 ﻿using Pliant.Grammars;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Pliant.Builders
 {
@@ -10,8 +8,13 @@ namespace Pliant.Builders
         public INonTerminal LeftHandSide { get; private set; }
        
         public ProductionBuilder(string leftHandSide)
+            : this(new NonTerminal(leftHandSide))
         {
-            LeftHandSide = new NonTerminal(leftHandSide);
+        }
+
+        public ProductionBuilder(INonTerminal leftHandSide)
+        {
+            LeftHandSide = leftHandSide;
         }
 
         public AlterationBuilder Rule(params SymbolBuilder[] symbolBuilders)
@@ -29,6 +32,27 @@ namespace Pliant.Builders
         public static implicit operator ProductionBuilder(string name)
         {
             return new ProductionBuilder(name);
+        }
+
+        public IEnumerable<IProduction> ToProductions()
+        {
+            foreach (var builderList in Definition.Data)
+            {
+                var symbolList = new List<ISymbol>();
+                foreach (var baseBuilder in builderList)
+                {
+                    var symbolBuilder = baseBuilder as SymbolBuilder;
+                    if (symbolBuilder != null)
+                        symbolList.Add(symbolBuilder.Symbol);
+                    else
+                    {
+                        var productionBuilder = baseBuilder as ProductionBuilder;
+                        if (productionBuilder != null)
+                            symbolList.Add(productionBuilder.LeftHandSide);
+                    }
+                }
+                yield return new Production(LeftHandSide, symbolList.ToArray());
+            }            
         }
     }
 }

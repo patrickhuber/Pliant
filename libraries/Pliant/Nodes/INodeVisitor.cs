@@ -8,10 +8,10 @@ namespace Pliant.Nodes
 {
     public interface INodeVisitor
     {
-        void Visit(ITerminalNode node, INodeVisitorStateManager stateManager);
-        void Visit(ISymbolNode node, INodeVisitorStateManager stateManager);
-        void Visit(IIntermediateNode node, INodeVisitorStateManager stateManager);
-        void Visit(IAndNode andNode, INodeVisitorStateManager stateManager);
-        void Visit(ITokenNode tokenNode, INodeVisitorStateManager stateManager);
+        void Visit(ITerminalNode node);
+        void Visit(ISymbolNode node);
+        void Visit(IIntermediateNode node);
+        void Visit(IAndNode andNode);
+        void Visit(ITokenNode tokenNode);
     }
 }

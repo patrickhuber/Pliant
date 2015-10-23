@@ -19,7 +19,7 @@ namespace Pliant.Ebnf
         private IGrammar TranslateAst(INode root)
         {
             var visitor = new EbnfVisitor();
-            root.Accept(visitor, new NodeVisitorStateManager());
+            root.Accept(visitor);
             return visitor.Grammar;
         }
 

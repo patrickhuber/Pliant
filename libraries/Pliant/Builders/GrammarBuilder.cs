@@ -2,19 +2,17 @@
 using Pliant.Grammars;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Pliant.Builders
 {
     public class GrammarBuilder : IGrammarBuilder
     {
-        private IList<IProduction> _productions;
-        private IList<ILexerRule> _ignoreRules;
-        private string _start;
+        private List<IProduction> _productions;
+        private List<ILexerRule> _ignoreRules;
+        public INonTerminal Start { get; set; }
 
-        public GrammarBuilder(string start)
+        public GrammarBuilder()
         {
-            _start = start;
             _productions = new List<IProduction>();
             _ignoreRules = new List<ILexerRule>();
         }
@@ -23,39 +21,51 @@ namespace Pliant.Builders
             ProductionBuilder start, 
             ProductionBuilder[] productionBuilder, 
             ILexerRule[] ignore)
-            : this(start.LeftHandSide.Value)
+            : this()
         {
-            foreach (var production in productionBuilder)
-            {
-                if (production.Definition == null)
-                {
-                    _productions.Add(new Production(production.LeftHandSide));
-                    continue;
-                }
-                foreach (var list in production.Definition.Data)
-                {
-                    _productions.Add(GetProductionFromNameAndListOfSymbols(production.LeftHandSide.Value, list));
-                }
-            }
+            Start = start.LeftHandSide;
+            AddProductions(productionBuilder);
             if (!ignore.IsNullOrEmpty())
                 foreach (var ignoreRule in ignore)
                     _ignoreRules.Add(ignoreRule);
         }
 
+        private void AddProductions(ProductionBuilder[] productionBuilder)
+        {
+            foreach (var production in productionBuilder)
+            {
+                AddProduction(production);
+            }
+        }
+        
         public GrammarBuilder(ProductionBuilder start, ProductionBuilder[] productions)
             : this(start, productions, null)
         {
         }
 
+        public void AddIgnoreRule(ILexerRule lexerRule)
+        {
+            _ignoreRules.Add(lexerRule);
+        }
+
+        public void AddProduction(ProductionBuilder builder)
+        {
+
+            if (builder.Definition == null)
+                _productions.Add(new Production(builder.LeftHandSide));
+            else
+                _productions.AddRange(builder.ToProductions());
+        }
+        
         public IGrammar ToGrammar()
         {
-            if (_start == null)
+            if (Start == null)
                 throw new Exception("no start production specified");
 
             // PERF: Avoid Linq FirstOrDefault due to lambda allocation
             IProduction startProduction = null;
             foreach (var production in _productions)
-                if (production.LeftHandSide.Value == _start)
+                if (production.LeftHandSide.Equals(Start))
                 {
                     startProduction = production;
                     break;
@@ -70,49 +80,6 @@ namespace Pliant.Builders
                 start, 
                 _productions.ToArray(), 
                 _ignoreRules.ToArray());
-        }
-
-        public IGrammarBuilder Production(string name, Action<IRuleBuilder> rules)
-        {
-            if (rules == null)
-                _productions.Add(new Production(name));
-            else
-            {
-                var ruleBuilder = new RuleBuilder();
-                rules(ruleBuilder);
-
-                var rightHandSide = new List<ISymbol>();
-                foreach (var builderList in ruleBuilder.Data)
-                {
-                    var production = GetProductionFromNameAndListOfSymbols(name, builderList);
-                    _productions.Add(production);
-                }                
-            }
-            return this;
-        }
-
-        private static IProduction GetProductionFromNameAndListOfSymbols(string name, BaseBuilderList builderList)
-        {
-            var symbolList = new List<ISymbol>();
-            foreach (var baseBuilder in builderList)
-            {
-                var symbolBuilder = baseBuilder as SymbolBuilder;
-                if (symbolBuilder != null)                
-                    symbolList.Add(symbolBuilder.Symbol);                
-                else
-                {
-                    var productionBuilder = baseBuilder as ProductionBuilder;
-                    if (productionBuilder != null)
-                        symbolList.Add(productionBuilder.LeftHandSide);
-                }
-            }
-            return new Production(name, symbolList.ToArray());
-        }
-
-        public IGrammarBuilder Ignore(ILexerRule lexerRule)
-        {
-            _ignoreRules.Add(lexerRule);
-            return this;
-        }
+        }        
     }
 }

@@ -4,43 +4,54 @@ using System.Collections.Generic;
 
 namespace Pliant.Tests.Unit
 {
-    public class LoggingNodeVisitor : INodeVisitor
+    public class LoggingNodeVisitor : NodeVisitorBase
     {
-        public IList<string> VisitLog { get; }
+        public IList<string> VisitLog { get; private set; }
 
         public LoggingNodeVisitor()
         {
+            Init();
+        }
+
+        public LoggingNodeVisitor(INodeVisitorStateManager stateManager)
+            : base(stateManager)
+        {
+            Init();
+        }
+
+        private void Init()
+        {
             VisitLog = new List<string>();
         }
-        
-        public void Visit(IIntermediateNode node, INodeVisitorStateManager stateManager)
+
+        public override void Visit(IIntermediateNode node)
         {
             VisitLog.Add(node.ToString());
             foreach (var child in node.Children)
-                Visit(child, stateManager);
+                Visit(child);
         }
 
-        public void Visit(ITokenNode node, INodeVisitorStateManager stateManager)
+        public override void Visit(ITokenNode node)
         {
             VisitLog.Add(node.ToString());
         }
 
-        public void Visit(ISymbolNode node, INodeVisitorStateManager stateManager)
+        public override void Visit(ISymbolNode node)
         {
             VisitLog.Add(node.ToString());
             foreach (var child in node.Children)
-                Visit(child, stateManager);
+                Visit(child);
         }
 
-        public void Visit(ITerminalNode node, INodeVisitorStateManager stateManager)
+        public override void Visit(ITerminalNode node)
         {
             VisitLog.Add(node.ToString());
         }
 
-        public void Visit(IAndNode node, INodeVisitorStateManager stateManager)
+        public override void Visit(IAndNode node)
         {            
             foreach (var child in node.Children)
-                child.Accept(this, stateManager);
+                child.Accept(this);
         }        
     }
 }
