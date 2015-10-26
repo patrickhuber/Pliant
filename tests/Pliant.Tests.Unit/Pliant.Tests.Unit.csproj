@@ -63,7 +63,7 @@
     <Compile Include="Grammars\DigitTerminalTests.cs" />
     <Compile Include="Builders\GrammarBuilderTests.cs" />
     <Compile Include="LoggingNodeVisitor.cs" />
-    <Compile Include="Nodes\NodeVisitorTests.cs" />
+    <Compile Include="Ast\NodeVisitorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Grammars\ProductionTests.cs" />
     <Compile Include="Regex\RegexTests.cs" />

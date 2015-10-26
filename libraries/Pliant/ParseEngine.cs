@@ -1,4 +1,4 @@
-﻿using Pliant.Nodes;
+﻿using Pliant.Ast;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,6 +13,8 @@ namespace Pliant
         public IGrammar Grammar { get; private set; }
 
         public int Location { get; private set; }
+
+        public IReadOnlyChart Chart { get { return _chart; } }
 
         private Chart _chart;
         private NodeSet _nodeSet;

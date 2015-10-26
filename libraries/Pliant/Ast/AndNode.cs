@@ -1,7 +1,7 @@
 ﻿using Pliant.Collections;
 using System.Collections.Generic;
 
-namespace Pliant.Nodes
+namespace Pliant.Ast
 {
     public class AndNode : IAndNode
     {

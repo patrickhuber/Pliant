@@ -1,12 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Regex;
-using Pliant.Nodes;
+using Pliant.Ast;
 using Pliant.Tokens;
 using Pliant.Builders;
 using Pliant.Grammars;
 using Pliant.Automata;
 
-namespace Pliant.Tests.Unit.Nodes
+namespace Pliant.Tests.Unit.Ast
 {
     [TestClass]
     public class NodeVisitorTests

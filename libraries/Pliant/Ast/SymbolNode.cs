@@ -1,6 +1,6 @@
 ﻿using Pliant.Grammars;
 
-namespace Pliant.Nodes
+namespace Pliant.Ast
 {
     public class SymbolNode : InternalNode, ISymbolNode
     {

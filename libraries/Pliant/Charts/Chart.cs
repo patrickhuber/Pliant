@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Pliant.Charts
 {
-    public class Chart
+    public class Chart : IChart
     {
         private ReadWriteList<IEarleySet> _earleySets;
 

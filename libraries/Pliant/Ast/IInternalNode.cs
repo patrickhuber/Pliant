@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Pliant.Nodes
+namespace Pliant.Ast
 {
     /// <summary>
     /// Represents a Disjuncion of IAndNodes

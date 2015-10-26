@@ -1,4 +1,4 @@
-﻿namespace Pliant.Nodes
+﻿namespace Pliant.Ast
 {
     public interface INode : INodeVisitable
     {

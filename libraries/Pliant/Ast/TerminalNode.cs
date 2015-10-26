@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pliant.Nodes
+namespace Pliant.Ast
 {
     public class TerminalNode : NodeBase, ITerminalNode
     {

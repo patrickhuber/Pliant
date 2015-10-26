@@ -1,7 +1,7 @@
 ﻿using System;
 using Pliant.Tokens;
 
-namespace Pliant.Nodes
+namespace Pliant.Ast
 {
     public class TokenNode : NodeBase, ITokenNode
     {

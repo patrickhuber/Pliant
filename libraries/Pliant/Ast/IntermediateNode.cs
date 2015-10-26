@@ -1,7 +1,7 @@
 ﻿using System;
 using Pliant.Charts;
 
-namespace Pliant.Nodes
+namespace Pliant.Ast
 {
     public class IntermediateNode : InternalNode, IIntermediateNode
     {

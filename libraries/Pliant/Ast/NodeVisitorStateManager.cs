@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-
-namespace Pliant.Nodes
-{
+using System.Collections.Generic;namespace Pliant.Ast{
     public class NodeVisitorStateManager : INodeVisitorStateManager
     {
         private IInternalNode _lock;

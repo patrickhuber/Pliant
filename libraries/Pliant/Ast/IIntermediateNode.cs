@@ -1,6 +1,6 @@
 ﻿using Pliant.Charts;
 
-namespace Pliant.Nodes
+namespace Pliant.Ast
 {
     public interface IIntermediateNode : IInternalNode
     {

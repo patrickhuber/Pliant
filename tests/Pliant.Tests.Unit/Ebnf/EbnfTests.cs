@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Grammars;
 using Pliant.Ebnf;
-using Pliant.Nodes;
+using Pliant.Ast;
 
 namespace Pliant.Tests.Unit.Ebnf
 {

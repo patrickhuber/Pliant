@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Pliant.Nodes
+namespace Pliant.Ast
 {
     public abstract class InternalNode : NodeBase, IInternalNode
     {

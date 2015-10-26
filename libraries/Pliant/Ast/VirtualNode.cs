@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Pliant.Grammars;
 using System;
 
-namespace Pliant.Nodes
+namespace Pliant.Ast
 {
     public class VirtualNode : NodeBase, ISymbolNode
     {

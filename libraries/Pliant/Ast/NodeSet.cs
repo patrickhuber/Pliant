@@ -3,7 +3,7 @@ using Pliant.Grammars;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Pliant.Nodes
+namespace Pliant.Ast
 {
     public class NodeSet
     {

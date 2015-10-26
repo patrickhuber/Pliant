@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pliant.Nodes
+namespace Pliant.Ast
 {
-    public interface ITerminalNode : INode
+    public interface INodeVisitable
     {
-        char Capture { get; }
+        void Accept(INodeVisitor visitor);
     }
 }
