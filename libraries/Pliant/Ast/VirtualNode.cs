@@ -43,16 +43,15 @@ namespace Pliant.Ast
 
         private void Initialize(ITransitionState transitionState)
         {
-            if (transitionState.ParseNode != null)
-            {
-                Symbol = transitionState.Production.LeftHandSide;
-                Origin = transitionState.Origin;
-            }
-            else
-            {
-                Symbol = _transitionState.Reduction.Production.LeftHandSide;
-                Origin = _transitionState.Reduction.Origin;
-            }
+            IState transitionStateToUse = transitionState;
+
+            var parameterTransitionStateHasNoParseNode = transitionState.ParseNode == null;
+
+            if (parameterTransitionStateHasNoParseNode)
+                transitionStateToUse = _transitionState.Reduction;
+
+            Symbol = transitionStateToUse.Production.LeftHandSide;
+            Origin = transitionStateToUse.Origin;
         }
 
         private void LazyLoadChildren()
