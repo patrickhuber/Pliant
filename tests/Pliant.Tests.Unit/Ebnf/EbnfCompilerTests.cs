@@ -11,7 +11,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void Test_EbnfCompiler_Creates_Character_Grammar_With_One_Production()
         {
-            var input = "Rule = 'a';";
+            var input = @"Rule = 'a';";
             var ebnfCompiler = new EbnfCompiler();
             var actual = ebnfCompiler.Compile(input);
             

@@ -59,17 +59,22 @@ namespace Pliant.Builders
         
         public IGrammar ToGrammar()
         {
-            if (Start == null)
-                throw new Exception("no start production specified");
+            if (_productions.Count == 0)
+                throw new Exception("no productions were found.");
 
             // PERF: Avoid Linq FirstOrDefault due to lambda allocation
             IProduction startProduction = null;
             foreach (var production in _productions)
+            {
+                if (Start == null)
+                    Start = production.LeftHandSide;
+
                 if (production.LeftHandSide.Equals(Start))
                 {
                     startProduction = production;
                     break;
                 }
+            }
 
             if (startProduction == null)
                 throw new Exception("no start production found for start symbol");

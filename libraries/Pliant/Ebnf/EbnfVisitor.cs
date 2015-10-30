@@ -63,7 +63,7 @@ namespace Pliant.Ebnf
 
         private void VisitSetting(ISymbolNode node)
         {
-
+            ;
         }
 
         public override void Visit(IIntermediateNode node)
