@@ -37,26 +37,26 @@ namespace Pliant.Tests.Unit.Ebnf
         Terminal            
             = '""' String '""'
             | ""'"" Character ""'""
-            | 'r' '""' Regex '""' ; 
+            | '/' Regex '/' ; 
         String              
             = { StringCharacter };
         StringCharacter     
-            = r""[^\""]""
+            = /[^\""]/
             | '\\' AnyCharacter ;
         Character           
             = SingleCharacter
             | '\\' SimpleEscape ;
         SingleCharacter     
-            = r""[^']"";
+            ~ /[^']/;
         SimpleEscape        
-            = ""'"" | '""' | '\\' | '0' | 'a' | 'b' 
+            ~ ""'"" | '""' | '\\' | '0' | 'a' | 'b' 
             | 'f' | 'n'  | 'r' | 't' | 'v' ;
         Digit               
-            = r""[0-9]"" ;
+            ~ /[0-9]/ ;
         Letter              
-            = r""[a-zA-Z]"";
+            ~ /[a-zA-Z]/;
         Whitespace          
-            = r""\w+"";
+            ~ /\w+/;
         Regex               
             = ['^'] Regex.Expression ['$'] ;
         Regex.Expression     
@@ -83,11 +83,11 @@ namespace Pliant.Tests.Unit.Ebnf
             = Regex.CharacterClassCharacter
             | Regex.CharacterClassCharacter '-' Regex.CharacterClassCharacter;
         Regex.CharacterClassCharacter
-            = r""[^\]]""
-            | '\\' r""."" ;
+            ~ /[^\]]/
+            | '\\' /./ ;
         Regex.Character
-            = r""[^.^$()[\] + *?\\]""
-            | '\\' r""."" ;
+            ~ /[^.^$()[\] + *?\\]/
+            | '\\' /./ ;
         :ignore             
             = Whitespace;";
 
@@ -154,7 +154,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void Test_Ebnf_That_Parses_Regex()
         {
-            ParseInput("Rule = r\"[a-zA-Z0-9]\";");
+            ParseInput("Rule = /[a-zA-Z0-9]/;");
         }
 
         [TestMethod]
@@ -208,8 +208,8 @@ namespace Pliant.Tests.Unit.Ebnf
         {
             ParseInput(@"
             Regex.CharacterClassCharacter
-            = r""[^\]]""
-            | '\\' r""."";");
+                = /[^\]]/
+                | /[\\]./;");
         }
 
         [TestMethod]

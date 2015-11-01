@@ -20,5 +20,10 @@ namespace Pliant.Automata
         {
             Start = state;
         }
+
+        public override string ToString()
+        {
+            return TokenType.ToString();
+        }
     }
 }

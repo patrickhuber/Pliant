@@ -24,6 +24,11 @@
             return Id.GetHashCode();
         }
 
+        public override string ToString()
+        {
+            return Id;
+        }
+
         public static bool operator ==(TokenType first, TokenType second)
         {
             return first.Equals(second);

@@ -1,5 +1,6 @@
 ﻿using Pliant.Grammars;
 using Pliant.Tokens;
+using System.Text;
 
 namespace Pliant.Lexemes
 {
@@ -7,7 +8,12 @@ namespace Pliant.Lexemes
     {
         public ITerminal Terminal { get; private set; }
 
-        public string Capture { get; private set; }
+        private StringBuilder _captureBuilder;
+
+        public string Capture
+        {
+            get { return _captureBuilder.ToString(); }
+        }
 
         public TokenType TokenType { get; private set; }
 
@@ -20,12 +26,12 @@ namespace Pliant.Lexemes
         {
             Terminal = terminal;
             TokenType = tokenType;
-            Capture = string.Empty;
+            _captureBuilder = new StringBuilder();
         }
 
         public bool IsAccepted()
         {
-            return Capture.Length > 0;
+            return _captureBuilder.Length > 0;
         }
 
         public bool Scan(char c)
@@ -34,7 +40,7 @@ namespace Pliant.Lexemes
             {
                 if (Terminal.IsMatch(c))
                 {
-                    Capture = c.ToString();
+                    _captureBuilder.Append(c);
                     return true;
                 }
             }
