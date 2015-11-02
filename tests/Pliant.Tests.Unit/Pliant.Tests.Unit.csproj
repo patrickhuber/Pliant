@@ -76,6 +76,7 @@
     <Compile Include="ParseInterfaceTests.cs" />
     <Compile Include="Lexemes\TerminalLexemeTests.cs" />
     <Compile Include="Grammars\WhitespaceTerminalTests.cs" />
+    <Compile Include="Tree\TreeNodeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj">

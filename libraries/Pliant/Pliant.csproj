@@ -159,6 +159,14 @@
     <Compile Include="Charts\TransitionState.cs" />
     <Compile Include="Ast\VirtualNode.cs" />
     <Compile Include="Grammars\WhitespaceTerminal.cs" />
+    <Compile Include="Tree\IInternalTreeNode.cs" />
+    <Compile Include="Tree\InternalTreeNode.cs" />
+    <Compile Include="Tree\ITokenTreeNode.cs" />
+    <Compile Include="Tree\ITreeNode.cs" />
+    <Compile Include="Tree\ITreeNodeVisitor.cs" />
+    <Compile Include="Tree\TokenTreeNode.cs" />
+    <Compile Include="Tree\TreeNodeType.cs" />
+    <Compile Include="Tree\TreeNodeVisitorBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Pliant.nuspec" />
