@@ -102,10 +102,10 @@ public static int main (string[] args)
 		= Digits;
 		
 	Digits ~ /[0-9]+/ ;
-	Whitespace ~ /[\\w]+/ ;
+	Whitespace ~ /[\\s]+/ ;
 	
 	:start = Calculator;
-	:ignore = whitespace;";
+	:ignore = Whitespace;";
 	
 	var compiler = new EbnfCompiler();
 	var grammar = compiler.Compile(grammarText);
