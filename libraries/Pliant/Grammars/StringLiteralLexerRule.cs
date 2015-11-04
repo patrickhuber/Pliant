@@ -2,25 +2,17 @@
 
 namespace Pliant.Grammars
 {
-    public class StringLiteralLexerRule : IStringLiteralLexerRule
+    public class StringLiteralLexerRule : BaseLexerRule, IStringLiteralLexerRule
     {
         public static readonly LexerRuleType StringLiteralLexerRuleType = new LexerRuleType("StringLiteral");
 
         public string Literal { get; private set; }
-
-        public LexerRuleType LexerRuleType
-        {
-            get { return StringLiteralLexerRuleType; }
-        }
-
-        public SymbolType SymbolType { get { return SymbolType.LexerRule; } }
-
-        public TokenType TokenType { get; private set; }
-
+        
+        
         public StringLiteralLexerRule(string literal, TokenType tokenType)
+            : base(StringLiteralLexerRuleType, tokenType)
         {
             Literal = literal;
-            TokenType = tokenType;
         }
 
         public StringLiteralLexerRule(string literal)

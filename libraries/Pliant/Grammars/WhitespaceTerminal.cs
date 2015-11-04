@@ -6,16 +6,11 @@ using System.Threading.Tasks;
 
 namespace Pliant.Grammars
 {
-    public class WhitespaceTerminal : ITerminal
+    public class WhitespaceTerminal : BaseTerminal, ITerminal
     {
-        public bool IsMatch(char character)
+        public override bool IsMatch(char character)
         {
             return char.IsWhiteSpace(character);
-        }
-
-        public SymbolType SymbolType
-        {
-            get { return SymbolType.Terminal; }
         }
 
         const string ToStringValue = @"\s";

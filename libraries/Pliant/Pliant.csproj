@@ -32,13 +32,18 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ast\SinglePassNodeVisitorStateManager.cs" />
+    <Compile Include="Builders\BaseBuilder.cs" />
+    <Compile Include="Builders\BaseBuilderList.cs" />
+    <Compile Include="Builders\_.cs" />
+    <Compile Include="Charts\IChart.cs" />
+    <Compile Include="Charts\IReadOnlyChart.cs" />
+    <Compile Include="Grammars\BaseLexerRule.cs" />
     <Compile Include="Automata\INfa.cs" />
     <Compile Include="Automata\INfaState.cs" />
     <Compile Include="Automata\INfaTransition.cs" />
@@ -57,7 +62,14 @@
     <Compile Include="Automata\IDfaLexerRule.cs" />
     <Compile Include="Automata\IDfaState.cs" />
     <Compile Include="Automata\StringExtensions.cs" />
+    <Compile Include="Builders\IAlterationBuilder.cs" />
+    <Compile Include="Builders\ProductionBuilder.cs" />
+    <Compile Include="Builders\AlterationBuilder.cs" />
+    <Compile Include="Builders\SymbolBuilder.cs" />
+    <Compile Include="Ebnf\EbnfCompiler.cs" />
     <Compile Include="Ebnf\EbnfGrammar.cs" />
+    <Compile Include="Ebnf\EbnfVisitor.cs" />
+    <Compile Include="Grammars\BaseTerminal.cs" />
     <Compile Include="Grammars\IGrammarLexerRule.cs" />
     <Compile Include="Grammars\IStringLiteralLexerRule.cs" />
     <Compile Include="Grammars\ITerminalLexerRule.cs" />
@@ -70,7 +82,7 @@
     <Compile Include="Lexemes\StringLiteralLexeme.cs" />
     <Compile Include="Lexemes\StringLiteralLexemeFactory.cs" />
     <Compile Include="Lexemes\TerminalLexemeFactory.cs" />
-    <Compile Include="Nodes\AndNode.cs" />
+    <Compile Include="Ast\AndNode.cs" />
     <Compile Include="Grammars\AnyTerminal.cs" />
     <Compile Include="Assert.cs" />
     <Compile Include="Grammars\CharacterClassTerminal.cs" />
@@ -80,41 +92,42 @@
     <Compile Include="Charts\EarleySet.cs" />
     <Compile Include="Grammars\Grammar.cs" />
     <Compile Include="Builders\GrammarBuilder.cs" />
-    <Compile Include="Nodes\IAndNode.cs" />
+    <Compile Include="Ast\IAndNode.cs" />
     <Compile Include="Charts\IEarleySet.cs" />
     <Compile Include="Grammars\IGrammar.cs" />
     <Compile Include="Builders\IGrammarBuilder.cs" />
-    <Compile Include="Nodes\IIntermediateNode.cs" />
+    <Compile Include="Ast\IIntermediateNode.cs" />
     <Compile Include="Lexemes\ILexeme.cs" />
     <Compile Include="Grammars\ILexerRule.cs" />
-    <Compile Include="Nodes\INode.cs" />
+    <Compile Include="Ast\INode.cs" />
     <Compile Include="Grammars\INonTerminal.cs" />
-    <Compile Include="Nodes\INodeVisitable.cs" />
-    <Compile Include="Nodes\INodeVisitor.cs" />
-    <Compile Include="Nodes\INodeVisitorStateManager.cs" />
-    <Compile Include="Nodes\IntermediateNode.cs" />
+    <Compile Include="Ast\INodeVisitable.cs" />
+    <Compile Include="Ast\INodeVisitor.cs" />
+    <Compile Include="Ast\INodeVisitorStateManager.cs" />
+    <Compile Include="Ast\IntermediateNode.cs" />
     <Compile Include="INullable.cs" />
-    <Compile Include="Nodes\IInternalNode.cs" />
+    <Compile Include="Ast\IInternalNode.cs" />
     <Compile Include="IParseEngine.cs" />
     <Compile Include="IParseInterface.cs" />
     <Compile Include="Grammars\IProduction.cs" />
     <Compile Include="Builders\IRuleBuilder.cs" />
     <Compile Include="Charts\IState.cs" />
     <Compile Include="Grammars\ISymbol.cs" />
-    <Compile Include="Nodes\ISymbolNode.cs" />
+    <Compile Include="Ast\ISymbolNode.cs" />
     <Compile Include="Grammars\ITerminal.cs" />
-    <Compile Include="Nodes\ITerminalNode.cs" />
-    <Compile Include="Nodes\NodeBase.cs" />
-    <Compile Include="Nodes\NodeVisitorStateManager.cs" />
+    <Compile Include="Ast\ITerminalNode.cs" />
+    <Compile Include="Ast\NodeBase.cs" />
+    <Compile Include="Ast\NodeVisitorBase.cs" />
+    <Compile Include="Ast\NodeVisitorStateManager.cs" />
     <Compile Include="ParseEngineLexemeFactory.cs" />
     <Compile Include="Tokens\IToken.cs" />
-    <Compile Include="Nodes\ITokenNode.cs" />
+    <Compile Include="Ast\ITokenNode.cs" />
     <Compile Include="Charts\ITransitionState.cs" />
     <Compile Include="ParseEngineLexeme.cs" />
     <Compile Include="Grammars\GrammarLexerRule.cs" />
-    <Compile Include="Nodes\InternalNode.cs" />
-    <Compile Include="Nodes\NodeSet.cs" />
-    <Compile Include="Nodes\NodeType.cs" />
+    <Compile Include="Ast\InternalNode.cs" />
+    <Compile Include="Ast\NodeSet.cs" />
+    <Compile Include="Ast\NodeType.cs" />
     <Compile Include="Charts\Optimizer.cs" />
     <Compile Include="ParseEngine.cs" />
     <Compile Include="ParseInterface.cs" />
@@ -134,21 +147,32 @@
     <Compile Include="Charts\State.cs" />
     <Compile Include="Charts\StateQueue.cs" />
     <Compile Include="Charts\StateType.cs" />
-    <Compile Include="Nodes\SymbolNode.cs" />
+    <Compile Include="Ast\SymbolNode.cs" />
     <Compile Include="Grammars\SymbolType.cs" />
     <Compile Include="Grammars\Symbol.cs" />
-    <Compile Include="Grammars\Terminal.cs" />
+    <Compile Include="Grammars\CharacterTerminal.cs" />
     <Compile Include="Lexemes\TerminalLexeme.cs" />
     <Compile Include="Grammars\TerminalLexerRule.cs" />
-    <Compile Include="Nodes\TerminalNode.cs" />
+    <Compile Include="Ast\TerminalNode.cs" />
     <Compile Include="Tokens\Token.cs" />
-    <Compile Include="Nodes\TokenNode.cs" />
+    <Compile Include="Ast\TokenNode.cs" />
     <Compile Include="Tokens\TokenType.cs" />
     <Compile Include="Charts\TransitionState.cs" />
-    <Compile Include="Nodes\VirtualNode.cs" />
+    <Compile Include="Ast\VirtualNode.cs" />
     <Compile Include="Grammars\WhitespaceTerminal.cs" />
+    <Compile Include="Tree\IInternalTreeNode.cs" />
+    <Compile Include="Tree\InternalTreeNode.cs" />
+    <Compile Include="Tree\ITokenTreeNode.cs" />
+    <Compile Include="Tree\ITreeNode.cs" />
+    <Compile Include="Tree\ITreeNodeVisitor.cs" />
+    <Compile Include="Tree\TokenTreeNode.cs" />
+    <Compile Include="Tree\TreeEnumerator.cs" />
+    <Compile Include="Tree\TreeNodeType.cs" />
+    <Compile Include="Tree\TreeNodeVisitorBase.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Pliant.nuspec" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

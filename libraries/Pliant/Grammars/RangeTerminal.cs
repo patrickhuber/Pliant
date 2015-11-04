@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pliant.Grammars
 {
-    public class RangeTerminal : ITerminal
+    public class RangeTerminal : BaseTerminal, ITerminal
     {
         public char Start { get; private set; }
         public char End { get; private set; }
@@ -17,16 +17,11 @@ namespace Pliant.Grammars
             End = end;
         }
 
-        public bool IsMatch(char character)
+        public override bool IsMatch(char character)
         {
             return Start <= character && character <= End;
         }
-
-        public SymbolType SymbolType
-        {
-            get { return SymbolType.Terminal; }
-        }
-
+        
         public override string ToString()
         {
             return string.Format("[{0}-{1}]", Start, End);

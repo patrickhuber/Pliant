@@ -1,17 +1,12 @@
 ﻿namespace Pliant.Grammars
 {
-    public class AnyTerminal : ITerminal
+    public class AnyTerminal : BaseTerminal, ITerminal
     {
-        public bool IsMatch(char character)
+        public override bool IsMatch(char character)
         {
             return true;
         }
-
-        public SymbolType SymbolType
-        {
-            get { return SymbolType.Terminal; }
-        }
-
+        
         public override bool Equals(object obj)
         {
             var anyTerminal = obj as AnyTerminal;

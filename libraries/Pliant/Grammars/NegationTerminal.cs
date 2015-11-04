@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pliant.Grammars
 {
-    public class NegationTerminal : ITerminal
+    public class NegationTerminal : BaseTerminal, ITerminal
     {
         ITerminal _innerTerminal;
         public NegationTerminal(ITerminal innerTerminal)
@@ -14,14 +14,9 @@ namespace Pliant.Grammars
             _innerTerminal = innerTerminal;
         }
 
-        public bool IsMatch(char character)
+        public override bool IsMatch(char character)
         {
             return !_innerTerminal.IsMatch(character);
-        }
-
-        public SymbolType SymbolType
-        {
-            get { return SymbolType.Terminal; }
-        }
+        }       
     }
 }

@@ -68,7 +68,7 @@ namespace Pliant.Bnf
         {
             var start = new DfaState();
             var final = new DfaState(true);
-            var terminal = new NegationTerminal(new Terminal('\''));
+            var terminal = new NegationTerminal(new CharacterTerminal('\''));
             var edge = new DfaTransition(terminal, final);
             start.AddTransition(edge);
             final.AddTransition(edge);
@@ -84,7 +84,7 @@ namespace Pliant.Bnf
 
             var notQuoteTerminal = new NegationTerminal(
                 new SetTerminal('"', '\\'));
-            var escapeTerminal = new Terminal('\\');
+            var escapeTerminal = new CharacterTerminal('\\');
             var anyTerminal = new AnyTerminal();
 
             var notQuoteEdge = new DfaTransition(notQuoteTerminal, final);
@@ -133,15 +133,15 @@ namespace Pliant.Bnf
             return ruleName;
         }
 
-        private static ILexerRule CreateWhitespaceLexerRule()
+        private static BaseLexerRule CreateWhitespaceLexerRule()
         {
             var whitespaceTerminal = new WhitespaceTerminal();
-            var startWhitespace = new DfaState();
-            var finalWhitespace = new DfaState(true);
-            startWhitespace.AddTransition(new DfaTransition(whitespaceTerminal, finalWhitespace));
-            finalWhitespace.AddTransition(new DfaTransition(whitespaceTerminal, finalWhitespace));
-            var whitespace = new DfaLexerRule(startWhitespace, new TokenType("whitespace"));
-            return whitespace;
+            var startState = new DfaState();
+            var finalState = new DfaState(true);
+            var whitespaceTransition = new DfaTransition(whitespaceTerminal, finalState);
+            startState.AddTransition(whitespaceTransition);
+            finalState.AddTransition(whitespaceTransition);
+            return new DfaLexerRule(startState, new TokenType("[\\s]+"));
         }
 
         public IReadOnlyList<IProduction> Productions

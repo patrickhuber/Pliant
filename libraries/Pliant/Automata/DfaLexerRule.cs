@@ -4,19 +4,11 @@ using Pliant.Tokens;
 
 namespace Pliant.Automata
 {
-    public class DfaLexerRule : IDfaLexerRule
+    public class DfaLexerRule : BaseLexerRule, IDfaLexerRule
     {
         public static readonly LexerRuleType DfaLexerRuleType = new LexerRuleType("Dfa");
-        public LexerRuleType LexerRuleType { get { return DfaLexerRuleType; } }
-
+       
         public IDfaState Start { get; private set; }
-
-        public SymbolType SymbolType
-        {
-            get { return SymbolType.LexerRule; }
-        }
-
-        public TokenType TokenType { get; private set; }
 
         public DfaLexerRule(IDfaState state, string tokenType)
             : this(state, new TokenType(tokenType))
@@ -24,9 +16,14 @@ namespace Pliant.Automata
         }
 
         public DfaLexerRule(IDfaState state, TokenType tokenType)
+            : base(DfaLexerRuleType, tokenType)
         {
             Start = state;
-            TokenType = tokenType;
+        }
+
+        public override string ToString()
+        {
+            return TokenType.ToString();
         }
     }
 }

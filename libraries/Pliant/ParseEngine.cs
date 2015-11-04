@@ -1,8 +1,7 @@
-﻿using Pliant.Nodes;
+﻿using Pliant.Ast;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Pliant.Tokens;
 using Pliant.Grammars;
 using Pliant.Charts;
@@ -14,6 +13,8 @@ namespace Pliant
         public IGrammar Grammar { get; private set; }
 
         public int Location { get; private set; }
+
+        public IReadOnlyChart Chart { get { return _chart; } }
 
         private Chart _chart;
         private NodeSet _nodeSet;
@@ -48,7 +49,7 @@ namespace Pliant
             return expectedRuleDictionary.Values;
         }
 
-        public INode GetRoot()
+        public INode GetParseForestRoot()
         {
             if (!IsAccepted())
                 throw new Exception("Unable to parse expression.");

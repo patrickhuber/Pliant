@@ -2,7 +2,7 @@
 
 namespace Pliant.Grammars
 {
-    public class SetTerminal : ITerminal
+    public class SetTerminal : BaseTerminal, ITerminal
     {
         ISet<char> _characterSet;
 
@@ -16,12 +16,10 @@ namespace Pliant.Grammars
             _characterSet = characterSet;
         }
 
-        public bool IsMatch(char character)
+        public override bool IsMatch(char character)
         {
             return _characterSet.Contains(character);
         }
-
-        public SymbolType SymbolType { get { return SymbolType.Terminal; } }
 
         public override string ToString()
         {

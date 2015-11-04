@@ -1,8 +1,8 @@
 ﻿using Pliant.Automata;
+using Pliant.Builders;
 using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Collections.Generic;
-using System;
 
 namespace Pliant.Ebnf
 {
@@ -12,274 +12,202 @@ namespace Pliant.Ebnf
 
         static EbnfGrammar()
         {
-            var whitespace = CreateWhitespaceLexerRule();
-            var notDoubleQuote = CreateNotDoubleQuoteLexerRule();
-            var notSingleQuuote = CreateNotSingleQuoteLexerRule();
-            var identifier = CreateIdentifierLexerRule();
-            var settingIdentifier = CreateSettingIdentifierLexerRule();
-            var escapeCharacter = CreateEscapeCharacterLexerRule();
+            BaseLexerRule
+                settingIdentifier = CreateSettingIdentifierLexerRule(),
+                notDoubleQuote = CreateNotDoubleQuoteLexerRule(),
+                notSingleQuote = CreateNotSingleQuoteLexerRule(),
+                identifier = CreateIdentifierLexerRule(),
+                any = new TerminalLexerRule(new AnyTerminal(), "."),
+                notCloseBracket = new TerminalLexerRule(
+                    new NegationTerminal(new CharacterTerminal(']')), "[^\\]]"),
+                notMeta = CreateNotMetaLexerRule(),
+                escapeCharacter = CreateEscapeCharacterLexerRule(),
+                whitespace = CreateWhitespaceLexerRule();
 
-            var grammar = new NonTerminal("Grammar");
-            var rule = new NonTerminal("Rule");
-            var setting = new NonTerminal("Setting");
-            var ruleOrSetting = new NonTerminal("RuleOrSetting");
-            var expression = new NonTerminal("Expression");
-            var term = new NonTerminal("Term");
-            var factor = new NonTerminal("Factor");
-            var atom = new NonTerminal("Atom");
-            var literal = new NonTerminal("Literal");
-            var doubleQuoteText = new NonTerminal("DoubleQuoteText");
-            var singleQuoteText = new NonTerminal("SingleQuoteText");
-            var qualifiedIdentifier = new NonTerminal("QualifiedIdentifier");
-            var grouping = new NonTerminal("Grouping");
-            var optional = new NonTerminal("Optional");
-            var repetition = new NonTerminal("Repetition");
-            var regex = new NonTerminal("Regex");
-            var regexExpression = new NonTerminal("Regex.Expression");
-            var regexTerm = new NonTerminal("Regex.Term");
-            var regexFactor = new NonTerminal("Regex.Factor");
-            var regexAtom = new NonTerminal("Regex.Atom");
-            var regexIterator = new NonTerminal("Regex.Iterator");
-            var regexCharacter = new NonTerminal("Regex.Character");
-            var regexSet = new NonTerminal("Regex.Set");
-            var regexPositiveSet = new NonTerminal("Regex.PositiveSet");
-            var regexNegativeSet = new NonTerminal("Regex.NegativeSet");
-            var regexCharacterClass = new NonTerminal("Regex.CharacterClass");
-            var regexCharacterRange = new NonTerminal("Regex.CharacterRange");
-            var regexCharacterClassCharacter = new NonTerminal("Regex.CharacterClassCharacter");
+            ProductionBuilder
+                Grammar = "Grammar",
+                Block = "Block",
+                Rule = "Rule",
+                Setting = "Setting",
+                LexerRule = "LexerRule",
+                QualifiedIdentifier = "QualifiedIdentifier",
+                Expression = "Expression",
+                Term = "Term",
+                Factor = "Factor",
+                Literal = "Literal",
+                Grouping = "Grouping",
+                Repetition = "Repetition",
+                Optional = "Optional",
+                Regex = "Regex",
+                RegexExpression = "Regex.Expression",
+                RegexTerm = "Regex.Term",
+                RegexFactor = "Regex.Factor",
+                RegexAtom = "Regex.Atom",
+                RegexIterator = "Regex.Iterator",
+                RegexSet = "Regex.Set",
+                RegexPositiveSet = "Regex.PositiveSet",
+                RegexNegativeSet = "Regex.NegativeSet",
+                RegexCharacterClass = "Regex.CharacterClass",
+                RegexCharacterRange = "Regex.CharacterRange",
+                RegexCharacter = "Regex.Character",
+                RegexCharacterClassCharacter = "Regex.CharacterClassCharacter";
 
-            var productions = new[]
-            {
-                /*  Grammar         
-                        = RuleOrSetting { RuleOrSetting } ;
-                 */
-                new Production(grammar, ruleOrSetting),
-                new Production(grammar, ruleOrSetting, grammar),
-                
-                /*  RuleOrSetting
-                        = Rule | Setting
-                 */
-                new Production(ruleOrSetting, rule),
-                new Production(ruleOrSetting, setting),
+            Grammar.Definition =
+                Block
+                | Block + Grammar;
 
-                /*  Rule
-                        = QualifiedIdentifier '=' Expression ';' ;
-                 */
-                new Production(rule, qualifiedIdentifier, new TerminalLexerRule('='), expression, new TerminalLexerRule(';')),
-                
-                /*  Setting
-                        = r":[a-zA-Z][a-zA-Z0-9]*" '=' QualifiedIdentifier ';' ;
-                 */
-                new Production(setting, settingIdentifier, new TerminalLexerRule('='), qualifiedIdentifier, new TerminalLexerRule(';')),
+            Block.Definition =
+                Rule
+                | Setting
+                | LexerRule;
 
-                /*  Expression 
-                        = Term
-                        | Term '|' Expression ;
-                 */
-                new Production(expression, term),
-                new Production(expression, term, new TerminalLexerRule('|'), expression),
+            Rule.Definition =
+                QualifiedIdentifier + '=' + Expression + ';';
 
-                /*  Term
-                        = Factor
-                        | Factor Term ;
-                 */
-                new Production(term, factor),
-                new Production(term, factor, term),
+            Setting.Definition = (_)
+                settingIdentifier + '=' + QualifiedIdentifier + ';';
 
-                /*  Grouping
-                       = '(' Expression ')' ;
-                 */
-                new Production(grouping, new TerminalLexerRule('('), expression, new TerminalLexerRule(')')),
+            LexerRule.Definition =
+                QualifiedIdentifier + '~' + Expression + ';';
 
-                /*  Repetition
-                        = '{' Expression '}' ;
-                 */
-                new Production(repetition, new TerminalLexerRule('{'), expression, new TerminalLexerRule('}')),
+            Expression.Definition =
+                Term
+                | Term + '|' + Expression;
 
-                /*  Optional 
-                        = '[' Expression ']' ;
-                 */
-                new Production(optional, new TerminalLexerRule('['), expression, new TerminalLexerRule(']')),
+            Term.Definition =
+                Factor
+                | Factor + Term;
 
-                /*  Factor
-                        = QualifiedIdentifier
-                        | Literal
-                        | 'r' '"' Regex '"'
-                        | Repetition
-                        | Optional
-                        | Grouping ;
-                 */
-                new Production(factor, qualifiedIdentifier),
-                new Production(factor, literal),
-                new Production(factor, new TerminalLexerRule('r'), new TerminalLexerRule('"'), regex, new TerminalLexerRule('"')),
-                new Production(factor, repetition),
-                new Production(factor, optional),
-                new Production(factor, grouping),
+            Factor.Definition
+                = QualifiedIdentifier
+                | Literal
+                | '/' + Regex + '/'
+                | Repetition
+                | Optional
+                | Grouping;
 
-                /*  QualifiedIdentifier
-                        = r"[a-zA-Z0-9][a-zA-Z0-9_-]*" ;
-                 */
-                new Production(qualifiedIdentifier, identifier),
-                new Production(qualifiedIdentifier, identifier, new TerminalLexerRule('.'), qualifiedIdentifier),
+            Literal.Definition = (_)
+                '"' + notDoubleQuote + '"'
+                | (_)"'" + notSingleQuote + "'";
 
-                /*  Literal 
-                        = '"' r"[^""]" '"'
-                        | ""'"" r"[^']" ""'"" ;
-                */
-                new Production(literal, new TerminalLexerRule('"'), notDoubleQuote, new TerminalLexerRule('"')),
-                new Production(literal, new TerminalLexerRule('\''), notSingleQuuote, new TerminalLexerRule('\'')),
+            Repetition.Definition = (_)
+                '{' + Expression + '}';
 
-                /*  Regex 
-                        = Regex.Expression
-                        | '^' Regex.Expression
-                        | Regex.Expression '$'
-                        | '^' Regex.Expression '$' ;
-                 */
-                new Production(regex, regexExpression),
-                new Production(regex, new TerminalLexerRule('^'), regexExpression),
-                new Production(regex, new TerminalLexerRule('^'), regexExpression, new TerminalLexerRule('$')),
-                new Production(regex, regexExpression, new TerminalLexerRule('$')),
+            Optional.Definition = (_)
+                '[' + Expression + ']';
 
-                /*  Regex.Expression 
-                        = Regex.Term
-                        | Regex.Term '|' Regex.Expression
-                        | λ ;
-                */
-                new Production(regexExpression, regexTerm),
-                new Production(regexExpression, regexTerm, new TerminalLexerRule('|'), regexExpression),
-                new Production(regexExpression),
+            Grouping.Definition = (_)
+                '(' + Expression + ')';
 
-                /*  Regex.Term
-                        = Regex.Factor
-                        | Regex.Factor Regex.Term ;
-                 */
-                new Production(regexTerm, regexFactor),
-                new Production(regexTerm, regexFactor, regexTerm),
+            QualifiedIdentifier.Definition =
+                identifier
+                | (_)identifier + '.' + QualifiedIdentifier;
 
-                /*  Regex.Factor
-                        = Regex.Atom
-                        | Regex.Atom Regex.Iterator ;
-                 */
-                new Production(regexFactor, regexAtom),
-                new Production(regexFactor, regexAtom, regexIterator),
+            Regex.Definition =
+                RegexExpression
+                | '^' + RegexExpression
+                | RegexExpression + '$'
+                | '^' + RegexExpression + '$';
 
-                /*  Regex.Atom
-                        = '.'
-                        | '(' Rege.Expression ')'
-                        | Regex.Character
-                        | Regex.Set ;
-                 */
-                new Production(regexAtom, new TerminalLexerRule('.')),
-                new Production(regexAtom, new TerminalLexerRule('('), regexExpression, new TerminalLexerRule(')')),
-                new Production(regexAtom, regexCharacter),
-                new Production(regexAtom, regexSet),
+            RegexExpression.Definition =
+                RegexTerm
+                | RegexTerm + '|' + RegexExpression
+                | (_)null;
 
-                /*  Regex.Iterator 
-                        = '*' | '+' | '?' ;
-                 */
-                new Production(regexIterator, new TerminalLexerRule('*')),
-                new Production(regexIterator, new TerminalLexerRule('+')),
-                new Production(regexIterator, new TerminalLexerRule('?')),
+            RegexTerm.Definition =
+                RegexFactor
+                | RegexFactor + RegexTerm;
 
-                /*  Regex.Set 
-                        = Regex.PositiveSet
-                        | Regex.NegativeSet ;
-                 */
-                new Production(regexSet, regexNegativeSet),
-                new Production(regexSet, regexPositiveSet),
+            RegexFactor.Definition =
+                RegexAtom
+                | RegexAtom + RegexIterator;
 
-                /*  Regex.PositiveSet 
-                        = '[' Regex.CharacterClass ']' ;
-                */
-                new Production(regexPositiveSet, new TerminalLexerRule('['), regexCharacterClass, new TerminalLexerRule(']')),
-                
-                /*  Regex.NegativeSet 
-                        = "[^" Regex.CharacterClass ']' ;
-                */
-                new Production(regexNegativeSet, new StringLiteralLexerRule("[^"), regexCharacterClass, new TerminalLexerRule(']')),
+            RegexAtom.Definition =
+                '.'
+                | '(' + RegexExpression + ')'
+                | RegexCharacter
+                | RegexSet;
 
-                /*  Regex.CharacterClass
-                        = Regex.CharacterRange
-                        | Regex.CharacterRange Regex.CharacterClass;
-                 */
-                new Production(regexCharacterClass, regexCharacterRange),
-                new Production(regexCharacterClass, regexCharacterRange, regexCharacterClass),
+            RegexIterator.Definition = (_)
+                '*'
+                | '+'
+                | '?';
 
-                /*  Regex.CharacterRange
-                        = Regex.CharacterClassCharacter
-                        | Regex.CharacterClassCharacter '-' Regex.CharacterClassCharacter;
-                */
-                new Production(regexCharacterRange, regexCharacterClassCharacter),
-                new Production(regexCharacterRange, regexCharacterClassCharacter, new TerminalLexerRule('-'), regexCharacterClassCharacter),
+            RegexSet.Definition =
+                RegexPositiveSet
+                | RegexNegativeSet;
 
-                /*  Regex.Character
-                        = r"[^.^$()[\]+*?\\]"
-                        | '\\' r"." ;
-                 */
-                new Production(
-                    regexCharacter,
-                    new TerminalLexerRule(
-                        new NegationTerminal(
-                            new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')),
-                        "notMeta")),
-                new Production(
-                    regexCharacter, new TerminalLexerRule('\\'), new TerminalLexerRule(new AnyTerminal(), "any")),
+            RegexPositiveSet.Definition =
+                '[' + RegexCharacterClass + ']';
 
-                /*  Regex.CharacterClassCharacter
-                        = r"[^\]]"
-                        | '\\' r"." ;
-                 */
-                new Production(regexCharacterClassCharacter,
-                    new TerminalLexerRule(
-                        new NegationTerminal(new Terminal(']')), "[^\\]]")),
-                new Production(regexCharacterClassCharacter,
-                    escapeCharacter)                
-            };
+            RegexNegativeSet.Definition =
+                "[^" + RegexCharacterClass + ']';
 
-            var ignore = new[]
-            {
-                whitespace
-            };
+            RegexCharacterClass.Definition =
+                RegexCharacterRange
+                | RegexCharacterRange + RegexCharacterClass;
 
-            _ebnfGrammar = new Grammar(grammar, productions, ignore);
+            RegexCharacterRange.Definition =
+                RegexCharacterClassCharacter
+                | RegexCharacterClassCharacter + '-' + RegexCharacterClassCharacter;
+
+            RegexCharacter.Definition = (_)
+                escapeCharacter
+                | notMeta;
+
+            RegexCharacterClassCharacter.Definition = (_)
+                escapeCharacter
+                | notCloseBracket;
+
+            var grammarBuilder = new GrammarBuilder(
+                Grammar,
+                new[] { Grammar, Block, Rule, Setting, LexerRule, Expression, Term, Factor,
+                    Grouping, Repetition, Optional, QualifiedIdentifier, Literal,
+                    Regex, RegexExpression, RegexTerm, RegexFactor, RegexAtom,
+                    RegexIterator, RegexSet, RegexPositiveSet, RegexNegativeSet,
+                    RegexCharacterClass, RegexCharacterRange, RegexCharacter,
+                    RegexCharacterClassCharacter},
+                new[] { whitespace });
+
+            _ebnfGrammar = grammarBuilder.ToGrammar();
         }
-
-        private static ILexerRule CreateEscapeCharacterLexerRule()
+        
+        private static BaseLexerRule CreateEscapeCharacterLexerRule()
         {
             var start = new DfaState();
             var escape = new DfaState();
             var final = new DfaState(true);
-            start.AddTransition(new DfaTransition(new Terminal('\\'), escape));
+            start.AddTransition(new DfaTransition(new CharacterTerminal('\\'), escape));
             escape.AddTransition(new DfaTransition(new AnyTerminal(), final));
             return new DfaLexerRule(start, "escape");
         }
 
-        private static ILexerRule CreateNotSingleQuoteLexerRule()
+        private static BaseLexerRule CreateNotSingleQuoteLexerRule()
         {
             var start = new DfaState();
             var final = new DfaState(true);
-            var terminal = new NegationTerminal(new Terminal('\''));
+            var terminal = new NegationTerminal(new CharacterTerminal('\''));
             var edge = new DfaTransition(terminal, final);
             start.AddTransition(edge);
             final.AddTransition(edge);
-            return new DfaLexerRule(start, new TokenType("not-single-quote"));
+            return new DfaLexerRule(start, new TokenType(@"([^""]|(\\.))+"));
         }
 
-        private static ILexerRule CreateNotDoubleQuoteLexerRule()
+        private static BaseLexerRule CreateNotDoubleQuoteLexerRule()
         {
-            // ( [^"\\] | (\\ .) ) +
+            // ([^"]|(\\.))*
             var start = new DfaState();
             var escape = new DfaState();
             var final = new DfaState(true);
 
-            var notQuoteTerminal = new NegationTerminal(
-                new SetTerminal('"', '\\'));
-            var escapeTerminal = new Terminal('\\');
+            var notDoubleQuoteTerminal = new NegationTerminal(
+                new CharacterTerminal('"'));
+            var escapeTerminal = new CharacterTerminal('\\');
             var anyTerminal = new AnyTerminal();
 
-            var notQuoteEdge = new DfaTransition(notQuoteTerminal, final);
-            start.AddTransition(notQuoteEdge);
-            final.AddTransition(notQuoteEdge);
+            var notDoubleQuoteEdge = new DfaTransition(notDoubleQuoteTerminal, final);
+            start.AddTransition(notDoubleQuoteEdge);
+            final.AddTransition(notDoubleQuoteEdge);
 
             var escapeEdge = new DfaTransition(escapeTerminal, escape);
             start.AddTransition(escapeEdge);
@@ -288,18 +216,18 @@ namespace Pliant.Ebnf
             var anyEdge = new DfaTransition(anyTerminal, final);
             escape.AddTransition(anyEdge);
 
-            return new DfaLexerRule(start, new TokenType("not-double-quote"));
+            return new DfaLexerRule(start, new TokenType(@"([^""]|(\\.))*"));
         }
 
-        private static ILexerRule CreateSettingIdentifierLexerRule()
+        private static BaseLexerRule CreateSettingIdentifierLexerRule()
         {
-            // :[a-zA-Z][a-zA-Z0-9]*
+            // /:[a-zA-Z][a-zA-Z0-9]*/
             var start = new DfaState();
             var oneLetter = new DfaState();
             var zeroOrMoreLetterOrDigit = new DfaState(true);
             start.AddTransition(
                new DfaTransition(
-                   new Terminal(':'),
+                   new CharacterTerminal(':'),
                    oneLetter));
             oneLetter.AddTransition(
                  new DfaTransition(
@@ -317,9 +245,9 @@ namespace Pliant.Ebnf
             return new DfaLexerRule(start, "settingIdentifier");
         }
 
-        private static ILexerRule CreateIdentifierLexerRule()
+        private static BaseLexerRule CreateIdentifierLexerRule()
         {
-            // [a-zA-Z][a-zA-Z0-9-_]*
+            // /[a-zA-Z][a-zA-Z0-9-_]*/
             var identifierState = new DfaState();
             var zeroOrMoreLetterOrDigit = new DfaState(true);
             identifierState.AddTransition(
@@ -340,7 +268,7 @@ namespace Pliant.Ebnf
             return identifier;
         }
 
-        private static ILexerRule CreateWhitespaceLexerRule()
+        private static BaseLexerRule CreateWhitespaceLexerRule()
         {
             var whitespaceTerminal = new WhitespaceTerminal();
             var startWhitespace = new DfaState();
@@ -349,6 +277,14 @@ namespace Pliant.Ebnf
             finalWhitespace.AddTransition(new DfaTransition(whitespaceTerminal, finalWhitespace));
             var whitespace = new DfaLexerRule(startWhitespace, "whitespace");
             return whitespace;
+        }
+
+        private static BaseLexerRule CreateNotMetaLexerRule()
+        {
+            return new TerminalLexerRule(
+                    new NegationTerminal(
+                        new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')),
+                    "notMeta");
         }
 
         public IReadOnlyList<ILexerRule> Ignores

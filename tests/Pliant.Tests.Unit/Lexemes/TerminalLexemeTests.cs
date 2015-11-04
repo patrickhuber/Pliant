@@ -16,7 +16,7 @@ namespace Pliant.Tests.Unit
         public void Test_TerminalLexeme_When_Character_Matches_IsAcceptted_True()
         {
             var terminalLexeme = new TerminalLexeme(
-                new Terminal('c'), 
+                new CharacterTerminal('c'), 
                 new TokenType("c"));
             Assert.IsFalse(terminalLexeme.IsAccepted());
             Assert.IsTrue(terminalLexeme.Scan('c'));
@@ -27,7 +27,7 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void Test_TerminalLexeme_That_Capture_Is_Empty_String()
         {
-            var terminalLexeme = new TerminalLexeme(new Terminal('c'), new TokenType("c"));
+            var terminalLexeme = new TerminalLexeme(new CharacterTerminal('c'), new TokenType("c"));
             Assert.AreEqual(string.Empty, terminalLexeme.Capture);
         }
     }

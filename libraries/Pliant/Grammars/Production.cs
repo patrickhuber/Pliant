@@ -8,7 +8,7 @@ namespace Pliant.Grammars
     {
         public INonTerminal LeftHandSide { get; private set; }
 
-        private ReadOnlyList<ISymbol> _rightHandSide;
+        private ReadWriteList<ISymbol> _rightHandSide;
 
         public IReadOnlyList<ISymbol> RightHandSide { get { return _rightHandSide; } }
 
@@ -19,7 +19,7 @@ namespace Pliant.Grammars
             Assert.IsNotNull(leftHandSide, "leftHandSide");
             Assert.IsNotNull(rightHandSide, "rightHandSide");
             LeftHandSide = leftHandSide;
-            _rightHandSide = new ReadOnlyList<ISymbol>(new List<ISymbol>(rightHandSide));
+            _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
         }
 
         public Production(string leftHandSide, params ISymbol[] rightHandSide)
@@ -61,6 +61,25 @@ namespace Pliant.Grammars
                 _isHashCodeComputed = true;
                 return _computedHashCode;
             }
+        }
+        
+        public void AddSymbol(ISymbol symbol)
+        {
+            InvalidateCachedHashCode();
+            _rightHandSide.Add(symbol);
+        }
+
+        private void InvalidateCachedHashCode()
+        {
+            _isHashCodeComputed = false;
+        }
+
+        public Production Clone()
+        {
+            var production = new Production(LeftHandSide);
+            foreach(var symbol in RightHandSide)
+                production.AddSymbol(symbol);
+            return production;
         }
 
         public override string ToString()

@@ -53,6 +53,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Automata\DfaLexemeTests.cs" />
+    <Compile Include="Builders\ProductionBuilderTests.cs" />
+    <Compile Include="Builders\BuilderExpressionTests.cs" />
+    <Compile Include="Ebnf\EbnfCompilerTests.cs" />
     <Compile Include="Ebnf\EbnfTests.cs" />
     <Compile Include="Grammars\AnyTerminalTests.cs" />
     <Compile Include="Bnf\BnfTests.cs" />
@@ -60,7 +63,7 @@
     <Compile Include="Grammars\DigitTerminalTests.cs" />
     <Compile Include="Builders\GrammarBuilderTests.cs" />
     <Compile Include="LoggingNodeVisitor.cs" />
-    <Compile Include="Nodes\NodeVisitorTests.cs" />
+    <Compile Include="Ast\NodeVisitorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Grammars\ProductionTests.cs" />
     <Compile Include="Regex\RegexTests.cs" />
@@ -73,6 +76,7 @@
     <Compile Include="ParseInterfaceTests.cs" />
     <Compile Include="Lexemes\TerminalLexemeTests.cs" />
     <Compile Include="Grammars\WhitespaceTerminalTests.cs" />
+    <Compile Include="Tree\TreeNodeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj">

@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Grammars;
 using Pliant.Ebnf;
-using Pliant.Nodes;
+using Pliant.Ast;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
@@ -37,26 +37,26 @@ namespace Pliant.Tests.Unit.Ebnf
         Terminal            
             = '""' String '""'
             | ""'"" Character ""'""
-            | 'r' '""' Regex '""' ; 
+            | '/' Regex '/' ; 
         String              
             = { StringCharacter };
         StringCharacter     
-            = r""[^\""]""
+            = /[^\""]/
             | '\\' AnyCharacter ;
         Character           
             = SingleCharacter
             | '\\' SimpleEscape ;
         SingleCharacter     
-            = r""[^']"";
+            ~ /[^']/;
         SimpleEscape        
-            = ""'"" | '""' | '\\' | '0' | 'a' | 'b' 
+            ~ ""'"" | '""' | '\\' | '0' | 'a' | 'b' 
             | 'f' | 'n'  | 'r' | 't' | 'v' ;
         Digit               
-            = r""[0-9]"" ;
+            ~ /[0-9]/ ;
         Letter              
-            = r""[a-zA-Z]"";
+            ~ /[a-zA-Z]/;
         Whitespace          
-            = r""\w+"";
+            ~ /\w+/;
         Regex               
             = ['^'] Regex.Expression ['$'] ;
         Regex.Expression     
@@ -83,11 +83,11 @@ namespace Pliant.Tests.Unit.Ebnf
             = Regex.CharacterClassCharacter
             | Regex.CharacterClassCharacter '-' Regex.CharacterClassCharacter;
         Regex.CharacterClassCharacter
-            = r""[^\]]""
-            | '\\' r""."" ;
+            ~ /[^\]]/
+            | '\\' /./ ;
         Regex.Character
-            = r""[^.^$()[\] + *?\\]""
-            | '\\' r""."" ;
+            ~ /[^.^$()[\] + *?\\]/
+            | '\\' /./ ;
         :ignore             
             = Whitespace;";
 
@@ -154,7 +154,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void Test_Ebnf_That_Parses_Regex()
         {
-            ParseInput("Rule = r\"[a-zA-Z0-9]\";");
+            ParseInput("Rule = /[a-zA-Z0-9]/;");
         }
 
         [TestMethod]
@@ -208,8 +208,8 @@ namespace Pliant.Tests.Unit.Ebnf
         {
             ParseInput(@"
             Regex.CharacterClassCharacter
-            = r""[^\]]""
-            | '\\' r""."";");
+                = /[^\]]/
+                | /[\\]./;");
         }
 
         [TestMethod]
@@ -221,7 +221,7 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsNotNull(node);
             
             var visitor = new LoggingNodeVisitor();
-            node.Accept(visitor, new NodeVisitorStateManager());
+            node.Accept(visitor);
 
             var log = visitor.VisitLog;
             Assert.IsTrue(log.Count > 0);
@@ -235,7 +235,7 @@ namespace Pliant.Tests.Unit.Ebnf
                 Assert.IsTrue(parseInterface.Read(), "Error found in position {0}", parseInterface.Position);
             }
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
-            return parseInterface.ParseEngine.GetRoot();
+            return parseInterface.ParseEngine.GetParseForestRoot();
         }
 
         private void FailParseInput(string input)

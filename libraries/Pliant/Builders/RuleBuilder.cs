@@ -3,43 +3,53 @@ using Pliant.Grammars;
 using Pliant.Tokens;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Pliant.Builders
 {
-    public class RuleBuilder : IRuleBuilder
+    public class RuleBuilder : BaseBuilder, IRuleBuilder
     {
-        private IList<IList<ISymbol>> _rules;
-        
+        public List<BaseBuilderList> Data { get; private set; }
+
         public RuleBuilder()
         {
-            _rules = new List<IList<ISymbol>>();
+            Data = new List<BaseBuilderList>();
         }
 
-        private IGrammarLexerRule CreateGrammarLexerRule(IList<ITerminal> terminalNeighborList)
+        public RuleBuilder(BaseBuilder baseBuilder)
+            : this()
         {
-            var startNonTerminal = new NonTerminal("S");
-            var production = new Production(
-                startNonTerminal, 
-                terminalNeighborList.ToArray());
-            var grammar = new Grammar(startNonTerminal, new[] { production },  null);
-            return new GrammarLexerRule(Guid.NewGuid().ToString(), grammar);
+            AddWithAnd(baseBuilder);
+        }
+
+        public void AddWithAnd(BaseBuilder symbolBuilder)
+        {
+            if (Data.Count == 0)
+                Data.Add(new BaseBuilderList());
+            Data[Data.Count - 1].Add(symbolBuilder);
+        }
+
+        public void AddWithOr(BaseBuilder symbolBuilder)
+        {
+            var list = new BaseBuilderList();
+            list.Add(symbolBuilder);
+            Data.Add(list);
         }
 
         public IRuleBuilder Rule(params object[] symbols)
         {
-            var symbolList = new List<ISymbol>();
-            if (symbols != null)
+            if (!symbols.IsNullOrEmpty())
             {
+                var symbolList = new BaseBuilderList();
                 foreach (var symbol in symbols)
                 {
                     if (symbol is char)
                     {
-                        var terminal = new Terminal((char)symbol);
+                        var terminal = new CharacterTerminal((char)symbol);
                         var lexerRule = new TerminalLexerRule(
                             terminal,
                             new TokenType(terminal.ToString()));
-                        symbolList.Add(lexerRule);
+                        symbolList.Add(
+                            new SymbolBuilder(lexerRule));
                     }
                     else if (symbol is ITerminal)
                     {
@@ -47,23 +57,27 @@ namespace Pliant.Builders
                         var lexerRule = new TerminalLexerRule(
                             terminal,
                             new TokenType(terminal.ToString()));
-                        symbolList.Add(lexerRule);
+                        symbolList.Add(
+                            new SymbolBuilder(lexerRule));
                     }
                     else if (symbol is ILexerRule)
                     {
-                        symbolList.Add(symbol as ILexerRule);
+                        symbolList.Add(
+                            new SymbolBuilder(symbol as ILexerRule));
                     }
                     else if (symbol is string)
                     {
-                        var nonTerminal = new NonTerminal(symbol as string);
-                        symbolList.Add(nonTerminal);
+                        var terminal = new StringLiteralLexerRule(symbol as string);
+                        symbolList.Add(
+                            new SymbolBuilder(terminal));                                               
                     }
                     else if (symbol == null)
                     { }
                     else { throw new ArgumentException("unrecognized terminal or nonterminal"); }
                 }
+
+                Data.Add(symbolList);
             }
-            _rules.Add(symbolList);
             return this;
         }
 
@@ -71,10 +85,37 @@ namespace Pliant.Builders
         {
             return Rule();
         }
-
-        public IList<IList<ISymbol>> GetRules()
+        
+        public static implicit operator RuleBuilder(ProductionBuilder productionBuilder)
         {
-            return _rules.ToArray();
+            return new RuleBuilder(productionBuilder);
+        }
+
+        public static implicit operator RuleBuilder(string literal)
+        {
+            return new RuleBuilder(
+                new SymbolBuilder(
+                    new StringLiteralLexerRule(literal)));
+        }
+
+        public static implicit operator RuleBuilder(char literal)
+        {
+            return new RuleBuilder(
+                new SymbolBuilder(
+                    new TerminalLexerRule(literal)));
+        }
+
+        public static implicit operator RuleBuilder(BaseTerminal terminal)
+        {
+            return new RuleBuilder(
+                new SymbolBuilder(
+                    new TerminalLexerRule(terminal, terminal.ToString())));
+        }
+
+        public static implicit operator RuleBuilder(BaseLexerRule lexerRule)
+        {
+            return new RuleBuilder(
+                new SymbolBuilder(lexerRule));
         }
     }
 }
