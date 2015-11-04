@@ -1,6 +1,7 @@
 ﻿using Pliant.Grammars;
 using Pliant.Ast;
 using System;
+using Pliant.Tree;
 
 namespace Pliant.Ebnf
 {
@@ -19,7 +20,9 @@ namespace Pliant.Ebnf
         private IGrammar TranslateAst(INode root)
         {
             var visitor = new EbnfVisitor();
-            root.Accept(visitor);
+            var internalRoot = root as IInternalNode;
+            var internalTreeNode = new InternalTreeNode(internalRoot);
+            internalTreeNode.Accept(visitor);
             return visitor.Grammar;
         }
 

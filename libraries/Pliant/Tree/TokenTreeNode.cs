@@ -8,6 +8,9 @@ namespace Pliant.Tree
     {
         private ITokenNode _innerNode;
 
+        public int Origin { get { return _innerNode.Origin; } }
+        public int Location { get { return _innerNode.Location; } }
+
         public TokenTreeNode(ITokenNode innerNode)
         {
             _innerNode = innerNode;
@@ -23,6 +26,11 @@ namespace Pliant.Tree
         public void Accept(ITreeNodeVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        public override string ToString()
+        {
+            return $"{Token.TokenType.Id}({Origin}, {Location}) = {Token.Value}";
         }
     }
 }

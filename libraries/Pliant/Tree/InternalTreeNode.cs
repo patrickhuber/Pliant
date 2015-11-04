@@ -1,4 +1,5 @@
 ﻿using Pliant.Ast;
+using Pliant.Grammars;
 using System;
 using System.Collections.Generic;
 
@@ -10,6 +11,12 @@ namespace Pliant.Tree
         IAndNode _currentAndNode;
         IInternalNode _internalNode;
         
+        public int Origin { get { return _internalNode.Origin; } }
+
+        public int Location { get { return _internalNode.Location; } }
+
+        public INonTerminal Symbol { get; private set; }
+
         public InternalTreeNode(
             IInternalNode internalNode,
             IAndNode currentAndNode,
@@ -17,7 +24,34 @@ namespace Pliant.Tree
         {
             _stateManager = stateManager;
             _currentAndNode = currentAndNode;
-            _stateManager = stateManager;
+            _internalNode = internalNode;
+            SetRule(_internalNode);
+        }
+
+        public InternalTreeNode(
+            IInternalNode internalNode)
+            : this(internalNode, new NodeVisitorStateManager())
+        {            
+        }
+
+        public InternalTreeNode(
+            IInternalNode internalNode,
+            INodeVisitorStateManager stateManager)
+            : this(internalNode, stateManager.GetCurrentAndNode(internalNode), stateManager)
+        {
+        }
+
+        private void SetRule(IInternalNode node)
+        {
+            switch (node.NodeType)
+            {
+                case Ast.NodeType.Symbol:
+                    Symbol = (node as ISymbolNode).Symbol as INonTerminal;
+                    break;
+                case Ast.NodeType.Intermediate:
+                    Symbol = (node as IIntermediateNode).State.Production.LeftHandSide;
+                    break;
+            }
         }
 
         public IEnumerable<ITreeNode> Children
@@ -66,6 +100,11 @@ namespace Pliant.Tree
         public void Accept(ITreeNodeVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        public override string ToString()
+        {
+            return $"{Symbol}({Origin}, {Location})";
         }
     }
 }

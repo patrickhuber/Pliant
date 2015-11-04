@@ -1,110 +1,189 @@
-﻿using Pliant.Ast;
+﻿using Pliant.Tree;
 using Pliant.Grammars;
 using Pliant.Builders;
+using System;
+using System.Collections.Generic;
 
 namespace Pliant.Ebnf
 {
-    public class EbnfVisitor : NodeVisitorBase
+    public class EbnfVisitor : TreeNodeVisitorBase
     {
         public IGrammar Grammar { get { return _grammarbuilder.ToGrammar(); } }
 
         private GrammarBuilder _grammarbuilder;
+        private Grammar _grammar;
 
         public EbnfVisitor()
             : base()
         {
         }
 
-        public EbnfVisitor(INodeVisitorStateManager stateManager)
-            : base(stateManager)
+        public override void Visit(IInternalTreeNode node)
         {
-        }
-                        
-        public override void Visit(ISymbolNode node)
-        {
-            switch (node.Symbol.SymbolType)
+            switch (node.Symbol.Value)
             {
-                case SymbolType.NonTerminal:
-                    var leftHandSide = (node.Symbol as INonTerminal);
-                    switch (leftHandSide.Value)
-                    {
-                        case "Grammar":
-                            VisitGrammar(node);
-                            break;
+                case "Grammar":
+                    _grammarbuilder = new GrammarBuilder();
+                    _grammar = new Grammar();
+                    base.Visit(node);
+                    break;
 
-                        case "Rule":
-                            VisitRule(node);
-                            break;
+                case "Block":
+                    base.Visit(node);
+                    break;
 
-                        case "Setting":
-                            VisitSetting(node);
-                            break;
-
-                        default:
-                            BeginVisitInternalNodeChildren(node);
-                            EndVisitInternalNodeChildren(node);
-                            break;
-                    }
+                case "Rule":
+                    var builder = GetProductionBuilderFromRuleNode(node);
+                    _grammarbuilder.AddProduction(builder);
                     break;
             }
         }
 
-        private void VisitGrammar(ISymbolNode node)
+        private ProductionBuilder GetProductionBuilderFromRuleNode(IInternalTreeNode node)
         {
-            _grammarbuilder = new GrammarBuilder();
-            BeginVisitInternalNodeChildren(node);
-            EndVisitInternalNodeChildren(node);
+            ProductionBuilder productionBuilder = null;
+            foreach (var child in node.Children)
+            {
+                if (child.NodeType != TreeNodeType.Internal)
+                    continue;
+                var internalChild = child as IInternalTreeNode;
+                switch (internalChild.Symbol.Value)
+                {
+                    case "QualifiedIdentifier":
+                        var name = GetNameFromQualifiedIdentifierNode(internalChild);
+                        productionBuilder = new ProductionBuilder(name);
+                        break;
+
+                    case "Expression":
+                        var baseBuilderList = new BaseBuilderList();
+                        baseBuilderList = VisitExpressionNode(baseBuilderList, internalChild);
+                        var ruleBuilder = new RuleBuilder();
+                        ruleBuilder.Data.Add(baseBuilderList);
+                        productionBuilder.Definition = ruleBuilder;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            return productionBuilder; 
+        }
+        
+        private BaseBuilderList VisitExpressionNode(
+            BaseBuilderList builderList, IInternalTreeNode expressionNode)
+        {            
+            foreach (var child in expressionNode.Children)
+            {
+                if (child.NodeType != TreeNodeType.Internal)
+                    continue;
+
+                var internalChild = child as IInternalTreeNode;
+                switch (internalChild.Symbol.Value)
+                {
+                    case "Term":
+                        builderList = VisitTermNode(builderList, internalChild);
+                        break;
+
+                    case "Expression":
+                        builderList = VisitExpressionNode(builderList.CreateAlterations(), internalChild);
+                        break;
+                }
+            }
+            return builderList;
         }
 
-        private void VisitRule(ISymbolNode node)
+        private BaseBuilderList VisitTermNode(
+            BaseBuilderList builderList, IInternalTreeNode termNode)
         {
-            ;
+            foreach (var child in termNode.Children)
+            {
+                if (child.NodeType != TreeNodeType.Internal)
+                    continue;
+
+                var internalChild = child as IInternalTreeNode;
+                switch (internalChild.Symbol.Value)
+                {
+                    case "Factor":
+                        builderList = VisitFactorNode(builderList, internalChild);
+                        break;
+
+                    case "Term":
+                        builderList = VisitTermNode(builderList, internalChild);
+                        break;
+                }
+            }
+            return builderList;
         }
 
-        private void VisitSetting(ISymbolNode node)
+        private BaseBuilderList VisitFactorNode(
+            BaseBuilderList builderList, IInternalTreeNode factorNode)
         {
-            ;
+            foreach (var child in factorNode.Children)
+            {
+                if (child.NodeType != TreeNodeType.Internal)
+                    continue;
+
+                var internalChild = child as IInternalTreeNode;
+                switch (internalChild.Symbol.Value)
+                {
+                    case "QualifiedIdentfiier":
+                        break;
+
+                    case "Literal":
+                        SymbolBuilder stringLiteral = GetLexerRuleFromLiteralNode(internalChild);
+                        builderList.Add(stringLiteral);
+                        break;
+
+                    case "Regex":
+                        throw new NotSupportedException("Regex requires implementing a regex complier");
+                        
+                    case "Repetition":                           
+                        throw new NotSupportedException("Repetition is not currently supprted because implementation would require adding new rules to the grammar.");
+                        
+                    case "Optional":
+                        throw new NotSupportedException("Optional is not currently supported due to complexity in implementation.");
+
+                    case "Grouping":
+                        throw new NotSupportedException("Grouping is not currently supported due to complexity in implementation.");
+                }
+            }
+            return builderList;
         }
 
-        public override void Visit(IIntermediateNode node)
+        private BaseLexerRule GetLexerRuleFromLiteralNode(IInternalTreeNode node)
         {
-            // intermediate nodes are just used to binarize the tree, 
-            // we don't actually process them in any way
-            BeginVisitInternalNodeChildren(node);
-            EndVisitInternalNodeChildren(node);
+            foreach (var child in node.Children)
+            {
+                if (child.NodeType != TreeNodeType.Token)
+                    continue;
+                var tokenNode = child as ITokenTreeNode;                
+                if (tokenNode.Token.TokenType.Id != "'" &&
+                    tokenNode.Token.TokenType.Id != "\"")
+                {
+                    var value = tokenNode.Token.Value;
+                    return new StringLiteralLexerRule(value);
+                }
+            }
+            throw new Exception("invalid string literal.");   
         }
 
-        protected virtual void VisitInternalNodeChildren(IIntermediateNode node)
+        private string GetNameFromQualifiedIdentifierNode(IInternalTreeNode qualfieidIdentifier)
         {
-
+            foreach (var child in qualfieidIdentifier.Children)
+            {
+                if (child.NodeType == TreeNodeType.Token)
+                {
+                    var tokenNode = child as ITokenTreeNode;
+                    return tokenNode.Token.Value;
+                }
+                break;
+            }
+            return null;
         }
 
-        protected void BeginVisitInternalNodeChildren(IInternalNode node)
+        public override void Visit(ITokenTreeNode node)
         {
-            var currentAndNode = StateManager.GetCurrentAndNode(node);
-            foreach (var child in currentAndNode.Children)
-                child.Accept(this);
-        }
-
-        protected virtual void EndVisitInternalNodeChildren(IInternalNode node)
-        {
-            StateManager.MarkAsTraversed(node);
-        }
-
-
-        public override void Visit(ITokenNode tokenNode)
-        {
-            ;
-        }
-
-        public override void Visit(ITerminalNode node)
-        {
-            ;
-        }
-
-        public override void Visit(IAndNode andNode)
-        {
-            ;
+            base.Visit(node);
         }
     }
 }
