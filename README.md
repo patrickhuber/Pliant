@@ -18,7 +18,7 @@ using Pliant.Builders;
 using Pliant.Grammars;
 using Pliant.Automata;
 
-public static int main(string[] args)
+public static int Main(string[] args)
 {
 	var digits = CreateDigitLexerRule();
 	var whitespace = CreateWhitespaceLexerRule();
@@ -81,7 +81,7 @@ private static ILexerRule CreateWhitespaceLexerRule()
 #### Using the Ebnf Text Interface ( *work in progress* )
 
 ```CSharp
-public static int main (string[] args)
+public static int Main (string[] args)
 {
 	var grammarText = @"
 	Calculator 
