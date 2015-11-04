@@ -7,6 +7,113 @@ Pliant is a table driven parser that implements the Earley algorithm. Two optimi
 1. Optimization from Joop Leo to efficiently handle right recursions. 
 2. Bug fix from Aycock and Horspool to handle nullable predictions
 
+## Using the Code
+
+### Creating Grammars
+
+#### Using the Grammar Builder classes
+
+```CSharp
+using Pliant.Builders;
+using Pliant.Grammars;
+using Pliant.Automata;
+
+public static int main(string[] args)
+{
+	var digits = CreateDigitLexerRule();
+	var whitespace = CreateWhitespaceLexerRule();
+	
+	ProductionBuilder 
+		Calculator = "Calculator",
+		Factor = "Factor",
+		Term = "Term",
+		Expression = "Expression",
+		Number = "Number";
+		
+	Calculator.Definition 
+		= Expression ;
+		
+	Expression.Definition
+		= Expression + '+' + Term 
+		| Term ;
+
+	Term.Definition 
+		= Term + '*' + Factor
+		| Factor ;
+		
+	Factor.Definition 
+		= Number ;
+		
+	Number.Definition
+		= digits;
+		
+	var grammar = new GrammarBuilder(
+		Calculator, 
+		new[]{ Calculator, Factor, Term, Expression, Number }, 
+		new []{ whitespace })
+	.ToGrammar();	
+	
+	// TODO: Use the grammar in a parse.
+}
+
+private static BaseLexerRule CreateDigitLexerRule()
+{
+	var startState = new DfaState();
+	var finalState = new DfaState(true);
+	var digitTransition = new DfaTransition(new DigitTerminal(), finalState);
+	startState.AddTransition(digitTransition);
+	finalState.AddTransition(digitTransition);
+	return new DfaLexerRule(startState, "[\\d]+");
+}
+
+private static ILexerRule CreateWhitespaceLexerRule()
+{
+	var whitespaceTerminal = new WhitespaceTerminal();
+	var startState = new DfaState();
+	var finalState = new DfaState(true);
+	var whitespaceTransition = new DfaTransition(whitespaceTerminal, finalState);
+	startState.AddTransition(whitespaceTransition);
+	finalState.AddTransition(whitespaceTransition);
+	return new DfaLexerRule(startState, new TokenType("[\\s]+"));	
+}		
+```
+
+#### Using the Ebnf Text Interface ( *work in progress* )
+
+```CSharp
+public static int main (string[] args)
+{
+	var grammarText = @"
+	Calculator 
+		= Expression;
+		
+	Expression 
+		= Expression Term
+		| Term;
+		
+	Term 
+		= Term '*' Factor
+		| Factor;
+		
+	Factor 
+		= Number ;
+	
+	Number 
+		= Digits;
+		
+	Digits ~ /[0-9]+/ ;
+	Whitespace ~ /[\\w]+/ ;
+	
+	:start = Calculator;
+	:ignore = whitespace;";
+	
+	var compiler = new EbnfCompiler();
+	var grammar = compiler.Compile(grammarText);
+	
+	// TODO: use the grammar in a parse.
+}
+```
+
 ## References
 
 * [berkeley earley cs164](http://inst.eecs.berkeley.edu/~cs164/fa10/earley/earley.html)

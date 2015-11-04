@@ -133,15 +133,15 @@ namespace Pliant.Bnf
             return ruleName;
         }
 
-        private static ILexerRule CreateWhitespaceLexerRule()
+        private static BaseLexerRule CreateWhitespaceLexerRule()
         {
             var whitespaceTerminal = new WhitespaceTerminal();
-            var startWhitespace = new DfaState();
-            var finalWhitespace = new DfaState(true);
-            startWhitespace.AddTransition(new DfaTransition(whitespaceTerminal, finalWhitespace));
-            finalWhitespace.AddTransition(new DfaTransition(whitespaceTerminal, finalWhitespace));
-            var whitespace = new DfaLexerRule(startWhitespace, new TokenType("whitespace"));
-            return whitespace;
+            var startState = new DfaState();
+            var finalState = new DfaState(true);
+            var whitespaceTransition = new DfaTransition(whitespaceTerminal, finalState);
+            startState.AddTransition(whitespaceTransition);
+            finalState.AddTransition(whitespaceTransition);
+            return new DfaLexerRule(startState, new TokenType("[\\s]+"));
         }
 
         public IReadOnlyList<IProduction> Productions
