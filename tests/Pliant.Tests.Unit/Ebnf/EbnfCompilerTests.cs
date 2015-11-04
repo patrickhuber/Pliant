@@ -63,6 +63,46 @@ namespace Pliant.Tests.Unit.Ebnf
 
             Assert.AreEqual("Rule", grammar.Start.Value);
             Assert.AreEqual(2, grammar.Productions.Count);
+
+            var firstProduction = grammar.Productions[0];
+            Assert.AreEqual(firstProduction.LeftHandSide.Value, "Rule");
+            Assert.AreEqual(firstProduction.RightHandSide.Count, 1);
+            Assert.IsInstanceOfType(firstProduction.RightHandSide[0], typeof(StringLiteralLexerRule));
+            var firstProductionFirstSymbol = firstProduction.RightHandSide[0] as StringLiteralLexerRule;
+            Assert.AreEqual("a", firstProductionFirstSymbol.Literal);
+
+            var secondProduction = grammar.Productions[1];
+            Assert.AreEqual(secondProduction.LeftHandSide.Value, "Rule");
+            Assert.AreEqual(secondProduction.RightHandSide.Count, 1);
+            Assert.IsInstanceOfType(secondProduction.RightHandSide[0], typeof(StringLiteralLexerRule));
+            var secondProductionSecondSymbol = secondProduction.RightHandSide[0] as StringLiteralLexerRule;
+            Assert.AreEqual("b", secondProductionSecondSymbol.Literal);
+        }
+
+        [TestMethod]
+        public void Test_EbnfCompiler_Creates_Alteration_With_Two_Productions_When_Given_Alteration_After_Contactenation()
+        {
+            var input = @"Rule = 'a' 'b' | 'c';";
+            var ebnfCompiler = new EbnfCompiler();
+            var grammar = ebnfCompiler.Compile(input);
+
+            var firstProduction = grammar.Productions[0];
+            Assert.AreEqual(firstProduction.LeftHandSide.Value, "Rule");
+            Assert.AreEqual(firstProduction.RightHandSide.Count, 2);
+            Assert.IsInstanceOfType(firstProduction.RightHandSide[0], typeof(StringLiteralLexerRule));
+            var firstProductionFirstSymbol = firstProduction.RightHandSide[0] as StringLiteralLexerRule;
+            Assert.AreEqual("a", firstProductionFirstSymbol.Literal);
+
+            Assert.IsInstanceOfType(firstProduction.RightHandSide[0], typeof(StringLiteralLexerRule));
+            var firstProductionSecondSymbol = firstProduction.RightHandSide[1] as StringLiteralLexerRule;
+            Assert.AreEqual("b", firstProductionSecondSymbol.Literal);
+
+            var secondProduction = grammar.Productions[1];
+            Assert.AreEqual(secondProduction.LeftHandSide.Value, "Rule");
+            Assert.AreEqual(secondProduction.RightHandSide.Count, 1);
+            Assert.IsInstanceOfType(secondProduction.RightHandSide[0], typeof(StringLiteralLexerRule));
+            var secondProductionSecondSymbol = secondProduction.RightHandSide[0] as StringLiteralLexerRule;
+            Assert.AreEqual("c", secondProductionSecondSymbol.Literal);
         }
     }
 }

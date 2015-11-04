@@ -62,6 +62,25 @@ namespace Pliant.Grammars
                 return _computedHashCode;
             }
         }
+        
+        public void AddSymbol(ISymbol symbol)
+        {
+            InvalidateCachedHashCode();
+            _rightHandSide.Add(symbol);
+        }
+
+        private void InvalidateCachedHashCode()
+        {
+            _isHashCodeComputed = false;
+        }
+
+        public Production Clone()
+        {
+            var production = new Production(LeftHandSide);
+            foreach(var symbol in RightHandSide)
+                production.AddSymbol(symbol);
+            return production;
+        }
 
         public override string ToString()
         {

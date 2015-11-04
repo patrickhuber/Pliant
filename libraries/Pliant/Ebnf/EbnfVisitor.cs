@@ -8,9 +8,8 @@ namespace Pliant.Ebnf
 {
     public class EbnfVisitor : TreeNodeVisitorBase
     {
-        public IGrammar Grammar { get { return _grammarbuilder.ToGrammar(); } }
+        public IGrammar Grammar { get { return _grammar; } }
 
-        private GrammarBuilder _grammarbuilder;
         private Grammar _grammar;
 
         public EbnfVisitor()
@@ -23,9 +22,10 @@ namespace Pliant.Ebnf
             switch (node.Symbol.Value)
             {
                 case "Grammar":
-                    _grammarbuilder = new GrammarBuilder();
                     _grammar = new Grammar();
                     base.Visit(node);
+                    if (_grammar.Start == null)
+                        _grammar.Start = _grammar.Productions[0].LeftHandSide;                    
                     break;
 
                 case "Block":
@@ -33,45 +33,52 @@ namespace Pliant.Ebnf
                     break;
 
                 case "Rule":
-                    var builder = GetProductionBuilderFromRuleNode(node);
-                    _grammarbuilder.AddProduction(builder);
+                    var productions = GetProductionListFromRuleNode(node);
+                    foreach (var production in productions)
+                        _grammar.AddProduction(production);
                     break;
             }
         }
 
-        private ProductionBuilder GetProductionBuilderFromRuleNode(IInternalTreeNode node)
+        private class SymbolList : List<ISymbol>
         {
-            ProductionBuilder productionBuilder = null;
+        }
+
+        private List<Production> GetProductionListFromRuleNode(IInternalTreeNode node)
+        {
+            var productionList = new List<Production>();
+            var productionName = string.Empty;
             foreach (var child in node.Children)
             {
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
+
                 var internalChild = child as IInternalTreeNode;
                 switch (internalChild.Symbol.Value)
                 {
                     case "QualifiedIdentifier":
-                        var name = GetNameFromQualifiedIdentifierNode(internalChild);
-                        productionBuilder = new ProductionBuilder(name);
+                        productionName = GetNameFromQualifiedIdentifierNode(internalChild);
                         break;
 
                     case "Expression":
-                        var baseBuilderList = new BaseBuilderList();
-                        baseBuilderList = VisitExpressionNode(baseBuilderList, internalChild);
-                        var ruleBuilder = new RuleBuilder();
-                        ruleBuilder.Data.Add(baseBuilderList);
-                        productionBuilder.Definition = ruleBuilder;
-                        break;
-
-                    default:
+                        var listOfSymbolLists = GetListOfSymbolListFromExpressionNode(internalChild);
+                        foreach (var symbolList in listOfSymbolLists)
+                        {
+                            var production = new Production(productionName);
+                            foreach (var symbol in symbolList)
+                                production.AddSymbol(symbol);
+                            productionList.Add(production);
+                        } 
                         break;
                 }
             }
-            return productionBuilder; 
+            return productionList;
         }
-        
-        private BaseBuilderList VisitExpressionNode(
-            BaseBuilderList builderList, IInternalTreeNode expressionNode)
-        {            
+
+        private List<SymbolList> GetListOfSymbolListFromExpressionNode(
+            IInternalTreeNode expressionNode)
+        {
+            var listOfSymbolLists = new List<SymbolList>();
             foreach (var child in expressionNode.Children)
             {
                 if (child.NodeType != TreeNodeType.Internal)
@@ -81,20 +88,23 @@ namespace Pliant.Ebnf
                 switch (internalChild.Symbol.Value)
                 {
                     case "Term":
-                        builderList = VisitTermNode(builderList, internalChild);
+                        var termListOfSymbolList = GetListOfSymbolListFromTermNode(internalChild);
+                        // TODO: Check if this is this right. May need to add to each item in the range
+                        listOfSymbolLists.AddRange(termListOfSymbolList);
                         break;
 
                     case "Expression":
-                        builderList = VisitExpressionNode(builderList.CreateAlterations(), internalChild);
+                        var expressionListOfSymbolList = GetListOfSymbolListFromExpressionNode(internalChild);
+                        listOfSymbolLists.AddRange(expressionListOfSymbolList);
                         break;
                 }
             }
-            return builderList;
+            return listOfSymbolLists;
         }
 
-        private BaseBuilderList VisitTermNode(
-            BaseBuilderList builderList, IInternalTreeNode termNode)
+        private List<SymbolList> GetListOfSymbolListFromTermNode(IInternalTreeNode termNode)
         {
+            var listOfSymbolList = new List<SymbolList>();
             foreach (var child in termNode.Children)
             {
                 if (child.NodeType != TreeNodeType.Internal)
@@ -104,20 +114,29 @@ namespace Pliant.Ebnf
                 switch (internalChild.Symbol.Value)
                 {
                     case "Factor":
-                        builderList = VisitFactorNode(builderList, internalChild);
+                        var factorListOfSymbolList = GetListOfSymbolListFromFactorNode(internalChild);
+                        listOfSymbolList.AddRange(factorListOfSymbolList);
                         break;
 
                     case "Term":
-                        builderList = VisitTermNode(builderList, internalChild);
+                        var termListOfSymbolList = GetListOfSymbolListFromTermNode(internalChild);
+                        foreach (var currentSymbolList in listOfSymbolList)
+                        {
+                            foreach (var termSymbolList in termListOfSymbolList)
+                            {
+                                currentSymbolList.AddRange(termSymbolList);
+                            }
+                        }
                         break;
                 }
             }
-            return builderList;
+            return listOfSymbolList;
         }
 
-        private BaseBuilderList VisitFactorNode(
-            BaseBuilderList builderList, IInternalTreeNode factorNode)
+        private List<SymbolList> GetListOfSymbolListFromFactorNode(IInternalTreeNode factorNode)
         {
+            var listOfSymbolList = new List<SymbolList>();
+            var symbolList = new SymbolList();
             foreach (var child in factorNode.Children)
             {
                 if (child.NodeType != TreeNodeType.Internal)
@@ -130,16 +149,16 @@ namespace Pliant.Ebnf
                         break;
 
                     case "Literal":
-                        SymbolBuilder stringLiteral = GetLexerRuleFromLiteralNode(internalChild);
-                        builderList.Add(stringLiteral);
+                        var stringLiteral = GetLexerRuleFromLiteralNode(internalChild);
+                        symbolList.Add(stringLiteral);
                         break;
 
                     case "Regex":
                         throw new NotSupportedException("Regex requires implementing a regex complier");
-                        
-                    case "Repetition":                           
+
+                    case "Repetition":
                         throw new NotSupportedException("Repetition is not currently supprted because implementation would require adding new rules to the grammar.");
-                        
+
                     case "Optional":
                         throw new NotSupportedException("Optional is not currently supported due to complexity in implementation.");
 
@@ -147,9 +166,10 @@ namespace Pliant.Ebnf
                         throw new NotSupportedException("Grouping is not currently supported due to complexity in implementation.");
                 }
             }
-            return builderList;
+            listOfSymbolList.Add(symbolList);
+            return listOfSymbolList;
         }
-
+        
         private BaseLexerRule GetLexerRuleFromLiteralNode(IInternalTreeNode node)
         {
             foreach (var child in node.Children)

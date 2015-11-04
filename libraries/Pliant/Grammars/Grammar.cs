@@ -100,6 +100,6 @@ namespace Pliant.Grammars
         public IEnumerable<IProduction> StartProductions()
         {
             return RulesFor(Start);
-        }
+        }        
     }
 }
