@@ -3,7 +3,7 @@ using Pliant.Ast;
 using System;
 using System.Collections.Generic;
 
-namespace Pliant.Regex
+namespace Pliant.RegularExpressions
 {
     public class RegexParser
     {

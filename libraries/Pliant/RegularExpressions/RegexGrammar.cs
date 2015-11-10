@@ -4,7 +4,7 @@ using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Collections.Generic;
 
-namespace Pliant.Regex
+namespace Pliant.RegularExpressions
 {
     public class RegexGrammar : IGrammar
     {

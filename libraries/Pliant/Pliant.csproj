@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ast\SinglePassNodeVisitorStateManager.cs" />
+    <Compile Include="Automata\RegexToNfaTransform.cs" />
     <Compile Include="Builders\BaseBuilder.cs" />
     <Compile Include="Builders\BaseBuilderList.cs" />
     <Compile Include="Builders\_.cs" />
@@ -120,6 +121,17 @@
     <Compile Include="Ast\NodeVisitorBase.cs" />
     <Compile Include="Ast\NodeVisitorStateManager.cs" />
     <Compile Include="ParseEngineLexemeFactory.cs" />
+    <Compile Include="RegularExpressions\Regex.cs" />
+    <Compile Include="RegularExpressions\RegexAtom.cs" />
+    <Compile Include="RegularExpressions\RegexCharacter.cs" />
+    <Compile Include="RegularExpressions\RegexCharacterClass.cs" />
+    <Compile Include="RegularExpressions\RegexCharacterClassCharacter.cs" />
+    <Compile Include="RegularExpressions\RegexCharacterRange.cs" />
+    <Compile Include="RegularExpressions\RegexExpression.cs" />
+    <Compile Include="RegularExpressions\RegexFactor.cs" />
+    <Compile Include="RegularExpressions\RegexIterator.cs" />
+    <Compile Include="RegularExpressions\RegexSet.cs" />
+    <Compile Include="RegularExpressions\RegexTerm.cs" />
     <Compile Include="Tokens\IToken.cs" />
     <Compile Include="Ast\ITokenNode.cs" />
     <Compile Include="Charts\ITransitionState.cs" />
@@ -132,8 +144,8 @@
     <Compile Include="ParseEngine.cs" />
     <Compile Include="ParseInterface.cs" />
     <Compile Include="Collections\ReadWriteList.cs" />
-    <Compile Include="Regex\RegexGrammar.cs" />
-    <Compile Include="Regex\RegexParser.cs" />
+    <Compile Include="RegularExpressions\RegexGrammar.cs" />
+    <Compile Include="RegularExpressions\RegexParser.cs" />
     <Compile Include="Grammars\SetTerminal.cs" />
     <Compile Include="Grammars\NegationTerminal.cs" />
     <Compile Include="Grammars\NonTerminal.cs" />
