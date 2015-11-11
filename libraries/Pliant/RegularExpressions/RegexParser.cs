@@ -2,70 +2,27 @@
 using Pliant.Ast;
 using System;
 using System.Collections.Generic;
+using Pliant.Tree;
 
 namespace Pliant.RegularExpressions
 {
-    public class RegexParser
+    public class RegexParser 
     {
-        private static IGrammar _grammar;
-
-        static RegexParser()
+        public Regex Parse(string regularExpression)
         {
-            _grammar = new RegexGrammar();
-        }
+            var grammar = new RegexGrammar();
+            var parseEngine = new ParseEngine(grammar);
+            var parseInterface = new ParseInterface(parseEngine, regularExpression);
+            
+            var parseForest = parseEngine.GetParseForestRoot();
+            var parseTree = new InternalTreeNode(
+                parseForest as IInternalNode, 
+                new SinglePassNodeVisitorStateManager());
 
-        public IGrammar Parse(string regularExpression)
-        {
-            return null;
-        }
+            var regexVisitor = new RegexVisitor();
+            parseTree.Accept(regexVisitor);
 
-        private IGrammar Compile(INode parseForest)
-        {
-            if (parseForest is IInternalNode)
-            {
-                var internalNode = parseForest as IInternalNode;
-
-            }
-            return null;
-        }
-        
-        private static IEnumerable<IProduction> OneOrMany(INonTerminal identifier, ITerminal[] terminals)
-        {
-            var recursiveProductionSymbols = new List<ISymbol>();
-            recursiveProductionSymbols.Add(identifier);
-            recursiveProductionSymbols.AddRange(terminals);
-
-            // NonTerminal -> NonTerminal Terminal | Terminal                    
-            return new[] {
-                    new Production(identifier, recursiveProductionSymbols.ToArray()),
-                    new Production(identifier, terminals) };
-        }
-
-        private static IEnumerable<IProduction> ZeroOrMany(INonTerminal identifier, ITerminal[] terminals)
-        {
-            var recursiveProductionSymbols = new List<ISymbol>();
-            recursiveProductionSymbols.Add(identifier);
-            recursiveProductionSymbols.AddRange(terminals);
-
-            // NonTerminal -> NonTerminal Terminal | <null>
-            return new[]{
-                new Production(identifier, recursiveProductionSymbols.ToArray()),
-                new Production(identifier)};
-        }
-
-        private static IEnumerable<IProduction> ZeroOrOne(INonTerminal identifier, ITerminal[] terminals)
-        {
-            // NonTerminal -> Terminal | <null>
-            return new[]{
-                    new Production(identifier, terminals),
-                    new Production(identifier) };
-        }
-
-        private static IEnumerable<IProduction> Once(INonTerminal identifier, ITerminal[] terminals)
-        {
-            // NonTerminal -> Terminal
-            return new[]{
-                new Production(identifier, terminals)};
-        }
+            return regexVisitor.Regex;
+        }        
     }
 }

@@ -132,6 +132,7 @@
     <Compile Include="RegularExpressions\RegexIterator.cs" />
     <Compile Include="RegularExpressions\RegexSet.cs" />
     <Compile Include="RegularExpressions\RegexTerm.cs" />
+    <Compile Include="RegularExpressions\RegexVisitor.cs" />
     <Compile Include="Tokens\IToken.cs" />
     <Compile Include="Ast\ITokenNode.cs" />
     <Compile Include="Charts\ITransitionState.cs" />

@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Grammars;
-using Pliant.Regex;
+using Pliant.RegularExpressions;
 
-namespace Pliant.Tests.Unit
+namespace Pliant.Tests.Unit.RegularExpressions
 {
     /// <summary>
     /// Summary description for RegexTests

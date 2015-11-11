@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pliant.Regex;
+using Pliant.RegularExpressions;
 using Pliant.Ast;
 using Pliant.Tokens;
 using Pliant.Builders;
