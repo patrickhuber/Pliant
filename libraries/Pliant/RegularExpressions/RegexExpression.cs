@@ -9,7 +9,7 @@
         public RegexTerm Term { get; set; }
     }
 
-    public class RegexExpresssionAlteration : RegexExpressionTerm
+    public class RegexExpressionAlteration : RegexExpressionTerm
     {
         public RegexExpression Expression { get; set; }
     }

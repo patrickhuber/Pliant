@@ -1,7 +1,6 @@
 ﻿using Pliant.Automata;
 using Pliant.Builders;
 using Pliant.Grammars;
-using Pliant.Tokens;
 using System.Collections.Generic;
 
 namespace Pliant.RegularExpressions
@@ -10,131 +9,146 @@ namespace Pliant.RegularExpressions
     {
         private static IGrammar _regexGrammar;
 
+        /*  Regex                      ->   Expression |   
+         *                                  '^' Expression | 
+         *                                  Expression '$' |
+         *                                  '^' Expression '$'
+         *              
+         *  Expresion                  ->   Term |   
+         *                                  Term '|' Expression
+         *                                  λ
+         *              
+         *  Term                       ->   Factor |   
+         *                                  Factor Term
+         *             
+         *  Factor                     ->   Atom |   
+         *                                  Atom Iterator
+         *  
+         *  Atom                       ->   . |
+         *                                  Character | 
+         *                                  '(' Expression ')' | 
+         *                                  Set
+         *  
+         *  Set                        ->   PositiveSet |
+         *                                  NegativeSet
+         *  
+         *  PositiveSet                ->   '[' CharacterClass ']'
+         *  
+         *  NegativeSet                ->   "[^" CharacterClass ']'
+         *  
+         *  CharacterClass             ->   CharacterRange |
+         *                                  CharacterRange CharacterClass
+         *  
+         *  CharacterRange             ->   CharacterClassCharacter |
+         *                                  CharacterClassCharacter '-' CharacterClassCharacter
+         *  
+         *  Character                  ->   NotMetaCharacter |
+         *                                  EscapeSequence
+         *                                  
+         *  CharacterClassCharacter    ->   NotCloseBracketCharacter | 
+         *                                  EscapeSequence
+         */
         static RegexGrammar()
         {
-            /*  Regex                      ->   Expression |   
-            *                                  '^' Expression | 
-            *                                  Expression '$' |
-            *                                  '^' Expression '$'
-            *              
-            *  Expresion                  ->   Term |   
-            *                                  Term '|' Expression
-            *                                  λ
-            *              
-            *  Term                       ->   Factor |   
-            *                                  Factor Term
-            *             
-            *  Factor                     ->   Atom |   
-            *                                  Atom Iterator
-            *  
-            *  Atom                       ->   . |
-            *                                  Character | 
-            *                                  '(' Expression ')' | 
-            *                                  Set
-            *  
-            *  Set                        ->   PositiveSet |
-            *                                  NegativeSet
-            *  
-            *  PositiveSet                ->   '[' CharacterClass ']'
-            *  
-            *  NegativeSet                ->   "[^" CharacterClass ']'
-            *  
-            *  CharacterClass             ->   CharacterRange |
-            *                                  CharacterRange CharacterClass
-            *  
-            *  CharacterRange             ->   CharacterClassCharacter |
-            *                                  CharacterClassCharacter '-' CharacterClassCharacter
-            *  
-            *  Character                  ->   NotMetaCharacter |
-            *                                  EscapeSequence
-            *                                  
-            *  CharacterClassCharacter    ->   NotCloseBracketCharacter | 
-            *                                  EscapeSequence
-            */
-            var notMeta =  new NegationTerminal(
-                       new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\'));
-            var notCloseBracket = new NegationTerminal(
-                new CharacterTerminal(']'));
+            var notMeta = CreateNotMetaLexerRule();
+            var notCloseBracket = CreateNotCloseBracketLexerRule();
             var escape = CreateEscapeCharacterLexerRule();
- 
-            var regex = new ProductionBuilder("Regex");
-            var expression = new ProductionBuilder("Expression");
-            var term = new ProductionBuilder("Term");
-            var factor = new ProductionBuilder("Factor");
-            var atom = new ProductionBuilder("Atom");
-            var iterator = new ProductionBuilder("Iterator");
-            var set = new ProductionBuilder("Set");
-            var positiveSet = new ProductionBuilder("PositiveSet");
-            var negativeSet = new ProductionBuilder("NegativeSet");
-            var characterClass = new ProductionBuilder("CharacterClass");
-            var characterRange = new ProductionBuilder("CharacterRange");
-            var character = new ProductionBuilder("Character");
-            var characterClassCharacter = new ProductionBuilder("CharacterClassCharacter");
+
+            ProductionBuilder 
+                regex = "Regex",
+                expression = "Expression",
+                term = "Term",
+                factor = "Factor",
+                atom = "Atom",
+                iterator = "Iterator",
+                set = "Set",
+                positiveSet = "PositiveSet",
+                negativeSet = "NegativeSet",
+                characterClass = "CharacterClass",
+                characterRange = "CharacterRange",
+                character = "Character",
+                characterClassCharacter = "CharacterClassCharacter";
 
             var productions = new[] {
                 regex, expression, term, factor, atom, iterator, set, positiveSet, negativeSet, characterClass,
                 characterRange, character, characterClassCharacter };
-            
-            regex
-                .Rule(expression)
-                .Or('^', expression)
-                .Or(expression, '$')
-                .Or('^', expression, '$');
- 
-            expression
-                .Rule(term)
-                .Or(term, '|', expression)
-                .Or();
 
-            term
-                .Rule(factor)
-                .Or(factor, term);
+            regex.Definition 
+                = expression 
+                | '^' + expression 
+                | expression + '$' 
+                | '^' + expression + '$';
 
-            factor
-                .Rule(atom)
-                .Or(atom, iterator);
+            expression.Definition
+                = term
+                | term + '|' + expression
+                | (_)null;
 
-            atom
-                .Rule('.')
-                .Or(character)
-                .Or('(', expression, ')')
-                .Or(set);
+            term.Definition 
+                = factor 
+                | factor + term;
 
-            iterator
-                .Rule('*')
-                .Or('+')
-                .Or('?');
+            factor.Definition
+                = atom
+                | atom + iterator;
 
-            set
-                .Rule(positiveSet)
-                .Or(negativeSet);
+            atom.Definition 
+                = '.' 
+                | character 
+                | '(' + expression + ')' 
+                | set;
 
-            positiveSet
-                .Rule('[', characterClass, ']');
+            iterator.Definition = (_)
+                '*' 
+                | '+' 
+                | '?';
 
-            negativeSet
-                .Rule("[^", characterClass, ']');
+            set.Definition 
+                = positiveSet 
+                | negativeSet;
 
-            characterClass
-                .Rule(characterRange)
-                .Or(characterRange, characterClass);
+            positiveSet.Definition
+                = '[' + characterClass + ']';
 
-            characterRange
-                .Rule(characterClassCharacter)
-                .Or(characterClassCharacter, '-', characterClassCharacter);
+            negativeSet.Definition
+                = "[^" + characterClass + ']';
 
-            character
-                .Rule(notMeta)
-                .Or(escape);
+            characterClass.Definition
+                = characterRange
+                | characterRange + characterClass;
 
-            characterClassCharacter
-                .Rule(notCloseBracket)
-                .Or(escape);
+            characterRange.Definition 
+                = characterClassCharacter
+                | characterClassCharacter + '-' + characterClassCharacter;
+
+            character.Definition = (_)
+                notMeta 
+                | escape;
+
+            characterClassCharacter.Definition = (_)
+                notCloseBracket
+                | escape;
 
             _regexGrammar = new GrammarBuilder(regex, productions)
                 .ToGrammar();
         }
-        
+
+        private static BaseLexerRule CreateNotMetaLexerRule()
+        {   
+            return new TerminalLexerRule(
+                new NegationTerminal(
+                       new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')), 
+                "NotMeta");
+        }
+
+        private static BaseLexerRule CreateNotCloseBracketLexerRule()
+        {
+            return new TerminalLexerRule(
+                new NegationTerminal(
+                    new CharacterTerminal(']')),
+                "NotCloseBracket");
+        }
+
         private static BaseLexerRule CreateEscapeCharacterLexerRule()
         {
             var start = new DfaState();

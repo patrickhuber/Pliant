@@ -76,9 +76,9 @@ namespace Pliant.Tests.Unit
             Assert.IsNotNull(B_0_0_1);
             Assert.AreEqual(1, B_0_0_1.Children.Count);
 
-            var nullTerminal = B_0_0_1.Children[0] as ITerminalNode;
-            Assert.IsNotNull(nullTerminal);
-            Assert.AreEqual('\0', nullTerminal.Capture);
+            var nullToken = B_0_0_1.Children[0] as ITokenNode;
+            Assert.IsNotNull(nullToken);
+            Assert.AreEqual(string.Empty, nullToken.Token.Value);
 
             var T_1_4_1 = T_1_4.Children[0] as IAndNode;
             Assert.IsNotNull(T_1_4_1);
