@@ -96,7 +96,29 @@ namespace Pliant.Tests.Unit.RegularExpressions
         public void Test_RegexParser_That_Parses_Multiple_Ranges()
         {
             var regexParser = new RegexParser();
-            var regex = regexParser.Parse("[a-zA-Z0-9]");
+            var actual = regexParser.Parse("[a-zA-Z0-9]");
+            var expected = new Regex(
+                startsWith :false, 
+                endsWith:false, 
+                expression: new RegexExpressionTerm(
+                    term:  new RegexTerm(
+                        factor: new RegexFactor(
+                            atom: new RegexAtomSet(
+                                set: new RegexSet(
+                                    negate: false, 
+                                    characterClass: new RegexCharacterClassList(
+                                        characterClass: new RegexCharacterClassList(
+                                            characterClass: new RegexCharacterClass(
+                                                characterRange: new RegexCharacterRangeSet(
+                                                    startCharacter:  new RegexCharacterClassCharacter(value: '0' ),
+                                                    endCharacter: new RegexCharacterClassCharacter (value: '9' ))),
+                                            characterRange: new RegexCharacterRangeSet(
+                                                startCharacter: new RegexCharacterClassCharacter(value: 'A' ),
+                                                endCharacter: new RegexCharacterClassCharacter(value: 'Z' ))),
+                                        characterRange: new RegexCharacterRangeSet(
+                                            startCharacter: new RegexCharacterClassCharacter(value: 'a' ),
+                                            endCharacter: new RegexCharacterClassCharacter(value: 'z' )))))))));
+            Assert.AreEqual(expected, actual);
         }
     }
 }
