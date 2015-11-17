@@ -391,7 +391,8 @@ namespace Pliant
         private INode CreateNullParseNode(ISymbol symbol, int location)
         {
             var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(symbol, location, location);
-            var nullNode = new TerminalNode('\0', location, location);
+            var token = new Token(string.Empty, location, new TokenType(string.Empty));
+            var nullNode = new TokenNode(token, location, location);
             symbolNode.AddUniqueFamily(nullNode);
             return symbolNode;
         }

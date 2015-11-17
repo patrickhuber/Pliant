@@ -66,7 +66,8 @@
     <Compile Include="Ast\NodeVisitorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Grammars\ProductionTests.cs" />
-    <Compile Include="Regex\RegexTests.cs" />
+    <Compile Include="RegularExpressions\RegexParserTests.cs" />
+    <Compile Include="RegularExpressions\RegexTests.cs" />
     <Compile Include="Charts\StateTests.cs" />
     <Compile Include="Grammars\GrammarTests.cs" />
     <Compile Include="AycockHorspoolAlgorithmTests.cs" />
