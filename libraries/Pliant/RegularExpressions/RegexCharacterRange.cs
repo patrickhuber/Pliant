@@ -3,20 +3,44 @@
     public class RegexCharacterRange
     {
         public RegexCharacterClassCharacter StartCharacter { get; set; }
-
-        public RegexCharacterRange() { }
+        
 
         public RegexCharacterRange(RegexCharacterClassCharacter startCharacter)
         {
             StartCharacter = startCharacter;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if ((object)obj == null)
+                return false;
+
+            var characterRange = obj as RegexCharacterRange;
+            if ((object)characterRange == null)
+                return false;
+
+            return characterRange.StartCharacter.Equals(StartCharacter);
+        }
+
+        private bool _isHashCodeSet = false;
+        private int _hashCode = 0;
+
+        public override int GetHashCode()
+        {
+            if (!_isHashCodeSet)
+            {
+                _hashCode = HashUtil.ComputeHash(
+                    StartCharacter.GetHashCode());
+                _isHashCodeSet = true;
+            }
+            return _hashCode;
         }
     }
 
     public class RegexCharacterRangeSet : RegexCharacterRange
     {
         public RegexCharacterClassCharacter EndCharacter { get; set; }
-
-        public RegexCharacterRangeSet() { }
+        
         public RegexCharacterRangeSet(
             RegexCharacterClassCharacter startCharacter, 
             RegexCharacterClassCharacter endCharacter)

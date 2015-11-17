@@ -46,9 +46,7 @@ namespace Pliant.RegularExpressions
     public class RegexAtomExpression : RegexAtom
     {
         public RegexExpression Expression { get; private set; }
-
-        public RegexAtomExpression() { }
-
+        
         public RegexAtomExpression(RegexExpression expression)
             : base()
         {

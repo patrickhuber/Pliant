@@ -3,9 +3,7 @@
     public class RegexTerm
     {
         public RegexFactor Factor { get; private set; }
-
-        public RegexTerm() { }
-
+        
         public RegexTerm(RegexFactor factor)
         {
             Factor = factor;
@@ -44,9 +42,7 @@
         {
             Term = term;
         }
-
-        public RegexTermFactor() { }
-
+        
         public override bool Equals(object obj)
         {
             if ((object)obj == null)

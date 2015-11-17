@@ -216,7 +216,6 @@ namespace Pliant.RegularExpressions
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
                 var childInternalNode = child as IInternalTreeNode;
-                var set = new RegexSet();
                 switch (childInternalNode.Symbol.Value)
                 {
                     case "PositiveSet":

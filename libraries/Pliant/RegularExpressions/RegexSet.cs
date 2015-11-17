@@ -5,9 +5,7 @@
         public bool Negate { get; private set; }
 
         public RegexCharacterClass CharacterClass {get; private set;}
-
-        public RegexSet() { }
-
+        
         public RegexSet(bool negate, RegexCharacterClass characterClass)
         {
             Negate = negate;

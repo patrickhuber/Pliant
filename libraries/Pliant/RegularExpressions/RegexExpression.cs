@@ -6,9 +6,7 @@
         {
             if ((object)obj == null)
                 return false;
-            if (obj is RegexExpression)
-                return true;
-            return false;
+            return obj.GetType() == typeof(RegexExpression);                
         }
 
         public override int GetHashCode()
@@ -20,9 +18,7 @@
     public class RegexExpressionTerm : RegexExpression
     {
         public RegexTerm Term { get; set; }
-
-        public RegexExpressionTerm() { }
-
+        
         public RegexExpressionTerm(RegexTerm term)
         {
             Term = term;
@@ -57,10 +53,7 @@
     public class RegexExpressionAlteration : RegexExpressionTerm
     {
         public RegexExpression Expression { get; private set; }
-
-        public RegexExpressionAlteration() 
-            : base() { }
-
+        
         public RegexExpressionAlteration(RegexTerm term, RegexExpression expression)
             : base(term)
         {
