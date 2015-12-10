@@ -1,6 +1,5 @@
 ﻿using Pliant.Tree;
 using Pliant.Grammars;
-using Pliant.Builders;
 using System;
 using System.Collections.Generic;
 
@@ -12,6 +11,19 @@ namespace Pliant.Ebnf
 
         private Grammar _grammar;
 
+        private const string GrammarSymbol = "Grammar";
+        private const string BlockSymbol = "Block";
+        private const string RuleSymbol = "Rule";
+        private const string QualifiedIdentifierSymbol = "QualifiedIdentifier";
+        private const string ExpressionSymbol = "Expression";
+        private const string TermSymbol = "Term";
+        private const string FactorSymbol = "Factor";
+        private const string LiteralSymbol = "Literal";
+        private const string RegexSymbol = "Regex";
+        private const string RepetitionSymbol = "Repetition";
+        private const string OptionalSymbol = "Optional";
+        private const string GroupingSymbol = "Grouping";
+
         public EbnfVisitor()
             : base()
         {
@@ -21,18 +33,18 @@ namespace Pliant.Ebnf
         {
             switch (node.Symbol.Value)
             {
-                case "Grammar":
+                case GrammarSymbol:
                     _grammar = new Grammar();
                     base.Visit(node);
                     if (_grammar.Start == null)
                         _grammar.Start = _grammar.Productions[0].LeftHandSide;                    
                     break;
 
-                case "Block":
+                case BlockSymbol:
                     base.Visit(node);
                     break;
 
-                case "Rule":
+                case RuleSymbol:
                     var productions = GetProductionListFromRuleNode(node);
                     foreach (var production in productions)
                         _grammar.AddProduction(production);
@@ -56,11 +68,11 @@ namespace Pliant.Ebnf
                 var internalChild = child as IInternalTreeNode;
                 switch (internalChild.Symbol.Value)
                 {
-                    case "QualifiedIdentifier":
+                    case QualifiedIdentifierSymbol:
                         productionName = GetNameFromQualifiedIdentifierNode(internalChild);
                         break;
 
-                    case "Expression":
+                    case ExpressionSymbol:
                         var listOfSymbolLists = GetListOfSymbolListFromExpressionNode(internalChild);
                         foreach (var symbolList in listOfSymbolLists)
                         {
@@ -87,13 +99,13 @@ namespace Pliant.Ebnf
                 var internalChild = child as IInternalTreeNode;
                 switch (internalChild.Symbol.Value)
                 {
-                    case "Term":
+                    case TermSymbol:
                         var termListOfSymbolList = GetListOfSymbolListFromTermNode(internalChild);
                         // TODO: Check if this is this right. May need to add to each item in the range
                         listOfSymbolLists.AddRange(termListOfSymbolList);
                         break;
 
-                    case "Expression":
+                    case ExpressionSymbol:
                         var expressionListOfSymbolList = GetListOfSymbolListFromExpressionNode(internalChild);
                         listOfSymbolLists.AddRange(expressionListOfSymbolList);
                         break;
@@ -113,12 +125,12 @@ namespace Pliant.Ebnf
                 var internalChild = child as IInternalTreeNode;
                 switch (internalChild.Symbol.Value)
                 {
-                    case "Factor":
+                    case FactorSymbol:
                         var factorListOfSymbolList = GetListOfSymbolListFromFactorNode(internalChild);
                         listOfSymbolList.AddRange(factorListOfSymbolList);
                         break;
 
-                    case "Term":
+                    case TermSymbol:
                         var termListOfSymbolList = GetListOfSymbolListFromTermNode(internalChild);
                         foreach (var currentSymbolList in listOfSymbolList)
                         {
@@ -145,24 +157,24 @@ namespace Pliant.Ebnf
                 var internalChild = child as IInternalTreeNode;
                 switch (internalChild.Symbol.Value)
                 {
-                    case "QualifiedIdentfiier":
+                    case QualifiedIdentifierSymbol:
                         break;
 
-                    case "Literal":
+                    case LiteralSymbol:
                         var stringLiteral = GetLexerRuleFromLiteralNode(internalChild);
                         symbolList.Add(stringLiteral);
                         break;
 
-                    case "Regex":
+                    case RegexSymbol:
                         throw new NotSupportedException("Regex requires implementing a regex complier");
 
-                    case "Repetition":
+                    case RepetitionSymbol:
                         throw new NotSupportedException("Repetition is not currently supprted because implementation would require adding new rules to the grammar.");
 
-                    case "Optional":
+                    case OptionalSymbol:
                         throw new NotSupportedException("Optional is not currently supported due to complexity in implementation.");
 
-                    case "Grouping":
+                    case GroupingSymbol:
                         throw new NotSupportedException("Grouping is not currently supported due to complexity in implementation.");
                 }
             }
