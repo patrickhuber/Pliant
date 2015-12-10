@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".documentation", ".documentation", "{026B4A97-0C94-4C41-A869-433989C12BE7}"
 	ProjectSection(SolutionItems) = preProject
@@ -22,6 +22,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.ConsoleApp", "hosts\Pliant.ConsoleApp\Pliant.ConsoleApp.csproj", "{4FC6B08A-1054-4E01-98F1-6FEAD12E54D3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.ProtocolBuffers", "libraries\Pliant.ProtocolBuffers\Pliant.ProtocolBuffers.csproj", "{6FCB3236-9D19-4B61-9A54-246EE6AD686A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.CodeGen", "libraries\Pliant.CodeGen\Pliant.CodeGen.csproj", "{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{6FCB3236-9D19-4B61-9A54-246EE6AD686A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FCB3236-9D19-4B61-9A54-246EE6AD686A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FCB3236-9D19-4B61-9A54-246EE6AD686A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,5 +60,6 @@ Global
 		{5C23805F-0FFC-4039-B853-E5ACBE63A3C0} = {6AF43B18-EF28-4486-8C5C-E4AFD659F8D8}
 		{4FC6B08A-1054-4E01-98F1-6FEAD12E54D3} = {E3C2A6DF-5436-4BC8-AAB1-C3B524B0FBAB}
 		{6FCB3236-9D19-4B61-9A54-246EE6AD686A} = {6AF43B18-EF28-4486-8C5C-E4AFD659F8D8}
+		{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C} = {6AF43B18-EF28-4486-8C5C-E4AFD659F8D8}
 	EndGlobalSection
 EndGlobal
