@@ -11,9 +11,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void Test_EbnfCompiler_Creates_Character_Grammar_With_One_Production()
         {
-            var input = @"Rule = 'a';";
-            var ebnfCompiler = new EbnfCompiler();
-            var grammar = ebnfCompiler.Compile(input);
+            var grammar = Compile(@"Rule = 'a';");
 
             Assert.AreEqual("Rule", grammar.Start.Value);
             Assert.AreEqual(1, grammar.Productions.Count);
@@ -31,9 +29,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void Test_EbnfCompiler_Creates_Contactenation_With_One_Production()
         {
-            var input = @"Rule = 'a' 'b';";
-            var ebnfCompiler = new EbnfCompiler();
-            var grammar = ebnfCompiler.Compile(input);
+            var grammar = Compile( @"Rule = 'a' 'b';");
 
             Assert.AreEqual("Rule", grammar.Start.Value);
             Assert.AreEqual(1, grammar.Productions.Count);
@@ -57,9 +53,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void Test_EbnfCompiler_Creates_Alteration_With_Two_Productions()
         {
-            var input = @"Rule = 'a' | 'b';";
-            var ebnfCompiler = new EbnfCompiler();
-            var grammar = ebnfCompiler.Compile(input);
+            var grammar = Compile(@"Rule = 'a' | 'b';");
 
             Assert.AreEqual("Rule", grammar.Start.Value);
             Assert.AreEqual(2, grammar.Productions.Count);
@@ -82,9 +76,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void Test_EbnfCompiler_Creates_Alteration_With_Two_Productions_When_Given_Alteration_After_Contactenation()
         {
-            var input = @"Rule = 'a' 'b' | 'c';";
-            var ebnfCompiler = new EbnfCompiler();
-            var grammar = ebnfCompiler.Compile(input);
+            var grammar = Compile(@"Rule = 'a' 'b' | 'c';");
 
             var firstProduction = grammar.Productions[0];
             Assert.AreEqual(firstProduction.LeftHandSide.Value, "Rule");
@@ -103,6 +95,36 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsInstanceOfType(secondProduction.RightHandSide[0], typeof(StringLiteralLexerRule));
             var secondProductionSecondSymbol = secondProduction.RightHandSide[0] as StringLiteralLexerRule;
             Assert.AreEqual("c", secondProductionSecondSymbol.Literal);
+        }
+
+        [TestMethod]
+        public void Test_EbnfCompiler_That_Creates_LexerRule_When_Given_Regex()
+        {
+            var grammar = Compile(@"Rule = /[a-z]/;");
+        }
+
+        [TestMethod]
+        public void Test_EbnfCompiler_That_Creates_Repetition_When_Given_Braces()
+        {
+            var grammar = Compile(@"Rule = { 'a' };");
+        }
+        
+        [TestMethod]
+        public void Test_EbnfCompiler_That_Creates_Optional_When_Given_Brackets()
+        {
+            var grammar = Compile(@"Rule = [ 'a' ];");
+        }
+
+        [TestMethod]
+        public void Test_EbnfCompiler_That_Creates_Grouping_When_Given_Paranthesis()
+        {
+            var grammar = Compile(@"Rule = ('a');");
+        }
+
+        private static IGrammar Compile(string input)
+        {
+            var ebnfCompiler = new EbnfCompiler();
+            return ebnfCompiler.Compile(input);
         }
     }
 }
