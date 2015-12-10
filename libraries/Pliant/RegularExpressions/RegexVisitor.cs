@@ -17,7 +17,7 @@ namespace Pliant.RegularExpressions
             }
         }
 
-        public Regex VisitRegexNode(IInternalTreeNode node)
+        private Regex VisitRegexNode(IInternalTreeNode node)
         {
             RegexExpression expression = null;
             bool startsWith = false;
