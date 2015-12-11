@@ -2,6 +2,7 @@
 using Pliant.Grammars;
 using System;
 using System.Collections.Generic;
+using Pliant.RegularExpressions;
 
 namespace Pliant.Ebnf
 {
@@ -166,7 +167,9 @@ namespace Pliant.Ebnf
                         break;
 
                     case RegexSymbol:
-                        throw new NotSupportedException("Regex requires implementing a regex complier");
+                        var lexerRule = GetLexerRuleFromRegexNode(internalChild);
+                        symbolList.Add(lexerRule);
+                        break;
 
                     case RepetitionSymbol:
                         throw new NotSupportedException("Repetition is not currently supprted because implementation would require adding new rules to the grammar.");
@@ -181,7 +184,17 @@ namespace Pliant.Ebnf
             listOfSymbolList.Add(symbolList);
             return listOfSymbolList;
         }
-        
+
+        private static ILexerRule GetLexerRuleFromRegexNode(IInternalTreeNode internalChild)
+        {
+            var regexVisitor = new RegexVisitor();
+            internalChild.Accept(regexVisitor);
+            var regex = regexVisitor.Regex;
+            var regexCompiler = new RegexCompiler();
+            var lexerRule = regexCompiler.Compile(regex);
+            return lexerRule;
+        }
+
         private BaseLexerRule GetLexerRuleFromLiteralNode(IInternalTreeNode node)
         {
             foreach (var child in node.Children)
