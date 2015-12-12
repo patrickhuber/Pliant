@@ -98,25 +98,25 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_That_Creates_LexerRule_When_Given_Regex()
+        public void Test_EbnfCompiler_That_Given_Regex_Then_Creates_LexerRule()
         {
             var grammar = Compile(@"Rule = /[a-z]/;");
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_That_Creates_Repetition_When_Given_Braces()
+        public void Test_EbnfCompiler_That_Given_Braces_Then_Creates_Repetition()
         {
             var grammar = Compile(@"Rule = { 'a' };");
         }
         
         [TestMethod]
-        public void Test_EbnfCompiler_That_Creates_Optional_When_Given_Brackets()
+        public void Test_EbnfCompiler_That_Given_Brackets_Then_Creates_Optional_()
         {
             var grammar = Compile(@"Rule = [ 'a' ];");
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_That_Creates_Grouping_When_Given_Paranthesis()
+        public void Test_EbnfCompiler_That_Given_Paranthesis_Then_Creates_Grouping()
         {
             var grammar = Compile(@"Rule = ('a');");
         }

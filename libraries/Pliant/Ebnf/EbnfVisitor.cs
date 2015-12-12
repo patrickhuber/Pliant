@@ -3,6 +3,7 @@ using Pliant.Grammars;
 using System;
 using System.Collections.Generic;
 using Pliant.RegularExpressions;
+using Pliant.Automata;
 
 namespace Pliant.Ebnf
 {
@@ -189,10 +190,20 @@ namespace Pliant.Ebnf
         {
             var regexVisitor = new RegexVisitor();
             internalChild.Accept(regexVisitor);
+
             var regex = regexVisitor.Regex;
-            var regexCompiler = new RegexCompiler();
-            var lexerRule = regexCompiler.Compile(regex);
-            return lexerRule;
+
+            var regexCompiler = new RegexCompiler(
+                new ThompsonConstructionAlgorithm(),
+                new SubsetConstructionAlgorithm());
+
+            var dfa = regexCompiler.Compile(regex);
+
+            // use a guid as the token type for now
+            // TODO: get the tostring value of the regex
+            var tokenType = Guid.NewGuid().ToString();
+
+            return new DfaLexerRule(dfa, tokenType);
         }
 
         private BaseLexerRule GetLexerRuleFromLiteralNode(IInternalTreeNode node)

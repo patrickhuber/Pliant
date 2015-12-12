@@ -1,9 +1,5 @@
 ﻿using Pliant.Automata;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pliant.RegularExpressions
 {
@@ -12,6 +8,17 @@ namespace Pliant.RegularExpressions
         public INfa Transform(Regex regex)
         {
             throw new NotImplementedException();
-        }        
+        }
+
+        public INfa Transform(RegexCharacterClassCharacter character)
+        {
+            
+            throw new NotImplementedException();
+        }
+
+        public INfa Transform(RegexCharacter character)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
