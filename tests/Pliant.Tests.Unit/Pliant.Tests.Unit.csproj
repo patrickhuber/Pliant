@@ -77,6 +77,7 @@
     <Compile Include="ParseInterfaceTests.cs" />
     <Compile Include="Lexemes\TerminalLexemeTests.cs" />
     <Compile Include="Grammars\WhitespaceTerminalTests.cs" />
+    <Compile Include="RegularExpressions\ThompsonConstructionTests.cs" />
     <Compile Include="Tree\TreeNodeTests.cs" />
   </ItemGroup>
   <ItemGroup>

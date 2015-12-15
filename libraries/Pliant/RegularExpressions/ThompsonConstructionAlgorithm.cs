@@ -8,6 +8,73 @@ namespace Pliant.RegularExpressions
     {
         public INfa Transform(Regex regex)
         {
+            return Expression(regex.Expression);
+        }
+
+        private INfa Expression(RegexExpression expression)
+        {
+            switch (expression.NodeType)
+            {
+                case RegexNodeType.RegexExpression:
+                    return Empty();
+
+                case RegexNodeType.RegexExpressionAlteration:
+                    var regexExpressionAlteration = expression as RegexExpressionAlteration;
+                    
+                    var termNfa = Term(regexExpressionAlteration.Term);
+                    var expressionNfa = Expression(regexExpressionAlteration.Expression);
+
+                    return Union(termNfa, expressionNfa);
+
+                case RegexNodeType.RegexExpressionTerm:
+                    var regexExpressionTerm = expression as RegexExpressionTerm;
+                    return Term(regexExpressionTerm.Term);
+            }
+            throw new InvalidOperationException("Unrecognized Regex Expression");
+        }
+
+        private INfa Term(RegexTerm term)
+        {
+            switch (term.NodeType)
+            {
+                case RegexNodeType.RegexTerm:
+                    return Factor(term.Factor);
+
+                case RegexNodeType.RegexTermFactor:
+                    var regexTermFactor = term as RegexTermFactor;
+                    var factorNfa = Factor(regexTermFactor.Factor);
+                    var termNfa = Term(regexTermFactor.Term);
+                    return Concatenation(factorNfa, termNfa);
+            }
+            throw new InvalidOperationException("Unrecognized Regex Term");
+        }
+
+        private INfa Factor(RegexFactor factor)
+        {
+            var atomNfa = Atom(factor.Atom);
+            switch (factor.NodeType)
+            {
+                case RegexNodeType.RegexFactor:
+                    return atomNfa;
+
+                case RegexNodeType.RegexFactorIterator:
+                    var regexFactorIterator = factor as RegexFactorIterator;
+                    switch (regexFactorIterator.Iterator)
+                    {
+                        case RegexIterator.ZeroOrMany:
+                            return KleeneStar(atomNfa);
+                        case RegexIterator.OneOrMany:
+                            return KleenePlus(atomNfa);
+                        case RegexIterator.ZeroOrOne:
+                            return Optional(atomNfa);
+                    }
+                    break;
+            }
+            throw new InvalidOperationException("Unrecognized regex factor");
+        }
+
+        private INfa Atom(RegexAtom atom)
+        {
             throw new NotImplementedException();
         }
 
@@ -77,6 +144,24 @@ namespace Pliant.RegularExpressions
             start.AddTransistion(nullToNewEnd);
             nfa.End.AddTransistion(nullToNewEnd);
 
+            return new Nfa(start, end);
+        }
+
+        private INfa KleenePlus(INfa nfa)
+        {
+            var end = new NfaState();
+            nfa.End.AddTransistion(new NullNfaTransition(end));
+            nfa.End.AddTransistion(new NullNfaTransition(nfa.Start));
+            return new Nfa(nfa.Start, end);
+        }
+        
+        private INfa Optional(INfa nfa)
+        {
+            var start = new NfaState();
+            var end = new NfaState();
+            start.AddTransistion(new NullNfaTransition(nfa.Start));
+            start.AddTransistion(new NullNfaTransition(end));
+            nfa.End.AddTransistion(new NullNfaTransition(end));
             return new Nfa(start, end);
         }
     }
