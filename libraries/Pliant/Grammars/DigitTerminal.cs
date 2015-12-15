@@ -12,7 +12,8 @@
             get { return SymbolType.Terminal; }
         }
 
-        const string ToStringValue = "[0-9]";
+        private const string ToStringValue = "[0-9]";
+
         public override string ToString()
         {
             return ToStringValue;

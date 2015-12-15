@@ -1,9 +1,4 @@
 ﻿using Pliant.Grammars;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pliant.Builders
 {
@@ -12,7 +7,9 @@ namespace Pliant.Builders
         public _(BaseBuilder baseBuilder) : base(baseBuilder)
         { }
 
-        public _() : base() { }
+        public _() : base()
+        {
+        }
 
         public static explicit operator _(char terminal)
         {

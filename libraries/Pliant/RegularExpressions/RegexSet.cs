@@ -1,11 +1,16 @@
 ﻿namespace Pliant.RegularExpressions
 {
-    public class RegexSet
+    public class RegexSet : RegexNode
     {
         public bool Negate { get; private set; }
 
-        public RegexCharacterClass CharacterClass {get; private set;}
-        
+        public RegexCharacterClass CharacterClass { get; private set; }
+
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexSet; }
+        }
+
         public RegexSet(bool negate, RegexCharacterClass characterClass)
         {
             Negate = negate;
@@ -39,6 +44,5 @@
             }
             return _hashCode;
         }
-
     }
 }

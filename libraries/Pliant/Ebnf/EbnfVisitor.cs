@@ -1,9 +1,9 @@
-﻿using Pliant.Tree;
+﻿using Pliant.Automata;
 using Pliant.Grammars;
+using Pliant.RegularExpressions;
+using Pliant.Tree;
 using System;
 using System.Collections.Generic;
-using Pliant.RegularExpressions;
-using Pliant.Automata;
 
 namespace Pliant.Ebnf
 {
@@ -39,7 +39,7 @@ namespace Pliant.Ebnf
                     _grammar = new Grammar();
                     base.Visit(node);
                     if (_grammar.Start == null)
-                        _grammar.Start = _grammar.Productions[0].LeftHandSide;                    
+                        _grammar.Start = _grammar.Productions[0].LeftHandSide;
                     break;
 
                 case BlockSymbol:
@@ -82,7 +82,7 @@ namespace Pliant.Ebnf
                             foreach (var symbol in symbolList)
                                 production.AddSymbol(symbol);
                             productionList.Add(production);
-                        } 
+                        }
                         break;
                 }
             }
@@ -212,7 +212,7 @@ namespace Pliant.Ebnf
             {
                 if (child.NodeType != TreeNodeType.Token)
                     continue;
-                var tokenNode = child as ITokenTreeNode;                
+                var tokenNode = child as ITokenTreeNode;
                 if (tokenNode.Token.TokenType.Id != "'" &&
                     tokenNode.Token.TokenType.Id != "\"")
                 {
@@ -220,7 +220,7 @@ namespace Pliant.Ebnf
                     return new StringLiteralLexerRule(value);
                 }
             }
-            throw new Exception("invalid string literal.");   
+            throw new Exception("invalid string literal.");
         }
 
         private string GetNameFromQualifiedIdentifierNode(IInternalTreeNode qualfieidIdentifier)

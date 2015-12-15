@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pliant.Grammars;
-using Pliant.Ebnf;
 using Pliant.Ast;
+using Pliant.Ebnf;
+using Pliant.Grammars;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
@@ -12,13 +12,13 @@ namespace Pliant.Tests.Unit.Ebnf
     public class EbnfTests
     {
         private static readonly string _ebnfText = @"
-        Grammar             
+        Grammar
             = { Rule } ;
-        Rule                
+        Rule
             = RuleName '=' Expression ';' ;
-        RuleName            
+        RuleName
             = Identifier ;
-        Expression          
+        Expression
             = Identifier
             | Terminal
             | Optional
@@ -26,58 +26,58 @@ namespace Pliant.Tests.Unit.Ebnf
             | Grouping
             | Expression '|' Expression
             | Expression Expression ;
-        Optional 
+        Optional
             = '[' Expression ']';
         Repetition
             = '{' Expression '}';
-        Grouping 
+        Grouping
             = '(' Expression ')';
-        Identifier          
+        Identifier
             = Letter { Letter | Digit | '_' };
-        Terminal            
+        Terminal
             = '""' String '""'
             | ""'"" Character ""'""
-            | '/' Regex '/' ; 
-        String              
+            | '/' Regex '/' ;
+        String
             = { StringCharacter };
-        StringCharacter     
+        StringCharacter
             = /[^\""]/
             | '\\' AnyCharacter ;
-        Character           
+        Character
             = SingleCharacter
             | '\\' SimpleEscape ;
-        SingleCharacter     
+        SingleCharacter
             ~ /[^']/;
-        SimpleEscape        
-            ~ ""'"" | '""' | '\\' | '0' | 'a' | 'b' 
+        SimpleEscape
+            ~ ""'"" | '""' | '\\' | '0' | 'a' | 'b'
             | 'f' | 'n'  | 'r' | 't' | 'v' ;
-        Digit               
+        Digit
             ~ /[0-9]/ ;
-        Letter              
+        Letter
             ~ /[a-zA-Z]/;
-        Whitespace          
+        Whitespace
             ~ /\w+/;
-        Regex               
+        Regex
             = ['^'] Regex.Expression ['$'] ;
-        Regex.Expression     
+        Regex.Expression
             = [Regex.Term]
             | Regex.Term '|' Regex.Expression ;
-        Regex.Term           
+        Regex.Term
             = Regex.Factor [Regex.Term] ;
-        Regex.Factor         
+        Regex.Factor
             = Regex.Atom [Regex.Iterator] ;
-        Regex.Atom           
+        Regex.Atom
             = '.'
             | Regex.Character
             | '(' Regex.Expression ')'
             | Regex.Set ;
-        Regex.Set            
+        Regex.Set
             = Regex.PositiveSet
             | Regex.NegativeSet ;
-        Regex.PositiveSet         
+        Regex.PositiveSet
             = '[' Regex.CharacterClass ']'
             | ""[^"" Regex.CharacterClass ""]"" ;
-        Regex.CharacterClass      
+        Regex.CharacterClass
             = Regex.CharacterRange { Regex.CharacterRange } ;
         Regex.CharacterRange
             = Regex.CharacterClassCharacter
@@ -88,7 +88,7 @@ namespace Pliant.Tests.Unit.Ebnf
         Regex.Character
             ~ /[^.^$()[\] + *?\\]/
             | '\\' /./ ;
-        :ignore             
+        :ignore
             = Whitespace;";
 
         private static readonly IGrammar ebnfGrammar;
@@ -219,7 +219,7 @@ namespace Pliant.Tests.Unit.Ebnf
             SomeRule = 'a' 'b' 'c' ;
             ") as ISymbolNode;
             Assert.IsNotNull(node);
-            
+
             var visitor = new LoggingNodeVisitor();
             node.Accept(visitor);
 
@@ -241,7 +241,7 @@ namespace Pliant.Tests.Unit.Ebnf
         private void FailParseInput(string input)
         {
             var parseInterface = new ParseInterface(_parseEngine, input);
-            Assert.IsFalse(parseInterface.ParseEngine.IsAccepted());  
+            Assert.IsFalse(parseInterface.ParseEngine.IsAccepted());
         }
     }
 }

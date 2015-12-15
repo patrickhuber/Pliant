@@ -3,9 +3,9 @@ using System.IO;
 
 namespace Pliant.ConsoleApp
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var sampleBnf = @"
             <syntax>         ::= <rule> | <rule> <syntax>

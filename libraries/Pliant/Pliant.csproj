@@ -123,6 +123,8 @@
     <Compile Include="Ast\NodeVisitorStateManager.cs" />
     <Compile Include="ParseEngineLexemeFactory.cs" />
     <Compile Include="RegularExpressions\IRegexToNfa.cs" />
+    <Compile Include="RegularExpressions\RegexNode.cs" />
+    <Compile Include="RegularExpressions\RegexNodeType.cs" />
     <Compile Include="RegularExpressions\ThompsonConstructionAlgorithm.cs" />
     <Compile Include="RegularExpressions\Regex.cs" />
     <Compile Include="RegularExpressions\RegexAtom.cs" />

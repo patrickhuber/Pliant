@@ -10,7 +10,7 @@ namespace Pliant.Tests.Unit
         public void Test_DigitTerminal_That_IsMatch_Returns_True_When_Number()
         {
             var digitTerminal = new DigitTerminal();
-            Assert.IsTrue (digitTerminal.IsMatch('0'));
+            Assert.IsTrue(digitTerminal.IsMatch('0'));
         }
 
         [TestMethod]

@@ -1,8 +1,8 @@
-﻿using Pliant.Grammars;
-using Pliant.Ast;
+﻿using Pliant.Ast;
+using Pliant.Charts;
+using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Collections.Generic;
-using Pliant.Charts;
 
 namespace Pliant
 {
@@ -17,19 +17,19 @@ namespace Pliant
         void Reset();
 
         /// <summary>
-        /// Gets the current accepted status of the parse. 
+        /// Gets the current accepted status of the parse.
         /// </summary>
         /// <returns>true if the parse is in a accepted state / false otherwise. </returns>
         bool IsAccepted();
 
         /// <summary>
-        /// Gets the root of the parse forest. 
+        /// Gets the root of the parse forest.
         /// </summary>
         /// <returns></returns>
         INode GetParseForestRoot();
 
         /// <summary>
-        /// Returns the list of expected lexer rules based on the current state of the parse. 
+        /// Returns the list of expected lexer rules based on the current state of the parse.
         /// </summary>
         /// <returns>The enumeration of lexer rules that apply at the current parse position.</returns>
         IEnumerable<ILexerRule> GetExpectedLexerRules();
@@ -52,7 +52,7 @@ namespace Pliant
         IGrammar Grammar { get; }
 
         /// <summary>
-        /// Gets the location in the parse. The location is the current token index and not the character index in the parse. 
+        /// Gets the location in the parse. The location is the current token index and not the character index in the parse.
         /// </summary>
         int Location { get; }
     }

@@ -69,7 +69,7 @@ namespace Pliant.Builders
                     {
                         var terminal = new StringLiteralLexerRule(symbol as string);
                         symbolList.Add(
-                            new SymbolBuilder(terminal));                                               
+                            new SymbolBuilder(terminal));
                     }
                     else if (symbol == null)
                     { }
@@ -85,7 +85,7 @@ namespace Pliant.Builders
         {
             return Rule();
         }
-        
+
         public static implicit operator RuleBuilder(ProductionBuilder productionBuilder)
         {
             return new RuleBuilder(productionBuilder);

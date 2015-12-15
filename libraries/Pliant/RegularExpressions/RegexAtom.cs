@@ -1,19 +1,25 @@
-﻿using System;
-
-namespace Pliant.RegularExpressions
+﻿namespace Pliant.RegularExpressions
 {
-    public class RegexAtom
+    public class RegexAtom : RegexNode
     {
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexAtom; }
+        }
     }
 
     public class RegexAtomAny : RegexAtom
     {
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexAtomAny; }
+        }
     }
 
     public class RegexAtomCharacter : RegexAtom
     {
         public RegexCharacter Character { get; private set; }
-        
+
         public RegexAtomCharacter(RegexCharacter character)
         {
             Character = character;
@@ -24,7 +30,7 @@ namespace Pliant.RegularExpressions
             if ((object)obj == null)
                 return false;
             var atomCharacter = obj as RegexAtomCharacter;
-            if((object)atomCharacter == null)
+            if ((object)atomCharacter == null)
                 return false;
             return Character.Equals(atomCharacter.Character);
         }
@@ -41,17 +47,23 @@ namespace Pliant.RegularExpressions
             }
             return _hashCode;
         }
+
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexAtomCharacter; }
+        }
     }
 
     public class RegexAtomExpression : RegexAtom
     {
         public RegexExpression Expression { get; private set; }
-        
+
         public RegexAtomExpression(RegexExpression expression)
             : base()
         {
             Expression = expression;
         }
+
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
@@ -61,7 +73,7 @@ namespace Pliant.RegularExpressions
                 return false;
             return Expression.Equals(atomExpression.Expression);
         }
-        
+
         private bool _isHashCodeSet = false;
         private int _hashCode = 0;
 
@@ -73,6 +85,11 @@ namespace Pliant.RegularExpressions
                 _isHashCodeSet = true;
             }
             return _hashCode;
+        }
+
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexAtomExpression; }
         }
     }
 
@@ -107,5 +124,10 @@ namespace Pliant.RegularExpressions
             }
             return _hashCode;
         }
-    }    
+
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexAtomSet; }
+        }
+    }
 }

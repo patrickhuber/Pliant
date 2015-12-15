@@ -2,16 +2,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pliant.Tree
 {
     public class TreeEnumerator : IEnumerator<ITreeNode>
     {
-        INodeVisitorStateManager _stateManager;
-        IInternalNode _root;
+        private INodeVisitorStateManager _stateManager;
+        private IInternalNode _root;
 
         public TreeEnumerator(IInternalNode internalNode, INodeVisitorStateManager stateManager)
         {

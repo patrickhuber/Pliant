@@ -6,7 +6,7 @@ namespace Pliant
     {
         internal static void IsNotNull(object instance, string propertyName)
         {
-            if(instance == null)
+            if (instance == null)
                 throw new ArgumentNullException(propertyName, string.Format("{0} can not be null.", propertyName));
         }
 
@@ -42,7 +42,7 @@ namespace Pliant
         {
             if (integer < 0)
                 throw new ArgumentOutOfRangeException(
-                    "paramterName", 
+                    "paramterName",
                     string.Format("{0} can not be less than zero.", paramterName));
         }
     }

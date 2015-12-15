@@ -11,16 +11,16 @@ namespace Pliant.Charts
         {
             _earleySets = new ReadWriteList<IEarleySet>();
         }
-        
+
         public bool Enqueue(int index, IState state)
         {
             if (_earleySets.Count <= index)
                 _earleySets.Add(new EarleySet(index));
-            
+
             var earleySet = _earleySets[index];
             return earleySet.Enqueue(state);
         }
-        
+
         public IReadOnlyList<IEarleySet> EarleySets { get { return _earleySets; } }
 
         public int Count

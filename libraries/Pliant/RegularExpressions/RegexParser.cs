@@ -1,12 +1,10 @@
-﻿using Pliant.Grammars;
-using Pliant.Ast;
-using System;
-using System.Collections.Generic;
+﻿using Pliant.Ast;
 using Pliant.Tree;
+using System;
 
 namespace Pliant.RegularExpressions
 {
-    public class RegexParser 
+    public class RegexParser
     {
         public Regex Parse(string regularExpression)
         {
@@ -24,13 +22,13 @@ namespace Pliant.RegularExpressions
 
             var parseForest = parseEngine.GetParseForestRoot();
             var parseTree = new InternalTreeNode(
-                parseForest as IInternalNode, 
+                parseForest as IInternalNode,
                 new SinglePassNodeVisitorStateManager());
 
             var regexVisitor = new RegexVisitor();
             parseTree.Accept(regexVisitor);
 
             return regexVisitor.Regex;
-        }        
+        }
     }
 }

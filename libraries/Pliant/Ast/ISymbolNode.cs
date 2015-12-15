@@ -4,6 +4,6 @@ namespace Pliant.Ast
 {
     public interface ISymbolNode : IInternalNode
     {
-        ISymbol Symbol { get;}
+        ISymbol Symbol { get; }
     }
 }

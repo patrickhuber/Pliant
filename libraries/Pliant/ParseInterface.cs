@@ -1,5 +1,5 @@
-﻿using Pliant.Collections;
-using Pliant.Automata;
+﻿using Pliant.Automata;
+using Pliant.Collections;
 using Pliant.Grammars;
 using Pliant.Lexemes;
 using Pliant.Tokens;
@@ -52,7 +52,7 @@ namespace Pliant
                     return true;
                 return TryParseExistingToken();
             }
-            
+
             if (AnyExistingLexemes())
                 if (!TryParseExistingToken())
                     return false;
@@ -67,9 +67,9 @@ namespace Pliant
             if (MatchesExistingIgnoreLexemes(character))
                 return true;
             ClearExistingIngoreLexemes();
-                        
+
             if (MatchesNewIgnoreLexemes(character))
-                return true;            
+                return true;
 
             return false;
         }
@@ -78,7 +78,7 @@ namespace Pliant
         {
             var newLexemes = new List<ILexeme>();
             var anyLexemeScanned = false;
-            foreach ( var lexerRule in ParseEngine.GetExpectedLexerRules())
+            foreach (var lexerRule in ParseEngine.GetExpectedLexerRules())
             {
                 var lexeme = CreateLexemeForLexerRule(lexerRule);
                 if (lexeme.Scan(character))
@@ -135,7 +135,7 @@ namespace Pliant
                 _ignoreLexemes = matchingIgnoreLexemes;
                 return true;
             }
-            return false;   
+            return false;
         }
 
         private void ClearExistingIngoreLexemes()
@@ -178,7 +178,7 @@ namespace Pliant
                     longestAcceptedMatch = lexeme;
                     break;
                 }
-            
+
             if (longestAcceptedMatch == null)
                 return false;
 
@@ -192,12 +192,12 @@ namespace Pliant
             ClearExistingLexemes();
             return true;
         }
-        
+
         private bool AnyExistingLexemes()
         {
             return !_existingLexemes.IsNullOrEmpty();
         }
-        
+
         public bool EndOfStream()
         {
             return _textReader.Peek() == -1;
@@ -209,14 +209,14 @@ namespace Pliant
             Position++;
             return character;
         }
-        
+
         private ILexeme CreateLexemeForLexerRule(ILexerRule lexerRule)
         {
             return _lexemeFactoryRegistry
                 .Get(lexerRule.LexerRuleType)
                 .Create(lexerRule);
         }
-        
+
         private IToken CreateTokenFromLexeme(ILexeme lexeme)
         {
             return new Token(
@@ -224,6 +224,5 @@ namespace Pliant
                 Position - lexeme.Capture.Length,
                 lexeme.TokenType);
         }
-                
     }
 }

@@ -33,7 +33,7 @@ namespace Pliant.Tests.Unit
         public void Test_WhitespaceTerminal_That_Space_Character_IsMatch_Returns_True()
         {
             var whitespaceTerminal = new WhitespaceTerminal();
-            Assert.IsTrue(whitespaceTerminal.IsMatch(' '));        
+            Assert.IsTrue(whitespaceTerminal.IsMatch(' '));
         }
     }
 }

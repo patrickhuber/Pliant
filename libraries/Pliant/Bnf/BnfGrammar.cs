@@ -11,7 +11,7 @@ namespace Pliant.Bnf
 
         static BnfGrammar()
         {
-            /* 
+            /*
              *  <grammar>        ::= <rule> | <rule> <grammar>
              *  <rule>           ::= "<" <rule-name> ">" "::=" <expression>
              *  <expression>     ::= <list> | <list> "|" <expression>
@@ -98,7 +98,7 @@ namespace Pliant.Bnf
             var anyEdge = new DfaTransition(anyTerminal, final);
             escape.AddTransition(anyEdge);
 
-            return new DfaLexerRule(start, new TokenType("not-double-quote"));            
+            return new DfaLexerRule(start, new TokenType("not-double-quote"));
         }
 
         private static ILexerRule CreateEndOfLineLexerRule()
@@ -158,12 +158,12 @@ namespace Pliant.Bnf
         {
             get { return _bnfGrammar.Ignores; }
         }
-        
+
         public IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal)
         {
             return _bnfGrammar.RulesFor(nonTerminal);
         }
-        
+
         public IEnumerable<IProduction> StartProductions()
         {
             return _bnfGrammar.StartProductions();

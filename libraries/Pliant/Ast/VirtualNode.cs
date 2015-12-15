@@ -1,8 +1,7 @@
 ﻿using Pliant.Charts;
 using Pliant.Collections;
-using System.Collections.Generic;
 using Pliant.Grammars;
-using System;
+using System.Collections.Generic;
 
 namespace Pliant.Ast
 {
@@ -11,16 +10,17 @@ namespace Pliant.Ast
         private ITransitionState _transitionState;
         private INode _completedParseNode;
         private ReadWriteList<IAndNode> _children;
+
         /// <summary>
         /// A single AND node. Virtual nodes are leo nodes and by nature don't have ambiguity.
         /// </summary>
         private AndNode _andNode;
-        
+
         public ISymbol Symbol { get; private set; }
 
         public VirtualNode(
-            int location, 
-            ITransitionState transitionState, 
+            int location,
+            ITransitionState transitionState,
             INode completedParseNode)
         {
             _transitionState = transitionState;
@@ -30,14 +30,14 @@ namespace Pliant.Ast
             NodeType = NodeType.Symbol;
             Initialize(transitionState);
         }
-                
+
         public IReadOnlyList<IAndNode> Children
         {
-            get 
+            get
             {
-                if(!ResultCached())
+                if (!ResultCached())
                     LazyLoadChildren();
-                return _children; 
+                return _children;
             }
         }
 
@@ -59,7 +59,7 @@ namespace Pliant.Ast
             if (_transitionState.NextTransition != null)
             {
                 var virtualNode = new VirtualNode(Location, _transitionState.NextTransition, _completedParseNode);
-                
+
                 if (_transitionState.Reduction.ParseNode == null)
                     AddUniqueFamily(virtualNode);
                 else
@@ -72,7 +72,7 @@ namespace Pliant.Ast
             else
             {
                 AddUniqueFamily(_completedParseNode);
-            }            
+            }
         }
 
         private bool ResultCached()
@@ -98,7 +98,7 @@ namespace Pliant.Ast
             _andNode.AddChild(trigger);
             _children.Add(_andNode);
         }
-        
+
         public override string ToString()
         {
             return string.Format("({0}, {1}, {2})", Symbol, Origin, Location);

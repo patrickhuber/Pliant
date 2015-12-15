@@ -1,5 +1,4 @@
-﻿using Pliant.Automata;
-using Pliant.Grammars;
+﻿using Pliant.Grammars;
 
 namespace Pliant.Builders
 {

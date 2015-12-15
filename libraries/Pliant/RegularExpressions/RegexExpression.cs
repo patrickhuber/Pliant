@@ -1,24 +1,32 @@
 ﻿namespace Pliant.RegularExpressions
 {
-    public class RegexExpression
+    public class RegexExpression : RegexNode
     {
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
                 return false;
-            return obj.GetType() == typeof(RegexExpression);                
+            return obj is RegexExpression;
         }
 
         public override int GetHashCode()
         {
             return 0;
         }
+
+        public override RegexNodeType NodeType
+        {
+            get
+            {
+                return RegexNodeType.RegexExpression;
+            }
+        }
     }
 
     public class RegexExpressionTerm : RegexExpression
     {
         public RegexTerm Term { get; set; }
-        
+
         public RegexExpressionTerm(RegexTerm term)
         {
             Term = term;
@@ -35,7 +43,7 @@
 
             return Term.Equals(otherRegexExpressionTerm.Term);
         }
-        
+
         private bool _isHashCodeSet = false;
         private int _hashCode = 0;
 
@@ -48,12 +56,20 @@
             }
             return _hashCode;
         }
+
+        public override RegexNodeType NodeType
+        {
+            get
+            {
+                return RegexNodeType.RegexExpressionTerm;
+            }
+        }
     }
 
     public class RegexExpressionAlteration : RegexExpressionTerm
     {
         public RegexExpression Expression { get; private set; }
-        
+
         public RegexExpressionAlteration(RegexTerm term, RegexExpression expression)
             : base(term)
         {
@@ -85,6 +101,14 @@
                 return false;
 
             return otherAlteration.Expression.Equals(Expression);
+        }
+
+        public override RegexNodeType NodeType
+        {
+            get
+            {
+                return RegexNodeType.RegexExpressionAlteration;
+            }
         }
     }
 }

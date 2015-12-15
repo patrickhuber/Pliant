@@ -6,7 +6,7 @@
         {
             return true;
         }
-        
+
         public override bool Equals(object obj)
         {
             var anyTerminal = obj as AnyTerminal;

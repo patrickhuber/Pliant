@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pliant.Grammars;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders;
+using System.Linq;
 
 namespace Pliant.Tests.Unit
 {

@@ -1,9 +1,14 @@
 ﻿namespace Pliant.RegularExpressions
 {
-    public class RegexTerm
+    public class RegexTerm : RegexNode
     {
         public RegexFactor Factor { get; private set; }
-        
+
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexTerm; }
+        }
+
         public RegexTerm(RegexFactor factor)
         {
             Factor = factor;
@@ -42,7 +47,7 @@
         {
             Term = term;
         }
-        
+
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
@@ -50,7 +55,7 @@
             var termFactor = obj as RegexTermFactor;
             if ((object)termFactor == null)
                 return false;
-            return termFactor.Factor.Equals(Factor) 
+            return termFactor.Factor.Equals(Factor)
                 && termFactor.Term.Equals(Term);
         }
 
@@ -69,5 +74,9 @@
             return _hashCode;
         }
 
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexTermFactor; }
+        }
     }
 }

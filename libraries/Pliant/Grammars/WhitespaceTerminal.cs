@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pliant.Grammars
+﻿namespace Pliant.Grammars
 {
     public class WhitespaceTerminal : BaseTerminal, ITerminal
     {
@@ -13,7 +7,7 @@ namespace Pliant.Grammars
             return char.IsWhiteSpace(character);
         }
 
-        const string ToStringValue = @"\s";
+        private const string ToStringValue = @"\s";
 
         public override string ToString()
         {

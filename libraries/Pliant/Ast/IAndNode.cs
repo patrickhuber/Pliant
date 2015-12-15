@@ -4,6 +4,6 @@ namespace Pliant.Ast
 {
     public interface IAndNode
     {
-        IReadOnlyList<INode> Children { get; } 
+        IReadOnlyList<INode> Children { get; }
     }
 }

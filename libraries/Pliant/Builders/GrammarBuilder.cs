@@ -18,8 +18,8 @@ namespace Pliant.Builders
         }
 
         public GrammarBuilder(
-            ProductionBuilder start, 
-            ProductionBuilder[] productionBuilder, 
+            ProductionBuilder start,
+            ProductionBuilder[] productionBuilder,
             ILexerRule[] ignore)
             : this()
         {
@@ -37,7 +37,7 @@ namespace Pliant.Builders
                 AddProduction(production);
             }
         }
-        
+
         public GrammarBuilder(ProductionBuilder start, ProductionBuilder[] productions)
             : this(start, productions, null)
         {
@@ -50,13 +50,12 @@ namespace Pliant.Builders
 
         public void AddProduction(ProductionBuilder builder)
         {
-
             if (builder.Definition == null)
                 _productions.Add(new Production(builder.LeftHandSide));
             else
                 _productions.AddRange(builder.ToProductions());
         }
-        
+
         public IGrammar ToGrammar()
         {
             if (_productions.Count == 0)
@@ -82,9 +81,9 @@ namespace Pliant.Builders
             var start = startProduction.LeftHandSide;
 
             return new Grammar(
-                start, 
-                _productions.ToArray(), 
+                start,
+                _productions.ToArray(),
                 _ignoreRules.ToArray());
-        }        
+        }
     }
 }

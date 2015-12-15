@@ -8,7 +8,9 @@ namespace Pliant.Tests.Unit
     [TestClass]
     public class TerminalLexemeTests
     {
-        public TerminalLexemeTests() { }
+        public TerminalLexemeTests()
+        {
+        }
 
         public TestContext TestContext { get; set; }
 
@@ -16,7 +18,7 @@ namespace Pliant.Tests.Unit
         public void Test_TerminalLexeme_When_Character_Matches_IsAcceptted_True()
         {
             var terminalLexeme = new TerminalLexeme(
-                new CharacterTerminal('c'), 
+                new CharacterTerminal('c'),
                 new TokenType("c"));
             Assert.IsFalse(terminalLexeme.IsAccepted());
             Assert.IsTrue(terminalLexeme.Scan('c'));

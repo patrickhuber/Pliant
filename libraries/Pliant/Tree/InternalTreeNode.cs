@@ -7,10 +7,10 @@ namespace Pliant.Tree
 {
     public class InternalTreeNode : IInternalTreeNode
     {
-        INodeVisitorStateManager _stateManager;
-        IAndNode _currentAndNode;
-        IInternalNode _internalNode;
-        
+        private INodeVisitorStateManager _stateManager;
+        private IAndNode _currentAndNode;
+        private IInternalNode _internalNode;
+
         public int Origin { get { return _internalNode.Origin; } }
 
         public int Location { get { return _internalNode.Location; } }
@@ -31,7 +31,7 @@ namespace Pliant.Tree
         public InternalTreeNode(
             IInternalNode internalNode)
             : this(internalNode, new NodeVisitorStateManager())
-        {            
+        {
         }
 
         public InternalTreeNode(
@@ -48,6 +48,7 @@ namespace Pliant.Tree
                 case Ast.NodeType.Symbol:
                     Symbol = (node as ISymbolNode).Symbol as INonTerminal;
                     break;
+
                 case Ast.NodeType.Intermediate:
                     Symbol = (node as IIntermediateNode).State.Production.LeftHandSide;
                     break;
@@ -58,7 +59,7 @@ namespace Pliant.Tree
         {
             get
             {
-                return EnumerateChildren(_currentAndNode);                        
+                return EnumerateChildren(_currentAndNode);
             }
         }
 
@@ -71,7 +72,7 @@ namespace Pliant.Tree
                     case Ast.NodeType.Intermediate:
                         var intermediateNode = child as IIntermediateNode;
                         var currentAndNode = _stateManager.GetCurrentAndNode(intermediateNode);
-                        foreach(var otherChild in EnumerateChildren(currentAndNode))
+                        foreach (var otherChild in EnumerateChildren(currentAndNode))
                             yield return otherChild;
                         break;
 
@@ -87,7 +88,6 @@ namespace Pliant.Tree
 
                     default:
                         throw new Exception("Unrecognized NodeType");
-
                 }
             }
         }

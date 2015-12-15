@@ -21,7 +21,7 @@ namespace Pliant
             _capture = new StringBuilder();
             _parseEngine = parseEngine;
         }
-                
+
         public bool Scan(char c)
         {
             // get expected lexems
@@ -30,7 +30,7 @@ namespace Pliant
             foreach (var rule in _parseEngine.GetExpectedLexerRules())
                 if (rule.LexerRuleType == TerminalLexerRule.TerminalLexerRuleType)
                     expectedLexemes.Add(new TerminalLexeme(rule as ITerminalLexerRule));
-            
+
             // filter on first rule to pass (since all rules are one character per lexeme)
             // PERF: Avoid Linq FirstOrDefault due to lambda allocation
             TerminalLexeme firstPassingRule = null;
@@ -52,7 +52,7 @@ namespace Pliant
 
             return result;
         }
-        
+
         public bool IsAccepted()
         {
             return _parseEngine.IsAccepted();

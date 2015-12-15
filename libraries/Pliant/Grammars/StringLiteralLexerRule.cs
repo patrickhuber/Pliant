@@ -7,8 +7,7 @@ namespace Pliant.Grammars
         public static readonly LexerRuleType StringLiteralLexerRuleType = new LexerRuleType("StringLiteral");
 
         public string Literal { get; private set; }
-        
-        
+
         public StringLiteralLexerRule(string literal, TokenType tokenType)
             : base(StringLiteralLexerRuleType, tokenType)
         {

@@ -20,7 +20,6 @@ namespace Pliant.Tests.Unit
             Assert.IsFalse(rangeTerminal.IsMatch('A'));
         }
 
-
         [TestMethod]
         public void Test_RangeTerminal_That_When_Character_Between_Bounds_IsMatch_Returns_True()
         {

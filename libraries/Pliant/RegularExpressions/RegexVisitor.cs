@@ -45,6 +45,7 @@ namespace Pliant.RegularExpressions
                             case "$":
                                 endsWith = true;
                                 break;
+
                             case "^":
                                 startsWith = true;
                                 break;
@@ -106,7 +107,7 @@ namespace Pliant.RegularExpressions
                 }
             }
             if (term == null)
-                return new RegexTerm(factor );
+                return new RegexTerm(factor);
 
             return new RegexTermFactor(factor, term);
         }
@@ -135,7 +136,7 @@ namespace Pliant.RegularExpressions
 
             if (iterator.HasValue)
                 return new RegexFactorIterator(
-                    atom, 
+                    atom,
                     iterator.Value);
 
             return new RegexFactor(atom);
@@ -152,6 +153,7 @@ namespace Pliant.RegularExpressions
                     {
                         case ".":
                             return new RegexAtomAny();
+
                         default:
                             continue;
                     }
@@ -187,8 +189,10 @@ namespace Pliant.RegularExpressions
                 {
                     case "*":
                         return RegexIterator.ZeroOrMany;
+
                     case "?":
                         return RegexIterator.ZeroOrOne;
+
                     case "+":
                         return RegexIterator.OneOrMany;
                 }
@@ -225,7 +229,6 @@ namespace Pliant.RegularExpressions
                     case "NegativeSet":
                         var negativeSet = VisitInnerSetNode(true, childInternalNode);
                         return negativeSet;
-
                 }
             }
             throw new Exception("Invalid Set Detected.");
@@ -263,6 +266,7 @@ namespace Pliant.RegularExpressions
                     case "CharacterRange":
                         characterRange = VisitCharacterRangeNode(childInternalNode);
                         break;
+
                     case "CharacterClass":
                         characterClass = VisitCharacterClassNode(childInternalNode);
                         break;
@@ -270,7 +274,7 @@ namespace Pliant.RegularExpressions
             }
             if (characterClass != null)
                 return new RegexCharacterClassList(
-                    characterRange, 
+                    characterRange,
                     characterClass);
 
             return new RegexCharacterClass(characterRange);

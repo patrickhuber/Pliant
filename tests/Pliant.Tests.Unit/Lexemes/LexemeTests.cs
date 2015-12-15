@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders;
 using Pliant.Grammars;
-using Pliant.Lexemes;
 using Pliant.Tokens;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,10 +37,10 @@ namespace Pliant.Tests.Unit
         public void Test_Lexeme_That_Consumes_Character_Sequence()
         {
             ProductionBuilder sequence = "sequence";
-            sequence.Definition = (_) 'a' + 'b' + 'c' +  '1' + '2' + '3';
+            sequence.Definition = (_)'a' + 'b' + 'c' + '1' + '2' + '3';
 
             var grammar = new GrammarBuilder(sequence, new[] { sequence }).ToGrammar();
-            
+
             var parseEngine = new ParseEngine(grammar);
             var lexeme = new ParseEngineLexeme(parseEngine, new TokenType("sequence"));
             var input = "abc123";
@@ -56,7 +55,7 @@ namespace Pliant.Tests.Unit
             var lexemeList = new List<ParseEngineLexeme>();
 
             ProductionBuilder There = "there";
-            There.Definition = (_) 't' + 'h' + 'e' + 'r' + 'e';
+            There.Definition = (_)'t' + 'h' + 'e' + 'r' + 'e';
             var thereGrammar = new GrammarBuilder(There, new[] { There })
                 .ToGrammar();
             var thereParseEngine = new ParseEngine(thereGrammar);
@@ -64,13 +63,13 @@ namespace Pliant.Tests.Unit
             lexemeList.Add(thereLexeme);
 
             ProductionBuilder Therefore = "therefore";
-            Therefore.Definition = (_)'t'+ 'h'+ 'e'+ 'r'+ 'e'+ 'f'+ 'o'+ 'r'+ 'e';
+            Therefore.Definition = (_)'t' + 'h' + 'e' + 'r' + 'e' + 'f' + 'o' + 'r' + 'e';
             var thereforeGrammar = new GrammarBuilder(Therefore, new[] { Therefore })
                 .ToGrammar();
             var parseEngine = new ParseEngine(thereforeGrammar);
             var thereforeLexeme = new ParseEngineLexeme(parseEngine, new TokenType(Therefore.LeftHandSide.Value));
             lexemeList.Add(thereforeLexeme);
-            
+
             var input = "therefore";
             var i = 0;
             for (; i < input.Length; i++)
@@ -84,7 +83,7 @@ namespace Pliant.Tests.Unit
                 // we read this character
                 if (passedLexemes.Count() == 0)
                     break;
-                
+
                 lexemeList = passedLexemes;
             }
 

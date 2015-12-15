@@ -1,12 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders;
-using Pliant.Grammars;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pliant.Tests.Unit.Builders
 {
@@ -95,7 +88,7 @@ namespace Pliant.Tests.Unit.Builders
             s.Rule(a)
                 .Or("string");
         }
-        
+
         [TestMethod]
         public void Test_ProductionBuilder_That_Given_Two_Strings_Resolves_Alteration()
         {
@@ -105,7 +98,6 @@ namespace Pliant.Tests.Unit.Builders
             s.Rule("one")
                 .Or("two");
             var grammarBuilder = new GrammarBuilder(s, new[] { s, a });
-        }        
+        }
     }
 }
-

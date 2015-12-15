@@ -4,7 +4,6 @@ using Pliant.Grammars;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
-
     [TestClass]
     public class EbnfCompilerTests
     {
@@ -29,7 +28,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void Test_EbnfCompiler_Creates_Contactenation_With_One_Production()
         {
-            var grammar = Compile( @"Rule = 'a' 'b';");
+            var grammar = Compile(@"Rule = 'a' 'b';");
 
             Assert.AreEqual("Rule", grammar.Start.Value);
             Assert.AreEqual(1, grammar.Productions.Count);
@@ -108,7 +107,7 @@ namespace Pliant.Tests.Unit.Ebnf
         {
             var grammar = Compile(@"Rule = { 'a' };");
         }
-        
+
         [TestMethod]
         public void Test_EbnfCompiler_That_Given_Brackets_Then_Creates_Optional_()
         {

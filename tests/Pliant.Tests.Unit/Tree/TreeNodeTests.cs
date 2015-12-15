@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pliant.Tree;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Ast;
 using Pliant.Builders;
 using Pliant.Grammars;
+using Pliant.Tree;
 
 namespace Pliant.Tests.Unit.Tree
 {
@@ -37,7 +36,7 @@ namespace Pliant.Tests.Unit.Tree
             }
             Assert.AreEqual(3, childCount);
         }
-        
+
         [TestMethod]
         public void Test_TreeNode_That_Ambiguous_Parse_Returns_First_Parse_Tree()
         {
@@ -52,7 +51,7 @@ namespace Pliant.Tests.Unit.Tree
             var treeNode = GetTreeNode(grammar, input);
             ;
         }
-        
+
         private static InternalTreeNode GetTreeNode(IGrammar grammar, string input)
         {
             var parseEngine = new ParseEngine(grammar);

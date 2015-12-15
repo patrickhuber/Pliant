@@ -10,8 +10,8 @@ namespace Pliant.Tests.Unit.RegularExpressions
     [TestClass]
     public class RegexTests
     {
-        IParseEngine _parseEngine;
-        IGrammar _regexGrammar;
+        private IParseEngine _parseEngine;
+        private IGrammar _regexGrammar;
 
         [TestInitialize]
         public void Initialize_Regex_Tests()
@@ -21,7 +21,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
 
         public RegexTests()
         {
-            _regexGrammar = new RegexGrammar();            
+            _regexGrammar = new RegexGrammar();
         }
 
         public TestContext TestContext { get; set; }
@@ -74,6 +74,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
             var input = "(a";
             ParseAndNotAcceptInput(input);
         }
+
         [TestMethod]
         public void Test_Regex_That_Fails_On_MisMatched_Brackets()
         {

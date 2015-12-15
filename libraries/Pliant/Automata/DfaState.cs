@@ -5,7 +5,7 @@ namespace Pliant.Automata
     public class DfaState : IDfaState
     {
         private IList<IDfaTransition> _transitions;
-        
+
         public bool IsFinal { get; private set; }
 
         public IEnumerable<IDfaTransition> Transitions { get { return _transitions; } }

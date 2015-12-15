@@ -10,7 +10,7 @@ namespace Pliant.Tests.Unit
     /// </summary>
     [TestClass]
     public class ChartTests
-    {        
+    {
         [TestMethod]
         public void Test_Chart_That_Enqueue_Avoids_Duplicates()
         {

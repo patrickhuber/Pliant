@@ -16,7 +16,7 @@ namespace Pliant.Tests.Unit
             var grammar = new GrammarBuilder(A, new[] { A }).ToGrammar();
             Assert.IsNotNull(grammar);
             Assert.AreEqual(1, grammar.Productions.Count);
-            
+
             var production = grammar.Productions[0];
             Assert.IsNotNull(production);
 
@@ -31,7 +31,7 @@ namespace Pliant.Tests.Unit
             var grammar = new GrammarBuilder(A, new[] { A }).ToGrammar();
             Assert.IsNotNull(grammar);
             Assert.AreEqual(1, grammar.Productions.Count);
-            
+
             var production = grammar.Productions[0];
             Assert.AreEqual(1, production.RightHandSide.Count);
 
@@ -69,6 +69,5 @@ namespace Pliant.Tests.Unit
             var grammar = grammarBuilder.ToGrammar();
             Assert.AreEqual(4, grammar.Productions.Count);
         }
-        
     }
 }

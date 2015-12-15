@@ -1,5 +1,4 @@
-﻿using System;
-namespace Pliant.Grammars
+﻿namespace Pliant.Grammars
 {
     public interface ITerminal : ISymbol
     {

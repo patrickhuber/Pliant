@@ -1,10 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pliant.RegularExpressions;
 using Pliant.Ast;
-using Pliant.Tokens;
+using Pliant.Automata;
 using Pliant.Builders;
 using Pliant.Grammars;
-using Pliant.Automata;
+using Pliant.RegularExpressions;
+using Pliant.Tokens;
 
 namespace Pliant.Tests.Unit.Ast
 {
@@ -46,7 +46,7 @@ namespace Pliant.Tests.Unit.Ast
             var nodeVisitor = new LoggingNodeVisitor();
             var root = regexParseEngine.GetParseForestRoot();
             root.Accept(nodeVisitor);
-            Assert.AreEqual(31, nodeVisitor.VisitLog.Count);           
+            Assert.AreEqual(31, nodeVisitor.VisitLog.Count);
         }
 
         [TestMethod]
@@ -68,27 +68,27 @@ namespace Pliant.Tests.Unit.Ast
             var aAn = new GrammarBuilder(AAn, new[] { AAn }).ToGrammar();
 
             ShootsLeaves.Definition =
-                (_) 's' + 'h' + 'o' + 'o' + 't' + 's'
+                (_)'s' + 'h' + 'o' + 'o' + 't' + 's'
                 | (_)'l' + 'e' + 'a' + 'v' + 'e' + 's';
             var shootsLeaves = new GrammarBuilder(ShootsLeaves, new[] { ShootsLeaves }).ToGrammar();
 
             EatsShootsLeaves.Definition =
-                (_) 'e' + 'a' + 't' + 's'
+                (_)'e' + 'a' + 't' + 's'
                 | (_)'s' + 'h' + 'o' + 'o' + 't' + 's'
                 | (_)'l' + 'e' + 'a' + 'v' + 'e' + 's';
             var eatsShootsLeaves = new GrammarBuilder(EatsShootsLeaves, new[] { EatsShootsLeaves }).ToGrammar();
 
-            ProductionBuilder 
-                S = "S", NP = "NP", VP = "VP", NN = "NN", 
-                NNS = "NNS", DT = "DT", CC = "CC", VBZ="VBZ";
+            ProductionBuilder
+                S = "S", NP = "NP", VP = "VP", NN = "NN",
+                NNS = "NNS", DT = "DT", CC = "CC", VBZ = "VBZ";
 
-            S.Definition = 
+            S.Definition =
                 NP + VP + '.';
-            NP.Definition = 
-                NN 
-                | NNS 
-                | DT + NN 
-                | NN + NNS 
+            NP.Definition =
+                NN
+                | NNS
+                | DT + NN
+                | NN + NNS
                 | NNS + CC + NNS;
             VP.Definition = VBZ + NP
                 | VP + VBZ + NNS
@@ -102,8 +102,8 @@ namespace Pliant.Tests.Unit.Ast
             VBZ.Definition = new GrammarLexerRule("VBZ", eatsShootsLeaves);
 
             var grammar = new GrammarBuilder(
-                S, 
-                new[] { S, NP, VP, CC, DT, NN, NNS, VBZ }, 
+                S,
+                new[] { S, NP, VP, CC, DT, NN, NNS, VBZ },
                 new[] { _whitespace })
                 .ToGrammar();
             var sentence = "a panda eats shoots and leaves.";
@@ -113,10 +113,10 @@ namespace Pliant.Tests.Unit.Ast
 
             while (!parseInterface.EndOfStream())
             {
-                Assert.IsTrue(parseInterface.Read(), 
+                Assert.IsTrue(parseInterface.Read(),
                     string.Format("Error parsing position: {0}", parseInterface.Position));
             }
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
-        }    
+        }
     }
 }

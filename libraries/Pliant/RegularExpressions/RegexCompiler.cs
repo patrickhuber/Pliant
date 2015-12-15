@@ -4,8 +4,8 @@ namespace Pliant.RegularExpressions
 {
     public class RegexCompiler
     {
-        IRegexToNfa _regexToNfa;
-        INfaToDfa _nfaToDfa;
+        private IRegexToNfa _regexToNfa;
+        private INfaToDfa _nfaToDfa;
 
         public RegexCompiler(
             IRegexToNfa regexToNfa,
@@ -20,6 +20,6 @@ namespace Pliant.RegularExpressions
             var nfa = _regexToNfa.Transform(regex);
             var dfa = _nfaToDfa.Transform(nfa);
             return dfa;
-        }        
+        }
     }
 }

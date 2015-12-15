@@ -1,13 +1,13 @@
-﻿using System.Text;
+﻿using Pliant.Grammars;
 using Pliant.Tokens;
-using Pliant.Grammars;
+using System.Text;
 
 namespace Pliant.Lexemes
 {
     public class StringLiteralLexeme : ILexeme
     {
         private StringBuilder _capture;
-        
+
         private int _index = 0;
 
         public string Literal { get; private set; }

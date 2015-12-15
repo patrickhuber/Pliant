@@ -1,6 +1,4 @@
-﻿using Pliant.Collections;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Pliant.Automata
 {
@@ -25,7 +23,7 @@ namespace Pliant.Automata
 
         public IEnumerable<INfaState> Closure()
         {
-            // the working queue used to process states 
+            // the working queue used to process states
             var queue = new Queue<INfaState>();
 
             // the hash set used to track visited states

@@ -1,7 +1,7 @@
-﻿using Pliant.Grammars;
-using Pliant.Ast;
-using System;
+﻿using Pliant.Ast;
+using Pliant.Grammars;
 using Pliant.Tree;
+using System;
 
 namespace Pliant.Ebnf
 {

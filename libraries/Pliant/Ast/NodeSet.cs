@@ -1,7 +1,6 @@
 ﻿using Pliant.Charts;
 using Pliant.Grammars;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Pliant.Ast
 {
@@ -24,11 +23,11 @@ namespace Pliant.Ast
                 if (node.Origin == origin
                     && node.Location == location
                     && node.Symbol.Equals(symbol))
-                { 
+                {
                     symbolNode = node;
                     break;
                 }
-            
+
             if (symbolNode == null)
             {
                 symbolNode = new SymbolNode(symbol, origin, location);
@@ -36,7 +35,7 @@ namespace Pliant.Ast
             }
             return symbolNode;
         }
-        
+
         public IIntermediateNode AddOrGetExistingIntermediateNode(IState trigger, int origin, int location)
         {
             // PERF: Avoid Linq FirstOrDefault due to lambda allocation
@@ -54,7 +53,7 @@ namespace Pliant.Ast
             }
             return intermediateNode;
         }
-        
+
         public void Clear()
         {
             _symbolNodes.Clear();

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pliant.Grammars
+﻿namespace Pliant.Grammars
 {
     public class CharacterTerminal : Symbol, ITerminal
     {
@@ -15,7 +9,7 @@ namespace Pliant.Grammars
         {
             Character = character;
         }
-        
+
         public override int GetHashCode()
         {
             return HashUtil.ComputeHash(

@@ -1,12 +1,11 @@
-﻿using System;
-using Pliant.Tokens;
+﻿using Pliant.Tokens;
 
 namespace Pliant.Ast
 {
     public class TokenNode : NodeBase, ITokenNode
     {
         public IToken Token { get; private set; }
-        
+
         public TokenNode(IToken token, int origin, int location)
         {
             Token = token;
