@@ -1,6 +1,6 @@
 ﻿namespace Pliant.RegularExpressions
 {
-    public class RegexAtom : RegexNode
+    public abstract class RegexAtom : RegexNode
     {
         public override RegexNodeType NodeType
         {

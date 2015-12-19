@@ -75,6 +75,28 @@ namespace Pliant.RegularExpressions
 
         private INfa Atom(RegexAtom atom)
         {
+            switch (atom.NodeType)
+            {
+                case RegexNodeType.RegexAtomAny:
+                    return Any();
+
+                case RegexNodeType.RegexAtomCharacter:
+                    var regexAtomCharacter = atom as RegexAtomCharacter;
+                    return Character(regexAtomCharacter.Character);
+
+                case RegexNodeType.RegexAtomExpression:
+                    var regexAtomExpression = atom as RegexAtomExpression;
+                    return Expression(regexAtomExpression.Expression);
+
+                case RegexNodeType.RegexAtomSet:
+                    var regexAtomSet = atom as RegexAtomSet;
+                    return Set(regexAtomSet);
+            }
+            throw new InvalidOperationException("Unrecognized regex atom");
+        }
+
+        private INfa Set(RegexAtomSet regexAtomSet)
+        {
             throw new NotImplementedException();
         }
 
@@ -107,6 +129,14 @@ namespace Pliant.RegularExpressions
             var start = new NfaState();
             var end = new NfaState();
             start.AddTransistion(new NullNfaTransition(end));
+            return new Nfa(start, end);
+        }
+
+        private INfa Any()
+        {
+            var start = new NfaState();
+            var end = new NfaState();
+            start.AddTransistion(new TerminalNfaTransition(new AnyTerminal(), end));
             return new Nfa(start, end);
         }
 
