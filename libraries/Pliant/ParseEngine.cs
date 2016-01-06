@@ -163,8 +163,8 @@ namespace Pliant
                 // is there a new prediction?
                 else if (p < earleySet.Predictions.Count)
                 {
-                    var prediction = earleySet.Predictions[p];
-                    Predict(prediction, location);
+                    var evidence = earleySet.Predictions[p];
+                    Predict(evidence, location);
                     p++;
                 }
                 else
@@ -172,12 +172,12 @@ namespace Pliant
             }
         }
 
-        private void Predict(IState prediction, int j)
+        private void Predict(IState evidence, int j)
         {
-            var nonTerminal = prediction.PostDotSymbol as INonTerminal;
+            var nonTerminal = evidence.PostDotSymbol as INonTerminal;
             foreach (var production in Grammar.RulesFor(nonTerminal))
             {
-                PredictProduction(prediction, j, production);
+                PredictProduction(evidence, j, production);
             }
         }
 
