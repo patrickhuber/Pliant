@@ -157,7 +157,7 @@ namespace Pliant.RegularExpressions
         private INfa Concatenation(INfa first, INfa second)
         {
             first.End.AddTransistion(new NullNfaTransition(second.Start));
-            return first;
+            return new Nfa(first.Start, second.End);
         }
 
         private INfa KleeneStar(INfa nfa)

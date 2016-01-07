@@ -107,5 +107,26 @@ namespace Pliant.Tests.Unit.RegularExpressions
                                             endCharacter: new RegexCharacterClassCharacter(value: 'z')))))))));
             Assert.AreEqual(expected, actual);
         }
+
+        [TestMethod]
+        public void Test_RegexParser_That_Parses_Alteration()
+        {
+            var regexParser = new RegexParser();
+            var actual = regexParser.Parse("a|b");
+            var expected = new Regex(
+                startsWith: false,
+                endsWith: false,
+                expression: new RegexExpressionAlteration(
+                    term: new RegexTerm(
+                        factor: new RegexFactor(
+                            atom: new RegexAtomCharacter(
+                                character: new RegexCharacter('a')))),
+                    expression: new RegexExpressionTerm(
+                        term: new RegexTerm(
+                            factor: new RegexFactor(
+                                atom: new RegexAtomCharacter(
+                                    character: new RegexCharacter('b')))))));
+            Assert.AreEqual(expected, actual);
+        }
     }
 }

@@ -68,6 +68,8 @@ namespace Pliant.RegularExpressions
                 switch (childInternalNode.Symbol.Value)
                 {
                     case "Expression":
+                        if (expression != null)
+                            throw new Exception("Invalid Parse, only one expression can be present in an expression node.");
                         expression = VisitRegexExpressionNode(childInternalNode);
                         break;
 

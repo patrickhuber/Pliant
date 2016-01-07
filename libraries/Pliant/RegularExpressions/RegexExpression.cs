@@ -6,7 +6,11 @@
         {
             if ((object)obj == null)
                 return false;
-            return obj is RegexExpression;
+
+            var otherRegexExpression = obj as RegexExpression;
+            if (otherRegexExpression != null)
+                return false;
+            return otherRegexExpression.NodeType == RegexNodeType.RegexExpression;
         }
 
         public override int GetHashCode()
