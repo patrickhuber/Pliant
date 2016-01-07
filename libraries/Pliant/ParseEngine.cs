@@ -28,7 +28,7 @@ namespace Pliant
 
         public ParseEngine(IGrammar grammar, ParseEngineOptions options)
         {
-
+            Options = options;
             _nodeSet = new NodeSet();
             Grammar = grammar;
             Initialize();
