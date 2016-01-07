@@ -122,6 +122,7 @@
     <Compile Include="Ast\NodeVisitorBase.cs" />
     <Compile Include="Ast\NodeVisitorStateManager.cs" />
     <Compile Include="ParseEngineLexemeFactory.cs" />
+    <Compile Include="ParseEngineOptions.cs" />
     <Compile Include="RegularExpressions\IRegexToNfa.cs" />
     <Compile Include="RegularExpressions\RegexNode.cs" />
     <Compile Include="RegularExpressions\RegexNodeType.cs" />

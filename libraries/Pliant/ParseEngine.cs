@@ -16,11 +16,19 @@ namespace Pliant
 
         public IReadOnlyChart Chart { get { return _chart; } }
 
+        public ParseEngineOptions Options { get; private set; }
+
         private Chart _chart;
         private NodeSet _nodeSet;
 
         public ParseEngine(IGrammar grammar)
+            : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
         {
+        }
+
+        public ParseEngine(IGrammar grammar, ParseEngineOptions options)
+        {
+
             _nodeSet = new NodeSet();
             Grammar = grammar;
             Initialize();
@@ -216,7 +224,8 @@ namespace Pliant
             var earleySet = _chart.EarleySets[completed.Origin];
             var searchSymbol = completed.Production.LeftHandSide;
 
-            OptimizeReductionPath(searchSymbol, completed.Origin);
+            if(Options.OptimizeRightRecursion)
+                OptimizeReductionPath(searchSymbol, completed.Origin);
 
             var transitionState = earleySet.FindTransitionState(searchSymbol);
             if (transitionState != null)
