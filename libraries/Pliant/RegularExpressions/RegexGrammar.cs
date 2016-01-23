@@ -82,8 +82,7 @@ namespace Pliant.RegularExpressions
 
             expression.Definition
                 = term
-                | term + '|' + expression
-                | (_)null;
+                | term + '|' + expression;
 
             term.Definition
                 = factor

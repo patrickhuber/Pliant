@@ -22,17 +22,9 @@ namespace Pliant.Tests.Unit.Bnf
             <term>           ::= <literal > | <identifier>
             <identifier>     ::= ""<"" <rule-name> "">""
             <literal>        ::= '""' <text> '""' | ""'"" <text> ""'""";
-
+        
         [TestMethod]
-        public void Test_Bnf_That_String_Iterate_Sets_Baseline()
-        {
-            var stringReader = new StringReader(_bnfText);
-            int c = 0;
-            while ((c = stringReader.Read()) != -1) ;
-        }
-
-        [TestMethod]
-        public void Test_Bnf_That_Parse_Produces_Bnf_Chart()
+        public void BnfShouldProduceParseChartForTextGrammar()
         {
             var grammar = new BnfGrammar();
             var parseEngine = new ParseEngine(grammar);
@@ -74,7 +66,7 @@ namespace Pliant.Tests.Unit.Bnf
 
         [TestMethod]
         [DeploymentItem(@"Bnf\AnsiC.bnf", "Bnf")]
-        public void Test_Bnf_That_Parses_Large_Grammar_In_File()
+        public void BnfShouldParseLargeGrammarInFile()
         {
             var bnf = File.ReadAllText(Path.Combine(TestContext.TestDeploymentDir, "Bnf", "AnsiC.bnf"));
             Assert.IsFalse(string.IsNullOrEmpty(bnf));

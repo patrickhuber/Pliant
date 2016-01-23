@@ -7,7 +7,7 @@ namespace Pliant.Tests.Unit.Builders
     public class ProductionBuilderTests
     {
         [TestMethod]
-        public void Test_ProductionBuilder_That_Can_Implicit_Cast_Rule()
+        public void ProductionBuilderShouldImplicitCastRule()
         {
             var s = new ProductionBuilder("S");
             var a = new ProductionBuilder("A");
@@ -15,21 +15,21 @@ namespace Pliant.Tests.Unit.Builders
         }
 
         [TestMethod]
-        public void Test_ProductionBuilder_That_Can_Implicit_Cast_String()
+        public void ProductionBuilderShouldImplicitCastString()
         {
             var s = new ProductionBuilder("S");
             s.Rule("string");
         }
 
         [TestMethod]
-        public void Test_ProductionBuilder_That_Can_Implicit_Cast_Char()
+        public void ProductionBuilderShouldImplicitCastCharacter()
         {
             var s = new ProductionBuilder("S");
             s.Rule('c');
         }
 
         [TestMethod]
-        public void Test_ProductionBuilder_That_Given_Two_ProductionBuilders_Can_Resolve_Alteration()
+        public void ProductionShouldResolveAlteration()
         {
             var s = new ProductionBuilder("S");
             var a = new ProductionBuilder("A");
@@ -40,7 +40,7 @@ namespace Pliant.Tests.Unit.Builders
         }
 
         [TestMethod]
-        public void Test_ProductionBuilder_That_Given_Two_ProductionBuilders_Can_Resolve_Concatenation()
+        public void ProductionBuilderGivenTwoProductionBuildersShouldResolveConcatenation()
         {
             var s = new ProductionBuilder("S");
             var a = new ProductionBuilder("A");
@@ -50,7 +50,7 @@ namespace Pliant.Tests.Unit.Builders
         }
 
         [TestMethod]
-        public void Test_ProductionBuilder_That_Given_Char_And_ProductionBuilder_Resolves_Alteration()
+        public void ProductionBuilderGivenCharAndProductionBuilderShouldResolveAlteration()
         {
             var s = new ProductionBuilder("S");
             var a = new ProductionBuilder("A");
@@ -60,7 +60,7 @@ namespace Pliant.Tests.Unit.Builders
         }
 
         [TestMethod]
-        public void Test_ProductionBuilder_That_Given_ProductionBuilder_And_Char_Resolves_Alteration()
+        public void ProductionBuilderGivenProductionBuilderAndCharShouldResolveAlteration()
         {
             var s = new ProductionBuilder("S");
             var a = new ProductionBuilder("A");
@@ -70,7 +70,7 @@ namespace Pliant.Tests.Unit.Builders
         }
 
         [TestMethod]
-        public void Test_ProductionBuilder_That_Given_String_And_ProductionBuilder_Resolves_Alteration()
+        public void ProductionBuilderGivenStringAndProductionBuilderShouldResolveAlteration()
         {
             var s = new ProductionBuilder("S");
             var a = new ProductionBuilder("A");
@@ -80,7 +80,7 @@ namespace Pliant.Tests.Unit.Builders
         }
 
         [TestMethod]
-        public void Test_ProductionBuilder_That_Given_ProductionBuilder_And_String_Resolves_Alteration()
+        public void ProductionBuilderGivenProductionBuilderAndStringShouldResolveAlteration()
         {
             var s = new ProductionBuilder("S");
             var a = new ProductionBuilder("A");
@@ -90,7 +90,7 @@ namespace Pliant.Tests.Unit.Builders
         }
 
         [TestMethod]
-        public void Test_ProductionBuilder_That_Given_Two_Strings_Resolves_Alteration()
+        public void ProductionBuilderGivenTwoStringsShouldResolveAlteration()
         {
             var s = new ProductionBuilder("S");
             var a = new ProductionBuilder("A");

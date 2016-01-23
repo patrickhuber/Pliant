@@ -27,84 +27,84 @@ namespace Pliant.Tests.Unit.RegularExpressions
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        public void Test_Regex_That_Parses_Single_Character()
+        public void RegexShouldParseSingleCharacter()
         {
             var input = "a";
             ParseAndAcceptInput(input);
         }
 
         [TestMethod]
-        public void Test_Regex_That_Parses_String_Literal()
+        public void RegexShouldParseStringLiteral()
         {
             var input = "abc";
             ParseAndAcceptInput(input);
         }
 
         [TestMethod]
-        public void Test_Regex_That_Parses_Optional_Character_Class()
+        public void RegexShouldParseOptionalCharacter()
         {
             var input = "a?";
             ParseAndAcceptInput(input);
         }
 
         [TestMethod]
-        public void Test_Regex_That_Parses_Whitespace_Character_Class()
+        public void RegexShouldParseWhitespaceCharacterClass()
         {
             var input = @"[\s]+";
             ParseAndAcceptInput(input);
         }
 
         [TestMethod]
-        public void Test_Regex_That_Parses_Range_Character_Class()
+        public void RegexParseRangeCharacterClass()
         {
             var input = @"[a-z]";
             ParseAndAcceptInput(input);
         }
 
         [TestMethod]
-        public void Test_Regex_That_Parses_Any_Character_Class()
+        public void RegexShouldParseAnyCharacterClass()
         {
             var input = @".*";
             ParseAndAcceptInput(input);
         }
 
         [TestMethod]
-        public void Test_Regex_That_Fails_On_MisMatched_Parenthesis()
+        public void RegexFailOnMisMatchedParenthesis()
         {
             var input = "(a";
             ParseAndNotAcceptInput(input);
         }
 
         [TestMethod]
-        public void Test_Regex_That_Fails_On_MisMatched_Brackets()
+        public void RegexShouldFailOnMisMatchedBrackets()
         {
             var input = "[abc";
             ParseAndNotAcceptInput(input);
         }
 
         [TestMethod]
-        public void Test_Regex_That_Parses_Empty_Group()
+        public void RegexShouldFailEmptyGroup()
         {
             var input = "()";
-            ParseAndAcceptInput(input);
+            FailParseAtPosition(input, 1);
         }
 
         [TestMethod]
-        public void Test_Regex_That_Parses_Empty_String()
+        public void RegexShouldFailEmptyInput()
         {
             var input = "";
-            ParseAndAcceptInput(input);
+            ParseAndNotAcceptInput(input);
         }
 
         [TestMethod]
-        public void Test_Regex_That_Parses_Negative_Character_Class()
+        public void RegexShouldParseNegativeCharacterClass()
         {
             var input = "[^abc]";
             ParseAndAcceptInput(input);
         }
 
         [TestMethod]
-        public void Test_Regex_That_Parses_Open_Bracket_In_Character_Class()
+        public void RegexShouldParseOpenBracketInCharacterClass()
         {
             var input = "[\\]]";
             ParseAndAcceptInput(input);
@@ -122,14 +122,23 @@ namespace Pliant.Tests.Unit.RegularExpressions
             NotAccept();
         }
 
+        private void FailParseAtPosition(string input, int position)
+        {
+            var parseInterface = new ParseInterface(_parseEngine, input);
+            for (int i = 0; i < input.Length; i++)
+                if (i < position)
+                    Assert.IsTrue(parseInterface.Read(),
+                        $"Line 0, Column {_parseEngine.Location} : Invalid Character {input[i]}");
+                else
+                    Assert.IsFalse(parseInterface.Read());
+        }
+
         private void ParseInput(string input)
         {
             var parseInterface = new ParseInterface(_parseEngine, input);
             for (int i = 0; i < input.Length; i++)
                 Assert.IsTrue(parseInterface.Read(),
-                    string.Format("Line 0, Column {1} : Invalid Character '{0}'",
-                        input[i],
-                        _parseEngine.Location));
+                        $"Line 0, Column {_parseEngine.Location} : Invalid Character {input[i]}");
         }
 
         private void Accept()

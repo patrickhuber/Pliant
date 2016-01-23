@@ -10,7 +10,7 @@ namespace Pliant.Tests.Unit
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        public void Test_GrammarBuilder_That_Production_With_No_RHS_Adds_Empty_Production_To_List()
+        public void GrammarBuilderGivenProductionWithNoRightHandSideShouldAddEmptyProductionToList()
         {
             ProductionBuilder A = "A";
             var grammar = new GrammarBuilder(A, new[] { A }).ToGrammar();
@@ -24,7 +24,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_GrammarBuilder_That_Production_With_Character_RHS_Adds_Terminal()
+        public void GrammarBuilderGivenProductionWithCharacterRightHandSideShouldAddTerminal()
         {
             ProductionBuilder A = "A";
             A.Definition = 'a';
@@ -41,7 +41,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_GrammarBuilder_That_Production_With_String_RHS_Adds_NonTerminal()
+        public void GrammarBuilderGivenProductionWithStringRightHandSideShouldAddNonTerminal()
         {
             ProductionBuilder A = "A", B = "B";
             A.Definition = B;
@@ -61,7 +61,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_GrammarBuilder_That_Production_With_Two_Calls_To_RuleBuilder_Rule_Method_Creates_Two_Productions()
+        public void GrammarBuilderGivenProductionWithTwoCallsToRuleBuilderShouldCreateTwoProductions()
         {
             ProductionBuilder A = "A", B = "B", C = "C";
             A.Definition = B | C;

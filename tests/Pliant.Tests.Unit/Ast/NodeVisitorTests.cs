@@ -30,7 +30,7 @@ namespace Pliant.Tests.Unit.Ast
         }
 
         [TestMethod]
-        public void Test_NodeWalker_That_Walks_Simple_Regex()
+        public void NodeVisitorShouldWalkSimpleRegex()
         {
             var regexGrammar = new RegexGrammar();
             var regexParseEngine = new ParseEngine(regexGrammar);
@@ -50,7 +50,7 @@ namespace Pliant.Tests.Unit.Ast
         }
 
         [TestMethod]
-        public void Test_NodeVisitor_That_Enumerates_All_Parse_Trees()
+        public void NodeVisitorShouldEnumerateAllParseTrees()
         {
             ProductionBuilder And = "AND",
                 Panda = "Panda",

@@ -113,26 +113,26 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_Self_Defined_Grammar()
+        public void EbnfShouldParsesSelfDefinedGrammar()
         {
             var input = _ebnfText;
             ParseInput(input);
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Fails_Empty_Text()
+        public void EbnfShouldFailEmptyText()
         {
             FailParseInput("");
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_Single_Rule()
+        public void EbnfShouldParseSingleRule()
         {
             ParseInput("Rule = Rule ;");
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_Two_Rules()
+        public void EbnfShouldParseTwoRules()
         {
             ParseInput(@"
             Rule = Expression;
@@ -140,25 +140,25 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_String()
+        public void EbnfShouldParseString()
         {
             ParseInput("Rule = \"string\";");
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_Character()
+        public void EbnfShouldParseCharacter()
         {
             ParseInput("Rule = 'a';");
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_Regex()
+        public void EbnfShouldParseRegex()
         {
             ParseInput("Rule = /[a-zA-Z0-9]/;");
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_ZeroOrMore()
+        public void EbnfShouldParseZeroOrMore()
         {
             ParseInput(@"
             Rule = { Expression };
@@ -166,7 +166,7 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_OneOrZero()
+        public void EbnfShouldParseOneOrZero()
         {
             ParseInput(@"
             Rule = [ Expression ];
@@ -174,7 +174,7 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_Parenthesis()
+        public void EbnfShouldParseParenthesis()
         {
             ParseInput(@"
             Rule = ( Expression );
@@ -182,21 +182,21 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_Alteration()
+        public void EbnfShouldParseAlteration()
         {
             ParseInput(@"
             Rule = Expression | Other;");
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_Concatenation()
+        public void EbnfShouldParseConcatenation()
         {
             ParseInput(@"
             Rule = Expression Other;");
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_Namespace()
+        public void EbnfShouldParseNamespace()
         {
             ParseInput(@"
             RegularExpressions.Regex = RegularExpressions.Expression;
@@ -204,7 +204,7 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parses_Escape()
+        public void EbnfShouldParseEscape()
         {
             ParseInput(@"
             Regex.CharacterClassCharacter
@@ -213,7 +213,7 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_Ebnf_That_Parse_Tree_For_Rule_Is_Created_Correctly()
+        public void EbnfShouldCreateCorrectParseTreeForRule()
         {
             var node = ParseInput(@"
             SomeRule = 'a' 'b' 'c' ;

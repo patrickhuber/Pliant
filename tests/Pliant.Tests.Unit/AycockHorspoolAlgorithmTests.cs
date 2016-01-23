@@ -10,7 +10,7 @@ namespace Pliant.Tests.Unit
     public class AycockHorspoolAlgorithmTests
     {
         [TestMethod]
-        public void Test_AycockHorspoolAlgorithm_That_Vulnerable_Grammar_Accepts_Input()
+        public void AycockHorspoolAlgorithmShouldAcceptVulnerableGrammar()
         {
             var a = new TerminalLexerRule(
                 new CharacterTerminal('a'),

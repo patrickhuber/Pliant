@@ -11,7 +11,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
     public class ThompsonConstructionTests
     {
         [TestMethod]
-        public void Test_ThompsonConstruction_Given_Null_Expression_Creates_Null_Nfa()
+        public void ThompsonConstructionShouldCreateNfaFromEmptyString()
         {
             var input = "";
             var nfa = CreateNfa(input);
@@ -24,7 +24,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
         }
         
         [TestMethod]
-        public void Test_ThompsonConstruction_Given_Character_Expression_Creates_Character_Nfa()
+        public void ThompsonConstructionShouldCreatNfaFromCharacterExpression()
         {
             var input = "a";
             var nfa = CreateNfa(input);
@@ -37,7 +37,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
         }
 
         [TestMethod]
-        public void Test_ThompsonConstruction_Given_Character_Class_Nfa()
+        public void ThompsonConstructionShouldCreateNfaFromCharacterClass()
         {
             var input = "[a]";
             var nfa = CreateNfa(input);
@@ -45,7 +45,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
         }
 
         [TestMethod]
-        public void Test_ThompsonConstruction_Given_Concatenation_Creates_Chained_Transition_States()
+        public void ThompsonConstructionShouldCreateChangedTransitionStatestFromConcatenation()
         {
             var input = "ab";
             var nfa = CreateNfa(input);
@@ -68,7 +68,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
         }
 
         [TestMethod]
-        public void Test_ThompsonConstruction_Given_Union_Creates_Nfa_With_Optional_Paths()
+        public void ThompsonConstructionShouldCreateOptionalPathNfaFromUnionExpression()
         {
             var input = "a|b";
             var nfa = CreateNfa(input);

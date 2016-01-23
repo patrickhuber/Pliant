@@ -15,7 +15,7 @@ namespace Pliant.Tests.Unit
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        public void Test_TerminalLexeme_When_Character_Matches_IsAcceptted_True()
+        public void TerminalLexemShouldWhileAcceptedContinuesToMatch()
         {
             var terminalLexeme = new TerminalLexeme(
                 new CharacterTerminal('c'),
@@ -27,7 +27,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_TerminalLexeme_That_Capture_Is_Empty_String()
+        public void TerminalLexemeShouldInitializeCatpureToEmptyString()
         {
             var terminalLexeme = new TerminalLexeme(new CharacterTerminal('c'), new TokenType("c"));
             Assert.AreEqual(string.Empty, terminalLexeme.Capture);

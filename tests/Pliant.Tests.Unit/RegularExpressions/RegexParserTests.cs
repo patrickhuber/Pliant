@@ -12,7 +12,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        public void Test_RegexParser_That_Single_Character_Returns_Proper_Object()
+        public void RegexParserShouldParseSingleCharacter()
         {
             var regexParser = new RegexParser();
             var actual = regexParser.Parse("a");
@@ -30,7 +30,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
         }
 
         [TestMethod]
-        public void Test_RegexParser_That_Positive_Set_Returns_Proper_Object()
+        public void RegexParserShouldParsePositiveSet()
         {
             var regexParser = new RegexParser();
             var actual = regexParser.Parse("[a]");
@@ -47,40 +47,9 @@ namespace Pliant.Tests.Unit.RegularExpressions
                 false);
             Assert.AreEqual(expected, actual);
         }
-
+        
         [TestMethod]
-        public void Test_RegexParser_That_Parses_SubExpression()
-        {
-            var regexParser = new RegexParser();
-            var actual = regexParser.Parse("(()())()()");
-            var expected = new Regex(
-                false,
-                new RegexExpressionTerm(
-                    new RegexTermFactor(
-                        new RegexFactor(
-                            new RegexAtomExpression(
-                                new RegexExpressionTerm(
-                                    new RegexTermFactor(
-                                        new RegexFactor(
-                                            new RegexAtomExpression(
-                                                new RegexExpression())),
-                                        new RegexTerm(
-                                            new RegexFactor(new RegexAtomExpression(
-                                                new RegexExpression()))))))),
-                        new RegexTermFactor(
-                            new RegexFactor(
-                                new RegexAtomExpression(
-                                    new RegexExpression())),
-                            new RegexTerm(
-                                new RegexFactor(
-                                    new RegexAtomExpression(
-                                        new RegexExpression())))))),
-                false);
-            Assert.AreEqual(actual, expected);
-        }
-
-        [TestMethod]
-        public void Test_RegexParser_That_Parses_Multiple_Ranges()
+        public void RegexParserShouldParseMultipleRanges()
         {
             var regexParser = new RegexParser();
             var actual = regexParser.Parse("[a-zA-Z0-9]");
@@ -109,7 +78,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
         }
 
         [TestMethod]
-        public void Test_RegexParser_That_Parses_Alteration()
+        public void RegexParserShouldParseAlteration()
         {
             var regexParser = new RegexParser();
             var actual = regexParser.Parse("a|b");

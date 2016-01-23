@@ -49,7 +49,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParserInterface_That_Parses_Simple_Word_Sequence()
+        public void ParseInterfaceShouldParseSimpleWordSentence()
         {
             ProductionBuilder S = "S";
             S.Definition =
@@ -64,7 +64,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseInterface_That_Whitespace_Is_Ignored()
+        public void ParseInterfaceShouldIgnoreWhitespace()
         {
             // a <word boundary> abc <word boundary> a <word boundary> a
             const string input = "a abc a a";
@@ -83,7 +83,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseInterface_That_Emits_Token_Between_Lexer_Rules_And_Eof()
+        public void ParseInterfaceShouldEmitTokenBetweenLexerRulesAndEndOfFile()
         {
             const string input = "aa";
             ProductionBuilder S = "S";
@@ -100,7 +100,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseInterface_Given_Existing_Lexemes_When_Character_Matches_Then_It_Is_Added()
+        public void ParseInterfaceShouldUseExistingMatchingLexemesToPerformMatch()
         {
             const string input = "aaaa";
 
@@ -123,7 +123,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseInterface_Given_No_Existing_Lexemes_When_Character_Matches_Then_It_Is_Added_To_New_Lexeme()
+        public void ParseInterfaceWhenNoLexemesMatchCharacterShouldCreateNewLexeme()
         {
             const string input = "aaaa";
 
@@ -146,7 +146,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseInterface_When_Character_Should_Be_Ignored_Then_Emits_Token()
+        public void ParseInterfaceShouldEmitTokenWhenIgnoreCharacterIsEncountered()
         {
             const string input = "aa aa";
             ProductionBuilder S = "S";
@@ -169,7 +169,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseInterface_When_Character_Matches_Next_Production_Then_Emits_Token()
+        public void ParseInterfaceShouldEmitTokenWhenCharacterMatchesNextProduction()
         {
             const string input = "aabb";
             ProductionBuilder A = "A";
@@ -207,7 +207,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseInterface_Given_Ignore_Characters_When_Overlap_With_Terminal_Then_Chooses_Terminal()
+        public void ParseInterfaceGivenIgnoreCharactersWhenOverlapWithTerminalShouldChooseTerminal()
         {
             var input = "word \t\r\n word";
 

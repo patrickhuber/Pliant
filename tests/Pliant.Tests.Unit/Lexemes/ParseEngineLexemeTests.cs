@@ -8,10 +8,10 @@ using System.Linq;
 namespace Pliant.Tests.Unit
 {
     [TestClass]
-    public class LexemeTests
+    public class ParseEngineLexemeTests
     {
         [TestMethod]
-        public void Test_Lexeme_That_Consumes_Whitespace()
+        public void ParseEngineLexemeShouldConsumeWhitespace()
         {
             ProductionBuilder S = "S";
             ProductionBuilder W = "W";
@@ -34,7 +34,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_Lexeme_That_Consumes_Character_Sequence()
+        public void ParseEngineLexemeShouldConsumeCharacterSequence()
         {
             ProductionBuilder sequence = "sequence";
             sequence.Definition = (_)'a' + 'b' + 'c' + '1' + '2' + '3';
@@ -50,7 +50,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_Lexeme_That_Matches_Longest_Acceptable_Token_When_Given_Ambiguity()
+        public void ParseEngineLexemeShouldMatchLongestAcceptableTokenWhenGivenAmbiguity()
         {
             var lexemeList = new List<ParseEngineLexeme>();
 

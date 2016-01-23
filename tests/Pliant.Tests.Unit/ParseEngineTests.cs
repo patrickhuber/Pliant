@@ -13,7 +13,7 @@ namespace Pliant.Tests.Unit
     public class ParseEngineTests
     {
         [TestMethod]
-        public void Test_ParseEngine_That_Ambiguous_Grammar_Creates_Multiple_Parse_Paths()
+        public void ParseEngineGivenAmbiguousGrammarShouldCreateMulipleParsePaths()
         {
             // example 3 section 4, Elizabeth Scott
             var tokens = Tokenize("abbb");
@@ -106,7 +106,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Completed_Scan_Creates_Internal_And_Terminal_Node()
+        public void ParseEngineWhenScanCompletedShouldCreateInternalAndTerminalNodes()
         {
             ProductionBuilder S = "S";
             S.Definition = (_)'a';
@@ -135,7 +135,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Completed_Prediction_Creates_Internal_Node()
+        public void ParseEnginePredicationShouldCreateInternalNode()
         {
             ProductionBuilder S = "S", A = "A";
             S.Definition = (_)A;
@@ -172,7 +172,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Leo_Items_Generate_Proper_Parse_Tree()
+        public void ParseEngineLeoItemsShouldGenerateProperParseTree()
         {
             ProductionBuilder S = "S", A = "A";
 
@@ -223,7 +223,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_PassThrough_Recursive_Items_Creates_Virtual_Nodes()
+        public void ParseEnginePassThroughRecursiveItemsShouldCreateVirtualNodes()
         {
             ProductionBuilder S = "S", A = "A", B = "B";
             S.Definition = A;
@@ -318,7 +318,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Mid_Grammar_Right_Recursion_Handles_Null_Root_Transition_Item()
+        public void ParseEngineShouldParseMidGrammarRightRecursionAndHandleNullRootTransitionItem()
         {
             ProductionBuilder S = "S", A = "A", B = "B", C = "C";
             S.Definition = (_)A | A + S;
@@ -379,7 +379,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Simple_Substitution_Grammar_Parses()
+        public void ParseEngineShouldParseSimpleSubstitutionGrammar()
         {
             ProductionBuilder A = "A", B = "B", C = "C";
             A.Definition = (_)B + C;
@@ -394,7 +394,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Expression_Grammar_Parses_Expression()
+        public void ParseEngineShouldParseExpressionGrammar()
         {
             var expressionGrammar = CreateExpressionGrammar();
 
@@ -411,7 +411,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Invalid_Input_Exists_Parse()
+        public void ParseEngineWhenInvalidInputShouldExitParse()
         {
             var grammar = CreateExpressionGrammar();
             var tokens = new[]
@@ -429,7 +429,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Unmarked_Middle_Recursion_Parses()
+        public void ParseEngineShouldParseUnmarkedMiddleRecursion()
         {
             ProductionBuilder S = "S";
             S.Definition = 'a' + S + 'a' | 'a';
@@ -442,7 +442,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Right_Recursive_Quasi_Complete_Items_Are_Leo_Optimized()
+        public void ParseEngineShouldLeoOptimizeRightRecursiveQuasiCompleteItems()
         {
             ProductionBuilder S = "S", A = "A", B = "B";
             S.Definition = A + B;
@@ -459,7 +459,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Right_Recursion_Is_Not_O_N_3()
+        public void ParseEngineRightRecursionShouldNotBeCubicComplexity()
         {
             var a = new TerminalLexerRule(
                 new CharacterTerminal('a'),
@@ -498,7 +498,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Intermediate_Step_Creates_Transition_Items()
+        public void ParseEngineGivenIntermediateStepsShouldCreateTransitionItems()
         {
             ProductionBuilder S = "S", A = "A", B = "B";
             S.Definition = A;
@@ -511,7 +511,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Right_Recursive_To_Normal_Transition_Creates_Correct_Parse_Tree()
+        public void ParseEngineShouldHandleTransitionsFromRightRecursionToNormalGrammar()
         {
             IGrammar grammar = CreateRegularExpressionStubGrammar();
 
@@ -558,7 +558,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Creates_Correct_Parse_Tree_When_Multiple_Leo_Items_Exist_On_Search_Path()
+        public void ParseEngineWhenMultipleLeoItemsExistOnSearchPathShouldCreateCorrectParseTree()
         {
             var grammar = CreateRegularExpressionStubGrammar();
             var input = Tokenize("aaa");
@@ -586,7 +586,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Long_Production_Rule_Produces_Proper_Parse_Tree()
+        public void ParseEngineGivenLongProductionRuleShouldCreateCorrectParseTree()
         {
             ProductionBuilder S = "S", A = "A", B = "B", C = "C", D = "D";
             S.Definition = (_)

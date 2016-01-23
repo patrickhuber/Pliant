@@ -8,7 +8,7 @@ namespace Pliant.Tests.Unit.Ebnf
     public class EbnfCompilerTests
     {
         [TestMethod]
-        public void Test_EbnfCompiler_Creates_Character_Grammar_With_One_Production()
+        public void EbnfCompilerGivenCharacterShouldCreateOneProductionn()
         {
             var grammar = Compile(@"Rule = 'a';");
 
@@ -26,7 +26,7 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_Creates_Contactenation_With_One_Production()
+        public void EbnfCompilerGivenConcatenationShouldCreateOneProduction()
         {
             var grammar = Compile(@"Rule = 'a' 'b';");
 
@@ -50,7 +50,7 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_Creates_Alteration_With_Two_Productions()
+        public void EbnfCompilerGivenAlterationShouldCreateTwoProductions()
         {
             var grammar = Compile(@"Rule = 'a' | 'b';");
 
@@ -73,7 +73,7 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_Creates_Alteration_With_Two_Productions_When_Given_Alteration_After_Contactenation()
+        public void EbnfCompilerGivenAlterationAndConcatenationShouldCreateTwoProductions()
         {
             var grammar = Compile(@"Rule = 'a' 'b' | 'c';");
 
@@ -97,25 +97,25 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_That_Given_Regex_Then_Creates_LexerRule()
+        public void EbnfCompilerGivenRegexShouldCreateLexerRule()
         {
             var grammar = Compile(@"Rule = /[a-z]/;");
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_That_Given_Braces_Then_Creates_Repetition()
+        public void EbnfCompilerGivenBracesShouldCreateRepetition()
         {
             var grammar = Compile(@"Rule = { 'a' };");
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_That_Given_Brackets_Then_Creates_Optional_()
+        public void EbnfCompilerGivenBracketsShouldCreateOptional()
         {
             var grammar = Compile(@"Rule = [ 'a' ];");
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_That_Given_Paranthesis_Then_Creates_Grouping()
+        public void EbnfCompilerGivenParanthesisShouldCreateGrouping()
         {
             var grammar = Compile(@"Rule = ('a');");
         }

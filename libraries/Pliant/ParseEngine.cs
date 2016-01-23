@@ -483,7 +483,7 @@ namespace Pliant
         private void LogScan(int origin, IState state, IToken token)
         {
             Debug.Write(string.Format("{0}\t{1}", origin, state));
-            Debug.WriteLine(string.Format("\t # Scan {0}", token));
+            Debug.WriteLine(string.Format("\t # Scan {0}", token.Value));
         }
     }
 }

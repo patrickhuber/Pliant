@@ -10,7 +10,7 @@ namespace Pliant.Tests.Unit.Tree
     public class TreeNodeTests
     {
         [TestMethod]
-        public void Test_TreeNode_That_Flattens_Intermediate_Nodes()
+        public void TreeNodeShouldFlattenIntermediateNodes()
         {
             ProductionBuilder S = "S", A = "A", B = "B", C = "C";
             S.Definition = A + B + C;
@@ -38,7 +38,7 @@ namespace Pliant.Tests.Unit.Tree
         }
 
         [TestMethod]
-        public void Test_TreeNode_That_Ambiguous_Parse_Returns_First_Parse_Tree()
+        public void TreeNodeWhenAmbiguousParseShouldReturnFirstParseTree()
         {
             ProductionBuilder A = "A";
             A.Definition =
