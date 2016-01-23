@@ -9,52 +9,53 @@ namespace Pliant.RegularExpressions
     {
         private static IGrammar _regexGrammar;
 
-        /*  Regex                      ->   Expression |   
-         *                                  '^' Expression | 
+        /*  Regex                      ->   Expression |
+         *                                  '^' Expression |
          *                                  Expression '$' |
          *                                  '^' Expression '$'
-         *              
-         *  Expresion                  ->   Term |   
+         *
+         *  Expresion                  ->   Term |
          *                                  Term '|' Expression
          *                                  λ
-         *              
-         *  Term                       ->   Factor |   
+         *
+         *  Term                       ->   Factor |
          *                                  Factor Term
-         *             
-         *  Factor                     ->   Atom |   
+         *
+         *  Factor                     ->   Atom |
          *                                  Atom Iterator
-         *  
+         *
          *  Atom                       ->   . |
-         *                                  Character | 
-         *                                  '(' Expression ')' | 
+         *                                  Character |
+         *                                  '(' Expression ')' |
          *                                  Set
-         *  
+         *
          *  Set                        ->   PositiveSet |
          *                                  NegativeSet
-         *  
+         *
          *  PositiveSet                ->   '[' CharacterClass ']'
-         *  
+         *
          *  NegativeSet                ->   "[^" CharacterClass ']'
-         *  
+         *
          *  CharacterClass             ->   CharacterRange |
          *                                  CharacterRange CharacterClass
-         *  
+         *
          *  CharacterRange             ->   CharacterClassCharacter |
          *                                  CharacterClassCharacter '-' CharacterClassCharacter
-         *  
+         *
          *  Character                  ->   NotMetaCharacter |
          *                                  EscapeSequence
-         *                                  
-         *  CharacterClassCharacter    ->   NotCloseBracketCharacter | 
+         *
+         *  CharacterClassCharacter    ->   NotCloseBracketCharacter |
          *                                  EscapeSequence
          */
+
         static RegexGrammar()
         {
             var notMeta = CreateNotMetaLexerRule();
             var notCloseBracket = CreateNotCloseBracketLexerRule();
             var escape = CreateEscapeCharacterLexerRule();
 
-            ProductionBuilder 
+            ProductionBuilder
                 regex = "Regex",
                 expression = "Expression",
                 term = "Term",
@@ -73,38 +74,37 @@ namespace Pliant.RegularExpressions
                 regex, expression, term, factor, atom, iterator, set, positiveSet, negativeSet, characterClass,
                 characterRange, character, characterClassCharacter };
 
-            regex.Definition 
-                = expression 
-                | '^' + expression 
-                | expression + '$' 
+            regex.Definition
+                = expression
+                | '^' + expression
+                | expression + '$'
                 | '^' + expression + '$';
 
             expression.Definition
                 = term
-                | term + '|' + expression
-                | (_)null;
+                | term + '|' + expression;
 
-            term.Definition 
-                = factor 
+            term.Definition
+                = factor
                 | factor + term;
 
             factor.Definition
                 = atom
                 | atom + iterator;
 
-            atom.Definition 
-                = '.' 
-                | character 
-                | '(' + expression + ')' 
+            atom.Definition
+                = '.'
+                | character
+                | '(' + expression + ')'
                 | set;
 
             iterator.Definition = (_)
-                '*' 
-                | '+' 
+                '*'
+                | '+'
                 | '?';
 
-            set.Definition 
-                = positiveSet 
+            set.Definition
+                = positiveSet
                 | negativeSet;
 
             positiveSet.Definition
@@ -117,12 +117,12 @@ namespace Pliant.RegularExpressions
                 = characterRange
                 | characterRange + characterClass;
 
-            characterRange.Definition 
+            characterRange.Definition
                 = characterClassCharacter
                 | characterClassCharacter + '-' + characterClassCharacter;
 
             character.Definition = (_)
-                notMeta 
+                notMeta
                 | escape;
 
             characterClassCharacter.Definition = (_)
@@ -134,10 +134,10 @@ namespace Pliant.RegularExpressions
         }
 
         private static BaseLexerRule CreateNotMetaLexerRule()
-        {   
+        {
             return new TerminalLexerRule(
                 new NegationTerminal(
-                       new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')), 
+                       new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')),
                 "NotMeta");
         }
 
@@ -158,7 +158,7 @@ namespace Pliant.RegularExpressions
             escape.AddTransition(new DfaTransition(new AnyTerminal(), final));
             return new DfaLexerRule(start, "escape");
         }
-        
+
         public IReadOnlyList<IProduction> Productions
         {
             get { return _regexGrammar.Productions; }

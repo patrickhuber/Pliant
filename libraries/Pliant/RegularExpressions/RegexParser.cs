@@ -1,17 +1,15 @@
-﻿using Pliant.Grammars;
-using Pliant.Ast;
-using System;
-using System.Collections.Generic;
+﻿using Pliant.Ast;
 using Pliant.Tree;
+using System;
 
 namespace Pliant.RegularExpressions
 {
-    public class RegexParser 
+    public class RegexParser
     {
         public Regex Parse(string regularExpression)
         {
             var grammar = new RegexGrammar();
-            var parseEngine = new ParseEngine(grammar);
+            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
             var parseInterface = new ParseInterface(parseEngine, regularExpression);
             while (!parseInterface.EndOfStream())
             {
@@ -20,17 +18,18 @@ namespace Pliant.RegularExpressions
                         $"Unable to parse regular expression. Error at position {parseInterface.Position}.");
             }
             if (!parseEngine.IsAccepted())
-                throw new Exception($"Error parsing regular expression. Error at position {parseInterface.Position}");
+                throw new Exception(
+                    $"Error parsing regular expression. Error at position {parseInterface.Position}");
 
             var parseForest = parseEngine.GetParseForestRoot();
             var parseTree = new InternalTreeNode(
-                parseForest as IInternalNode, 
+                parseForest as IInternalNode,
                 new SinglePassNodeVisitorStateManager());
 
             var regexVisitor = new RegexVisitor();
             parseTree.Accept(regexVisitor);
 
             return regexVisitor.Regex;
-        }        
+        }
     }
 }

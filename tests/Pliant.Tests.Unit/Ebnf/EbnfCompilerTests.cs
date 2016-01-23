@@ -4,16 +4,13 @@ using Pliant.Grammars;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
-
     [TestClass]
     public class EbnfCompilerTests
     {
         [TestMethod]
-        public void Test_EbnfCompiler_Creates_Character_Grammar_With_One_Production()
+        public void EbnfCompilerGivenCharacterShouldCreateOneProductionn()
         {
-            var input = @"Rule = 'a';";
-            var ebnfCompiler = new EbnfCompiler();
-            var grammar = ebnfCompiler.Compile(input);
+            var grammar = Compile(@"Rule = 'a';");
 
             Assert.AreEqual("Rule", grammar.Start.Value);
             Assert.AreEqual(1, grammar.Productions.Count);
@@ -29,11 +26,9 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_Creates_Contactenation_With_One_Production()
+        public void EbnfCompilerGivenConcatenationShouldCreateOneProduction()
         {
-            var input = @"Rule = 'a' 'b';";
-            var ebnfCompiler = new EbnfCompiler();
-            var grammar = ebnfCompiler.Compile(input);
+            var grammar = Compile(@"Rule = 'a' 'b';");
 
             Assert.AreEqual("Rule", grammar.Start.Value);
             Assert.AreEqual(1, grammar.Productions.Count);
@@ -55,11 +50,9 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_Creates_Alteration_With_Two_Productions()
+        public void EbnfCompilerGivenAlterationShouldCreateTwoProductions()
         {
-            var input = @"Rule = 'a' | 'b';";
-            var ebnfCompiler = new EbnfCompiler();
-            var grammar = ebnfCompiler.Compile(input);
+            var grammar = Compile(@"Rule = 'a' | 'b';");
 
             Assert.AreEqual("Rule", grammar.Start.Value);
             Assert.AreEqual(2, grammar.Productions.Count);
@@ -80,11 +73,9 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void Test_EbnfCompiler_Creates_Alteration_With_Two_Productions_When_Given_Alteration_After_Contactenation()
+        public void EbnfCompilerGivenAlterationAndConcatenationShouldCreateTwoProductions()
         {
-            var input = @"Rule = 'a' 'b' | 'c';";
-            var ebnfCompiler = new EbnfCompiler();
-            var grammar = ebnfCompiler.Compile(input);
+            var grammar = Compile(@"Rule = 'a' 'b' | 'c';");
 
             var firstProduction = grammar.Productions[0];
             Assert.AreEqual(firstProduction.LeftHandSide.Value, "Rule");
@@ -103,6 +94,36 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsInstanceOfType(secondProduction.RightHandSide[0], typeof(StringLiteralLexerRule));
             var secondProductionSecondSymbol = secondProduction.RightHandSide[0] as StringLiteralLexerRule;
             Assert.AreEqual("c", secondProductionSecondSymbol.Literal);
+        }
+
+        [TestMethod]
+        public void EbnfCompilerGivenRegexShouldCreateLexerRule()
+        {
+            var grammar = Compile(@"Rule = /[a-z]/;");
+        }
+
+        [TestMethod]
+        public void EbnfCompilerGivenBracesShouldCreateRepetition()
+        {
+            var grammar = Compile(@"Rule = { 'a' };");
+        }
+
+        [TestMethod]
+        public void EbnfCompilerGivenBracketsShouldCreateOptional()
+        {
+            var grammar = Compile(@"Rule = [ 'a' ];");
+        }
+
+        [TestMethod]
+        public void EbnfCompilerGivenParanthesisShouldCreateGrouping()
+        {
+            var grammar = Compile(@"Rule = ('a');");
+        }
+
+        private static IGrammar Compile(string input)
+        {
+            var ebnfCompiler = new EbnfCompiler();
+            return ebnfCompiler.Compile(input);
         }
     }
 }

@@ -83,7 +83,7 @@ namespace Pliant.Builders
         {
             return AddWithOr(new SymbolBuilder(new TerminalLexerRule(lhs, lhs.ToString())), rhs);
         }
-        
+
         public static RuleBuilder operator |(BaseBuilder lhs, BaseLexerRule rhs)
         {
             return AddWithOr(lhs, new SymbolBuilder(rhs));
@@ -96,7 +96,7 @@ namespace Pliant.Builders
 
         private static RuleBuilder AddWithAnd(BaseBuilder lhs, BaseBuilder rhs)
         {
-            var expression = lhs as RuleBuilder ?? new RuleBuilder(lhs); 
+            var expression = lhs as RuleBuilder ?? new RuleBuilder(lhs);
             expression.Data[expression.Data.Count - 1].Add(rhs);
             return expression;
         }
@@ -108,6 +108,5 @@ namespace Pliant.Builders
             lhsExpression.Data.AddRange(rhsExpression.Data);
             return lhsExpression;
         }
-
     }
 }

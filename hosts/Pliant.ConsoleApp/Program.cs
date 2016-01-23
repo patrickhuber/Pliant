@@ -1,17 +1,11 @@
 ﻿using Pliant.Bnf;
-using Pliant.Builders;
-using Pliant.Automata;
-using Pliant.Grammars;
-using Pliant.Tokens;
-using System;
 using System.IO;
-using System.Text;
 
 namespace Pliant.ConsoleApp
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var sampleBnf = @"
             <syntax>         ::= <rule> | <rule> <syntax>

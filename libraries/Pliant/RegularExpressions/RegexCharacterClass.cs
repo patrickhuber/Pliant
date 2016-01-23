@@ -1,9 +1,9 @@
 ﻿namespace Pliant.RegularExpressions
 {
-    public class RegexCharacterClass
+    public class RegexCharacterClass : RegexNode
     {
         public RegexCharacterRange CharacterRange { get; private set; }
-        
+
         public RegexCharacterClass(RegexCharacterRange characterRange)
         {
             CharacterRange = characterRange;
@@ -32,14 +32,19 @@
                 return false;
             return characterClass.CharacterRange.Equals(CharacterRange);
         }
+
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexCharacterClass; }
+        }
     }
 
     public class RegexCharacterClassList : RegexCharacterClass
     {
         public RegexCharacterClass CharacterClass { get; private set; }
-        
+
         public RegexCharacterClassList(
-            RegexCharacterRange characterRange, 
+            RegexCharacterRange characterRange,
             RegexCharacterClass characterClass)
             : base(characterRange)
         {
@@ -70,6 +75,11 @@
                 return false;
             return characterClassList.CharacterRange.Equals(CharacterRange)
                 && characterClassList.CharacterClass.Equals(CharacterClass);
+        }
+
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexCharacterClassList; }
         }
     }
 }

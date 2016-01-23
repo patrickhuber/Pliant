@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pliant
 {
     public abstract class Observable<T> : IObservable<T>
     {
-         private IList<IObserver<T>> _observers;
+        private IList<IObserver<T>> _observers;
 
         public Observable()
         {
             _observers = new List<IObserver<T>>();
         }
-                
+
         public IDisposable Subscribe(IObserver<T> observer)
         {
             if (!_observers.Contains(observer))

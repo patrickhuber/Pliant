@@ -7,7 +7,7 @@ namespace Pliant.Tests.Unit
     public class AnyTerminalTests
     {
         [TestMethod]
-        public void Test_AnyTerminal_That_IsMatch_Returns_True_When_Any_Character_Specified()
+        public void AnyTerminalIsMatchShouldReturnTrueWhenAnyCharacterSpecified()
         {
             var anyTerminal = new AnyTerminal();
             for (char c = char.MinValue; c < char.MaxValue; c++)

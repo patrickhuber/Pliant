@@ -1,5 +1,5 @@
-﻿using System;
-using Pliant.Grammars;
+﻿using Pliant.Grammars;
+using System;
 
 namespace Pliant.Lexemes
 {
@@ -12,7 +12,7 @@ namespace Pliant.Lexemes
             if (lexerRule.LexerRuleType != LexerRuleType)
                 throw new Exception(
                     string.Format(
-                        "Unable to create TerminalLexeme from type {0}. Expected TerminalLexerRule", 
+                        "Unable to create TerminalLexeme from type {0}. Expected TerminalLexerRule",
                         lexerRule.GetType().FullName));
             var terminalLexerRule = lexerRule as ITerminalLexerRule;
             return new TerminalLexeme(terminalLexerRule);

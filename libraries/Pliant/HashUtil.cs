@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Pliant
+﻿namespace Pliant
 {
     internal static class HashUtil
     {
@@ -9,7 +7,7 @@ namespace Pliant
             unchecked
             {
                 int hash = (int)2166136261;
-                for(int i=0;i<hashCodes.Length;i++)
+                for (int i = 0; i < hashCodes.Length; i++)
                 {
                     hash = hash * 16777619 ^ hashCodes[i];
                 }

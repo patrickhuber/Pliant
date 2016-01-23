@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pliant.Grammars
+﻿namespace Pliant.Grammars
 {
     public class RangeTerminal : BaseTerminal, ITerminal
     {
@@ -21,7 +15,7 @@ namespace Pliant.Grammars
         {
             return Start <= character && character <= End;
         }
-        
+
         public override string ToString()
         {
             return string.Format("[{0}-{1}]", Start, End);

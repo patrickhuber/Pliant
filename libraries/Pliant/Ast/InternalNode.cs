@@ -9,14 +9,14 @@ namespace Pliant.Ast
         private ReadWriteList<IAndNode> _children;
 
         public IReadOnlyList<IAndNode> Children { get { return _children; } }
-        
+
         protected InternalNode(int origin, int location)
         {
             Origin = origin;
             Location = location;
             _children = new ReadWriteList<IAndNode>();
         }
-        
+
         public void AddUniqueFamily(INode trigger)
         {
             AddUniqueAndNode(trigger);
@@ -26,7 +26,7 @@ namespace Pliant.Ast
         {
             AddUniqueAndNode(source, trigger);
         }
-        
+
         private void AddUniqueAndNode(params INode[] children)
         {
             foreach (var andNode in _children)
@@ -43,7 +43,7 @@ namespace Pliant.Ast
             foreach (var child in children)
                 newAndNode.AddChild(child);
 
-            _children.Add(newAndNode); 
+            _children.Add(newAndNode);
         }
 
         private static bool IsMatchedSubTree(INode[] children, IAndNode andNode)
@@ -74,10 +74,13 @@ namespace Pliant.Ast
             {
                 case NodeType.Symbol:
                     return IsSameNode(parameterNode as ISymbolNode, compareNode as ISymbolNode);
+
                 case NodeType.Terminal:
                     return IsSameNode(parameterNode as ITerminalNode, compareNode as ITerminalNode);
+
                 case NodeType.Token:
                     return IsSameNode(parameterNode as ITokenNode, compareNode as ITokenNode);
+
                 case NodeType.Intermediate:
                     return IsSameNode(parameterNode as IIntermediateNode, compareNode as IIntermediateNode);
             }

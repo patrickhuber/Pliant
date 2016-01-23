@@ -4,11 +4,11 @@ namespace Pliant.Grammars
 {
     public class SetTerminal : BaseTerminal, ITerminal
     {
-        ISet<char> _characterSet;
+        private ISet<char> _characterSet;
 
         public SetTerminal(params char[] characters)
             : this(new HashSet<char>(characters))
-        {            
+        {
         }
 
         public SetTerminal(ISet<char> characterSet)
@@ -23,7 +23,7 @@ namespace Pliant.Grammars
 
         public override string ToString()
         {
-            return string.Join(", ", string.Format("'{0}'",  _characterSet));
+            return string.Join(", ", string.Format("'{0}'", _characterSet));
         }
     }
 }

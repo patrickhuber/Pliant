@@ -171,7 +171,7 @@ namespace Pliant.Ebnf
 
             _ebnfGrammar = grammarBuilder.ToGrammar();
         }
-        
+
         private static BaseLexerRule CreateEscapeCharacterLexerRule()
         {
             var start = new DfaState();

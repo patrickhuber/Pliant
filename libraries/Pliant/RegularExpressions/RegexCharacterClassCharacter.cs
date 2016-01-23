@@ -1,9 +1,14 @@
 ﻿namespace Pliant.RegularExpressions
 {
-    public class RegexCharacterClassCharacter
+    public class RegexCharacterClassCharacter : RegexNode
     {
         public char Value { get; private set; }
-        
+
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexCharacterClassCharacter; }
+        }
+
         public RegexCharacterClassCharacter(char value)
         {
             Value = value;

@@ -6,7 +6,7 @@ namespace Pliant.Builders
     public class ProductionBuilder : BaseBuilder
     {
         public INonTerminal LeftHandSide { get; private set; }
-       
+
         public ProductionBuilder(string leftHandSide)
             : this(new NonTerminal(leftHandSide))
         {
@@ -22,11 +22,11 @@ namespace Pliant.Builders
             Definition = new RuleBuilder();
             foreach (var symbolBuilder in symbolBuilders)
                 Definition.AddWithAnd(symbolBuilder);
-            
-            var alterationBuilder = new AlterationBuilder(Definition);            
+
+            var alterationBuilder = new AlterationBuilder(Definition);
             return alterationBuilder;
         }
-        
+
         public RuleBuilder Definition { get; set; }
 
         public static implicit operator ProductionBuilder(string name)
@@ -52,7 +52,7 @@ namespace Pliant.Builders
                     }
                 }
                 yield return new Production(LeftHandSide, symbolList.ToArray());
-            }            
+            }
         }
     }
 }

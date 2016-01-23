@@ -12,7 +12,7 @@ namespace Pliant.Tests.Unit.Bnf
     public class BnfTests
     {
         public TestContext TestContext { get; set; }
-        
+
         private string _bnfText = @"
             <syntax>         ::= <rule> | <rule> <syntax>
             <rule>           ::= <identifier> ""::="" <expression> <line-end>
@@ -22,24 +22,16 @@ namespace Pliant.Tests.Unit.Bnf
             <term>           ::= <literal > | <identifier>
             <identifier>     ::= ""<"" <rule-name> "">""
             <literal>        ::= '""' <text> '""' | ""'"" <text> ""'""";
-
+        
         [TestMethod]
-        public void Test_Bnf_That_String_Iterate_Sets_Baseline()
-        {
-            var stringReader = new StringReader(_bnfText);
-            int c = 0;
-            while ((c = stringReader.Read()) != -1) ;                
-        }
-
-        [TestMethod]
-        public void Test_Bnf_That_Parse_Produces_Bnf_Chart()
+        public void BnfShouldProduceParseChartForTextGrammar()
         {
             var grammar = new BnfGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, _bnfText);
-            
+
             while (!parseInterface.EndOfStream())
-            {                 
+            {
                 if (!parseInterface.Read())
                 {
                     var position = parseInterface.Position;
@@ -68,13 +60,13 @@ namespace Pliant.Tests.Unit.Bnf
                 }
             }
             Assert.IsTrue(
-                parseInterface.ParseEngine.IsAccepted(), 
+                parseInterface.ParseEngine.IsAccepted(),
                 "error at position {0}", parseInterface.Position);
         }
 
         [TestMethod]
         [DeploymentItem(@"Bnf\AnsiC.bnf", "Bnf")]
-        public void Test_Bnf_That_Parses_Large_Grammar_In_File()
+        public void BnfShouldParseLargeGrammarInFile()
         {
             var bnf = File.ReadAllText(Path.Combine(TestContext.TestDeploymentDir, "Bnf", "AnsiC.bnf"));
             Assert.IsFalse(string.IsNullOrEmpty(bnf));
@@ -88,7 +80,7 @@ namespace Pliant.Tests.Unit.Bnf
                 if (!parseInterface.Read())
                     Assert.Fail("Error Parsing At Position {0}", parseInterface.Position);
             }
-            Assert.IsTrue(parseEngine.IsAccepted());          
+            Assert.IsTrue(parseEngine.IsAccepted());
         }
     }
 }

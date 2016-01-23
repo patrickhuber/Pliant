@@ -1,6 +1,6 @@
-﻿using Pliant.Lexemes;
+﻿using Pliant.Grammars;
+using Pliant.Lexemes;
 using System;
-using Pliant.Grammars;
 
 namespace Pliant
 {

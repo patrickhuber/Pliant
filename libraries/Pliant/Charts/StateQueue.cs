@@ -1,5 +1,4 @@
 ﻿using Pliant.Collections;
-using System.Linq;
 
 namespace Pliant.Charts
 {

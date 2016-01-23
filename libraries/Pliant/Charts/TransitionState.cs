@@ -1,21 +1,20 @@
 ﻿using Pliant.Grammars;
-using Pliant.Ast;
 
 namespace Pliant.Charts
 {
     public class TransitionState : State, ITransitionState
     {
         public ISymbol Recognized { get; private set; }
-        
+
         public IState Reduction { get; private set; }
 
         public int Position { get; private set; }
 
         public ITransitionState NextTransition { get; set; }
-        
+
         public TransitionState(
-            ISymbol recognized, 
-            IState transition, 
+            ISymbol recognized,
+            IState transition,
             IState reduction,
             int position)
             : base(transition.Production, transition.Length, transition.Origin)
@@ -24,7 +23,7 @@ namespace Pliant.Charts
             Recognized = recognized;
             Position = position;
         }
-                
+
         public override bool Equals(object obj)
         {
             var transitionState = obj as TransitionState;

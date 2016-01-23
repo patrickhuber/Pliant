@@ -9,31 +9,31 @@ namespace Pliant.Tests.Unit
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        public void Test_WhitespaceTerminal_That_Tab_Character_IsMatch_Returns_True()
+        public void WhitespaceTerminalShouldMatchTabCharacter()
         {
             var whitespaceTerminal = new WhitespaceTerminal();
             Assert.IsTrue(whitespaceTerminal.IsMatch('\t'));
         }
 
         [TestMethod]
-        public void Test_WhitespaceTerminal_That_NewLine_Character_IsMatch_Returns_True()
+        public void WhitespaceTerminalShouldMatchNewLineCharacter()
         {
             var whitespaceTerminal = new WhitespaceTerminal();
             Assert.IsTrue(whitespaceTerminal.IsMatch('\r'));
         }
 
         [TestMethod]
-        public void Test_WhitespaceTerminal_That_LineFeed_Character_IsMatch_Returns_True()
+        public void WhitespaceTerminalShouldMatchLineFeed()
         {
             var whitespaceTerminal = new WhitespaceTerminal();
             Assert.IsTrue(whitespaceTerminal.IsMatch('\n'));
         }
 
         [TestMethod]
-        public void Test_WhitespaceTerminal_That_Space_Character_IsMatch_Returns_True()
+        public void WhitespaceShouldMatchSpaceCharacter()
         {
             var whitespaceTerminal = new WhitespaceTerminal();
-            Assert.IsTrue(whitespaceTerminal.IsMatch(' '));        
+            Assert.IsTrue(whitespaceTerminal.IsMatch(' '));
         }
     }
 }

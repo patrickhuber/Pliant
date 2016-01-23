@@ -1,11 +1,10 @@
 ﻿using System;
-using Pliant.RegularExpressions;
 
 namespace Pliant.Automata
 {
-    public class RegexToNfaTransform
+    public class SubsetConstructionAlgorithm : INfaToDfa
     {
-        public Nfa Transform(Regex regex)
+        public IDfaState Transform(INfa nfa)
         {
             throw new NotImplementedException();
         }

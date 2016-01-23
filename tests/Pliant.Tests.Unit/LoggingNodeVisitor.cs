@@ -1,5 +1,4 @@
 ﻿using Pliant.Ast;
-using System;
 using System.Collections.Generic;
 
 namespace Pliant.Tests.Unit
@@ -49,9 +48,9 @@ namespace Pliant.Tests.Unit
         }
 
         public override void Visit(IAndNode node)
-        {            
+        {
             foreach (var child in node.Children)
                 child.Accept(this);
-        }        
+        }
     }
 }

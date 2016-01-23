@@ -1,10 +1,10 @@
 ﻿using Pliant.Ast;
+using Pliant.Charts;
+using Pliant.Grammars;
+using Pliant.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Pliant.Tokens;
-using Pliant.Grammars;
-using Pliant.Charts;
 
 namespace Pliant
 {
@@ -16,11 +16,19 @@ namespace Pliant
 
         public IReadOnlyChart Chart { get { return _chart; } }
 
+        public ParseEngineOptions Options { get; private set; }
+
         private Chart _chart;
         private NodeSet _nodeSet;
 
         public ParseEngine(IGrammar grammar)
+            : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
         {
+        }
+
+        public ParseEngine(IGrammar grammar, ParseEngineOptions options)
+        {
+            Options = options;
             _nodeSet = new NodeSet();
             Grammar = grammar;
             Initialize();
@@ -53,7 +61,7 @@ namespace Pliant
         {
             if (!IsAccepted())
                 throw new Exception("Unable to parse expression.");
-            
+
             var lastSet = _chart.EarleySets[_chart.Count - 1];
             var start = Grammar.Start;
 
@@ -81,7 +89,7 @@ namespace Pliant
                     return true;
             return false;
         }
-                
+
         private void Initialize()
         {
             Location = 0;
@@ -163,8 +171,8 @@ namespace Pliant
                 // is there a new prediction?
                 else if (p < earleySet.Predictions.Count)
                 {
-                    var prediction = earleySet.Predictions[p];
-                    Predict(prediction, location);
+                    var evidence = earleySet.Predictions[p];
+                    Predict(evidence, location);
                     p++;
                 }
                 else
@@ -172,12 +180,12 @@ namespace Pliant
             }
         }
 
-        private void Predict(IState prediction, int j)
+        private void Predict(IState evidence, int j)
         {
-            var nonTerminal = prediction.PostDotSymbol as INonTerminal;
+            var nonTerminal = evidence.PostDotSymbol as INonTerminal;
             foreach (var production in Grammar.RulesFor(nonTerminal))
             {
-                PredictProduction(prediction, j, production);
+                PredictProduction(evidence, j, production);
             }
         }
 
@@ -216,7 +224,8 @@ namespace Pliant
             var earleySet = _chart.EarleySets[completed.Origin];
             var searchSymbol = completed.Production.LeftHandSide;
 
-            OptimizeReductionPath(searchSymbol, completed.Origin);
+            if(Options.OptimizeRightRecursion)
+                OptimizeReductionPath(searchSymbol, completed.Origin);
 
             var transitionState = earleySet.FindTransitionState(searchSymbol);
             if (transitionState != null)
@@ -234,7 +243,7 @@ namespace Pliant
             var earleySet = _chart.EarleySets[transitionState.Position];
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.PreDotSymbol);
-            
+
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
 
@@ -249,7 +258,7 @@ namespace Pliant
             if (_chart.Enqueue(k, topmostItem))
                 Log("Complete", k, topmostItem);
         }
-        
+
         private void EarleyComplete(IState completed, int k)
         {
             int j = completed.Origin;
@@ -262,7 +271,7 @@ namespace Pliant
 
                 var i = prediction.Origin;
                 var nextState = prediction.NextState();
-                
+
                 var parseNode = CreateParseNode(
                     nextState,
                     prediction.ParseNode,
@@ -308,7 +317,7 @@ namespace Pliant
             // and [B-> aA.b, k] is quasi complete (is b null)
             if (!IsNextStateQuasiComplete(sourceState))
                 return;
-            
+
             // then t_rule := [B->aAb.]; t_pos=k;
             t_rule = sourceState.NextState();
 
@@ -330,10 +339,10 @@ namespace Pliant
                   t_rule,
                   sourceState,
                   previousTransitionState.Position);
-                
+
                 previousTransitionState.NextTransition = currentTransitionState;
             }
-            else 
+            else
                 currentTransitionState = new TransitionState(
                   searchSymbol,
                   t_rule,
@@ -363,7 +372,7 @@ namespace Pliant
                 return true;
 
             // if all subsequent symbols are nullable
-            for (int i = nextStatePosition; i < state.Production.RightHandSide.Count;i++)
+            for (int i = nextStatePosition; i < state.Production.RightHandSide.Count; i++)
             {
                 var nextSymbol = state.Production.RightHandSide[nextStatePosition];
                 var isSymbolNullable = IsSymbolNullable(nextSymbol);
@@ -371,13 +380,13 @@ namespace Pliant
                     return false;
 
                 // From Page 4 of Leo's paper:
-                // 
+                //
                 // "on a non-empty deterministic reduction path there always
                 //  exists a topmost item if S =+> S is impossible.
                 //  The easiest way to avoid problems in this respect is to augment
                 //  the grammar with a new start symbol S'.
                 //  this means adding the rule S'=>S as the start."
-                // 
+                //
                 // to fix this, check if S can derive S. Basically if we are in the Start state
                 // and the Start state is found and is nullable, exit with false
                 if (state.Production.LeftHandSide == Grammar.Start &&
@@ -445,10 +454,10 @@ namespace Pliant
 
             return internalNode;
         }
-        
+
         private bool IsSymbolNullable(ISymbol symbol)
-        { 
-            if(symbol == null)
+        {
+            if (symbol == null)
                 return true;
             if (symbol.SymbolType != SymbolType.NonTerminal)
                 return false;
@@ -470,11 +479,11 @@ namespace Pliant
             Debug.Write(string.Format("{0}\t{1}", origin, state));
             Debug.WriteLine(string.Format("\t # {0}", operation));
         }
-                
+
         private void LogScan(int origin, IState state, IToken token)
         {
             Debug.Write(string.Format("{0}\t{1}", origin, state));
-            Debug.WriteLine(string.Format("\t # Scan {0}", token));
+            Debug.WriteLine(string.Format("\t # Scan {0}", token.Value));
         }
     }
 }

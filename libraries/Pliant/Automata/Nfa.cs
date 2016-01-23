@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Pliant.Automata
+﻿namespace Pliant.Automata
 {
     public class Nfa : INfa
     {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Pliant.Ast
 {
@@ -7,7 +6,7 @@ namespace Pliant.Ast
     {
         private IInternalNode _lock;
         private IDictionary<IInternalNode, int> _stateStore;
-        
+
         public NodeVisitorStateManager()
         {
             _lock = null;
@@ -40,7 +39,7 @@ namespace Pliant.Ast
 
         private void SetTraversalPosition(IInternalNode internalNode, int value)
         {
-            _stateStore[internalNode] = value ;
+            _stateStore[internalNode] = value;
         }
 
         private bool TryAcquireLock(IInternalNode internalNode)

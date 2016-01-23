@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pliant.Grammars;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders;
+using System.Linq;
 
 namespace Pliant.Tests.Unit
 {
@@ -10,7 +8,7 @@ namespace Pliant.Tests.Unit
     public class GrammarTests
     {
         [TestMethod]
-        public void Test_Grammar_That_RulesFor_Returns_Rules_When_Production_Matches()
+        public void GrammarRulesForWhenProductionMatchesShouldReturnRules()
         {
             ProductionBuilder B = "B", A = "A", S = "S";
             S.Definition = A | B;

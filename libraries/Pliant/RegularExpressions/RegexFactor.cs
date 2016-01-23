@@ -1,9 +1,9 @@
 ﻿namespace Pliant.RegularExpressions
 {
-    public class RegexFactor
+    public class RegexFactor : RegexNode
     {
         public RegexAtom Atom { get; private set; }
-        
+
         public RegexFactor(RegexAtom atom)
         {
             Atom = atom;
@@ -32,12 +32,17 @@
                 return false;
             return factor.Atom.Equals(Atom);
         }
+
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexFactor; }
+        }
     }
 
     public class RegexFactorIterator : RegexFactor
     {
         public RegexIterator Iterator { get; private set; }
-        
+
         public RegexFactorIterator(RegexAtom atom, RegexIterator iterator)
             : base(atom)
         {
@@ -69,5 +74,9 @@
             return _hashCode;
         }
 
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexFactorIterator; }
+        }
     }
 }

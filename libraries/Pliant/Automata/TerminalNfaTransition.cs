@@ -9,5 +9,11 @@ namespace Pliant.Automata
         public ITerminal Terminal { get; private set; }
 
         public NfaTransitionType TransitionType { get { return NfaTransitionType.Terminal; } }
+
+        public TerminalNfaTransition(ITerminal terminal, INfaState target)
+        {
+            Terminal = terminal;
+            Target = target;
+        }
     }
 }

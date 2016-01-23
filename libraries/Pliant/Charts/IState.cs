@@ -1,5 +1,5 @@
-﻿using Pliant.Grammars;
-using Pliant.Ast;
+﻿using Pliant.Ast;
+using Pliant.Grammars;
 
 namespace Pliant.Charts
 {
@@ -12,11 +12,17 @@ namespace Pliant.Charts
         ISymbol PostDotSymbol { get; }
         int Length { get; }
         bool IsComplete { get; }
+
         IState NextState();
+
         IState NextState(int newOrigin);
+
         IState NextState(INode parseNode);
+
         IState NextState(int newOrigin, INode parseNode);
+
         INode ParseNode { get; set; }
+
         bool IsSource(ISymbol searchSymbol);
     }
 }

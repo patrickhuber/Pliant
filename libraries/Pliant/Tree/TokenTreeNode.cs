@@ -1,6 +1,5 @@
-﻿using Pliant.Tokens;
-using Pliant.Ast;
-using System;
+﻿using Pliant.Ast;
+using Pliant.Tokens;
 
 namespace Pliant.Tree
 {

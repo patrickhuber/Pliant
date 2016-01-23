@@ -38,7 +38,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ast\SinglePassNodeVisitorStateManager.cs" />
-    <Compile Include="Automata\RegexToNfaTransform.cs" />
+    <Compile Include="Automata\INfaToDfa.cs" />
+    <Compile Include="Automata\SubsetConstructionAlgorithm.cs" />
     <Compile Include="Builders\BaseBuilder.cs" />
     <Compile Include="Builders\BaseBuilderList.cs" />
     <Compile Include="Builders\_.cs" />
@@ -121,12 +122,18 @@
     <Compile Include="Ast\NodeVisitorBase.cs" />
     <Compile Include="Ast\NodeVisitorStateManager.cs" />
     <Compile Include="ParseEngineLexemeFactory.cs" />
+    <Compile Include="ParseEngineOptions.cs" />
+    <Compile Include="RegularExpressions\IRegexToNfa.cs" />
+    <Compile Include="RegularExpressions\RegexNode.cs" />
+    <Compile Include="RegularExpressions\RegexNodeType.cs" />
+    <Compile Include="RegularExpressions\ThompsonConstructionAlgorithm.cs" />
     <Compile Include="RegularExpressions\Regex.cs" />
     <Compile Include="RegularExpressions\RegexAtom.cs" />
     <Compile Include="RegularExpressions\RegexCharacter.cs" />
     <Compile Include="RegularExpressions\RegexCharacterClass.cs" />
     <Compile Include="RegularExpressions\RegexCharacterClassCharacter.cs" />
     <Compile Include="RegularExpressions\RegexCharacterRange.cs" />
+    <Compile Include="RegularExpressions\RegexCompiler.cs" />
     <Compile Include="RegularExpressions\RegexExpression.cs" />
     <Compile Include="RegularExpressions\RegexFactor.cs" />
     <Compile Include="RegularExpressions\RegexIterator.cs" />

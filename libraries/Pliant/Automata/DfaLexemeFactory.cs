@@ -1,6 +1,6 @@
-﻿using System;
-using Pliant.Grammars;
+﻿using Pliant.Grammars;
 using Pliant.Lexemes;
+using System;
 
 namespace Pliant.Automata
 {

@@ -1,5 +1,5 @@
-﻿using Pliant.Grammars;
-using Pliant.Ast;
+﻿using Pliant.Ast;
+using Pliant.Grammars;
 using System.Text;
 
 namespace Pliant.Charts
@@ -15,11 +15,11 @@ namespace Pliant.Charts
         public ISymbol PostDotSymbol { get; private set; }
 
         public int Length { get; private set; }
-                
+
         public virtual StateType StateType { get { return StateType.Normal; } }
 
         public INode ParseNode { get; set; }
-        
+
         public State(IProduction production, int position, int origin)
         {
             Assert.IsNotNull(production, "production");
@@ -37,7 +37,7 @@ namespace Pliant.Charts
         {
             ParseNode = parseNode;
         }
-                
+
         public IState NextState()
         {
             return NextState(null as INode);
@@ -69,7 +69,7 @@ namespace Pliant.Charts
                 newOrigin,
                 parseNode);
         }
-        
+
         public bool IsComplete
         {
             get { return Length == Production.RightHandSide.Count; }

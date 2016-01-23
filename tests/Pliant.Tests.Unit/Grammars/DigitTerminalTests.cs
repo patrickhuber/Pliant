@@ -7,14 +7,14 @@ namespace Pliant.Tests.Unit
     public class DigitTerminalTests
     {
         [TestMethod]
-        public void Test_DigitTerminal_That_IsMatch_Returns_True_When_Number()
+        public void DigitTerminalGivenNumberShouldMatch()
         {
             var digitTerminal = new DigitTerminal();
-            Assert.IsTrue (digitTerminal.IsMatch('0'));
+            Assert.IsTrue(digitTerminal.IsMatch('0'));
         }
 
         [TestMethod]
-        public void Test_DigitTerminal_That_IsMatch_Returns_False_When_Letter()
+        public void DigitTerminalGivenLetterShouldFailMatch()
         {
             var digitTerminal = new DigitTerminal();
             Assert.IsFalse(digitTerminal.IsMatch('a'));

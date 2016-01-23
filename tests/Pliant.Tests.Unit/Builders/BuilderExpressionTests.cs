@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders;
 
 namespace Pliant.Tests.Unit.Builders
@@ -8,7 +7,7 @@ namespace Pliant.Tests.Unit.Builders
     public class BuilderExpressionTests
     {
         [TestMethod]
-        public void Test_BuilderExpression_That_Can_Cast_BuilderNonTerminal_To_BuilderExpression()
+        public void BuilderExpressionShouldCastBuilderNonTerminalToBuilderExpression()
         {
             ProductionBuilder term = null;
             RuleBuilder expression = null;
@@ -18,7 +17,7 @@ namespace Pliant.Tests.Unit.Builders
         }
 
         [TestMethod]
-        public void Test_BuilderExpression_That_Can_Cast_String_To_BuilderExpression()
+        public void BuilderExpressionShouldCastStringToBuilderExpression()
         {
             string input = "";
             RuleBuilder expression = null;
@@ -28,28 +27,28 @@ namespace Pliant.Tests.Unit.Builders
         }
 
         [TestMethod]
-        public void Test_BuilderExpression_That_Can_Cast_String_And_String()
+        public void BuilderExpressionShouldCastStringAndString()
         {
             string input1 = "";
             string input2 = "";
-            RuleBuilder expression = (_) input1 + input2;
+            RuleBuilder expression = (_)input1 + input2;
             Assert.AreEqual(1, expression.Data.Count);
             Assert.AreEqual(2, expression.Data[0].Count);
         }
 
         [TestMethod]
-        public void Test_BuilderExpression_That_Can_Cast_String_Or_String()
+        public void BuilderExpressionShouldCastStringOrString()
         {
             string input1 = "";
             string input2 = "";
-            RuleBuilder expression = (_) input1 | input2;
+            RuleBuilder expression = (_)input1 | input2;
             Assert.AreEqual(2, expression.Data.Count);
             Assert.AreEqual(1, expression.Data[0].Count);
             Assert.AreEqual(1, expression.Data[1].Count);
         }
 
         [TestMethod]
-        public void Test_BuilderExpression_That_Can_Cast_Complex_Rule()
+        public void BuilderExpressionShouldCastComplexRule()
         {
             ProductionBuilder A = "A";
             RuleBuilder expression = (_)"abc" + "def" | "abc" + A;

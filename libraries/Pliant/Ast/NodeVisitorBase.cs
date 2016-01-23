@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pliant.Ast
+﻿namespace Pliant.Ast
 {
     public abstract class NodeVisitorBase : INodeVisitor
     {
@@ -36,7 +30,7 @@ namespace Pliant.Ast
                 child.Accept(this);
         }
 
-        public  virtual void Visit(ISymbolNode node)
+        public virtual void Visit(ISymbolNode node)
         {
             var currentAndNode = StateManager.GetCurrentAndNode(node);
             Visit(currentAndNode);

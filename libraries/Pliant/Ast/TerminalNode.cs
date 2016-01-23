@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pliant.Ast
+﻿namespace Pliant.Ast
 {
     public class TerminalNode : NodeBase, ITerminalNode
     {
         public char Capture { get; private set; }
-                
+
         public TerminalNode(char capture, int origin, int location)
         {
             Capture = capture;
@@ -20,11 +14,11 @@ namespace Pliant.Ast
 
         public override string ToString()
         {
-            return string.Format("({0}, {1}, {2})", 
-                Capture == '\0' 
+            return string.Format("({0}, {1}, {2})",
+                Capture == '\0'
                 ? "null"
-                : Capture.ToString(), 
-                Origin, 
+                : Capture.ToString(),
+                Origin,
                 Location);
         }
 

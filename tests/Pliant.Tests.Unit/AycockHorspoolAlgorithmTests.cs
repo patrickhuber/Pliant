@@ -10,7 +10,7 @@ namespace Pliant.Tests.Unit
     public class AycockHorspoolAlgorithmTests
     {
         [TestMethod]
-        public void Test_AycockHorspoolAlgorithm_That_Vulnerable_Grammar_Accepts_Input()
+        public void AycockHorspoolAlgorithmShouldAcceptVulnerableGrammar()
         {
             var a = new TerminalLexerRule(
                 new CharacterTerminal('a'),
@@ -22,15 +22,15 @@ namespace Pliant.Tests.Unit
             ProductionBuilder E = "E";
 
             SPrime.Definition = S;
-            S.Definition = (_) S | A + A + A + A;
+            S.Definition = (_)S | A + A + A + A;
             A.Definition = (_)"a" | E;
 
             var grammarBuilder = new GrammarBuilder(
-                SPrime, 
+                SPrime,
                 new[] { SPrime, S, A, E });
 
             var grammar = grammarBuilder.ToGrammar();
-            
+
             var parseEngine = new ParseEngine(grammar);
             parseEngine.Pulse(new Token("a", 0, a.TokenType));
 

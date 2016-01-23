@@ -5,7 +5,7 @@ namespace Pliant.Grammars
     public class TerminalLexerRule : BaseLexerRule, ITerminalLexerRule
     {
         public ITerminal Terminal { get; }
-        
+
         public static readonly LexerRuleType TerminalLexerRuleType = new LexerRuleType("Terminal");
 
         public TerminalLexerRule(char character)
@@ -23,7 +23,7 @@ namespace Pliant.Grammars
             : this(terminal, new TokenType(tokenTypeId))
         {
         }
-        
+
         public override string ToString()
         {
             return Terminal.ToString();

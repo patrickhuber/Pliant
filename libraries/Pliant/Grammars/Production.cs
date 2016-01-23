@@ -24,7 +24,7 @@ namespace Pliant.Grammars
 
         public Production(string leftHandSide, params ISymbol[] rightHandSide)
             : this(new NonTerminal(leftHandSide), rightHandSide)
-        { 
+        {
         }
 
         public override bool Equals(object obj)
@@ -44,6 +44,7 @@ namespace Pliant.Grammars
 
         // PERF: Cache Costly Hash Code Computation
         private bool _isHashCodeComputed = false;
+
         private int _computedHashCode = 0;
 
         public override int GetHashCode()
@@ -62,7 +63,7 @@ namespace Pliant.Grammars
                 return _computedHashCode;
             }
         }
-        
+
         public void AddSymbol(ISymbol symbol)
         {
             InvalidateCachedHashCode();
@@ -77,7 +78,7 @@ namespace Pliant.Grammars
         public Production Clone()
         {
             var production = new Production(LeftHandSide);
-            foreach(var symbol in RightHandSide)
+            foreach (var symbol in RightHandSide)
                 production.AddSymbol(symbol);
             return production;
         }

@@ -1,5 +1,5 @@
-﻿using System;
-using Pliant.Grammars;
+﻿using Pliant.Grammars;
+using System;
 
 namespace Pliant.Lexemes
 {

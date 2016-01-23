@@ -10,9 +10,9 @@ namespace Pliant.Tests.Unit
     /// </summary>
     [TestClass]
     public class ChartTests
-    {        
+    {
         [TestMethod]
-        public void Test_Chart_That_Enqueue_Avoids_Duplicates()
+        public void ChartEnqueShouldAvoidDuplication()
         {
             ProductionBuilder L = "L";
             var aToZ = new RangeTerminal('a', 'z');

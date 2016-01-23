@@ -1,9 +1,8 @@
 ﻿namespace Pliant.RegularExpressions
 {
-    public class RegexCharacterRange
+    public class RegexCharacterRange : RegexNode
     {
         public RegexCharacterClassCharacter StartCharacter { get; set; }
-        
 
         public RegexCharacterRange(RegexCharacterClassCharacter startCharacter)
         {
@@ -35,20 +34,24 @@
             }
             return _hashCode;
         }
+
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexCharacterRange; }
+        }
     }
 
     public class RegexCharacterRangeSet : RegexCharacterRange
     {
         public RegexCharacterClassCharacter EndCharacter { get; set; }
-        
+
         public RegexCharacterRangeSet(
-            RegexCharacterClassCharacter startCharacter, 
+            RegexCharacterClassCharacter startCharacter,
             RegexCharacterClassCharacter endCharacter)
             : base(startCharacter)
         {
             EndCharacter = endCharacter;
         }
-
 
         public override bool Equals(object obj)
         {
@@ -61,7 +64,7 @@
                 StartCharacter.Equals(characterRangeSet.StartCharacter)
                 && EndCharacter.Equals(characterRangeSet.EndCharacter);
         }
-        
+
         private bool _isHashCodeSet = false;
         private int _hashCode = 0;
 
@@ -75,6 +78,11 @@
                 _isHashCodeSet = true;
             }
             return _hashCode;
+        }
+
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.RegexCharacterRangeSet; }
         }
     }
 }

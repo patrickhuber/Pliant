@@ -8,7 +8,9 @@ namespace Pliant.Ast
     public interface IInternalNode : INode
     {
         IReadOnlyList<IAndNode> Children { get; }
+
         void AddUniqueFamily(INode trigger);
+
         void AddUniqueFamily(INode source, INode trigger);
     }
 }

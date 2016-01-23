@@ -1,11 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Ast;
 using Pliant.Builders;
+using Pliant.Charts;
 using Pliant.Grammars;
 using Pliant.Tokens;
-using System.Linq;
 using System.Collections.Generic;
-using Pliant.Charts;
+using System.Linq;
 
 namespace Pliant.Tests.Unit
 {
@@ -13,17 +13,17 @@ namespace Pliant.Tests.Unit
     public class ParseEngineTests
     {
         [TestMethod]
-        public void Test_ParseEngine_That_Ambiguous_Grammar_Creates_Multiple_Parse_Paths()
+        public void ParseEngineGivenAmbiguousGrammarShouldCreateMulipleParsePaths()
         {
             // example 3 section 4, Elizabeth Scott
             var tokens = Tokenize("abbb");
 
             ProductionBuilder B = "B", S = "S", T = "T", A = "A";
-            
-            S.Definition = (_) A + T | 'a' + T;
-            A.Definition = (_) 'a' | B + A;
+
+            S.Definition = (_)A + T | 'a' + T;
+            A.Definition = (_)'a' | B + A;
             B.Definition = null;
-            T.Definition = (_) 'b' + 'b' + 'b';
+            T.Definition = (_)'b' + 'b' + 'b';
 
             var grammar = new GrammarBuilder(S, new[] { S, A, B, T })
                 .ToGrammar();
@@ -47,7 +47,7 @@ namespace Pliant.Tests.Unit
             var T_1_4 = S_0_4_1.Children[1] as ISymbolNode;
             Assert.IsNotNull(T_1_4);
             Assert.AreEqual(1, T_1_4.Children.Count);
-                
+
             var S_0_4_2 = S_0_4.Children[1] as IAndNode;
             Assert.IsNotNull(S_0_4_2);
             Assert.AreEqual(2, S_0_4_2.Children.Count);
@@ -65,7 +65,7 @@ namespace Pliant.Tests.Unit
             var A_0_1_2 = A_0_1.Children[1] as IAndNode;
             Assert.IsNotNull(A_0_1_1);
             Assert.AreEqual(2, A_0_1_2.Children.Count);
-            
+
             Assert.AreSame(A_0_1, A_0_1_2.Children[1]);
 
             var B_0_0 = A_0_1_2.Children[0] as ISymbolNode;
@@ -87,7 +87,7 @@ namespace Pliant.Tests.Unit
             var T_1_3 = T_1_4_1.Children[0] as IIntermediateNode;
             Assert.IsNotNull(T_1_3);
             Assert.AreEqual(1, T_1_3.Children.Count);
-            
+
             var b_3_4 = T_1_4_1.Children[1] as ITokenNode;
             Assert.IsNotNull(b_3_4);
             Assert.AreEqual("b", b_3_4.Token.Value);
@@ -106,7 +106,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Completed_Scan_Creates_Internal_And_Terminal_Node()
+        public void ParseEngineWhenScanCompletedShouldCreateInternalAndTerminalNodes()
         {
             ProductionBuilder S = "S";
             S.Definition = (_)'a';
@@ -135,11 +135,11 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Completed_Prediction_Creates_Internal_Node()
+        public void ParseEnginePredicationShouldCreateInternalNode()
         {
             ProductionBuilder S = "S", A = "A";
-            S.Definition = (_) A;
-            A.Definition = (_) 'a';
+            S.Definition = (_)A;
+            A.Definition = (_)'a';
 
             var grammar = new GrammarBuilder(S, new[] { S, A }).ToGrammar();
 
@@ -153,7 +153,7 @@ namespace Pliant.Tests.Unit
             var S_0_1 = parseEngine.GetParseForestRoot() as ISymbolNode;
             Assert.IsNotNull(S_0_1);
             Assert.AreEqual(1, S_0_1.Children.Count);
-            
+
             var S_0_1_1 = S_0_1.Children[0] as IAndNode;
             Assert.IsNotNull(S_0_1_1);
             Assert.AreEqual(1, S_0_1_1.Children.Count);
@@ -172,7 +172,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Leo_Items_Generate_Proper_Parse_Tree()
+        public void ParseEngineLeoItemsShouldGenerateProperParseTree()
         {
             ProductionBuilder S = "S", A = "A";
 
@@ -181,7 +181,7 @@ namespace Pliant.Tests.Unit
 
             var grammar = new GrammarBuilder(S, new[] { S, A }).ToGrammar();
 
-            var tokens = Tokenize( "ab");
+            var tokens = Tokenize("ab");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
@@ -192,7 +192,7 @@ namespace Pliant.Tests.Unit
             var S_0_2 = parseEngine.GetParseForestRoot() as ISymbolNode;
             Assert.IsNotNull(S_0_2);
             Assert.AreEqual(1, S_0_2.Children.Count);
-            
+
             var S_0_2_1 = S_0_2.Children[0] as IAndNode;
             Assert.IsNotNull(S_0_2_1);
             Assert.AreEqual(1, S_0_2_1.Children.Count);
@@ -222,9 +222,8 @@ namespace Pliant.Tests.Unit
             Assert.AreEqual("b", b_1_2.Token.Value);
         }
 
-
         [TestMethod]
-        public void Test_ParseEngine_That_PassThrough_Recursive_Items_Creates_Virtual_Nodes()
+        public void ParseEnginePassThroughRecursiveItemsShouldCreateVirtualNodes()
         {
             ProductionBuilder S = "S", A = "A", B = "B";
             S.Definition = A;
@@ -232,7 +231,7 @@ namespace Pliant.Tests.Unit
             B.Definition = A | 'b';
 
             var grammar = new GrammarBuilder(S, new[] { S, A, B }).ToGrammar();
-            var tokens = Tokenize( "aaab");
+            var tokens = Tokenize("aaab");
 
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
@@ -260,7 +259,7 @@ namespace Pliant.Tests.Unit
             var A_0_4_1 = A_0_4.Children[0] as IAndNode;
             Assert.IsNotNull(A_0_4_1);
             Assert.AreEqual(2, A_0_4_1.Children.Count);
-            
+
             var a_0_1 = A_0_4_1.Children[0] as ITokenNode;
             Assert.IsNotNull(a_0_1);
             Assert.AreEqual("a", a_0_1.Token.Value);
@@ -280,7 +279,7 @@ namespace Pliant.Tests.Unit
             var A_1_4_1 = A_1_4.Children[0] as IAndNode;
             Assert.IsNotNull(A_1_4_1);
             Assert.AreEqual(2, A_1_4_1.Children.Count);
-            
+
             var a_1_2 = A_1_4_1.Children[0] as ITokenNode;
             Assert.IsNotNull(a_1_2);
             Assert.AreEqual("a", a_1_2.Token.Value);
@@ -319,13 +318,13 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Mid_Grammar_Right_Recursion_Handles_Null_Root_Transition_Item()
+        public void ParseEngineShouldParseMidGrammarRightRecursionAndHandleNullRootTransitionItem()
         {
             ProductionBuilder S = "S", A = "A", B = "B", C = "C";
-            S.Definition = (_) A | A + S;
-            A.Definition = (_) B | B + C;
-            B.Definition = (_) '.';
-            C.Definition = (_) '+' | '?' | '*';
+            S.Definition = (_)A | A + S;
+            A.Definition = (_)B | B + C;
+            B.Definition = (_)'.';
+            C.Definition = (_)'+' | '?' | '*';
 
             var grammar = new GrammarBuilder(S, new[] { S, A, B, C }).ToGrammar();
             var tokens = Tokenize(".+");
@@ -380,12 +379,12 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Simple_Substitution_Grammar_Parses()
+        public void ParseEngineShouldParseSimpleSubstitutionGrammar()
         {
             ProductionBuilder A = "A", B = "B", C = "C";
-            A.Definition = (_) B + C;
-            B.Definition = (_) 'b';
-            C.Definition = (_) 'c';
+            A.Definition = (_)B + C;
+            B.Definition = (_)'b';
+            C.Definition = (_)'c';
 
             var grammar = new GrammarBuilder(A, new[] { A, B, C }).ToGrammar();
             var parseEngine = new ParseEngine(grammar);
@@ -395,7 +394,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Expression_Grammar_Parses_Expression()
+        public void ParseEngineShouldParseExpressionGrammar()
         {
             var expressionGrammar = CreateExpressionGrammar();
 
@@ -412,14 +411,14 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Invalid_Input_Exists_Parse()
+        public void ParseEngineWhenInvalidInputShouldExitParse()
         {
             var grammar = CreateExpressionGrammar();
             var tokens = new[]
             {
                 CreateDigitToken(1, 0),
                 CreateCharacterToken('+', 1),
-                CreateCharacterToken('b', 2), 
+                CreateCharacterToken('b', 2),
                 CreateCharacterToken('*', 3),
                 CreateDigitToken(3, 4)
             };
@@ -430,7 +429,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Unmarked_Middle_Recursion_Parses()
+        public void ParseEngineShouldParseUnmarkedMiddleRecursion()
         {
             ProductionBuilder S = "S";
             S.Definition = 'a' + S + 'a' | 'a';
@@ -443,7 +442,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Right_Recursive_Quasi_Complete_Items_Are_Leo_Optimized()
+        public void ParseEngineShouldLeoOptimizeRightRecursiveQuasiCompleteItems()
         {
             ProductionBuilder S = "S", A = "A", B = "B";
             S.Definition = A + B;
@@ -459,16 +458,15 @@ namespace Pliant.Tests.Unit
             Assert.IsTrue(chart.EarleySets[23].Completions.Count < 10);
         }
 
-
         [TestMethod]
-        public void Test_ParseEngine_That_Right_Recursion_Is_Not_O_N_3()
+        public void ParseEngineRightRecursionShouldNotBeCubicComplexity()
         {
             var a = new TerminalLexerRule(
                 new CharacterTerminal('a'),
                 new TokenType("a"));
             ProductionBuilder A = "A";
-            A.Definition = 
-                'a' + A 
+            A.Definition =
+                'a' + A
                 | (_)null;
 
             var grammar = new GrammarBuilder(A, new[] { A })
@@ -498,9 +496,9 @@ namespace Pliant.Tests.Unit
             Assert.AreEqual(1, lastEarleySet.Predictions.Count);
             Assert.AreEqual(1, lastEarleySet.Scans.Count);
         }
-        
+
         [TestMethod]
-        public void Test_ParseEngine_That_Intermediate_Step_Creates_Transition_Items()
+        public void ParseEngineGivenIntermediateStepsShouldCreateTransitionItems()
         {
             ProductionBuilder S = "S", A = "A", B = "B";
             S.Definition = A;
@@ -513,7 +511,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Right_Recursive_To_Normal_Transition_Creates_Correct_Parse_Tree()
+        public void ParseEngineShouldHandleTransitionsFromRightRecursionToNormalGrammar()
         {
             IGrammar grammar = CreateRegularExpressionStubGrammar();
 
@@ -560,7 +558,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Creates_Correct_Parse_Tree_When_Multiple_Leo_Items_Exist_On_Search_Path()
+        public void ParseEngineWhenMultipleLeoItemsExistOnSearchPathShouldCreateCorrectParseTree()
         {
             var grammar = CreateRegularExpressionStubGrammar();
             var input = Tokenize("aaa");
@@ -572,7 +570,7 @@ namespace Pliant.Tests.Unit
             var E_0_3 = GetAndCastChildAtIndex<ISymbolNode>(R_0_3, 0);
             AssertNodeProperties(E_0_3, "E", 0, 3);
             var T_0_3 = GetAndCastChildAtIndex<ISymbolNode>(E_0_3, 0);
-            AssertNodeProperties(T_0_3, "T", 0, 3);            
+            AssertNodeProperties(T_0_3, "T", 0, 3);
             var F_0_1 = GetAndCastChildAtIndex<ISymbolNode>(T_0_3, 0);
             AssertNodeProperties(F_0_1, "F", 0, 1);
             var A_0_1 = GetAndCastChildAtIndex<ISymbolNode>(F_0_1, 0);
@@ -588,7 +586,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void Test_ParseEngine_That_Long_Production_Rule_Produces_Proper_Parse_Tree()
+        public void ParseEngineGivenLongProductionRuleShouldCreateCorrectParseTree()
         {
             ProductionBuilder S = "S", A = "A", B = "B", C = "C", D = "D";
             S.Definition = (_)
@@ -607,21 +605,21 @@ namespace Pliant.Tests.Unit
 
             var S_0_17 = CastAndCountChildren<ISymbolNode>(root, 2);
         }
-        
+
         private static IGrammar CreateRegularExpressionStubGrammar()
         {
             ProductionBuilder R = "R", E = "E", T = "T", F = "F", A = "A", I = "I";
             R.Definition = (_)
-                E 
-                | '^' + E 
-                | E + '$' 
+                E
+                | '^' + E
+                | E + '$'
                 | '^' + E + '$';
             E.Definition = (_)
-                T 
+                T
                 | T + '|' + E
                 | (_)null;
             T.Definition = (_)
-                F + T 
+                F + T
                 | F;
             F.Definition = (_)
                 A
@@ -629,8 +627,8 @@ namespace Pliant.Tests.Unit
             A.Definition = (_)
                 'a';
             I.Definition = (_)
-                '+' 
-                | '?' 
+                '+'
+                | '?'
                 | '*';
 
             return new GrammarBuilder(R, new[] { R, E, T, F, A, I }).ToGrammar();
@@ -648,7 +646,7 @@ namespace Pliant.Tests.Unit
             where T : class, IInternalNode
         {
             var tNode = node as T;
-            Assert.IsNotNull(node);            
+            Assert.IsNotNull(node);
             Assert.AreEqual(1, tNode.Children.Count);
             var firstAndNode = tNode.Children[0];
             Assert.IsNotNull(firstAndNode);
@@ -665,7 +663,7 @@ namespace Pliant.Tests.Unit
             var child = firstAndNode.Children[index] as T;
             Assert.IsNotNull(child);
             return child;
-        }              
+        }
 
         private static Chart GetChartFromParseEngine(ParseEngine parseEngine)
         {

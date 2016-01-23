@@ -1,6 +1,5 @@
 ﻿using Pliant.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Pliant.Grammars
 {
@@ -100,6 +99,6 @@ namespace Pliant.Grammars
         public IEnumerable<IProduction> StartProductions()
         {
             return RulesFor(Start);
-        }        
+        }
     }
 }

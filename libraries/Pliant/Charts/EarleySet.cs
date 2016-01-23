@@ -26,7 +26,7 @@ namespace Pliant.Charts
         public IReadOnlyList<IState> Completions { get { return _completions; } }
 
         public IReadOnlyList<IState> Transitions { get { return _transitions; } }
-        
+
         public bool Enqueue(IState state)
         {
             if (!state.IsComplete)
@@ -40,11 +40,10 @@ namespace Pliant.Charts
             if (state.StateType == StateType.Transitive)
                 return _transitions.Enqueue(state);
 
-            return _completions.Enqueue(state);  
+            return _completions.Enqueue(state);
         }
-        
-        public int Location { get; private set; }
 
+        public int Location { get; private set; }
 
         public ITransitionState FindTransitionState(ISymbol searchSymbol)
         {

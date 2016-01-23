@@ -1,14 +1,19 @@
 ﻿namespace Pliant.RegularExpressions
 {
-    public class Regex
+    public class Regex : RegexNode
     {
         public bool StartsWith { get; private set; }
         public RegexExpression Expression { get; private set; }
         public bool EndsWith { get; private set; }
-        
+
+        public override RegexNodeType NodeType
+        {
+            get { return RegexNodeType.Regex; }
+        }
+
         public Regex(
-            bool startsWith, 
-            RegexExpression expression, 
+            bool startsWith,
+            RegexExpression expression,
             bool endsWith)
         {
             StartsWith = startsWith;

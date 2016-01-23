@@ -1,5 +1,4 @@
-﻿using System;
-using Pliant.Charts;
+﻿using Pliant.Charts;
 
 namespace Pliant.Ast
 {

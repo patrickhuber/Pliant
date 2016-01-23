@@ -73,10 +73,11 @@
     <Compile Include="AycockHorspoolAlgorithmTests.cs" />
     <Compile Include="Grammars\RangeTerminalTests.cs" />
     <Compile Include="ParseEngineTests.cs" />
-    <Compile Include="Lexemes\LexemeTests.cs" />
+    <Compile Include="Lexemes\ParseEngineLexemeTests.cs" />
     <Compile Include="ParseInterfaceTests.cs" />
     <Compile Include="Lexemes\TerminalLexemeTests.cs" />
     <Compile Include="Grammars\WhitespaceTerminalTests.cs" />
+    <Compile Include="RegularExpressions\ThompsonConstructionTests.cs" />
     <Compile Include="Tree\TreeNodeTests.cs" />
   </ItemGroup>
   <ItemGroup>
