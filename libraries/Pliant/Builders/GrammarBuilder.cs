@@ -11,41 +11,68 @@ namespace Pliant.Builders
         private List<ILexerRule> _ignoreRules;
         public INonTerminal Start { get; set; }
 
-        public GrammarBuilder()
-        {
-            _productions = new List<IProduction>();
-            _ignoreRules = new List<ILexerRule>();
-        }
-
         public GrammarBuilder(
             ProductionBuilder start,
-            ProductionBuilder[] productionBuilder,
-            ILexerRule[] ignore)
-            : this()
+            ProductionBuilder[] productionBuilder = null,
+            ILexerRule[] ignore = null)
         {
             Start = start.LeftHandSide;
-            AddProductions(productionBuilder);
-            if (!ignore.IsNullOrEmpty())
-                foreach (var ignoreRule in ignore)
-                    _ignoreRules.Add(ignoreRule);
+
+            _productions = new List<IProduction>();
+            _ignoreRules = new List<ILexerRule>();
+
+            var shouldGetProductionsByTraversingStartSymbol = productionBuilder.IsNullOrEmpty();
+            if (shouldGetProductionsByTraversingStartSymbol)
+                AddProductionsFromStart(start);
+            else
+                AddProductions(productionBuilder);
+
+            var shouldAddIgnoreRules = !ignore.IsNullOrEmpty();
+            if (shouldAddIgnoreRules)
+                AddIgnoreRules(ignore);
         }
 
-        private void AddProductions(ProductionBuilder[] productionBuilder)
+        private void AddIgnoreRules(ILexerRule[] ignore)
+        {
+            foreach (var ignoreRule in ignore)
+                _ignoreRules.Add(ignoreRule);
+        }
+
+        private void AddProductionsFromStart(ProductionBuilder start)
+        {
+            var hashSet = new HashSet<ProductionBuilder>();
+            TraverseAndAddProductions(start, hashSet);
+            AddProductions(hashSet);
+        }
+
+        private void TraverseAndAddProductions(
+            ProductionBuilder production, 
+            ISet<ProductionBuilder> discoveredProductions)
+        {
+            bool productionBuilderBeenProcessed = !discoveredProductions.Add(production);
+            if (productionBuilderBeenProcessed)
+                return;
+
+            var rules = production.Definition.Data;
+            foreach (var rule in rules)
+            {
+                foreach (var builder in rule)
+                {
+                    if (builder is RuleBuilder) { }
+                    else if (builder is ProductionBuilder)
+                        TraverseAndAddProductions(
+                            builder as ProductionBuilder, 
+                            discoveredProductions);
+                }
+            }
+        }
+
+        private void AddProductions(IEnumerable<ProductionBuilder> productionBuilder)
         {
             foreach (var production in productionBuilder)
             {
                 AddProduction(production);
             }
-        }
-
-        public GrammarBuilder(ProductionBuilder start, ProductionBuilder[] productions)
-            : this(start, productions, null)
-        {
-        }
-
-        public void AddIgnoreRule(ILexerRule lexerRule)
-        {
-            _ignoreRules.Add(lexerRule);
         }
 
         public void AddProduction(ProductionBuilder builder)
@@ -54,6 +81,11 @@ namespace Pliant.Builders
                 _productions.Add(new Production(builder.LeftHandSide));
             else
                 _productions.AddRange(builder.ToProductions());
+        }
+
+        public void AddIgnoreRule(ILexerRule lexerRule)
+        {
+            _ignoreRules.Add(lexerRule);
         }
 
         public IGrammar ToGrammar()

@@ -113,7 +113,7 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void EbnfShouldParsesSelfDefinedGrammar()
+        public void EbnfShouldParseSelfDefinedGrammar()
         {
             var input = _ebnfText;
             ParseInput(input);
