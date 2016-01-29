@@ -78,6 +78,7 @@ namespace Pliant.Ebnf
                         var listOfSymbolLists = GetListOfSymbolListFromExpressionNode(internalChild);
                         foreach (var symbolList in listOfSymbolLists)
                         {
+                            // TODO: add namespace information here as well. 
                             var production = new Production(productionName);
                             foreach (var symbol in symbolList)
                                 production.AddSymbol(symbol);

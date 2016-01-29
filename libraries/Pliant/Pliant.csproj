@@ -42,6 +42,8 @@
     <Compile Include="Automata\SubsetConstructionAlgorithm.cs" />
     <Compile Include="Builders\BaseBuilder.cs" />
     <Compile Include="Builders\BaseBuilderList.cs" />
+    <Compile Include="Grammars\FullyQualifiedName.cs" />
+    <Compile Include="Builders\NamespaceBuilder.cs" />
     <Compile Include="Builders\_.cs" />
     <Compile Include="Charts\IChart.cs" />
     <Compile Include="Charts\IReadOnlyChart.cs" />

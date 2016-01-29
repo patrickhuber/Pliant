@@ -13,7 +13,7 @@ namespace Pliant.Grammars
         public IReadOnlyList<ISymbol> RightHandSide { get { return _rightHandSide; } }
 
         public bool IsEmpty { get { return _rightHandSide.Count == 0; } }
-
+        
         public Production(INonTerminal leftHandSide, params ISymbol[] rightHandSide)
         {
             Assert.IsNotNull(leftHandSide, "leftHandSide");
@@ -22,11 +22,11 @@ namespace Pliant.Grammars
             _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
         }
 
-        public Production(string leftHandSide, params ISymbol[] rightHandSide)
+        internal Production(string leftHandSide, params ISymbol[] rightHandSide)
             : this(new NonTerminal(leftHandSide), rightHandSide)
         {
         }
-
+        
         public override bool Equals(object obj)
         {
             var production = obj as Production;

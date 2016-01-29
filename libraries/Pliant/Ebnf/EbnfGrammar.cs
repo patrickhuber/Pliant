@@ -111,8 +111,7 @@ namespace Pliant.Ebnf
 
             RegexExpression.Definition =
                 RegexTerm
-                | RegexTerm + '|' + RegexExpression
-                | (_)null;
+                | RegexTerm + '|' + RegexExpression;
 
             RegexTerm.Definition =
                 RegexFactor
