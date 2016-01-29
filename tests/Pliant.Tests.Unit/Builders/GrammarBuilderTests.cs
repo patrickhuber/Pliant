@@ -83,5 +83,17 @@ namespace Pliant.Tests.Unit
             var grammar = grammarBuilder.ToGrammar();
             Assert.AreEqual(5, grammar.Productions.Count);
         }
+
+        [TestMethod]
+        public void GrammarBuilderGivenOnlyStartProductionBuilderShouldShouldTraverseRecursiveStructuresOnlyOnce()
+        {
+            ProductionBuilder S = "S", A = "A";
+            S.Definition = S | A;
+            A.Definition = 'a';
+
+            var grammarBuilder = new GrammarBuilder(S);
+            var grammar = grammarBuilder.ToGrammar();
+            Assert.AreEqual(3, grammar.Productions.Count);
+        }
     }
 }

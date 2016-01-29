@@ -9,7 +9,7 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ProductionToStringShouldGenerateCorrectlyFormattedString()
         {
-            var production = new Production("A", new NonTerminal("B"));
+            var production = new Production(new NonTerminal("A"), new NonTerminal("B"));
             Assert.AreEqual("A -> B", production.ToString());
         }
     }

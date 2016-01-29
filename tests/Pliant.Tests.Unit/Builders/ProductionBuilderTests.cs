@@ -9,95 +9,130 @@ namespace Pliant.Tests.Unit.Builders
         [TestMethod]
         public void ProductionBuilderShouldImplicitCastRule()
         {
-            var s = new ProductionBuilder("S");
-            var a = new ProductionBuilder("A");
+            ProductionBuilder 
+                s = "S",
+                a = "A";
             s.Definition = a;
+
+            AssertProductionCount(s, 2, s, a);
         }
 
         [TestMethod]
         public void ProductionBuilderShouldImplicitCastString()
         {
-            var s = new ProductionBuilder("S");
+            ProductionBuilder s = "S";
             s.Rule("string");
+
+            AssertProductionCount(s, 1, s);
         }
 
         [TestMethod]
         public void ProductionBuilderShouldImplicitCastCharacter()
         {
-            var s = new ProductionBuilder("S");
+
+            ProductionBuilder s = "S";
             s.Rule('c');
+            
+            AssertProductionCount(s, 1, s);
         }
 
         [TestMethod]
         public void ProductionShouldResolveAlteration()
         {
-            var s = new ProductionBuilder("S");
-            var a = new ProductionBuilder("A");
-            var b = new ProductionBuilder("B");
+            ProductionBuilder
+                s = "S",
+                a = "A",
+                b = "B";
 
             s.Rule(a)
              .Or(b);
+            
+            AssertProductionCount(s, 4, s, a, b);
         }
 
         [TestMethod]
         public void ProductionBuilderGivenTwoProductionBuildersShouldResolveConcatenation()
         {
-            var s = new ProductionBuilder("S");
-            var a = new ProductionBuilder("A");
-            var b = new ProductionBuilder("B");
+            ProductionBuilder
+                s = "S",
+                a = "A",
+                b = "B";
 
             s.Rule(a, b);
+            
+            AssertProductionCount(s, 3, s, a, b);
         }
 
         [TestMethod]
         public void ProductionBuilderGivenCharAndProductionBuilderShouldResolveAlteration()
         {
-            var s = new ProductionBuilder("S");
-            var a = new ProductionBuilder("A");
+            ProductionBuilder
+                s = "S",
+                a = "A";
 
             s.Rule('c')
              .Or(a);
+
+            AssertProductionCount(s, 3, s, a);
         }
 
         [TestMethod]
         public void ProductionBuilderGivenProductionBuilderAndCharShouldResolveAlteration()
         {
-            var s = new ProductionBuilder("S");
-            var a = new ProductionBuilder("A");
+            ProductionBuilder
+                s = "S",
+                a = "A";
 
             s.Rule(a)
              .Or('c');
+            
+            AssertProductionCount(s, 3, s, a);
         }
 
         [TestMethod]
         public void ProductionBuilderGivenStringAndProductionBuilderShouldResolveAlteration()
         {
-            var s = new ProductionBuilder("S");
-            var a = new ProductionBuilder("A");
+            ProductionBuilder
+                s = "S",
+                a = "A";
 
             s.Rule("string")
                 .Or(a);
+            
+            AssertProductionCount(s, 3, s, a);
         }
 
         [TestMethod]
         public void ProductionBuilderGivenProductionBuilderAndStringShouldResolveAlteration()
         {
-            var s = new ProductionBuilder("S");
-            var a = new ProductionBuilder("A");
+            ProductionBuilder
+                s = "S",
+                a = "A";
 
             s.Rule(a)
                 .Or("string");
+            AssertProductionCount(s, 3, s, a);
         }
+
 
         [TestMethod]
         public void ProductionBuilderGivenTwoStringsShouldResolveAlteration()
         {
-            var s = new ProductionBuilder("S");
-            var a = new ProductionBuilder("A");
+            ProductionBuilder
+                s = "S";
 
             s.Rule("one")
                 .Or("two");
-            var grammarBuilder = new GrammarBuilder(s, new[] { s, a });
+
+            AssertProductionCount(s, 2, s);
+        }
+
+
+        private static void AssertProductionCount(ProductionBuilder start, int count, params ProductionBuilder[] additional)
+        {
+            var grammarBuilder = new GrammarBuilder(start, additional);
+            var grammar = grammarBuilder.ToGrammar();
+            Assert.AreEqual(count, grammar.Productions.Count);
         }
     }
 }

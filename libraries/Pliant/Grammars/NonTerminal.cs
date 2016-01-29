@@ -2,13 +2,30 @@
 {
     public class NonTerminal : Symbol, INonTerminal
     {
-        public NonTerminal(string value)
-            : base(SymbolType.NonTerminal)
+        public string Value { get; private set; }
+
+        public string Namespace { get; private set; }
+
+        public string Name { get; private set; }
+
+        public NonTerminal(string name)
+            : this(string.Empty, name)
         {
-            Value = value;
+            Name = name;
         }
 
-        public string Value { get; private set; }
+        public NonTerminal(string @namespace, string name)
+            : base(SymbolType.NonTerminal)
+        {
+            Namespace = @namespace;
+            Name = name;
+
+            // precompute to same time on property execution
+            if(string.IsNullOrEmpty(@namespace))
+                Value = Name;
+            else 
+                Value = $"{Namespace}.{Name}";
+        }
 
         public override int GetHashCode()
         {

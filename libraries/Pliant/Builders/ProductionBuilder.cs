@@ -7,16 +7,18 @@ namespace Pliant.Builders
     {
         public INonTerminal LeftHandSide { get; private set; }
 
-        public ProductionBuilder(string leftHandSide)
-            : this(new NonTerminal(leftHandSide))
+        public ProductionBuilder(string leftHandSide, string @namespace = "")
+            : this(new NonTerminal(
+                @namespace: @namespace, 
+                @name: leftHandSide))
         {
         }
-
+        
         public ProductionBuilder(INonTerminal leftHandSide)
         {
             LeftHandSide = leftHandSide;
         }
-
+        
         public AlterationBuilder Rule(params SymbolBuilder[] symbolBuilders)
         {
             Definition = new RuleBuilder();
@@ -32,6 +34,11 @@ namespace Pliant.Builders
         public static implicit operator ProductionBuilder(string name)
         {
             return new ProductionBuilder(name);
+        }
+
+        public static implicit operator ProductionBuilder(FullyQualifiedName name)
+        {
+            return new ProductionBuilder(name.Name, name.Namespace);
         }
 
         public IEnumerable<IProduction> ToProductions()
