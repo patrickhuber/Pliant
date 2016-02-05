@@ -58,7 +58,7 @@ namespace Pliant.Builders
                             symbolList.Add(productionBuilder.LeftHandSide);
                     }
                 }
-                yield return new Production(LeftHandSide, symbolList.ToArray());
+                yield return new Production(LeftHandSide, symbolList);
             }
         }
     }

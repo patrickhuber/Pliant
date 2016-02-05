@@ -14,7 +14,7 @@ namespace Pliant.Grammars
 
         public bool IsEmpty { get { return _rightHandSide.Count == 0; } }
         
-        public Production(INonTerminal leftHandSide, params ISymbol[] rightHandSide)
+        public Production(INonTerminal leftHandSide, IEnumerable<ISymbol> rightHandSide)
         {
             Assert.IsNotNull(leftHandSide, "leftHandSide");
             Assert.IsNotNull(rightHandSide, "rightHandSide");
@@ -22,11 +22,14 @@ namespace Pliant.Grammars
             _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
         }
 
-        internal Production(string leftHandSide, params ISymbol[] rightHandSide)
-            : this(new NonTerminal(leftHandSide), rightHandSide)
+        public Production(INonTerminal leftHandSide, params ISymbol[] rightHandSide)
         {
+            Assert.IsNotNull(leftHandSide, "leftHandSide");
+            Assert.IsNotNull(rightHandSide, "rightHandSide");
+            LeftHandSide = leftHandSide;
+            _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
         }
-        
+                
         public override bool Equals(object obj)
         {
             var production = obj as Production;
@@ -51,36 +54,23 @@ namespace Pliant.Grammars
         {
             if (_isHashCodeComputed)
                 return _computedHashCode;
+
+            _computedHashCode = ComputeHashCode();
+            _isHashCodeComputed = true;
+
+            return _computedHashCode;
+        }
+
+        private int ComputeHashCode()
+        {
             unchecked
             {
                 var hash = (int)2166136261;
                 hash *= 16777619 * LeftHandSide.GetHashCode();
                 foreach (var symbol in RightHandSide)
                     hash *= 16777619 ^ symbol.GetHashCode();
-
-                _computedHashCode = hash;
-                _isHashCodeComputed = true;
-                return _computedHashCode;
+                return hash;
             }
-        }
-
-        public void AddSymbol(ISymbol symbol)
-        {
-            InvalidateCachedHashCode();
-            _rightHandSide.Add(symbol);
-        }
-
-        private void InvalidateCachedHashCode()
-        {
-            _isHashCodeComputed = false;
-        }
-
-        public Production Clone()
-        {
-            var production = new Production(LeftHandSide);
-            foreach (var symbol in RightHandSide)
-                production.AddSymbol(symbol);
-            return production;
         }
 
         public override string ToString()

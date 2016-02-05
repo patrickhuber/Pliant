@@ -79,9 +79,10 @@ namespace Pliant.Ebnf
                         foreach (var symbolList in listOfSymbolLists)
                         {
                             // TODO: add namespace information here as well. 
-                            var production = new Production(productionName);
-                            foreach (var symbol in symbolList)
-                                production.AddSymbol(symbol);
+                            var nonTerminal = new NonTerminal(productionName);
+                            var production = new Production(
+                                nonTerminal,
+                                symbolList);
                             productionList.Add(production);
                         }
                         break;
