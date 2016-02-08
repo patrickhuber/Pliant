@@ -63,14 +63,10 @@ namespace Pliant.Grammars
 
         private int ComputeHashCode()
         {
-            unchecked
-            {
-                var hash = (int)2166136261;
-                hash *= 16777619 * LeftHandSide.GetHashCode();
-                foreach (var symbol in RightHandSide)
-                    hash *= 16777619 ^ symbol.GetHashCode();
-                return hash;
-            }
+            int hash = HashUtil.ComputeIncrementalHash(LeftHandSide.GetHashCode(), 0, true);
+            foreach (var symbol in RightHandSide)
+                hash = HashUtil.ComputeIncrementalHash(symbol.GetHashCode(), hash);
+            return hash;
         }
 
         public override string ToString()
