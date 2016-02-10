@@ -1,4 +1,5 @@
 ﻿using Pliant.Grammars;
+using System;
 using System.Collections.Generic;
 
 namespace Pliant.Builders
@@ -31,15 +32,6 @@ namespace Pliant.Builders
 
         public RuleBuilder Definition { get; set; }
 
-        public static implicit operator ProductionBuilder(string name)
-        {
-            return new ProductionBuilder(name);
-        }
-
-        public static implicit operator ProductionBuilder(FullyQualifiedName name)
-        {
-            return new ProductionBuilder(name.Name, name.Namespace);
-        }
 
         public IEnumerable<IProduction> ToProductions()
         {
@@ -60,6 +52,21 @@ namespace Pliant.Builders
                 }
                 yield return new Production(LeftHandSide, symbolList);
             }
+        }
+
+        public static implicit operator ProductionBuilder(string name)
+        {
+            return new ProductionBuilder(name);
+        }
+
+        public static implicit operator ProductionBuilder(FullyQualifiedName name)
+        {
+            return new ProductionBuilder(name.Name, name.Namespace);
+        }
+
+        public static ProductionReference operator +(ProductionBuilder builder, IProduction production)
+        {
+            throw new NotImplementedException();
         }
     }
 }

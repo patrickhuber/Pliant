@@ -23,8 +23,8 @@ namespace Pliant.Grammars
 
         public Grammar(
             INonTerminal start,
-            IProduction[] productions,
-            ILexerRule[] ignoreRules)
+            IEnumerable<IProduction> productions,
+            IEnumerable<ILexerRule> ignoreRules)
             : this()
         {
             Start = start;
@@ -32,13 +32,13 @@ namespace Pliant.Grammars
             AddIgnoreRules(ignoreRules ?? EmptyLexerRuleArray);
         }
 
-        private void AddIgnoreRules(ILexerRule[] ignoreRules)
+        private void AddIgnoreRules(IEnumerable<ILexerRule> ignoreRules)
         {
             foreach (var ignoreRule in ignoreRules)
                 AddIgnoreRule(ignoreRule);
         }
 
-        private void AddProductions(IProduction[] productions)
+        private void AddProductions(IEnumerable<IProduction> productions)
         {
             foreach (var production in productions)
                 AddProduction(production);

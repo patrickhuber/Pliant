@@ -117,5 +117,11 @@ namespace Pliant.Builders
             return new RuleBuilder(
                 new SymbolBuilder(lexerRule));
         }
+        
+        public static implicit operator RuleBuilder(ProductionReference productionReference)
+        {
+            return new RuleBuilder(
+                productionReference);
+        }
     }
 }

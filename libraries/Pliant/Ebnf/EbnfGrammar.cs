@@ -1,6 +1,7 @@
 ﻿using Pliant.Automata;
 using Pliant.Builders;
 using Pliant.Grammars;
+using Pliant.RegularExpressions;
 using Pliant.Tokens;
 using System.Collections.Generic;
 
@@ -37,21 +38,11 @@ namespace Pliant.Ebnf
                 Literal = "Literal",
                 Grouping = "Grouping",
                 Repetition = "Repetition",
-                Optional = "Optional",
-                Regex = "Regex",
-                RegexExpression = "Regex.Expression",
-                RegexTerm = "Regex.Term",
-                RegexFactor = "Regex.Factor",
-                RegexAtom = "Regex.Atom",
-                RegexIterator = "Regex.Iterator",
-                RegexSet = "Regex.Set",
-                RegexPositiveSet = "Regex.PositiveSet",
-                RegexNegativeSet = "Regex.NegativeSet",
-                RegexCharacterClass = "Regex.CharacterClass",
-                RegexCharacterRange = "Regex.CharacterRange",
-                RegexCharacter = "Regex.Character",
-                RegexCharacterClassCharacter = "Regex.CharacterClassCharacter";
+                Optional = "Optional";
 
+            var regexGrammar = new RegexGrammar();
+            var regexProductionReference = new ProductionReference(regexGrammar);
+                        
             Grammar.Definition =
                 Block
                 | Block + Grammar;
@@ -81,7 +72,7 @@ namespace Pliant.Ebnf
             Factor.Definition
                 = QualifiedIdentifier
                 | Literal
-                | '/' + Regex + '/'
+                | '/' + regexProductionReference + '/'
                 | Repetition
                 | Optional
                 | Grouping;
@@ -102,71 +93,10 @@ namespace Pliant.Ebnf
             QualifiedIdentifier.Definition =
                 identifier
                 | (_)identifier + '.' + QualifiedIdentifier;
-
-            Regex.Definition =
-                RegexExpression
-                | '^' + RegexExpression
-                | RegexExpression + '$'
-                | '^' + RegexExpression + '$';
-
-            RegexExpression.Definition =
-                RegexTerm
-                | RegexTerm + '|' + RegexExpression;
-
-            RegexTerm.Definition =
-                RegexFactor
-                | RegexFactor + RegexTerm;
-
-            RegexFactor.Definition =
-                RegexAtom
-                | RegexAtom + RegexIterator;
-
-            RegexAtom.Definition =
-                '.'
-                | '(' + RegexExpression + ')'
-                | RegexCharacter
-                | RegexSet;
-
-            RegexIterator.Definition = (_)
-                '*'
-                | '+'
-                | '?';
-
-            RegexSet.Definition =
-                RegexPositiveSet
-                | RegexNegativeSet;
-
-            RegexPositiveSet.Definition =
-                '[' + RegexCharacterClass + ']';
-
-            RegexNegativeSet.Definition =
-                "[^" + RegexCharacterClass + ']';
-
-            RegexCharacterClass.Definition =
-                RegexCharacterRange
-                | RegexCharacterRange + RegexCharacterClass;
-
-            RegexCharacterRange.Definition =
-                RegexCharacterClassCharacter
-                | RegexCharacterClassCharacter + '-' + RegexCharacterClassCharacter;
-
-            RegexCharacter.Definition = (_)
-                escapeCharacter
-                | notMeta;
-
-            RegexCharacterClassCharacter.Definition = (_)
-                escapeCharacter
-                | notCloseBracket;
-
+            
             var grammarBuilder = new GrammarBuilder(
-                Grammar,
-                new[] { Grammar, Block, Rule, Setting, LexerRule, Expression, Term, Factor,
-                    Grouping, Repetition, Optional, QualifiedIdentifier, Literal,
-                    Regex, RegexExpression, RegexTerm, RegexFactor, RegexAtom,
-                    RegexIterator, RegexSet, RegexPositiveSet, RegexNegativeSet,
-                    RegexCharacterClass, RegexCharacterRange, RegexCharacter,
-                    RegexCharacterClassCharacter},
-                new[] { whitespace });
+                start:  Grammar,                
+                ignore: new[] { whitespace });
 
             _ebnfGrammar = grammarBuilder.ToGrammar();
         }
