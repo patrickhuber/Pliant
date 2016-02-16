@@ -4,8 +4,8 @@ namespace Pliant.RegularExpressions
 {
     public class RegexCompiler
     {
-        private IRegexToNfa _regexToNfa;
-        private INfaToDfa _nfaToDfa;
+        private readonly IRegexToNfa _regexToNfa;
+        private readonly INfaToDfa _nfaToDfa;
 
         public RegexCompiler(
             IRegexToNfa regexToNfa,

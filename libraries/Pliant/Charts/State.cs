@@ -1,5 +1,6 @@
 ﻿using Pliant.Ast;
 using Pliant.Grammars;
+using System;
 using System.Text;
 
 namespace Pliant.Charts
@@ -30,6 +31,7 @@ namespace Pliant.Charts
             Length = position;
             PostDotSymbol = GetPostDotSymbol(position, production);
             PreDotSymbol = GetPreDotSymbol(position, production);
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
 
         public State(IProduction production, int position, int origin, INode parseNode)
@@ -91,19 +93,19 @@ namespace Pliant.Charts
             return GetHashCode() == state.GetHashCode();
         }
 
-        private int _computedHashCode = 0;
-        private bool _isHashCodeComputed = false;
+        private readonly Lazy<int> _hashCode;
 
-        public override int GetHashCode()
+        private int ComputeHashCode()
         {
-            if (_isHashCodeComputed)
-                return _computedHashCode;
-            _computedHashCode = HashUtil.ComputeHash(
+            return HashUtil.ComputeHash(
                 Length.GetHashCode(),
                 Origin.GetHashCode(),
                 Production.GetHashCode());
-            _isHashCodeComputed = true;
-            return _computedHashCode;
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode.Value;
         }
 
         public override string ToString()

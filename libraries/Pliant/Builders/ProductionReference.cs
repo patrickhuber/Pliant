@@ -11,6 +11,7 @@ namespace Pliant.Builders
     {
         public IGrammar Grammar { get; private set; }
         public INonTerminal Reference { get; private set; }
+        public override ISymbol Symbol { get { return Reference; } }
 
         public ProductionReference(IGrammar grammar)
         {
@@ -38,7 +39,9 @@ namespace Pliant.Builders
             }
 
             if (!anyRules)
-                throw new ArgumentException("Referenced non terminal must belong to specified grammar.", "reference");
+                throw new ArgumentException(
+                    "Referenced non terminal must belong to specified grammar.", 
+                    nameof(reference));
         }
     }
 }

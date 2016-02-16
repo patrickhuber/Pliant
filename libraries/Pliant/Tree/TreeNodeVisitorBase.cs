@@ -2,10 +2,6 @@
 {
     public abstract class TreeNodeVisitorBase : ITreeNodeVisitor
     {
-        public TreeNodeVisitorBase()
-            : base()
-        { }
-
         public virtual void Visit(IInternalTreeNode node)
         {
             foreach (var child in node.Children)

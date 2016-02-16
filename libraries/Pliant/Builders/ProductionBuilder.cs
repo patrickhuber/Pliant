@@ -7,7 +7,7 @@ namespace Pliant.Builders
     public class ProductionBuilder : BaseBuilder
     {
         public INonTerminal LeftHandSide { get; private set; }
-
+        public override ISymbol Symbol { get { return LeftHandSide; } }
         public ProductionBuilder(string leftHandSide, string @namespace = "")
             : this(new NonTerminal(
                 @namespace: @namespace, 
@@ -40,14 +40,20 @@ namespace Pliant.Builders
                 var symbolList = new List<ISymbol>();
                 foreach (var baseBuilder in builderList)
                 {
-                    var symbolBuilder = baseBuilder as SymbolBuilder;
-                    if (symbolBuilder != null)
+                    if (baseBuilder is SymbolBuilder)
+                    {
+                        var symbolBuilder = baseBuilder as SymbolBuilder;
                         symbolList.Add(symbolBuilder.Symbol);
-                    else
+                    }
+                    else if (baseBuilder is ProductionBuilder)
                     {
                         var productionBuilder = baseBuilder as ProductionBuilder;
-                        if (productionBuilder != null)
-                            symbolList.Add(productionBuilder.LeftHandSide);
+                        symbolList.Add(productionBuilder.LeftHandSide);
+                    }
+                    else if (baseBuilder is ProductionReference)
+                    {
+                        var productionReference = baseBuilder as ProductionReference;
+                        symbolList.Add(productionReference.Reference);
                     }
                 }
                 yield return new Production(LeftHandSide, symbolList);

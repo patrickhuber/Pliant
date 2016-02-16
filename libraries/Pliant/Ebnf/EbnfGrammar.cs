@@ -95,7 +95,7 @@ namespace Pliant.Ebnf
                 | (_)identifier + '.' + QualifiedIdentifier;
             
             var grammarBuilder = new GrammarBuilder(
-                start:  Grammar,                
+                Grammar,                
                 ignore: new[] { whitespace });
 
             _ebnfGrammar = grammarBuilder.ToGrammar();

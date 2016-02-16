@@ -13,7 +13,7 @@ namespace Pliant
         public TokenType TokenType { get; private set; }
 
         private StringBuilder _capture;
-        private IParseEngine _parseEngine;
+        private readonly IParseEngine _parseEngine;
 
         public ParseEngineLexeme(IParseEngine parseEngine, TokenType tokenType)
         {

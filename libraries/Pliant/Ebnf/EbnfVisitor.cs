@@ -25,12 +25,7 @@ namespace Pliant.Ebnf
         private const string RepetitionSymbol = "Repetition";
         private const string OptionalSymbol = "Optional";
         private const string GroupingSymbol = "Grouping";
-
-        public EbnfVisitor()
-            : base()
-        {
-        }
-
+        
         public override void Visit(IInternalTreeNode node)
         {
             switch (node.Symbol.Value)

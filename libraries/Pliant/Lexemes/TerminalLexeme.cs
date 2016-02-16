@@ -8,7 +8,7 @@ namespace Pliant.Lexemes
     {
         public ITerminal Terminal { get; private set; }
 
-        private StringBuilder _captureBuilder;
+        private readonly StringBuilder _captureBuilder;
 
         public string Capture
         {

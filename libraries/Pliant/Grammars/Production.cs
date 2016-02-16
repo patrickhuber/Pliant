@@ -1,4 +1,5 @@
 ﻿using Pliant.Collections;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -20,6 +21,7 @@ namespace Pliant.Grammars
             Assert.IsNotNull(rightHandSide, "rightHandSide");
             LeftHandSide = leftHandSide;
             _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
 
         public Production(INonTerminal leftHandSide, params ISymbol[] rightHandSide)
@@ -28,6 +30,7 @@ namespace Pliant.Grammars
             Assert.IsNotNull(rightHandSide, "rightHandSide");
             LeftHandSide = leftHandSide;
             _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
                 
         public override bool Equals(object obj)
@@ -46,19 +49,11 @@ namespace Pliant.Grammars
         }
 
         // PERF: Cache Costly Hash Code Computation
-        private bool _isHashCodeComputed = false;
-
-        private int _computedHashCode = 0;
+        private readonly Lazy<int> _hashCode;
 
         public override int GetHashCode()
         {
-            if (_isHashCodeComputed)
-                return _computedHashCode;
-
-            _computedHashCode = ComputeHashCode();
-            _isHashCodeComputed = true;
-
-            return _computedHashCode;
+            return _hashCode.Value;
         }
 
         private int ComputeHashCode()

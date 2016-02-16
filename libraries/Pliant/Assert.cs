@@ -2,7 +2,7 @@
 
 namespace Pliant
 {
-    internal class Assert
+    internal static class Assert
     {
         internal static void IsNotNull(object instance, string propertyName)
         {
@@ -42,7 +42,7 @@ namespace Pliant
         {
             if (integer < 0)
                 throw new ArgumentOutOfRangeException(
-                    "paramterName",
+                    nameof(paramterName),
                     string.Format("{0} can not be less than zero.", paramterName));
         }
     }

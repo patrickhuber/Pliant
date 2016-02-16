@@ -7,7 +7,7 @@ namespace Pliant
     {
         private IList<IObserver<T>> _observers;
 
-        public Observable()
+        protected Observable()
         {
             _observers = new List<IObserver<T>>();
         }
@@ -41,8 +41,8 @@ namespace Pliant
 
         private class Unsubscriber : IDisposable
         {
-            private IList<IObserver<T>> _observers;
-            private IObserver<T> _observer;
+            private readonly IList<IObserver<T>> _observers;
+            private readonly IObserver<T> _observer;
 
             public Unsubscriber(IList<IObserver<T>> observers, IObserver<T> observer)
             {

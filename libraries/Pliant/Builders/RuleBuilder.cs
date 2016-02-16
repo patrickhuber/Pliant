@@ -10,6 +10,11 @@ namespace Pliant.Builders
     {
         public List<BaseBuilderList> Data { get; private set; }
 
+        public override ISymbol Symbol
+        {
+            get { throw new NotImplementedException(); }
+        }
+
         public RuleBuilder()
         {
             Data = new List<BaseBuilderList>();

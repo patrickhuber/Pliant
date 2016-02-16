@@ -6,7 +6,7 @@ namespace Pliant.Automata
 {
     public class DfaLexeme : ILexeme
     {
-        private StringBuilder _capture;
+        private readonly StringBuilder _capture;
         private IDfaState _currentState;
 
         public DfaLexeme(IDfaState dfaState, TokenType tokenType)

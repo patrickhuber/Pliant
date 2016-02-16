@@ -7,7 +7,7 @@ namespace Pliant.Ast
     {
         public IReadOnlyList<INode> Children { get { return _children; } }
 
-        private ReadWriteList<INode> _children;
+        private readonly ReadWriteList<INode> _children;
 
         public AndNode()
         {

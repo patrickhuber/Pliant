@@ -4,6 +4,8 @@ namespace Pliant.Builders
 {
     public abstract class BaseBuilder
     {
+        public abstract ISymbol Symbol { get; }
+
         public static RuleBuilder operator +(BaseBuilder lhs, BaseBuilder rhs)
         {
             return AddWithAnd(lhs, rhs);

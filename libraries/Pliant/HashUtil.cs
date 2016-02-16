@@ -9,7 +9,7 @@
         {
             unchecked
             {
-                int hash = (int)SEED;
+                var hash = (int)SEED;
                 for (int i = 0; i < hashCodes.Length; i++)
                 {
                     hash = hash * INCREMENTAL ^ hashCodes[i];

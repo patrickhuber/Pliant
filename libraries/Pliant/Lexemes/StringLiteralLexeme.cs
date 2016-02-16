@@ -6,7 +6,7 @@ namespace Pliant.Lexemes
 {
     public class StringLiteralLexeme : ILexeme
     {
-        private StringBuilder _capture;
+        private readonly StringBuilder _capture;
 
         private int _index = 0;
 

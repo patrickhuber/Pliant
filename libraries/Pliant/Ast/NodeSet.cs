@@ -6,8 +6,8 @@ namespace Pliant.Ast
 {
     public class NodeSet
     {
-        private IList<ISymbolNode> _symbolNodes;
-        private IList<IIntermediateNode> _intermediateNodes;
+        private readonly IList<ISymbolNode> _symbolNodes;
+        private readonly IList<IIntermediateNode> _intermediateNodes;
 
         public NodeSet()
         {

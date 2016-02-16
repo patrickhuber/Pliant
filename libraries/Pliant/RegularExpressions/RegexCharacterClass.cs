@@ -1,4 +1,6 @@
-﻿namespace Pliant.RegularExpressions
+﻿using System;
+
+namespace Pliant.RegularExpressions
 {
     public class RegexCharacterClass : RegexNode
     {
@@ -7,20 +9,20 @@
         public RegexCharacterClass(RegexCharacterRange characterRange)
         {
             CharacterRange = characterRange;
+            _hashCode = new Lazy<int>(ComputeHash);
         }
 
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        private readonly Lazy<int> _hashCode;
+
+        private int ComputeHash()
+        {
+            return HashUtil.ComputeHash(
+                    CharacterRange.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(
-                    CharacterRange.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
 
         public override bool Equals(object obj)
@@ -49,21 +51,21 @@
             : base(characterRange)
         {
             CharacterClass = characterClass;
+            _hashCode = new Lazy<int>(ComputeHash);
         }
 
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        private readonly Lazy<int> _hashCode;
+
+        int ComputeHash()
+        {
+            return HashUtil.ComputeHash(
+                    CharacterRange.GetHashCode(),
+                    CharacterClass.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(
-                    CharacterRange.GetHashCode(),
-                    CharacterClass.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
 
         public override bool Equals(object obj)

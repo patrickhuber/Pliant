@@ -6,11 +6,7 @@ namespace Pliant.Builders
     {
         public _(BaseBuilder baseBuilder) : base(baseBuilder)
         { }
-
-        public _() : base()
-        {
-        }
-
+        
         public static explicit operator _(char terminal)
         {
             return new _(new SymbolBuilder(new TerminalLexerRule(terminal)));

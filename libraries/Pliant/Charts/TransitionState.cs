@@ -1,4 +1,5 @@
 ﻿using Pliant.Grammars;
+using System;
 
 namespace Pliant.Charts
 {
@@ -22,6 +23,7 @@ namespace Pliant.Charts
             Reduction = reduction;
             Recognized = recognized;
             Position = position;
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
 
         public override bool Equals(object obj)
@@ -31,19 +33,19 @@ namespace Pliant.Charts
                 return false;
             return base.Equals(obj as State) && this.Recognized.Equals(transitionState.Recognized);
         }
+        
+        private readonly Lazy<int> _hashCode;
 
-        private int _computedHashCode = 0;
-        private bool _isHashCodeComputed = false;
+        private int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(
+                this.Recognized.GetHashCode(),
+                base.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (_isHashCodeComputed)
-                return _computedHashCode;
-            _computedHashCode = HashUtil.ComputeHash(
-                this.Recognized.GetHashCode(),
-                base.GetHashCode());
-            _isHashCodeComputed = true;
-            return _computedHashCode;
+            return _hashCode.Value;
         }
 
         public override string ToString()

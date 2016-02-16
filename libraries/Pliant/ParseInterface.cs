@@ -19,7 +19,7 @@ namespace Pliant
         private IEnumerable<ILexeme> _ignoreLexemes;
         private ILexemeFactoryRegistry _lexemeFactoryRegistry;
 
-        private static readonly ILexeme[] EmptyLexemeArray = new ILexeme[] { };
+        private static readonly ILexeme[] EmptyLexemeArray = { };
 
         public ParseInterface(IParseEngine parseEngine, string input)
             : this(parseEngine, new StringReader(input))

@@ -7,8 +7,8 @@ namespace Pliant.Builders
 {
     public class GrammarBuilder : IGrammarBuilder
     {
-        private HashSet<IProduction> _productions;
-        private HashSet<ILexerRule> _ignoreRules;
+        private readonly HashSet<IProduction> _productions;
+        private readonly HashSet<ILexerRule> _ignoreRules;
         public INonTerminal Start { get; set; }
 
         public GrammarBuilder(
@@ -82,7 +82,6 @@ namespace Pliant.Builders
             ProductionReference productionReference, 
             ISet<ProductionBuilder> discoveredProductions)
         {
-            // TODO: may need to use hashset to avoid duplication
             foreach (var production in productionReference.Grammar.Productions)
                 _productions.Add(production);
         }

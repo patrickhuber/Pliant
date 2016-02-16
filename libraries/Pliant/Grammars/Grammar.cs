@@ -10,8 +10,8 @@ namespace Pliant.Grammars
         private IDictionary<INonTerminal, IList<IProduction>> _productionIndex;
         private IDictionary<int, IList<ILexerRule>> _ignoreIndex;
 
-        private static readonly IProduction[] EmptyProductionArray = new IProduction[] { };
-        private static readonly ILexerRule[] EmptyLexerRuleArray = new ILexerRule[] { };
+        private static readonly IProduction[] EmptyProductionArray = { };
+        private static readonly ILexerRule[] EmptyLexerRuleArray = { };
 
         public Grammar()
         {
