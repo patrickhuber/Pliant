@@ -31,7 +31,7 @@ namespace Pliant.RegularExpressions
 
     public class RegexExpressionTerm : RegexExpression
     {
-        public RegexTerm Term { get; set; }
+        public RegexTerm Term { get; private set; }
 
         public RegexExpressionTerm(RegexTerm term)
         {
