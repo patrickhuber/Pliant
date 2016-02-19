@@ -17,8 +17,8 @@ namespace Pliant.Grammars
         
         public Production(INonTerminal leftHandSide, IEnumerable<ISymbol> rightHandSide)
         {
-            Assert.IsNotNull(leftHandSide, "leftHandSide");
-            Assert.IsNotNull(rightHandSide, "rightHandSide");
+            Assert.IsNotNull(leftHandSide, nameof(leftHandSide));
+            Assert.IsNotNull(rightHandSide, nameof(rightHandSide));
             LeftHandSide = leftHandSide;
             _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
             _hashCode = new Lazy<int>(ComputeHashCode);
@@ -26,8 +26,8 @@ namespace Pliant.Grammars
 
         public Production(INonTerminal leftHandSide, params ISymbol[] rightHandSide)
         {
-            Assert.IsNotNull(leftHandSide, "leftHandSide");
-            Assert.IsNotNull(rightHandSide, "rightHandSide");
+            Assert.IsNotNull(leftHandSide, nameof(leftHandSide));
+            Assert.IsNotNull(rightHandSide, nameof(rightHandSide));
             LeftHandSide = leftHandSide;
             _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
             _hashCode = new Lazy<int>(ComputeHashCode);

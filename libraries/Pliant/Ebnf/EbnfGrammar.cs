@@ -11,6 +11,21 @@ namespace Pliant.Ebnf
     {
         private static readonly IGrammar _ebnfGrammar;
 
+        public static readonly string Namespace = "Ebnf";
+        public static readonly FullyQualifiedName Definition = new FullyQualifiedName(Namespace, "Definition");
+        public static readonly FullyQualifiedName Block = new FullyQualifiedName(Namespace, "Block");
+        public static readonly FullyQualifiedName Rule = new FullyQualifiedName(Namespace, "Rule");
+        public static readonly FullyQualifiedName Setting = new FullyQualifiedName(Namespace, "Setting");
+        public static readonly FullyQualifiedName LexerRule = new FullyQualifiedName(Namespace, "LexerRule");
+        public static readonly FullyQualifiedName QualifiedIdentifier = new FullyQualifiedName(Namespace, "QualifiedIdentifier");
+        public static readonly FullyQualifiedName Expression = new FullyQualifiedName(Namespace, "Expression");
+        public static readonly FullyQualifiedName Term = new FullyQualifiedName(Namespace, "Term");
+        public static readonly FullyQualifiedName Factor = new FullyQualifiedName(Namespace, "Factor");
+        public static readonly FullyQualifiedName Literal = new FullyQualifiedName(Namespace, "Literal");
+        public static readonly FullyQualifiedName Grouping = new FullyQualifiedName(Namespace, "Grouping");
+        public static readonly FullyQualifiedName Repetition = new FullyQualifiedName(Namespace, "Repetition");
+        public static readonly FullyQualifiedName Optional = new FullyQualifiedName(Namespace, "Optional");
+
         static EbnfGrammar()
         {
             BaseLexerRule
@@ -26,76 +41,76 @@ namespace Pliant.Ebnf
                 whitespace = CreateWhitespaceLexerRule();
 
             ProductionBuilder
-                Grammar = "Grammar",
-                Block = "Block",
-                Rule = "Rule",
-                Setting = "Setting",
-                LexerRule = "LexerRule",
-                QualifiedIdentifier = "QualifiedIdentifier",
-                Expression = "Expression",
-                Term = "Term",
-                Factor = "Factor",
-                Literal = "Literal",
-                Grouping = "Grouping",
-                Repetition = "Repetition",
-                Optional = "Optional";
+                definition = Definition,
+                block = Block,
+                rule = Rule,
+                setting = Setting,
+                lexerRule = LexerRule,
+                qualifiedIdentifier = QualifiedIdentifier,
+                expression = Expression,
+                term = Term,
+                factor = Factor,
+                literal = Literal,
+                grouping = Grouping,
+                repetition = Repetition,
+                optional = Optional;
 
             var regexGrammar = new RegexGrammar();
             var regexProductionReference = new ProductionReference(regexGrammar);
                         
-            Grammar.Definition =
-                Block
-                | Block + Grammar;
+            definition.Definition =
+                block
+                | block + definition;
 
-            Block.Definition =
-                Rule
-                | Setting
-                | LexerRule;
+            block.Definition =
+                rule
+                | setting
+                | lexerRule;
 
-            Rule.Definition =
-                QualifiedIdentifier + '=' + Expression + ';';
+            rule.Definition =
+                qualifiedIdentifier + '=' + expression + ';';
 
-            Setting.Definition = (_)
-                settingIdentifier + '=' + QualifiedIdentifier + ';';
+            setting.Definition = (_)
+                settingIdentifier + '=' + qualifiedIdentifier + ';';
 
-            LexerRule.Definition =
-                QualifiedIdentifier + '~' + Expression + ';';
+            lexerRule.Definition =
+                qualifiedIdentifier + '~' + expression + ';';
 
-            Expression.Definition =
-                Term
-                | Term + '|' + Expression;
+            expression.Definition =
+                term
+                | term + '|' + expression;
 
-            Term.Definition =
-                Factor
-                | Factor + Term;
+            term.Definition =
+                factor
+                | factor + term;
 
-            Factor.Definition
-                = QualifiedIdentifier
-                | Literal
+            factor.Definition
+                = qualifiedIdentifier
+                | literal
                 | '/' + regexProductionReference + '/'
-                | Repetition
-                | Optional
-                | Grouping;
+                | repetition
+                | optional
+                | grouping;
 
-            Literal.Definition = (_)
+            literal.Definition = (_)
                 '"' + notDoubleQuote + '"'
                 | (_)"'" + notSingleQuote + "'";
 
-            Repetition.Definition = (_)
-                '{' + Expression + '}';
+            repetition.Definition = (_)
+                '{' + expression + '}';
 
-            Optional.Definition = (_)
-                '[' + Expression + ']';
+            optional.Definition = (_)
+                '[' + expression + ']';
 
-            Grouping.Definition = (_)
-                '(' + Expression + ')';
+            grouping.Definition = (_)
+                '(' + expression + ')';
 
-            QualifiedIdentifier.Definition =
+            qualifiedIdentifier.Definition =
                 identifier
-                | (_)identifier + '.' + QualifiedIdentifier;
+                | (_)identifier + '.' + qualifiedIdentifier;
             
             var grammarBuilder = new GrammarBuilder(
-                Grammar,                
+                definition,                
                 ignore: new[] { whitespace });
 
             _ebnfGrammar = grammarBuilder.ToGrammar();

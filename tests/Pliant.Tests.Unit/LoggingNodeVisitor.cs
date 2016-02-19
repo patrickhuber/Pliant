@@ -23,33 +23,33 @@ namespace Pliant.Tests.Unit
             VisitLog = new List<string>();
         }
 
-        public override void Visit(IIntermediateNode node)
+        public override void Visit(IIntermediateNode intermediateNode)
         {
-            VisitLog.Add(node.ToString());
-            foreach (var child in node.Children)
+            VisitLog.Add(intermediateNode.ToString());
+            foreach (var child in intermediateNode.Children)
                 Visit(child);
         }
 
-        public override void Visit(ITokenNode node)
+        public override void Visit(ITokenNode tokenNode)
         {
-            VisitLog.Add(node.ToString());
+            VisitLog.Add(tokenNode.ToString());
         }
 
-        public override void Visit(ISymbolNode node)
+        public override void Visit(ISymbolNode symbolNode)
         {
-            VisitLog.Add(node.ToString());
-            foreach (var child in node.Children)
+            VisitLog.Add(symbolNode.ToString());
+            foreach (var child in symbolNode.Children)
                 Visit(child);
         }
 
-        public override void Visit(ITerminalNode node)
+        public override void Visit(ITerminalNode terminalNode)
         {
-            VisitLog.Add(node.ToString());
+            VisitLog.Add(terminalNode.ToString());
         }
 
-        public override void Visit(IAndNode node)
+        public override void Visit(IAndNode andNode)
         {
-            foreach (var child in node.Children)
+            foreach (var child in andNode.Children)
                 child.Accept(this);
         }
     }
