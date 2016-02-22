@@ -1,4 +1,6 @@
-﻿namespace Pliant.RegularExpressions
+﻿using System;
+
+namespace Pliant.RegularExpressions
 {
     public class RegexCharacterRange : RegexNode
     {
@@ -7,6 +9,7 @@
         public RegexCharacterRange(RegexCharacterClassCharacter startCharacter)
         {
             StartCharacter = startCharacter;
+            _hashCode = new Lazy<int>(ComputeHash);
         }
 
         public override bool Equals(object obj)
@@ -21,18 +24,17 @@
             return characterRange.StartCharacter.Equals(StartCharacter);
         }
 
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        private readonly Lazy<int> _hashCode;
+
+        private int ComputeHash()
+        {
+            return HashUtil.ComputeHash(
+                    StartCharacter.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(
-                    StartCharacter.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
 
         public override RegexNodeType NodeType
@@ -51,6 +53,7 @@
             : base(startCharacter)
         {
             EndCharacter = endCharacter;
+            _hashCode = new Lazy<int>(ComputeHash);
         }
 
         public override bool Equals(object obj)
@@ -64,20 +67,19 @@
                 StartCharacter.Equals(characterRangeSet.StartCharacter)
                 && EndCharacter.Equals(characterRangeSet.EndCharacter);
         }
+        
+        private readonly Lazy<int> _hashCode;
 
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        int ComputeHash()
+        {
+            return HashUtil.ComputeHash(
+                    StartCharacter.GetHashCode(),
+                    EndCharacter.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(
-                    StartCharacter.GetHashCode(),
-                    EndCharacter.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
 
         public override RegexNodeType NodeType

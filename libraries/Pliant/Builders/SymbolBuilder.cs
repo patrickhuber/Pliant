@@ -4,11 +4,13 @@ namespace Pliant.Builders
 {
     public class SymbolBuilder : BaseBuilder
     {
-        public ISymbol Symbol { get; private set; }
+        private ISymbol _symbol;
+
+        public override ISymbol Symbol { get { return _symbol; } }
 
         public SymbolBuilder(ISymbol symbol)
         {
-            Symbol = symbol;
+            _symbol = symbol;
         }
 
         public static implicit operator SymbolBuilder(ProductionBuilder builder)

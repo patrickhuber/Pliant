@@ -14,11 +14,11 @@
         {
         }
 
-        public virtual void Visit(IIntermediateNode node)
+        public virtual void Visit(IIntermediateNode intermediateNode)
         {
-            var currentAndNode = StateManager.GetCurrentAndNode(node);
+            var currentAndNode = StateManager.GetCurrentAndNode(intermediateNode);
             Visit(currentAndNode);
-            StateManager.MarkAsTraversed(node);
+            StateManager.MarkAsTraversed(intermediateNode);
         }
 
         public virtual void Visit(ITokenNode tokenNode)
@@ -30,14 +30,14 @@
                 child.Accept(this);
         }
 
-        public virtual void Visit(ISymbolNode node)
+        public virtual void Visit(ISymbolNode symbolNode)
         {
-            var currentAndNode = StateManager.GetCurrentAndNode(node);
+            var currentAndNode = StateManager.GetCurrentAndNode(symbolNode);
             Visit(currentAndNode);
-            StateManager.MarkAsTraversed(node);
+            StateManager.MarkAsTraversed(symbolNode);
         }
 
-        public virtual void Visit(ITerminalNode node)
+        public virtual void Visit(ITerminalNode terminalNode)
         { }
     }
 }

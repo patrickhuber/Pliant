@@ -10,6 +10,11 @@ namespace Pliant.Builders
     {
         public List<BaseBuilderList> Data { get; private set; }
 
+        public override ISymbol Symbol
+        {
+            get { throw new NotImplementedException(); }
+        }
+
         public RuleBuilder()
         {
             Data = new List<BaseBuilderList>();
@@ -116,6 +121,12 @@ namespace Pliant.Builders
         {
             return new RuleBuilder(
                 new SymbolBuilder(lexerRule));
+        }
+        
+        public static implicit operator RuleBuilder(ProductionReference productionReference)
+        {
+            return new RuleBuilder(
+                productionReference);
         }
     }
 }

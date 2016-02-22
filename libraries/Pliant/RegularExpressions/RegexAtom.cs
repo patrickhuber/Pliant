@@ -1,4 +1,6 @@
-﻿namespace Pliant.RegularExpressions
+﻿using System;
+
+namespace Pliant.RegularExpressions
 {
     public abstract class RegexAtom : RegexNode
     {
@@ -23,6 +25,7 @@
         public RegexAtomCharacter(RegexCharacter character)
         {
             Character = character;
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
 
         public override bool Equals(object obj)
@@ -34,18 +37,17 @@
                 return false;
             return Character.Equals(atomCharacter.Character);
         }
-
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        
+        private readonly Lazy<int> _hashCode;
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(Character.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
+        }
+
+        private int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(Character.GetHashCode());
         }
 
         public override RegexNodeType NodeType
@@ -59,9 +61,9 @@
         public RegexExpression Expression { get; private set; }
 
         public RegexAtomExpression(RegexExpression expression)
-            : base()
         {
             Expression = expression;
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
 
         public override bool Equals(object obj)
@@ -73,18 +75,17 @@
                 return false;
             return Expression.Equals(atomExpression.Expression);
         }
+        
+        private readonly Lazy<int> _hashCode;
 
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(Expression.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(Expression.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
 
         public override RegexNodeType NodeType
@@ -100,6 +101,7 @@
         public RegexAtomSet(RegexSet set)
         {
             Set = set;
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
 
         public override bool Equals(object obj)
@@ -111,18 +113,17 @@
                 return false;
             return Set.Equals(atomSet.Set);
         }
+        
+        private readonly Lazy<int> _hashCode;
 
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        private int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(Set.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(Set.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
 
         public override RegexNodeType NodeType

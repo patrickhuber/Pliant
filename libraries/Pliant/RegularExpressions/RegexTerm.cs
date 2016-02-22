@@ -1,4 +1,6 @@
-﻿namespace Pliant.RegularExpressions
+﻿using System;
+
+namespace Pliant.RegularExpressions
 {
     public class RegexTerm : RegexNode
     {
@@ -12,6 +14,7 @@
         public RegexTerm(RegexFactor factor)
         {
             Factor = factor;
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
 
         public override bool Equals(object obj)
@@ -23,18 +26,17 @@
                 return false;
             return term.Factor.Equals(Factor);
         }
-
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        
+        private readonly Lazy<int> _hashCode;
+        
+        int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(Factor.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(Factor.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
     }
 
@@ -46,6 +48,7 @@
             : base(factor)
         {
             Term = term;
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
 
         public override bool Equals(object obj)
@@ -58,20 +61,19 @@
             return termFactor.Factor.Equals(Factor)
                 && termFactor.Term.Equals(Term);
         }
+        
+        private readonly Lazy<int> _hashCode;
 
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(
+                    Term.GetHashCode(),
+                    Factor.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(
-                    Term.GetHashCode(),
-                    Factor.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
 
         public override RegexNodeType NodeType

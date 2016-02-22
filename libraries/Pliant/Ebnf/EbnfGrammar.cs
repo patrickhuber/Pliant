@@ -1,6 +1,7 @@
 ﻿using Pliant.Automata;
 using Pliant.Builders;
 using Pliant.Grammars;
+using Pliant.RegularExpressions;
 using Pliant.Tokens;
 using System.Collections.Generic;
 
@@ -9,6 +10,21 @@ namespace Pliant.Ebnf
     public class EbnfGrammar : IGrammar
     {
         private static readonly IGrammar _ebnfGrammar;
+
+        public static readonly string Namespace = "Ebnf";
+        public static readonly FullyQualifiedName Definition = new FullyQualifiedName(Namespace, "Definition");
+        public static readonly FullyQualifiedName Block = new FullyQualifiedName(Namespace, "Block");
+        public static readonly FullyQualifiedName Rule = new FullyQualifiedName(Namespace, "Rule");
+        public static readonly FullyQualifiedName Setting = new FullyQualifiedName(Namespace, "Setting");
+        public static readonly FullyQualifiedName LexerRule = new FullyQualifiedName(Namespace, "LexerRule");
+        public static readonly FullyQualifiedName QualifiedIdentifier = new FullyQualifiedName(Namespace, "QualifiedIdentifier");
+        public static readonly FullyQualifiedName Expression = new FullyQualifiedName(Namespace, "Expression");
+        public static readonly FullyQualifiedName Term = new FullyQualifiedName(Namespace, "Term");
+        public static readonly FullyQualifiedName Factor = new FullyQualifiedName(Namespace, "Factor");
+        public static readonly FullyQualifiedName Literal = new FullyQualifiedName(Namespace, "Literal");
+        public static readonly FullyQualifiedName Grouping = new FullyQualifiedName(Namespace, "Grouping");
+        public static readonly FullyQualifiedName Repetition = new FullyQualifiedName(Namespace, "Repetition");
+        public static readonly FullyQualifiedName Optional = new FullyQualifiedName(Namespace, "Optional");
 
         static EbnfGrammar()
         {
@@ -25,148 +41,77 @@ namespace Pliant.Ebnf
                 whitespace = CreateWhitespaceLexerRule();
 
             ProductionBuilder
-                Grammar = "Grammar",
-                Block = "Block",
-                Rule = "Rule",
-                Setting = "Setting",
-                LexerRule = "LexerRule",
-                QualifiedIdentifier = "QualifiedIdentifier",
-                Expression = "Expression",
-                Term = "Term",
-                Factor = "Factor",
-                Literal = "Literal",
-                Grouping = "Grouping",
-                Repetition = "Repetition",
-                Optional = "Optional",
-                Regex = "Regex",
-                RegexExpression = "Regex.Expression",
-                RegexTerm = "Regex.Term",
-                RegexFactor = "Regex.Factor",
-                RegexAtom = "Regex.Atom",
-                RegexIterator = "Regex.Iterator",
-                RegexSet = "Regex.Set",
-                RegexPositiveSet = "Regex.PositiveSet",
-                RegexNegativeSet = "Regex.NegativeSet",
-                RegexCharacterClass = "Regex.CharacterClass",
-                RegexCharacterRange = "Regex.CharacterRange",
-                RegexCharacter = "Regex.Character",
-                RegexCharacterClassCharacter = "Regex.CharacterClassCharacter";
+                definition = Definition,
+                block = Block,
+                rule = Rule,
+                setting = Setting,
+                lexerRule = LexerRule,
+                qualifiedIdentifier = QualifiedIdentifier,
+                expression = Expression,
+                term = Term,
+                factor = Factor,
+                literal = Literal,
+                grouping = Grouping,
+                repetition = Repetition,
+                optional = Optional;
 
-            Grammar.Definition =
-                Block
-                | Block + Grammar;
+            var regexGrammar = new RegexGrammar();
+            var regexProductionReference = new ProductionReference(regexGrammar);
+                        
+            definition.Definition =
+                block
+                | block + definition;
 
-            Block.Definition =
-                Rule
-                | Setting
-                | LexerRule;
+            block.Definition =
+                rule
+                | setting
+                | lexerRule;
 
-            Rule.Definition =
-                QualifiedIdentifier + '=' + Expression + ';';
+            rule.Definition =
+                qualifiedIdentifier + '=' + expression + ';';
 
-            Setting.Definition = (_)
-                settingIdentifier + '=' + QualifiedIdentifier + ';';
+            setting.Definition = (_)
+                settingIdentifier + '=' + qualifiedIdentifier + ';';
 
-            LexerRule.Definition =
-                QualifiedIdentifier + '~' + Expression + ';';
+            lexerRule.Definition =
+                qualifiedIdentifier + '~' + expression + ';';
 
-            Expression.Definition =
-                Term
-                | Term + '|' + Expression;
+            expression.Definition =
+                term
+                | term + '|' + expression;
 
-            Term.Definition =
-                Factor
-                | Factor + Term;
+            term.Definition =
+                factor
+                | factor + term;
 
-            Factor.Definition
-                = QualifiedIdentifier
-                | Literal
-                | '/' + Regex + '/'
-                | Repetition
-                | Optional
-                | Grouping;
+            factor.Definition
+                = qualifiedIdentifier
+                | literal
+                | '/' + regexProductionReference + '/'
+                | repetition
+                | optional
+                | grouping;
 
-            Literal.Definition = (_)
+            literal.Definition = (_)
                 '"' + notDoubleQuote + '"'
                 | (_)"'" + notSingleQuote + "'";
 
-            Repetition.Definition = (_)
-                '{' + Expression + '}';
+            repetition.Definition = (_)
+                '{' + expression + '}';
 
-            Optional.Definition = (_)
-                '[' + Expression + ']';
+            optional.Definition = (_)
+                '[' + expression + ']';
 
-            Grouping.Definition = (_)
-                '(' + Expression + ')';
+            grouping.Definition = (_)
+                '(' + expression + ')';
 
-            QualifiedIdentifier.Definition =
+            qualifiedIdentifier.Definition =
                 identifier
-                | (_)identifier + '.' + QualifiedIdentifier;
-
-            Regex.Definition =
-                RegexExpression
-                | '^' + RegexExpression
-                | RegexExpression + '$'
-                | '^' + RegexExpression + '$';
-
-            RegexExpression.Definition =
-                RegexTerm
-                | RegexTerm + '|' + RegexExpression;
-
-            RegexTerm.Definition =
-                RegexFactor
-                | RegexFactor + RegexTerm;
-
-            RegexFactor.Definition =
-                RegexAtom
-                | RegexAtom + RegexIterator;
-
-            RegexAtom.Definition =
-                '.'
-                | '(' + RegexExpression + ')'
-                | RegexCharacter
-                | RegexSet;
-
-            RegexIterator.Definition = (_)
-                '*'
-                | '+'
-                | '?';
-
-            RegexSet.Definition =
-                RegexPositiveSet
-                | RegexNegativeSet;
-
-            RegexPositiveSet.Definition =
-                '[' + RegexCharacterClass + ']';
-
-            RegexNegativeSet.Definition =
-                "[^" + RegexCharacterClass + ']';
-
-            RegexCharacterClass.Definition =
-                RegexCharacterRange
-                | RegexCharacterRange + RegexCharacterClass;
-
-            RegexCharacterRange.Definition =
-                RegexCharacterClassCharacter
-                | RegexCharacterClassCharacter + '-' + RegexCharacterClassCharacter;
-
-            RegexCharacter.Definition = (_)
-                escapeCharacter
-                | notMeta;
-
-            RegexCharacterClassCharacter.Definition = (_)
-                escapeCharacter
-                | notCloseBracket;
-
+                | (_)identifier + '.' + qualifiedIdentifier;
+            
             var grammarBuilder = new GrammarBuilder(
-                Grammar,
-                new[] { Grammar, Block, Rule, Setting, LexerRule, Expression, Term, Factor,
-                    Grouping, Repetition, Optional, QualifiedIdentifier, Literal,
-                    Regex, RegexExpression, RegexTerm, RegexFactor, RegexAtom,
-                    RegexIterator, RegexSet, RegexPositiveSet, RegexNegativeSet,
-                    RegexCharacterClass, RegexCharacterRange, RegexCharacter,
-                    RegexCharacterClassCharacter},
-                new[] { whitespace });
+                definition,                
+                ignore: new[] { whitespace });
 
             _ebnfGrammar = grammarBuilder.ToGrammar();
         }
@@ -189,7 +134,7 @@ namespace Pliant.Ebnf
             var edge = new DfaTransition(terminal, final);
             start.AddTransition(edge);
             final.AddTransition(edge);
-            return new DfaLexerRule(start, new TokenType(@"([^""]|(\\.))+"));
+            return new DfaLexerRule(start, new TokenType(@"([^']|(\\.))+"));
         }
 
         private static BaseLexerRule CreateNotDoubleQuoteLexerRule()
@@ -215,7 +160,7 @@ namespace Pliant.Ebnf
             var anyEdge = new DfaTransition(anyTerminal, final);
             escape.AddTransition(anyEdge);
 
-            return new DfaLexerRule(start, new TokenType(@"([^""]|(\\.))*"));
+            return new DfaLexerRule(start, new TokenType(@"([^""]|(\\.))+"));
         }
 
         private static BaseLexerRule CreateSettingIdentifierLexerRule()

@@ -7,7 +7,7 @@ namespace Pliant.RegularExpressions
 {    
     public class RegexGrammar : IGrammar
     {
-        private static IGrammar _regexGrammar;
+        private readonly static IGrammar _regexGrammar;
 
         /*  Regex                      ->   Expression |
          *                                  '^' Expression |

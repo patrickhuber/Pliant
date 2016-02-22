@@ -49,7 +49,6 @@ namespace Pliant.Tests.Unit.Tree
 
             var input = "a+a+a";
             var treeNode = GetTreeNode(grammar, input);
-            ;
         }
 
         private static InternalTreeNode GetTreeNode(IGrammar grammar, string input)

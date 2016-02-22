@@ -1,7 +1,7 @@
 ﻿using Pliant.Bnf;
 using System.IO;
 
-namespace Pliant.ConsoleApp
+namespace Pliant.PerfViewApp
 {
     internal class Program
     {

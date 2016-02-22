@@ -10,8 +10,8 @@ namespace Pliant.Grammars
         private IDictionary<INonTerminal, IList<IProduction>> _productionIndex;
         private IDictionary<int, IList<ILexerRule>> _ignoreIndex;
 
-        private static readonly IProduction[] EmptyProductionArray = new IProduction[] { };
-        private static readonly ILexerRule[] EmptyLexerRuleArray = new ILexerRule[] { };
+        private static readonly IProduction[] EmptyProductionArray = { };
+        private static readonly ILexerRule[] EmptyLexerRuleArray = { };
 
         public Grammar()
         {
@@ -23,8 +23,8 @@ namespace Pliant.Grammars
 
         public Grammar(
             INonTerminal start,
-            IProduction[] productions,
-            ILexerRule[] ignoreRules)
+            IEnumerable<IProduction> productions,
+            IEnumerable<ILexerRule> ignoreRules)
             : this()
         {
             Start = start;
@@ -32,13 +32,13 @@ namespace Pliant.Grammars
             AddIgnoreRules(ignoreRules ?? EmptyLexerRuleArray);
         }
 
-        private void AddIgnoreRules(ILexerRule[] ignoreRules)
+        private void AddIgnoreRules(IEnumerable<ILexerRule> ignoreRules)
         {
             foreach (var ignoreRule in ignoreRules)
                 AddIgnoreRule(ignoreRule);
         }
 
-        private void AddProductions(IProduction[] productions)
+        private void AddProductions(IEnumerable<IProduction> productions)
         {
             foreach (var production in productions)
                 AddProduction(production);

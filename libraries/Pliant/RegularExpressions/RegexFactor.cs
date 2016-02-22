@@ -1,4 +1,6 @@
-﻿namespace Pliant.RegularExpressions
+﻿using System;
+
+namespace Pliant.RegularExpressions
 {
     public class RegexFactor : RegexNode
     {
@@ -7,20 +9,20 @@
         public RegexFactor(RegexAtom atom)
         {
             Atom = atom;
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
+        
+        private readonly Lazy<int> _hashCode;
 
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(
+                    Atom.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(
-                    Atom.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
 
         public override bool Equals(object obj)
@@ -47,6 +49,7 @@
             : base(atom)
         {
             Iterator = iterator;
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
 
         public override bool Equals(object obj)
@@ -58,20 +61,19 @@
                 return false;
             return factor.Atom.Equals(Atom);
         }
+        
+        private readonly Lazy<int> _hashCode ;
 
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(
+                Atom.GetHashCode(),
+                Iterator.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(
-                    Atom.GetHashCode(),
-                    Iterator.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
 
         public override RegexNodeType NodeType

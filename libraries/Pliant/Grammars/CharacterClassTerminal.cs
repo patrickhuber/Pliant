@@ -4,7 +4,7 @@ namespace Pliant.Grammars
 {
     public class CharacterClassTerminal : ITerminal
     {
-        private IList<ITerminal> _terminals;
+        private readonly IList<ITerminal> _terminals;
 
         public SymbolType SymbolType { get { return SymbolType.Terminal; } }
 

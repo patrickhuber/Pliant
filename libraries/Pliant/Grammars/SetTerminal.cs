@@ -4,7 +4,7 @@ namespace Pliant.Grammars
 {
     public class SetTerminal : BaseTerminal, ITerminal
     {
-        private ISet<char> _characterSet;
+        private readonly ISet<char> _characterSet;
 
         public SetTerminal(params char[] characters)
             : this(new HashSet<char>(characters))

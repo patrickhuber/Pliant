@@ -4,9 +4,9 @@ namespace Pliant
 {
     public class Observer<T> : IObserver<T>
     {
-        private Action<T> _onNext;
-        private Action<Exception> _onError;
-        private Action _onCompleted;
+        private readonly Action<T> _onNext;
+        private readonly Action<Exception> _onError;
+        private readonly Action _onCompleted;
 
         public Observer(Action<T> onNext, Action<Exception> onError = null, Action onCompleted = null)
         {

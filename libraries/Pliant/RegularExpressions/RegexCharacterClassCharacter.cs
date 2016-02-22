@@ -1,4 +1,6 @@
-﻿namespace Pliant.RegularExpressions
+﻿using System;
+
+namespace Pliant.RegularExpressions
 {
     public class RegexCharacterClassCharacter : RegexNode
     {
@@ -12,20 +14,20 @@
         public RegexCharacterClassCharacter(char value)
         {
             Value = value;
+            _hashCode = new Lazy<int>(ComputeHash);
         }
+        
+        private readonly Lazy<int> _hashCode;
 
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        private int ComputeHash()
+        {
+            return HashUtil.ComputeHash(
+                    Value.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(
-                    Value.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
 
         public override bool Equals(object obj)

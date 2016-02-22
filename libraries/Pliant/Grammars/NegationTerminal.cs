@@ -2,7 +2,7 @@
 {
     public class NegationTerminal : BaseTerminal, ITerminal
     {
-        private ITerminal _innerTerminal;
+        private readonly ITerminal _innerTerminal;
 
         public NegationTerminal(ITerminal innerTerminal)
         {

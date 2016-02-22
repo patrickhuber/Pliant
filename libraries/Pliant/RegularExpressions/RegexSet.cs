@@ -1,4 +1,6 @@
-﻿namespace Pliant.RegularExpressions
+﻿using System;
+
+namespace Pliant.RegularExpressions
 {
     public class RegexSet : RegexNode
     {
@@ -15,6 +17,7 @@
         {
             Negate = negate;
             CharacterClass = characterClass;
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
 
         public override bool Equals(object obj)
@@ -29,20 +32,17 @@
             return CharacterClass.Equals(set.CharacterClass)
                 && Negate.Equals(set.Negate);
         }
-
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
-
+        
+        private readonly Lazy<int> _hashCode ;
+        int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(
+                Negate.GetHashCode(),
+                CharacterClass.GetHashCode());
+        }
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(
-                    Negate.GetHashCode(),
-                    CharacterClass.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
     }
 }

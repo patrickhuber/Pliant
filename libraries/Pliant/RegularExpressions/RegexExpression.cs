@@ -1,4 +1,6 @@
-﻿namespace Pliant.RegularExpressions
+﻿using System;
+
+namespace Pliant.RegularExpressions
 {
     public class RegexExpression : RegexNode
     {
@@ -29,11 +31,12 @@
 
     public class RegexExpressionTerm : RegexExpression
     {
-        public RegexTerm Term { get; set; }
+        public RegexTerm Term { get; private set; }
 
         public RegexExpressionTerm(RegexTerm term)
         {
             Term = term;
+            _hashCode = new Lazy<int>(ComputeHash);
         }
 
         public override bool Equals(object obj)
@@ -47,18 +50,17 @@
 
             return Term.Equals(otherRegexExpressionTerm.Term);
         }
+        
+        private readonly Lazy<int> _hashCode;
 
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        int ComputeHash()
+        {
+            return HashUtil.ComputeHash(Term.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(Term.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
 
         public override RegexNodeType NodeType
@@ -78,21 +80,21 @@
             : base(term)
         {
             Expression = expression;
+            _hashCode = new Lazy<int>(ComputeHash);
         }
+        
+        private readonly Lazy<int> _hashCode;
 
-        private bool _isHashCodeSet = false;
-        private int _hashCode = 0;
+        int ComputeHash()
+        {
+            return HashUtil.ComputeHash(
+                Term.GetHashCode(),
+                Expression.GetHashCode());
+        }
 
         public override int GetHashCode()
         {
-            if (!_isHashCodeSet)
-            {
-                _hashCode = HashUtil.ComputeHash(
-                    Term.GetHashCode(),
-                    Expression.GetHashCode());
-                _isHashCodeSet = true;
-            }
-            return _hashCode;
+            return _hashCode.Value;
         }
 
         public override bool Equals(object obj)

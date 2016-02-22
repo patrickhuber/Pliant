@@ -8,10 +8,6 @@ namespace Pliant.Tests.Unit
     [TestClass]
     public class TerminalLexemeTests
     {
-        public TerminalLexemeTests()
-        {
-        }
-
         public TestContext TestContext { get; set; }
 
         [TestMethod]

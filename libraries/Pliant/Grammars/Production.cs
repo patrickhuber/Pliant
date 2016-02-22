@@ -1,4 +1,5 @@
 ﻿using Pliant.Collections;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,19 +15,24 @@ namespace Pliant.Grammars
 
         public bool IsEmpty { get { return _rightHandSide.Count == 0; } }
         
-        public Production(INonTerminal leftHandSide, params ISymbol[] rightHandSide)
+        public Production(INonTerminal leftHandSide, IEnumerable<ISymbol> rightHandSide)
         {
-            Assert.IsNotNull(leftHandSide, "leftHandSide");
-            Assert.IsNotNull(rightHandSide, "rightHandSide");
+            Assert.IsNotNull(leftHandSide, nameof(leftHandSide));
+            Assert.IsNotNull(rightHandSide, nameof(rightHandSide));
             LeftHandSide = leftHandSide;
             _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
 
-        internal Production(string leftHandSide, params ISymbol[] rightHandSide)
-            : this(new NonTerminal(leftHandSide), rightHandSide)
+        public Production(INonTerminal leftHandSide, params ISymbol[] rightHandSide)
         {
+            Assert.IsNotNull(leftHandSide, nameof(leftHandSide));
+            Assert.IsNotNull(rightHandSide, nameof(rightHandSide));
+            LeftHandSide = leftHandSide;
+            _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
-        
+                
         public override bool Equals(object obj)
         {
             var production = obj as Production;
@@ -43,44 +49,19 @@ namespace Pliant.Grammars
         }
 
         // PERF: Cache Costly Hash Code Computation
-        private bool _isHashCodeComputed = false;
-
-        private int _computedHashCode = 0;
+        private readonly Lazy<int> _hashCode;
 
         public override int GetHashCode()
         {
-            if (_isHashCodeComputed)
-                return _computedHashCode;
-            unchecked
-            {
-                var hash = (int)2166136261;
-                hash *= 16777619 * LeftHandSide.GetHashCode();
-                foreach (var symbol in RightHandSide)
-                    hash *= 16777619 ^ symbol.GetHashCode();
-
-                _computedHashCode = hash;
-                _isHashCodeComputed = true;
-                return _computedHashCode;
-            }
+            return _hashCode.Value;
         }
 
-        public void AddSymbol(ISymbol symbol)
+        private int ComputeHashCode()
         {
-            InvalidateCachedHashCode();
-            _rightHandSide.Add(symbol);
-        }
-
-        private void InvalidateCachedHashCode()
-        {
-            _isHashCodeComputed = false;
-        }
-
-        public Production Clone()
-        {
-            var production = new Production(LeftHandSide);
+            int hash = HashUtil.ComputeIncrementalHash(LeftHandSide.GetHashCode(), 0, true);
             foreach (var symbol in RightHandSide)
-                production.AddSymbol(symbol);
-            return production;
+                hash = HashUtil.ComputeIncrementalHash(symbol.GetHashCode(), hash);
+            return hash;
         }
 
         public override string ToString()

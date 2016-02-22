@@ -45,7 +45,10 @@ namespace Pliant.Tests.Unit.Bnf
                                 break;
                             }
                     }
-                    var endIndex = _bnfText.IndexOf("\r\n", position);
+                    var endIndex = _bnfText.IndexOf(
+                        System.Environment.NewLine, 
+                        position, 
+                        System.StringComparison.CurrentCulture);
                     endIndex = endIndex < 0 ? _bnfText.Length : endIndex;
                     var length = endIndex - startIndex;
                     var stringBuilder = new StringBuilder();
