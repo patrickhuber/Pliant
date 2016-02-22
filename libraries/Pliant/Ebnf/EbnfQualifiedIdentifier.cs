@@ -44,13 +44,13 @@ namespace Pliant.Ebnf
         }
     }
 
-    public class EbnfQualifiedIdentifierRepetition : EbnfQualifiedIdentifier
+    public class EbnfQualifiedIdentifierConcatenation : EbnfQualifiedIdentifier
     {
         private readonly Lazy<int> _hashCode;
 
         public EbnfQualifiedIdentifier QualifiedIdentifier { get; private set; }
 
-        public EbnfQualifiedIdentifierRepetition(
+        public EbnfQualifiedIdentifierConcatenation(
             string identifier,
             EbnfQualifiedIdentifier qualifiedIdentifier)
             : base(identifier)
@@ -63,7 +63,7 @@ namespace Pliant.Ebnf
         {
             get
             {
-                return EbnfNodeType.EbnfQualifiedIdentifierRepetition;
+                return EbnfNodeType.EbnfQualifiedIdentifierConcatenation;
             }
         }
 
@@ -71,7 +71,7 @@ namespace Pliant.Ebnf
         {
             if ((object)obj == null)
                 return false;
-            var qualifiedIdentifier = obj as EbnfQualifiedIdentifierRepetition;
+            var qualifiedIdentifier = obj as EbnfQualifiedIdentifierConcatenation;
             if ((object)qualifiedIdentifier == null)
                 return false;
             return qualifiedIdentifier.NodeType == NodeType

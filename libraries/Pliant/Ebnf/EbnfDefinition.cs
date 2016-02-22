@@ -42,11 +42,11 @@ namespace Pliant.Ebnf
         }
     }
 
-    public class EbnfDefinitionRepetition : EbnfDefinition
+    public class EbnfDefinitionConcatenation : EbnfDefinition
     {
         private readonly Lazy<int> _hashCode;
 
-        public EbnfDefinitionRepetition(EbnfBlock block, EbnfDefinition definition)
+        public EbnfDefinitionConcatenation(EbnfBlock block, EbnfDefinition definition)
             : base(block)
         {
             Definition = definition;
@@ -55,17 +55,17 @@ namespace Pliant.Ebnf
 
         public EbnfDefinition Definition { get; private set; }
 
-        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfDefinitionRepetition; } }
+        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfDefinitionConcatenation; } }
 
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
                 return false;
-            var ebnfDefinitionRepetition = obj as EbnfDefinitionRepetition;
+            var ebnfDefinitionRepetition = obj as EbnfDefinitionConcatenation;
             if ((object)ebnfDefinitionRepetition == null)
                 return false;
             
-            return ebnfDefinitionRepetition.NodeType == EbnfNodeType.EbnfDefinitionRepetition
+            return ebnfDefinitionRepetition.NodeType == EbnfNodeType.EbnfDefinitionConcatenation
                 && ebnfDefinitionRepetition.Block.Equals(Block)
                 && ebnfDefinitionRepetition.Definition.Equals(Definition);
         }

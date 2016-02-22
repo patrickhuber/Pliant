@@ -9,7 +9,7 @@ namespace Pliant.Ebnf
     public enum EbnfNodeType
     {
         EbnfDefinition,
-        EbnfDefinitionRepetition,
+        EbnfDefinitionConcatenation,
         EbnfBlockRule,
         EbnfBlockSetting,
         EbnfBlockLexerRule,
@@ -23,11 +23,11 @@ namespace Pliant.Ebnf
         EbnfFactorIdentifier,
         EbnfFactorLiteral,
         EbnfFactorRegex,
-        EbnfFactorRepetition,
+        EbnfFactorConcatenation,
         EbnfFactorOptional,
         EbnfFactorGrouping,
         EbnfSettingIdentifier,
         EbnfQualifiedIdentifier,
-        EbnfQualifiedIdentifierRepetition,
+        EbnfQualifiedIdentifierConcatenation,
     }
 }

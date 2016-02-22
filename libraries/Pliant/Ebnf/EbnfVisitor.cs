@@ -36,7 +36,7 @@ namespace Pliant.Ebnf
             }
 
             if (definition != null)
-                return new EbnfDefinitionRepetition(block, definition);
+                return new EbnfDefinitionConcatenation(block, definition);
 
             return new EbnfDefinition(block);
         }
@@ -114,7 +114,7 @@ namespace Pliant.Ebnf
             if (repetitionIdentifier == null)
                 return new EbnfQualifiedIdentifier(identifier);
 
-            return new EbnfQualifiedIdentifierRepetition(identifier, repetitionIdentifier);         
+            return new EbnfQualifiedIdentifierConcatenation(identifier, repetitionIdentifier);         
         }
 
         private EbnfExpression VisitExpressionNode(IInternalTreeNode node)
@@ -209,7 +209,7 @@ namespace Pliant.Ebnf
             return null;
         }
 
-        private EbnfFactorRepetition VisitRepetitionNode(IInternalTreeNode node)
+        private EbnfFactorConcatenation VisitRepetitionNode(IInternalTreeNode node)
         {
             foreach (var child in node.Children)
                 switch (child.NodeType)
@@ -219,7 +219,7 @@ namespace Pliant.Ebnf
                         var symbolValue = internalNode.Symbol.Value;
                         if (EbnfGrammar.Expression == symbolValue)
                         {
-                            return new EbnfFactorRepetition(VisitExpressionNode(internalNode));
+                            return new EbnfFactorConcatenation(VisitExpressionNode(internalNode));
                         }
                         break;
                 }

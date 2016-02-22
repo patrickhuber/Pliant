@@ -136,13 +136,13 @@ namespace Pliant.Ebnf
         }
     }
 
-    public class EbnfFactorRepetition : EbnfFactor
+    public class EbnfFactorConcatenation : EbnfFactor
     {
         private readonly Lazy<int> _hashCode;
 
         public EbnfExpression Expression { get; private set; }
 
-        public EbnfFactorRepetition(EbnfExpression expression)
+        public EbnfFactorConcatenation(EbnfExpression expression)
         {
             Expression = expression;
             _hashCode = new Lazy<int>(ComputeHashCode);
@@ -152,7 +152,7 @@ namespace Pliant.Ebnf
         {
             get
             {
-                return EbnfNodeType.EbnfFactorRepetition;
+                return EbnfNodeType.EbnfFactorConcatenation;
             }
         }
         int ComputeHashCode()
@@ -171,7 +171,7 @@ namespace Pliant.Ebnf
         {
             if ((object)obj == null)
                 return false;
-            var factor = obj as EbnfFactorRepetition;
+            var factor = obj as EbnfFactorConcatenation;
             if ((object)factor == null)
                 return false;
             return factor.NodeType == NodeType
