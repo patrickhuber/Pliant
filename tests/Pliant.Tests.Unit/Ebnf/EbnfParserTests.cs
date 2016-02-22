@@ -1,10 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Ebnf;
+using Pliant.RegularExpressions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
@@ -12,74 +9,186 @@ namespace Pliant.Tests.Unit.Ebnf
     public class EbnfParserTests
     {
         [TestMethod]
-        public void EbnfParserShouldParseEmptyRule()
+        [ExpectedException(typeof(Exception))]
+        public void EbnfParserShouldNotParseEmptyRule()
         {
             var ebnf = Parse(@"");
             Assert.IsNotNull(ebnf);
         }
 
         [TestMethod]
-        public void EbnfParserGivenCharacterShouldCreateOneProductionn()
+        public void EbnfParserShouldParseCharacterProduction()
         {
-            var ebnf =  Parse(@"Rule = 'a';");
-            Assert.IsNotNull(ebnf);
+            var expected = new EbnfDefinition(
+                    new EbnfBlockRule(
+                        new EbnfRule(
+                            new EbnfQualifiedIdentifier("Rule"),
+                            new EbnfExpression(
+                                new EbnfTerm(
+                                    new EbnfFactorLiteral("a"))))));
+
+            var actual = Parse(@"Rule = 'a';");
+
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void EbnfParserGivenConcatenationShouldCreateOneProduction()
+        public void EbnfParserShouldParseConcatenation()
         {
-            var ebnf =  Parse(@"Rule = 'a' 'b';");
-            Assert.IsNotNull(ebnf);
+            var expected = new EbnfDefinition(
+                new EbnfBlockRule(
+                    new EbnfRule(
+                        new EbnfQualifiedIdentifier("Rule"),
+                        new EbnfExpression(
+                            new EbnfTermRepetition(
+                                new EbnfFactorLiteral("a"),
+                                new EbnfTerm(
+                                    new EbnfFactorLiteral("b")))))));
+
+            var actual =  Parse(@"Rule = 'a' 'b';");
+
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void EbnfParserGivenAlterationShouldCreateTwoProductions()
+        public void EbnfParserShouldParseAlteration()
         {
-            var ebnf =  Parse(@"Rule = 'a' | 'b';");
-            Assert.IsNotNull(ebnf);
+            var expected = new EbnfDefinition(
+                new EbnfBlockRule(
+                    new EbnfRule(
+                        new EbnfQualifiedIdentifier("Rule"),
+                        new EbnfExpressionAlteration(
+                            new EbnfTerm(
+                                new EbnfFactorLiteral("a")),
+                            new EbnfExpression(
+                                new EbnfTerm(
+                                    new EbnfFactorLiteral("b")))))));
+            var actual =  Parse(@"Rule = 'a' | 'b';");
+            Assert.AreEqual(expected, actual);
 
         }
 
         [TestMethod]
-        public void EbnfParserGivenAlterationAndConcatenationShouldCreateTwoProductions()
+        public void EbnfParserShouldParseAlterationAndConcatenation()
         {
-            var ebnf =  Parse(@"Rule = 'a' 'b' | 'c';");
-            Assert.IsNotNull(ebnf);
+            var expected = new EbnfDefinition(
+                new EbnfBlockRule(
+                    new EbnfRule(
+                        new EbnfQualifiedIdentifier("Rule"),
+                        new EbnfExpressionAlteration(
+                            new EbnfTermRepetition(
+                                new EbnfFactorLiteral("a"),
+                                new EbnfTerm(
+                                    new EbnfFactorLiteral("b"))),
+                            new EbnfExpression(
+                                new EbnfTerm(
+                                    new EbnfFactorLiteral("c")))))));
+            var actual =  Parse(@"Rule = 'a' 'b' | 'c';");
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void EbnfParserGivenRegexShouldCreateLexerRule()
+        public void EbnfParserRegularExpression()
         {
-            var ebnf =  Parse(@"Rule = /[a-z]/;");
-            Assert.IsNotNull(ebnf);
+            var expected = new EbnfDefinition(
+                    new EbnfBlockRule(
+                        new EbnfRule(
+                            new EbnfQualifiedIdentifier("Rule"),
+                            new EbnfExpression(
+                                new EbnfTerm(
+                                    new EbnfFactorRegex(
+                                        new Regex(
+                                            startsWith: false, 
+                                            expression: new RegexExpressionTerm(
+                                                new RegexTerm(
+                                                    new RegexFactor(
+                                                        new RegexAtomSet(
+                                                            new RegexSet(false, 
+                                                                new RegexCharacterClass(
+                                                                    new RegexCharacterRangeSet(
+                                                                        new RegexCharacterClassCharacter('a'),
+                                                                        new RegexCharacterClassCharacter('z')))))))), 
+                                            endsWith: false)))))));
+
+            var actual = Parse(@"Rule = /[a-z]/;");
+
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void EbnfParserGivenBracesShouldCreateRepetition()
+        public void EbnfParserShouldParseRepetition()
         {
-            var ebnf =  Parse(@"Rule = { 'a' };");
-            Assert.IsNotNull(ebnf);
+            var actual =  Parse(@"Rule = { 'a' };");
+
+            var expected = new EbnfDefinition(
+                    new EbnfBlockRule(
+                        new EbnfRule(
+                            new EbnfQualifiedIdentifier("Rule"),
+                            new EbnfExpression(
+                                new EbnfTerm(
+                                    new EbnfFactorRepetition(
+                                        new EbnfExpression(
+                                            new EbnfTerm(
+                                                new EbnfFactorLiteral("a")))))))));
+
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void EbnfParserGivenBracketsShouldCreateOptional()
+        public void EbnfParserShouldParseOptional()
         {
-            var ebnf =  Parse(@"Rule = [ 'a' ];");
-            Assert.IsNotNull(ebnf);
+            var actual =  Parse(@"Rule = [ 'a' ];");
+
+            var expected = new EbnfDefinition(
+                    new EbnfBlockRule(
+                        new EbnfRule(
+                            new EbnfQualifiedIdentifier("Rule"),
+                            new EbnfExpression(
+                                new EbnfTerm(
+                                    new EbnfFactorOptional(
+                                        new EbnfExpression(
+                                            new EbnfTerm(
+                                                new EbnfFactorLiteral("a")))))))));
+
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void EbnfParserGivenParanthesisShouldCreateGrouping()
+        public void EbnfParserShouldParseGrouping()
         {
-            var ebnf =  Parse(@"Rule = ('a');");
-            Assert.IsNotNull(ebnf);
+            var actual =  Parse(@"Rule = ('a');");
+
+            var expected = new EbnfDefinition(
+                    new EbnfBlockRule(
+                        new EbnfRule(
+                            new EbnfQualifiedIdentifier("Rule"),
+                            new EbnfExpression(
+                                new EbnfTerm(
+                                    new EbnfFactorGrouping(
+                                        new EbnfExpression(
+                                            new EbnfTerm(
+                                                new EbnfFactorLiteral("a")))))))));
+
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
-        public void EbnfParserGivenNamespaceShouldCreateQualifiedIdentifier()
+        public void EbnfParserShouldParseNamespace()
         {
-            var ebnf = Parse(@"This.Is.A.Namespace.Rule = 'a'; ");
-            Assert.IsNotNull(ebnf);
+            var expected = new EbnfDefinition(
+                    new EbnfBlockRule(
+                        new EbnfRule(
+                            new EbnfQualifiedIdentifierRepetition("This",
+                                new EbnfQualifiedIdentifierRepetition("Is",
+                                    new EbnfQualifiedIdentifierRepetition("A",
+                                        new EbnfQualifiedIdentifierRepetition("Namespace",
+                                        new EbnfQualifiedIdentifier("Rule"))))),
+                            new EbnfExpression(
+                                new EbnfTerm(
+                                    new EbnfFactorLiteral("a"))))));
+
+            var actual = Parse(@"This.Is.A.Namespace.Rule = 'a'; ");
+            Assert.AreEqual(expected, actual);
         }
 
         private static EbnfDefinition Parse(string input)

@@ -1,7 +1,5 @@
 ﻿using System;
-using Pliant.Grammars;
 using Pliant.Tree;
-using System.Text;
 using Pliant.RegularExpressions;
 
 namespace Pliant.Ebnf
@@ -189,16 +187,13 @@ namespace Pliant.Ebnf
                                 VisitLiteralNode(internalNode));
 
                         if (EbnfGrammar.Repetition == symbolValue)
-                            return new EbnfFactorRepetition(
-                                VisitExpressionNode(internalNode));
+                            return VisitRepetitionNode(internalNode);
 
                         if (EbnfGrammar.Optional == symbolValue)
-                            return new EbnfFactorOptional(
-                                VisitExpressionNode(internalNode));
+                            return VisitOptionalNode(internalNode);
 
                         if (EbnfGrammar.Grouping == symbolValue)
-                            return new EbnfFactorGrouping(
-                                VisitExpressionNode(internalNode));
+                            return VisitGroupingNode(internalNode);
 
                         if (RegexGrammar.Regex == symbolValue)
                         {
@@ -209,6 +204,57 @@ namespace Pliant.Ebnf
                         break;
 
                     case TreeNodeType.Token:
+                        break;
+                }
+            return null;
+        }
+
+        private EbnfFactorRepetition VisitRepetitionNode(IInternalTreeNode node)
+        {
+            foreach (var child in node.Children)
+                switch (child.NodeType)
+                {
+                    case TreeNodeType.Internal:
+                        var internalNode = child as IInternalTreeNode;
+                        var symbolValue = internalNode.Symbol.Value;
+                        if (EbnfGrammar.Expression == symbolValue)
+                        {
+                            return new EbnfFactorRepetition(VisitExpressionNode(internalNode));
+                        }
+                        break;
+                }
+            return null;
+        }
+
+        private EbnfFactorOptional VisitOptionalNode(IInternalTreeNode node)
+        {
+            foreach (var child in node.Children)
+                switch (child.NodeType)
+                {
+                    case TreeNodeType.Internal:
+                        var internalNode = child as IInternalTreeNode;
+                        var symbolValue = internalNode.Symbol.Value;
+                        if (EbnfGrammar.Expression == symbolValue)
+                        {
+                            return new EbnfFactorOptional(VisitExpressionNode(internalNode));
+                        }
+                        break;
+                }
+            return null;
+        }
+
+        private EbnfFactorGrouping VisitGroupingNode(IInternalTreeNode node)
+        {
+            foreach (var child in node.Children)
+                switch (child.NodeType)
+                {
+                    case TreeNodeType.Internal:
+                        var internalNode = child as IInternalTreeNode;
+                        var symbolValue = internalNode.Symbol.Value;
+                        if (EbnfGrammar.Expression == symbolValue)
+                        {
+                            return new EbnfFactorGrouping(VisitExpressionNode(internalNode));
+                        }
                         break;
                 }
             return null;
