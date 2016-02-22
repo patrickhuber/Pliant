@@ -4,6 +4,8 @@ namespace Pliant.Ebnf
 {
     public class EbnfRule : EbnfNode
     {
+        private readonly Lazy<int> _hashCode;
+
         public EbnfQualifiedIdentifier QualifiedIdentifier { get; private set; }
         public EbnfExpression Expression { get; private set; }
 
@@ -11,6 +13,7 @@ namespace Pliant.Ebnf
         {
             QualifiedIdentifier = qualifiedIdentifier;
             Expression = expression;
+            _hashCode = new Lazy<int>(ComputeHashCode);
         }
 
         public override EbnfNodeType NodeType
@@ -19,6 +22,31 @@ namespace Pliant.Ebnf
             {
                 return EbnfNodeType.EbnfRule;
             }
+        }
+
+        int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(
+                QualifiedIdentifier.GetHashCode(),
+                Expression.GetHashCode(),
+                NodeType.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode.Value;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if ((object)obj == null)
+                return false;
+            var rule = obj as EbnfRule;
+            if ((object)rule == null)
+                return false;
+            return rule.NodeType == EbnfNodeType.EbnfRule
+                && rule.QualifiedIdentifier.Equals(QualifiedIdentifier)
+                && rule.Expression.Equals(Expression);
         }
     }
 }
