@@ -75,6 +75,13 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsNotNull(ebnf);
         }
 
+        [TestMethod]
+        public void EbnfParserGivenNamespaceShouldCreateQualifiedIdentifier()
+        {
+            var ebnf = Parse(@"This.Is.A.Namespace.Rule = 'a'; ");
+            Assert.IsNotNull(ebnf);
+        }
+
         private static EbnfDefinition Parse(string input)
         {
             var ebnfParser = new EbnfParser();

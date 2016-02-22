@@ -1,21 +1,40 @@
-﻿using System;
-
-namespace Pliant.Ebnf
+﻿namespace Pliant.Ebnf
 {
     public class EbnfQualifiedIdentifier : EbnfNode
     {
-        public string Value { get; private set; }
+        public string Identifier { get; private set; }
 
-        public EbnfQualifiedIdentifier(string value)
+        public EbnfQualifiedIdentifier(string identifier)
         {
-            Value = value;
+            Identifier = identifier;
         }
 
         public override EbnfNodeType NodeType
         {
             get
             {
-                return EbnfNodeType.EbnfSettingIdentifier;
+                return EbnfNodeType.EbnfQualifiedIdentifier;
+            }
+        }
+    }
+
+    public class EbnfQualifiedIdentifierRepetition : EbnfQualifiedIdentifier
+    {
+        public EbnfQualifiedIdentifier QualifiedIdentifier { get; private set; }
+
+        public EbnfQualifiedIdentifierRepetition(
+            string identifier,
+            EbnfQualifiedIdentifier qualifiedIdentifier)
+            : base(identifier)
+        {
+            QualifiedIdentifier = qualifiedIdentifier;
+        }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfQualifiedIdentifierRepetition;
             }
         }
     }

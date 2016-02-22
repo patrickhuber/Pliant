@@ -27,5 +27,7 @@ namespace Pliant.Ebnf
         EbnfFactorOptional,
         EbnfFactorGrouping,
         EbnfSettingIdentifier,
+        EbnfQualifiedIdentifier,
+        EbnfQualifiedIdentifierRepetition,
     }
 }

@@ -134,7 +134,7 @@ namespace Pliant.Ebnf
             var edge = new DfaTransition(terminal, final);
             start.AddTransition(edge);
             final.AddTransition(edge);
-            return new DfaLexerRule(start, new TokenType(@"([^""]|(\\.))+"));
+            return new DfaLexerRule(start, new TokenType(@"([^']|(\\.))+"));
         }
 
         private static BaseLexerRule CreateNotDoubleQuoteLexerRule()
@@ -160,7 +160,7 @@ namespace Pliant.Ebnf
             var anyEdge = new DfaTransition(anyTerminal, final);
             escape.AddTransition(anyEdge);
 
-            return new DfaLexerRule(start, new TokenType(@"([^""]|(\\.))*"));
+            return new DfaLexerRule(start, new TokenType(@"([^""]|(\\.))+"));
         }
 
         private static BaseLexerRule CreateSettingIdentifierLexerRule()
