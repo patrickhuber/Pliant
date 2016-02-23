@@ -2,11 +2,11 @@
 
 namespace Pliant.RegularExpressions
 {
-    public class RegexCharacterRange : RegexNode
+    public class RegexCharacterRangeUnit : RegexNode
     {
         public RegexCharacterClassCharacter StartCharacter { get; set; }
 
-        public RegexCharacterRange(RegexCharacterClassCharacter startCharacter)
+        public RegexCharacterRangeUnit(RegexCharacterClassCharacter startCharacter)
         {
             StartCharacter = startCharacter;
             _hashCode = new Lazy<int>(ComputeHash);
@@ -17,7 +17,7 @@ namespace Pliant.RegularExpressions
             if ((object)obj == null)
                 return false;
 
-            var characterRange = obj as RegexCharacterRange;
+            var characterRange = obj as RegexCharacterRangeUnit;
             if ((object)characterRange == null)
                 return false;
 
@@ -39,15 +39,15 @@ namespace Pliant.RegularExpressions
 
         public override RegexNodeType NodeType
         {
-            get { return RegexNodeType.RegexCharacterRange; }
+            get { return RegexNodeType.RegexCharacterRangeUnit; }
         }
     }
 
-    public class RegexCharacterRangeSet : RegexCharacterRange
+    public class RegexCharacterRange : RegexCharacterRangeUnit
     {
         public RegexCharacterClassCharacter EndCharacter { get; set; }
 
-        public RegexCharacterRangeSet(
+        public RegexCharacterRange(
             RegexCharacterClassCharacter startCharacter,
             RegexCharacterClassCharacter endCharacter)
             : base(startCharacter)
@@ -60,7 +60,7 @@ namespace Pliant.RegularExpressions
         {
             if ((object)obj == null)
                 return false;
-            var characterRangeSet = obj as RegexCharacterRangeSet;
+            var characterRangeSet = obj as RegexCharacterRange;
             if ((object)characterRangeSet == null)
                 return false;
             return
@@ -84,7 +84,7 @@ namespace Pliant.RegularExpressions
 
         public override RegexNodeType NodeType
         {
-            get { return RegexNodeType.RegexCharacterRangeSet; }
+            get { return RegexNodeType.RegexCharacterRange; }
         }
     }
 }

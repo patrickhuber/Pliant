@@ -42,7 +42,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
                             new RegexAtomSet(
                                 new RegexSet(false,
                                     new RegexCharacterClass(
-                                        new RegexCharacterRange(
+                                        new RegexCharacterRangeUnit(
                                             new RegexCharacterClassCharacter('a')))))))),
                 false);
             Assert.AreEqual(expected, actual);
@@ -62,16 +62,16 @@ namespace Pliant.Tests.Unit.RegularExpressions
                             atom: new RegexAtomSet(
                                 set: new RegexSet(
                                     negate: false,
-                                    characterClass: new RegexCharacterClassList(
-                                        characterClass: new RegexCharacterClassList(
+                                    characterClass: new RegexCharacterClassAlteration(
+                                        characterClass: new RegexCharacterClassAlteration(
                                             characterClass: new RegexCharacterClass(
-                                                characterRange: new RegexCharacterRangeSet(
+                                                characterRange: new RegexCharacterRange(
                                                     startCharacter: new RegexCharacterClassCharacter(value: '0'),
                                                     endCharacter: new RegexCharacterClassCharacter(value: '9'))),
-                                            characterRange: new RegexCharacterRangeSet(
+                                            characterRange: new RegexCharacterRange(
                                                 startCharacter: new RegexCharacterClassCharacter(value: 'A'),
                                                 endCharacter: new RegexCharacterClassCharacter(value: 'Z'))),
-                                        characterRange: new RegexCharacterRangeSet(
+                                        characterRange: new RegexCharacterRange(
                                             startCharacter: new RegexCharacterClassCharacter(value: 'a'),
                                             endCharacter: new RegexCharacterClassCharacter(value: 'z')))))))));
             Assert.AreEqual(expected, actual);

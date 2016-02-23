@@ -105,7 +105,7 @@ namespace Pliant.Tests.Unit.Ebnf
                                                         new RegexAtomSet(
                                                             new RegexSet(false, 
                                                                 new RegexCharacterClass(
-                                                                    new RegexCharacterRangeSet(
+                                                                    new RegexCharacterRange(
                                                                         new RegexCharacterClassCharacter('a'),
                                                                         new RegexCharacterClassCharacter('z')))))))), 
                                             endsWith: false)))))));
