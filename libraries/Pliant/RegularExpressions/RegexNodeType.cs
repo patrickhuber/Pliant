@@ -12,7 +12,7 @@
         RegexCharacterClass,
         RegexCharacterClassAlteration,
         RegexCharacterClassCharacter,
-        RegexCharacterRangeUnit,
+        RegexCharacterUnitRange,
         RegexCharacterRange,
         RegexExpression,
         RegexExpressionTerm,

@@ -2,11 +2,11 @@
 
 namespace Pliant.RegularExpressions
 {
-    public class RegexCharacterRangeUnit : RegexNode
+    public class RegexCharacterUnitRange : RegexNode
     {
         public RegexCharacterClassCharacter StartCharacter { get; set; }
 
-        public RegexCharacterRangeUnit(RegexCharacterClassCharacter startCharacter)
+        public RegexCharacterUnitRange(RegexCharacterClassCharacter startCharacter)
         {
             StartCharacter = startCharacter;
             _hashCode = new Lazy<int>(ComputeHash);
@@ -17,7 +17,7 @@ namespace Pliant.RegularExpressions
             if ((object)obj == null)
                 return false;
 
-            var characterRange = obj as RegexCharacterRangeUnit;
+            var characterRange = obj as RegexCharacterUnitRange;
             if ((object)characterRange == null)
                 return false;
 
@@ -39,11 +39,11 @@ namespace Pliant.RegularExpressions
 
         public override RegexNodeType NodeType
         {
-            get { return RegexNodeType.RegexCharacterRangeUnit; }
+            get { return RegexNodeType.RegexCharacterUnitRange; }
         }
     }
 
-    public class RegexCharacterRange : RegexCharacterRangeUnit
+    public class RegexCharacterRange : RegexCharacterUnitRange
     {
         public RegexCharacterClassCharacter EndCharacter { get; set; }
 

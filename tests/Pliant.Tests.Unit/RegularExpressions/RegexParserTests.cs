@@ -42,7 +42,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
                             new RegexAtomSet(
                                 new RegexSet(false,
                                     new RegexCharacterClass(
-                                        new RegexCharacterRangeUnit(
+                                        new RegexCharacterUnitRange(
                                             new RegexCharacterClassCharacter('a')))))))),
                 false);
             Assert.AreEqual(expected, actual);
