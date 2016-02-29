@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Pliant.Grammars;
+using System.Collections.Generic;
 
 namespace Pliant.Automata
 {
@@ -8,6 +9,6 @@ namespace Pliant.Automata
 
         void AddTransistion(INfaTransition transition);
 
-        IEnumerable<INfaState> Closure();
+        IDictionary<ITerminal, ISet<INfaState>> Closure();
     }
 }

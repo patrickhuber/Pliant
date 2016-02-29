@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Pliant.Grammars;
+using System.Collections.Generic;
+using System;
 
 namespace Pliant.Automata
 {
@@ -21,13 +23,16 @@ namespace Pliant.Automata
             _transitions.Add(transition);
         }
 
-        public IEnumerable<INfaState> Closure()
+        public IDictionary<ITerminal, ISet<INfaState>> Closure()
         {
             // the working queue used to process states
             var queue = new Queue<INfaState>();
 
             // the hash set used to track visited states
             var set = new HashSet<INfaState>();
+
+            // the dictionary used to index states by terminal
+            var dictionary = new Dictionary<ITerminal, ISet<INfaState>>();
 
             // initialize by adding the curren state (this)
             set.Add(this);
@@ -39,12 +44,35 @@ namespace Pliant.Automata
             {
                 var state = queue.Dequeue();
                 foreach (var transition in state.Transitions)
-                    if (transition.TransitionType == NfaTransitionType.Null)
-                        if (set.Add(transition.Target))
-                            queue.Enqueue(transition.Target);
+                {
+                    var target = transition.Target;
+                    switch (transition.TransitionType)
+                    {
+                        case NfaTransitionType.Null:
+                            if (set.Add(target))
+                                queue.Enqueue(target);
+                            break;
+
+                        case NfaTransitionType.Terminal:
+                            var terminalTransition = transition as TerminalNfaTransition;
+                            var terminal = terminalTransition.Terminal;
+                            ISet<INfaState> terminalStateSet = null;
+                            if (dictionary.ContainsKey(terminal))
+                                terminalStateSet = dictionary[terminal];
+                            else
+                            {
+                                terminalStateSet = new HashSet<INfaState>();
+                                dictionary[terminal] = terminalStateSet;
+                            }
+                            terminalStateSet.Add(target);
+                            break;
+                    }
+                }
             }
 
-            return set;
+            return dictionary;
         }
+        
     }
+    
 }
