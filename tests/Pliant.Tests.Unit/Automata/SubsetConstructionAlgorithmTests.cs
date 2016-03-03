@@ -10,13 +10,12 @@ namespace Pliant.Tests.Unit.Automata
         [TestMethod]
         public void ShouldConvertSingleCharacterNfaToEquivalentDfa()
         {
-            var nfaStart = new NfaState();
-            var nfaEnd = new NfaState();
-            var nfa = new Nfa(nfaStart, nfaEnd);
-            nfaStart.AddTransistion(
-                new TerminalNfaTransition(
-                    new CharacterTerminal('a'), nfaEnd));
+            var a = new CharacterTerminal('a');
+            var states = CreateStates(2);
 
+            states[0].AddTransistion(new TerminalNfaTransition(a, states[1]));
+
+            var nfa = new Nfa(states[0], states[1]);
             var dfa = ConvertNfaToDfa(nfa);
         }
 
@@ -26,10 +25,7 @@ namespace Pliant.Tests.Unit.Automata
             var a = new CharacterTerminal('a');
             var b = new CharacterTerminal('b');
             var c = new CharacterTerminal('c');
-
-            var states = new NfaState[4];
-            for (int i = 0; i < states.Length; i++)
-                states[i] = new NfaState();
+            var states = CreateStates(4);
 
             states[0].AddTransistion(new TerminalNfaTransition(a, states[1]));
             states[0].AddTransistion(new TerminalNfaTransition(c, states[3]));
@@ -40,6 +36,14 @@ namespace Pliant.Tests.Unit.Automata
             states[3].AddTransistion(new NullNfaTransition(states[2]));
 
             var dfa = ConvertNfaToDfa(new Nfa(states[0], states[2]));
+        }
+
+        private static NfaState[] CreateStates(int count)
+        {
+            var states = new NfaState[count];
+            for (int i = 0; i < states.Length; i++)
+                states[i] = new NfaState();
+            return states;
         }
 
         private IDfaState ConvertNfaToDfa(INfa nfa)

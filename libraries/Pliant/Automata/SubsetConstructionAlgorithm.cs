@@ -75,20 +75,6 @@ namespace Pliant.Automata
         {
             return HashUtil.ComputeHash(closure);
         }
-
-        private static ISet<INfaState> GetOrSetTerminalTransitions(
-            IEnumerable<INfaState> closure, 
-            Dictionary<IEnumerable<INfaState>, Dictionary<ITerminal, ISet<INfaState>>> table, ITerminal terminal)
-        {
-            ISet<INfaState> terminalTransitions;
-            if (!table[closure].ContainsKey(terminal))
-            {
-                terminalTransitions = new HashSet<INfaState>();
-                table[closure][terminal] = terminalTransitions;
-            }
-            else
-                terminalTransitions = table[closure][terminal];
-            return terminalTransitions;
-        }
+        
     }
 }
