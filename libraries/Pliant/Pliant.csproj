@@ -43,6 +43,8 @@
     <Compile Include="Builders\BaseBuilder.cs" />
     <Compile Include="Builders\BaseBuilderList.cs" />
     <Compile Include="Builders\ProductionReference.cs" />
+    <Compile Include="Collections\IQueue.cs" />
+    <Compile Include="Collections\ProcessOnceQueue.cs" />
     <Compile Include="Ebnf\EbnfBlock.cs" />
     <Compile Include="Ebnf\EbnfDefinition.cs" />
     <Compile Include="Ebnf\EbnfExpression.cs" />

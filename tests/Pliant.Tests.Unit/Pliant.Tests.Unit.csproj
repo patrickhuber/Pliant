@@ -65,6 +65,7 @@
     <Compile Include="Builders\GrammarBuilderTests.cs" />
     <Compile Include="LoggingNodeVisitor.cs" />
     <Compile Include="Ast\NodeVisitorTests.cs" />
+    <Compile Include="ProcessOnceQueueTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Grammars\ProductionTests.cs" />
     <Compile Include="RegularExpressions\RegexParserTests.cs" />
@@ -93,7 +94,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Collections\" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
