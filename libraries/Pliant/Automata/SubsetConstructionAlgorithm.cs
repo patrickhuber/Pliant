@@ -75,6 +75,35 @@ namespace Pliant.Automata
         {
             return HashUtil.ComputeHash(closure);
         }
-        
+
+        private class ClosureDfaState : IDfaState
+        {
+            public bool IsFinal { get; private set; }
+            public IEnumerable<INfaState> Closure { get; private set; }
+
+            private IList<IDfaTransition> _transitions;
+
+            public IEnumerable<IDfaTransition> Transitions
+            {
+                get { return _transitions; }
+            }
+
+            public ClosureDfaState(IEnumerable<INfaState> closure, bool isFinal)
+            {
+                Closure = closure;
+                IsFinal = isFinal;
+                _transitions = new List<IDfaTransition>();
+            }
+
+            public void AddTransition(IDfaTransition edge)
+            {
+                _transitions.Add(edge);
+            }
+
+            public override int GetHashCode()
+            {
+                return base.GetHashCode();
+            }
+        }
     }
 }
