@@ -1,4 +1,6 @@
-﻿namespace Pliant
+﻿using System.Collections.Generic;
+
+namespace Pliant
 {
     internal static class HashUtil
     {
@@ -13,6 +15,19 @@
                 for (int i = 0; i < hashCodes.Length; i++)
                 {
                     hash = hash * INCREMENTAL ^ hashCodes[i];
+                }
+                return hash;
+            }
+        }
+
+        public static int ComputeHash(IEnumerable<object> items)
+        {
+            unchecked
+            {
+                var hash = (int)SEED;
+                foreach (var item in items)
+                {
+                    hash = hash * INCREMENTAL ^ item.GetHashCode();
                 }
                 return hash;
             }

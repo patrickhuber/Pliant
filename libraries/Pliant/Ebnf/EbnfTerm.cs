@@ -4,14 +4,14 @@ namespace Pliant.Ebnf
 {
     public class EbnfTerm : EbnfNode
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfFactor Factor { get; private set; }
         
         public EbnfTerm(EbnfFactor factor)
         {
             Factor = factor;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType
@@ -31,7 +31,7 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
@@ -48,7 +48,7 @@ namespace Pliant.Ebnf
 
     public class EbnfTermRepetition : EbnfTerm
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfTerm Term { get; private set; }
 
@@ -56,7 +56,7 @@ namespace Pliant.Ebnf
             : base(factor)
         {
             Term = term;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType
@@ -77,7 +77,7 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)

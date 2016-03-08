@@ -14,12 +14,12 @@ namespace Pliant.RegularExpressions
         public RegexCharacterClassCharacter(char value)
         {
             Value = value;
-            _hashCode = new Lazy<int>(ComputeHash);
+            _hashCode = ComputeHashCode();
         }
         
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
-        private int ComputeHash()
+        private int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
                     Value.GetHashCode());
@@ -27,7 +27,7 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)

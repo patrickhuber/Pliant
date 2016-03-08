@@ -4,17 +4,17 @@ namespace Pliant.RegularExpressions
 {
     public class RegexCharacterClass : RegexNode
     {
-        public RegexCharacterRange CharacterRange { get; private set; }
+        public RegexCharacterUnitRange CharacterRange { get; private set; }
 
-        public RegexCharacterClass(RegexCharacterRange characterRange)
+        public RegexCharacterClass(RegexCharacterUnitRange characterRange)
         {
             CharacterRange = characterRange;
-            _hashCode = new Lazy<int>(ComputeHash);
+            _hashCode = ComputeHashCode();
         }
 
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
-        private int ComputeHash()
+        private int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
                     CharacterRange.GetHashCode());
@@ -22,7 +22,7 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
@@ -41,22 +41,22 @@ namespace Pliant.RegularExpressions
         }
     }
 
-    public class RegexCharacterClassList : RegexCharacterClass
+    public class RegexCharacterClassAlteration : RegexCharacterClass
     {
         public RegexCharacterClass CharacterClass { get; private set; }
 
-        public RegexCharacterClassList(
-            RegexCharacterRange characterRange,
+        public RegexCharacterClassAlteration(
+            RegexCharacterUnitRange characterRange,
             RegexCharacterClass characterClass)
             : base(characterRange)
         {
             CharacterClass = characterClass;
-            _hashCode = new Lazy<int>(ComputeHash);
+            _hashCode = ComputeHashCode();
         }
 
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
-        int ComputeHash()
+        int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
                     CharacterRange.GetHashCode(),
@@ -65,14 +65,14 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
                 return false;
-            var characterClassList = obj as RegexCharacterClassList;
+            var characterClassList = obj as RegexCharacterClassAlteration;
             if ((object)characterClassList == null)
                 return false;
             return characterClassList.CharacterRange.Equals(CharacterRange)
@@ -81,7 +81,7 @@ namespace Pliant.RegularExpressions
 
         public override RegexNodeType NodeType
         {
-            get { return RegexNodeType.RegexCharacterClassList; }
+            get { return RegexNodeType.RegexCharacterClassAlteration; }
         }
     }
 }

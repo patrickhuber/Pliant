@@ -21,7 +21,7 @@ namespace Pliant.RegularExpressions
             StartsWith = startsWith;
             EndsWith = endsWith;
             Expression = expression;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -38,11 +38,11 @@ namespace Pliant.RegularExpressions
                 && other.Expression.Equals(Expression);
         }
         
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         private int ComputeHashCode()

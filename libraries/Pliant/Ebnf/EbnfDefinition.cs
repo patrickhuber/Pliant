@@ -4,12 +4,12 @@ namespace Pliant.Ebnf
 {
     public class EbnfDefinition : EbnfNode
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfDefinition(EbnfBlock block)
         {
             Block = block;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
 
@@ -38,34 +38,34 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
 
-    public class EbnfDefinitionRepetition : EbnfDefinition
+    public class EbnfDefinitionConcatenation : EbnfDefinition
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
-        public EbnfDefinitionRepetition(EbnfBlock block, EbnfDefinition definition)
+        public EbnfDefinitionConcatenation(EbnfBlock block, EbnfDefinition definition)
             : base(block)
         {
             Definition = definition;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public EbnfDefinition Definition { get; private set; }
 
-        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfDefinitionRepetition; } }
+        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfDefinitionConcatenation; } }
 
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
                 return false;
-            var ebnfDefinitionRepetition = obj as EbnfDefinitionRepetition;
+            var ebnfDefinitionRepetition = obj as EbnfDefinitionConcatenation;
             if ((object)ebnfDefinitionRepetition == null)
                 return false;
             
-            return ebnfDefinitionRepetition.NodeType == EbnfNodeType.EbnfDefinitionRepetition
+            return ebnfDefinitionRepetition.NodeType == EbnfNodeType.EbnfDefinitionConcatenation
                 && ebnfDefinitionRepetition.Block.Equals(Block)
                 && ebnfDefinitionRepetition.Definition.Equals(Definition);
         }
@@ -80,7 +80,7 @@ namespace Pliant.Ebnf
         
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
 }

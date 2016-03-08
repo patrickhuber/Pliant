@@ -105,7 +105,7 @@ namespace Pliant.Tests.Unit.Ebnf
                                                         new RegexAtomSet(
                                                             new RegexSet(false, 
                                                                 new RegexCharacterClass(
-                                                                    new RegexCharacterRangeSet(
+                                                                    new RegexCharacterRange(
                                                                         new RegexCharacterClassCharacter('a'),
                                                                         new RegexCharacterClassCharacter('z')))))))), 
                                             endsWith: false)))))));
@@ -126,7 +126,7 @@ namespace Pliant.Tests.Unit.Ebnf
                             new EbnfQualifiedIdentifier("Rule"),
                             new EbnfExpression(
                                 new EbnfTerm(
-                                    new EbnfFactorRepetition(
+                                    new EbnfFactorConcatenation(
                                         new EbnfExpression(
                                             new EbnfTerm(
                                                 new EbnfFactorLiteral("a")))))))));
@@ -178,10 +178,10 @@ namespace Pliant.Tests.Unit.Ebnf
             var expected = new EbnfDefinition(
                     new EbnfBlockRule(
                         new EbnfRule(
-                            new EbnfQualifiedIdentifierRepetition("This",
-                                new EbnfQualifiedIdentifierRepetition("Is",
-                                    new EbnfQualifiedIdentifierRepetition("A",
-                                        new EbnfQualifiedIdentifierRepetition("Namespace",
+                            new EbnfQualifiedIdentifierConcatenation("This",
+                                new EbnfQualifiedIdentifierConcatenation("Is",
+                                    new EbnfQualifiedIdentifierConcatenation("A",
+                                        new EbnfQualifiedIdentifierConcatenation("Namespace",
                                         new EbnfQualifiedIdentifier("Rule"))))),
                             new EbnfExpression(
                                 new EbnfTerm(
@@ -191,6 +191,42 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.AreEqual(expected, actual);
         }
 
+        [TestMethod]
+        public void EbnfParserShouldParseMultipleRules()
+        {
+            var expected = new EbnfDefinitionConcatenation(
+                new EbnfBlockRule(
+                    new EbnfRule(
+                        new EbnfQualifiedIdentifier("S"),
+                        new EbnfExpression(
+                            new EbnfTermRepetition(
+                                new EbnfFactorIdentifier(
+                                    new EbnfQualifiedIdentifier("A")),
+                                new EbnfTerm(
+                                    new EbnfFactorIdentifier(
+                                        new EbnfQualifiedIdentifier("B"))))))),
+                new EbnfDefinitionConcatenation(
+                    new EbnfBlockRule(
+                        new EbnfRule(
+                            new EbnfQualifiedIdentifier("A"),
+                            new EbnfExpression(
+                                new EbnfTerm(
+                                    new EbnfFactorLiteral("a"))))),
+                    new EbnfDefinition(
+                        new EbnfBlockRule(
+                            new EbnfRule(
+                                new EbnfQualifiedIdentifier(
+                                    "B"),
+                                new EbnfExpression(
+                                    new EbnfTerm(
+                                        new EbnfFactorLiteral("b"))))))));
+            var actual = Parse(@"
+                S = A B;
+                A = 'a';
+                B = 'b';
+            ");
+            Assert.AreEqual(expected, actual);
+        }
         private static EbnfDefinition Parse(string input)
         {
             var ebnfParser = new EbnfParser();

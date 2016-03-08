@@ -9,20 +9,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
 {
     [TestClass]
     public class ThompsonConstructionTests
-    {
-        [TestMethod]
-        public void ThompsonConstructionShouldCreateNfaFromEmptyString()
-        {
-            var input = "";
-            var nfa = CreateNfa(input);
-            VerifyNfaIsNotNullAndHasValidStartAndEndStates(nfa);
-            Assert.IsFalse(nfa.End.Transitions.Any());
-            var list = new List<INfaTransition>(nfa.Start.Transitions);
-            Assert.AreEqual(1, list.Count);
-            var nullNfaTransition = nfa.Start.Transitions.First() as NullNfaTransition;
-            Assert.AreEqual(nfa.End, nullNfaTransition.Target);
-        }
-        
+    {        
         [TestMethod]
         public void ThompsonConstructionShouldCreatNfaFromCharacterExpression()
         {
@@ -74,11 +61,42 @@ namespace Pliant.Tests.Unit.RegularExpressions
             var nfa = CreateNfa(input);
             VerifyNfaIsNotNullAndHasValidStartAndEndStates(nfa);
 
-            Assert.AreEqual(1, nfa.Start.Transitions.Count());
+            /*          / null - q0 - a - q2 - null \
+             *      start                           end
+             *          \ null - q1 - b - q3 - null /
+             *              
+             */
+            var start = nfa.Start;           
+            Assert.AreEqual(2, start.Transitions.Count());
 
-            var firstTransition = nfa.Start.Transitions.FirstOrDefault();
+            var startTransitions = new List<INfaTransition>(start.Transitions);
+            var firstTransition = startTransitions[0];
+            var q0 = firstTransition.Target;
             VerifyNullTransition(firstTransition);
-            Assert.AreEqual(2, firstTransition.Target.Transitions.Count());
+            Assert.AreEqual(1, q0.Transitions.Count());
+
+            var aTransition = q0.Transitions.FirstOrDefault();
+            VerifyCharacterTransition(aTransition, 'a');
+
+            var secondTransition = startTransitions[1];
+            var q1 = secondTransition.Target;
+            VerifyNullTransition(secondTransition);
+            Assert.AreEqual(1, q1.Transitions.Count());
+
+            var bTransition = q1.Transitions.FirstOrDefault();
+            VerifyCharacterTransition(bTransition, 'b');
+
+            var q2 = aTransition.Target;
+            Assert.AreEqual(1, q2.Transitions.Count());
+            var q2Transition = q2.Transitions.FirstOrDefault();
+            VerifyNullTransition(q2Transition);
+
+            var q3 = bTransition.Target;
+            Assert.AreEqual(1, q3.Transitions.Count());
+            var q3Transition = q3.Transitions.FirstOrDefault();
+            VerifyNullTransition(q3Transition);
+
+            Assert.AreEqual(q2Transition.Target, q3Transition.Target);
         }
 
         private static void VerifyNfaIsNotNullAndHasValidStartAndEndStates(INfa nfa)

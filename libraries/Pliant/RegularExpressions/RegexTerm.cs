@@ -14,7 +14,7 @@ namespace Pliant.RegularExpressions
         public RegexTerm(RegexFactor factor)
         {
             Factor = factor;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -27,7 +27,7 @@ namespace Pliant.RegularExpressions
             return term.Factor.Equals(Factor);
         }
         
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
         
         int ComputeHashCode()
         {
@@ -36,7 +36,7 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
 
@@ -48,7 +48,7 @@ namespace Pliant.RegularExpressions
             : base(factor)
         {
             Term = term;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -62,7 +62,7 @@ namespace Pliant.RegularExpressions
                 && termFactor.Term.Equals(Term);
         }
         
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         int ComputeHashCode()
         {
@@ -73,7 +73,7 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override RegexNodeType NodeType

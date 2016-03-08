@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Pliant.Grammars;
+using System.Collections.Generic;
+using System;
+using Pliant.Collections;
 
 namespace Pliant.Automata
 {
@@ -23,14 +26,10 @@ namespace Pliant.Automata
 
         public IEnumerable<INfaState> Closure()
         {
-            // the working queue used to process states
-            var queue = new Queue<INfaState>();
-
-            // the hash set used to track visited states
-            var set = new HashSet<INfaState>();
-
+            // the working queue used to process states 
+            var queue = new ProcessOnceQueue<INfaState>();
+            
             // initialize by adding the curren state (this)
-            set.Add(this);
             queue.Enqueue(this);
 
             // loop over items in the queue, adding newly discovered
@@ -40,11 +39,10 @@ namespace Pliant.Automata
                 var state = queue.Dequeue();
                 foreach (var transition in state.Transitions)
                     if (transition.TransitionType == NfaTransitionType.Null)
-                        if (set.Add(transition.Target))
-                            queue.Enqueue(transition.Target);
+                        queue.Enqueue(transition.Target);
             }
 
-            return set;
-        }
-    }
+            return queue.Visited;
+        }        
+    }    
 }

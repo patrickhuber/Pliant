@@ -95,16 +95,68 @@ namespace Pliant.RegularExpressions
             throw new InvalidOperationException("Unrecognized regex atom");
         }
 
-        private INfa Set(RegexAtomSet regexAtomSet)
+        private INfa Set(RegexAtomSet atomSet)
         {
-            throw new NotImplementedException();
+            return Set(atomSet.Set);
         }
 
-        private INfa Character(RegexCharacterClassCharacter character)
+        private INfa Set(RegexSet set)
+        {
+            return CharacterClass(set.CharacterClass, set.Negate);            
+        }
+
+        private INfa CharacterClass(RegexCharacterClass characterClass, bool negate)
+        {
+            switch (characterClass.NodeType)
+            {
+                case RegexNodeType.RegexCharacterClass:
+                    return UnitRange(characterClass.CharacterRange, negate);
+
+                case RegexNodeType.RegexCharacterClassAlteration:
+                    var alteration = characterClass as RegexCharacterClassAlteration;
+                    return Union(
+                        UnitRange(alteration.CharacterRange, negate),
+                        CharacterClass(alteration.CharacterClass, negate));
+            }
+            throw new InvalidOperationException("Unreachable code detected.");
+        }
+
+        private INfa UnitRange(RegexCharacterUnitRange unitRange, bool negate)
+        {
+            switch (unitRange.NodeType)
+            {
+                case RegexNodeType.RegexCharacterUnitRange:
+                    return Character(unitRange.StartCharacter, negate);                    
+
+                case RegexNodeType.RegexCharacterRange:
+                    var range = unitRange as RegexCharacterRange;
+                    return Range(range, negate);
+            }
+            throw new InvalidOperationException("Unreachable code detected.");
+        }
+
+        private INfa Range(RegexCharacterRange range, bool negate)
+        {
+            // combine characters into a character range terminal
+            var start = range.StartCharacter.Value;
+            var end = range.EndCharacter.Value;
+            ITerminal terminal = new RangeTerminal(start, end);
+            var nfaStartState = new NfaState();
+            var nfaEndState = new NfaState();
+            if (negate)
+                terminal = new NegationTerminal(terminal);
+            nfaStartState.AddTransistion(
+                new TerminalNfaTransition(terminal, nfaEndState));
+            return new Nfa(nfaStartState, nfaEndState);
+        }
+        
+        private INfa Character(RegexCharacterClassCharacter character, bool negate)
         {
             var start = new NfaState();
             var end = new NfaState();
-            var terminal = new CharacterTerminal(character.Value);
+            ITerminal terminal = new CharacterTerminal(character.Value);
+            if (negate)
+                terminal = new NegationTerminal(terminal);
             var transition = new TerminalNfaTransition(
                 terminal: terminal,
                 target: end);

@@ -17,7 +17,7 @@ namespace Pliant.RegularExpressions
         {
             Negate = negate;
             CharacterClass = characterClass;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -33,7 +33,8 @@ namespace Pliant.RegularExpressions
                 && Negate.Equals(set.Negate);
         }
         
-        private readonly Lazy<int> _hashCode ;
+        private readonly int _hashCode ;
+
         int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
@@ -42,7 +43,7 @@ namespace Pliant.RegularExpressions
         }
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
 }

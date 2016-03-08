@@ -9,10 +9,10 @@ namespace Pliant.RegularExpressions
         public RegexFactor(RegexAtom atom)
         {
             Atom = atom;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
         
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         int ComputeHashCode()
         {
@@ -22,7 +22,7 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
@@ -49,7 +49,7 @@ namespace Pliant.RegularExpressions
             : base(atom)
         {
             Iterator = iterator;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -62,7 +62,7 @@ namespace Pliant.RegularExpressions
             return factor.Atom.Equals(Atom);
         }
         
-        private readonly Lazy<int> _hashCode ;
+        private readonly int _hashCode ;
 
         int ComputeHashCode()
         {
@@ -73,7 +73,7 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override RegexNodeType NodeType

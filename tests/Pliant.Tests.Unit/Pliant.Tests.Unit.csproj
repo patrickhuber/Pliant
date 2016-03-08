@@ -53,6 +53,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Automata\DfaLexemeTests.cs" />
+    <Compile Include="Automata\SubsetConstructionAlgorithmTests.cs" />
     <Compile Include="Builders\ProductionBuilderTests.cs" />
     <Compile Include="Builders\BuilderExpressionTests.cs" />
     <Compile Include="Ebnf\EbnfParserTests.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Builders\GrammarBuilderTests.cs" />
     <Compile Include="LoggingNodeVisitor.cs" />
     <Compile Include="Ast\NodeVisitorTests.cs" />
+    <Compile Include="ProcessOnceQueueTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Grammars\ProductionTests.cs" />
     <Compile Include="RegularExpressions\RegexParserTests.cs" />
@@ -77,6 +79,7 @@
     <Compile Include="ParseInterfaceTests.cs" />
     <Compile Include="Lexemes\TerminalLexemeTests.cs" />
     <Compile Include="Grammars\WhitespaceTerminalTests.cs" />
+    <Compile Include="RegularExpressions\RegexToDfaTests.cs" />
     <Compile Include="RegularExpressions\ThompsonConstructionTests.cs" />
     <Compile Include="Tree\TreeNodeTests.cs" />
   </ItemGroup>
@@ -92,7 +95,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Collections\" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>
