@@ -8,7 +8,7 @@ namespace Pliant.Ebnf
 
     public class EbnfBlockRule : EbnfBlock
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfRule Rule { get; private set; }
 
@@ -17,7 +17,7 @@ namespace Pliant.Ebnf
         public EbnfBlockRule(EbnfRule rule)
         {
             Rule = rule;
-            _hashCode = new Lazy<int>(ComputeHash);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -31,7 +31,7 @@ namespace Pliant.Ebnf
                 && blockRule.Rule.Equals(Rule);
         }
 
-        int ComputeHash()
+        int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
                 Rule.GetHashCode(), 
@@ -40,20 +40,20 @@ namespace Pliant.Ebnf
                 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
 
     public class EbnfBlockSetting : EbnfBlock
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
         public EbnfSetting Setting { get; private set; }
         public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfBlockSetting; } }
 
         public EbnfBlockSetting(EbnfSetting setting)
         {
             Setting = setting;
-            _hashCode = new Lazy<int>(ComputeHash);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -67,7 +67,7 @@ namespace Pliant.Ebnf
                 && blockRule.Setting.Equals(Setting);
         }
 
-        int ComputeHash()
+        int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
                 Setting.GetHashCode(),
@@ -76,20 +76,20 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
 
     public class EbnfBlockLexerRule : EbnfBlock
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
         public EbnfLexerRule LexerRule { get; private set; }
         public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfBlockLexerRule; } }
 
         public EbnfBlockLexerRule(EbnfLexerRule lexerRule)
         {
             LexerRule = lexerRule;
-            _hashCode = new Lazy<int>(ComputeHash);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -103,7 +103,7 @@ namespace Pliant.Ebnf
                 && blockRule.LexerRule.Equals(LexerRule);
         }
 
-        int ComputeHash()
+        int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
                 LexerRule.GetHashCode(),
@@ -112,7 +112,7 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
 }

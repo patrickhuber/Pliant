@@ -31,7 +31,7 @@ namespace Pliant.Charts
             Length = position;
             PostDotSymbol = GetPostDotSymbol(position, production);
             PreDotSymbol = GetPreDotSymbol(position, production);
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public State(IProduction production, int position, int origin, INode parseNode)
@@ -93,7 +93,7 @@ namespace Pliant.Charts
             return GetHashCode() == state.GetHashCode();
         }
 
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         private int ComputeHashCode()
         {
@@ -105,7 +105,7 @@ namespace Pliant.Charts
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override string ToString()

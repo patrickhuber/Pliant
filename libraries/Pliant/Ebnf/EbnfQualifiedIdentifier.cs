@@ -4,14 +4,14 @@ namespace Pliant.Ebnf
 {
     public class EbnfQualifiedIdentifier : EbnfNode
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public string Identifier { get; private set; }
 
         public EbnfQualifiedIdentifier(string identifier)
         {
             Identifier = identifier;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType
@@ -40,13 +40,13 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
 
     public class EbnfQualifiedIdentifierConcatenation : EbnfQualifiedIdentifier
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfQualifiedIdentifier QualifiedIdentifier { get; private set; }
 
@@ -56,7 +56,7 @@ namespace Pliant.Ebnf
             : base(identifier)
         {
             QualifiedIdentifier = qualifiedIdentifier;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType
@@ -89,7 +89,7 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
 }

@@ -9,12 +9,12 @@ namespace Pliant.RegularExpressions
         public RegexCharacterClass(RegexCharacterUnitRange characterRange)
         {
             CharacterRange = characterRange;
-            _hashCode = new Lazy<int>(ComputeHash);
+            _hashCode = ComputeHashCode();
         }
 
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
-        private int ComputeHash()
+        private int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
                     CharacterRange.GetHashCode());
@@ -22,7 +22,7 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
@@ -51,12 +51,12 @@ namespace Pliant.RegularExpressions
             : base(characterRange)
         {
             CharacterClass = characterClass;
-            _hashCode = new Lazy<int>(ComputeHash);
+            _hashCode = ComputeHashCode();
         }
 
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
-        int ComputeHash()
+        int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
                     CharacterRange.GetHashCode(),
@@ -65,7 +65,7 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)

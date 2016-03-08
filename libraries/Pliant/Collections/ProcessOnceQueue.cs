@@ -6,8 +6,8 @@ namespace Pliant.Collections
 {
     public class ProcessOnceQueue<T> : IQueue<T>
     {
-        private Queue<T> _queue;
-        private Dictionary<T,T> _visited;
+        private readonly Queue<T> _queue;
+        private readonly Dictionary<T,T> _visited;
 
         public ProcessOnceQueue()
         {

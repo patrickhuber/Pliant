@@ -8,14 +8,14 @@ namespace Pliant.Ebnf
 
     public class EbnfFactorIdentifier : EbnfFactor
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfQualifiedIdentifier QualifiedIdentifier { get; private set; }
 
         public EbnfFactorIdentifier(EbnfQualifiedIdentifier qualifiedIdentifier)
         {
             QualifiedIdentifier = qualifiedIdentifier;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType
@@ -35,7 +35,7 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
@@ -52,14 +52,14 @@ namespace Pliant.Ebnf
 
     public class EbnfFactorLiteral : EbnfFactor
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public string Value { get; private set; }
 
         public EbnfFactorLiteral(string value)
         {
             Value = value;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType
@@ -78,7 +78,7 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
@@ -95,14 +95,14 @@ namespace Pliant.Ebnf
 
     public class EbnfFactorRegex : EbnfFactor
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public RegularExpressions.Regex Regex { get; private set; }
 
         public EbnfFactorRegex(RegularExpressions.Regex regex)
         {
             Regex = regex;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType
@@ -121,7 +121,7 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
@@ -138,14 +138,14 @@ namespace Pliant.Ebnf
 
     public class EbnfFactorConcatenation : EbnfFactor
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfExpression Expression { get; private set; }
 
         public EbnfFactorConcatenation(EbnfExpression expression)
         {
             Expression = expression;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType
@@ -164,7 +164,7 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
@@ -181,14 +181,14 @@ namespace Pliant.Ebnf
 
     public class EbnfFactorOptional : EbnfFactor
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfExpression Expression { get; private set; }
 
         public EbnfFactorOptional(EbnfExpression expression)
         {
             Expression = expression;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType
@@ -207,7 +207,7 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
@@ -224,14 +224,14 @@ namespace Pliant.Ebnf
 
     public class EbnfFactorGrouping : EbnfFactor
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfExpression Expression { get; private set; }
 
         public EbnfFactorGrouping(EbnfExpression expression)
         {
             Expression = expression;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType
@@ -250,7 +250,7 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override bool Equals(object obj)

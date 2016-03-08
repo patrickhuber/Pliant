@@ -25,7 +25,7 @@ namespace Pliant.RegularExpressions
         public RegexAtomCharacter(RegexCharacter character)
         {
             Character = character;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -38,11 +38,11 @@ namespace Pliant.RegularExpressions
             return Character.Equals(atomCharacter.Character);
         }
         
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         private int ComputeHashCode()
@@ -63,7 +63,7 @@ namespace Pliant.RegularExpressions
         public RegexAtomExpression(RegexExpression expression)
         {
             Expression = expression;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -76,7 +76,7 @@ namespace Pliant.RegularExpressions
             return Expression.Equals(atomExpression.Expression);
         }
         
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         int ComputeHashCode()
         {
@@ -85,7 +85,7 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override RegexNodeType NodeType
@@ -101,7 +101,7 @@ namespace Pliant.RegularExpressions
         public RegexAtomSet(RegexSet set)
         {
             Set = set;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -114,7 +114,7 @@ namespace Pliant.RegularExpressions
             return Set.Equals(atomSet.Set);
         }
         
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         private int ComputeHashCode()
         {
@@ -123,7 +123,7 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override RegexNodeType NodeType

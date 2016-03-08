@@ -23,7 +23,7 @@ namespace Pliant.Charts
             Reduction = reduction;
             Recognized = recognized;
             Position = position;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -34,7 +34,7 @@ namespace Pliant.Charts
             return base.Equals(obj as State) && this.Recognized.Equals(transitionState.Recognized);
         }
         
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         private int ComputeHashCode()
         {
@@ -45,7 +45,7 @@ namespace Pliant.Charts
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override string ToString()

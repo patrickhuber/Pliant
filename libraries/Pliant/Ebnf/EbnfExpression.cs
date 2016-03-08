@@ -4,14 +4,14 @@ namespace Pliant.Ebnf
 {
     public class EbnfExpression : EbnfNode
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfTerm Term { get; private set; }
 
         public EbnfExpression(EbnfTerm term)
         {
             Term = term;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType
@@ -42,13 +42,13 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
     
     public class EbnfExpressionAlteration : EbnfExpression
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfExpression Expression { get; private set; }
 
@@ -57,8 +57,8 @@ namespace Pliant.Ebnf
             EbnfExpression expression)
             : base(term)
         {
-            _hashCode = new Lazy<int>(ComputeHashCode);
             Expression = expression;
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType
@@ -91,7 +91,7 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
 }

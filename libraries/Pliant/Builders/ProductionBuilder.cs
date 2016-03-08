@@ -69,10 +69,5 @@ namespace Pliant.Builders
         {
             return new ProductionBuilder(name.Name, name.Namespace);
         }
-
-        public static ProductionReference operator +(ProductionBuilder builder, IProduction production)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

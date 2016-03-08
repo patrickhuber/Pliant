@@ -9,7 +9,7 @@ namespace Pliant.RegularExpressions
         public RegexCharacterUnitRange(RegexCharacterClassCharacter startCharacter)
         {
             StartCharacter = startCharacter;
-            _hashCode = new Lazy<int>(ComputeHash);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -24,9 +24,9 @@ namespace Pliant.RegularExpressions
             return characterRange.StartCharacter.Equals(StartCharacter);
         }
 
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
-        private int ComputeHash()
+        private int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
                     StartCharacter.GetHashCode());
@@ -34,7 +34,7 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override RegexNodeType NodeType
@@ -53,7 +53,7 @@ namespace Pliant.RegularExpressions
             : base(startCharacter)
         {
             EndCharacter = endCharacter;
-            _hashCode = new Lazy<int>(ComputeHash);
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
@@ -68,9 +68,9 @@ namespace Pliant.RegularExpressions
                 && EndCharacter.Equals(characterRangeSet.EndCharacter);
         }
         
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
-        int ComputeHash()
+        int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
                     StartCharacter.GetHashCode(),
@@ -79,7 +79,7 @@ namespace Pliant.RegularExpressions
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
 
         public override RegexNodeType NodeType

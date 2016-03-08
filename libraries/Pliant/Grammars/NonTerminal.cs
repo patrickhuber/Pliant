@@ -34,9 +34,13 @@
 
         public override bool Equals(object obj)
         {
-            var nonTerminal = obj as INonTerminal;
-            if (nonTerminal == null)
+            if ((object)obj == null)
                 return false;
+            
+            var nonTerminal = obj as INonTerminal;
+            if ((object)nonTerminal == null)
+                return false;
+
             return Value.Equals(nonTerminal.Value);
         }
 

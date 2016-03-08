@@ -4,12 +4,12 @@ namespace Pliant.Ebnf
 {
     public class EbnfDefinition : EbnfNode
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfDefinition(EbnfBlock block)
         {
             Block = block;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
 
@@ -38,19 +38,19 @@ namespace Pliant.Ebnf
 
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
 
     public class EbnfDefinitionConcatenation : EbnfDefinition
     {
-        private readonly Lazy<int> _hashCode;
+        private readonly int _hashCode;
 
         public EbnfDefinitionConcatenation(EbnfBlock block, EbnfDefinition definition)
             : base(block)
         {
             Definition = definition;
-            _hashCode = new Lazy<int>(ComputeHashCode);
+            _hashCode = ComputeHashCode();
         }
 
         public EbnfDefinition Definition { get; private set; }
@@ -80,7 +80,7 @@ namespace Pliant.Ebnf
         
         public override int GetHashCode()
         {
-            return _hashCode.Value;
+            return _hashCode;
         }
     }
 }
