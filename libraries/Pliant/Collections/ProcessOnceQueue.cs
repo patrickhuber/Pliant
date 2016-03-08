@@ -7,12 +7,12 @@ namespace Pliant.Collections
     public class ProcessOnceQueue<T> : IQueue<T>
     {
         private Queue<T> _queue;
-        private HashSet<T> _visited;
+        private Dictionary<T,T> _visited;
 
         public ProcessOnceQueue()
         {
             _queue = new Queue<T>();
-            _visited = new HashSet<T>();
+            _visited = new Dictionary<T, T>();
         }
 
         public void Clear()
@@ -23,8 +23,22 @@ namespace Pliant.Collections
 
         public void Enqueue(T item)
         {
-            if (_visited.Add(item))
+            if (!_visited.ContainsKey(item))
+            {
+                _visited[item] = item;
                 _queue.Enqueue(item);
+            }
+        }
+
+        public T EnqueueOrGetExisting(T item)
+        {
+            if (!_visited.ContainsKey(item))
+            {
+                _visited[item] = item;
+                _queue.Enqueue(item);
+                return item;
+            }
+            return _visited[item];
         }
 
         public T Dequeue()
@@ -46,6 +60,8 @@ namespace Pliant.Collections
         {
             _queue.TrimExcess();
         }
+
+        public IEnumerable<T> Visited { get { return _visited.Keys; } }
 
         public IEnumerator<T> GetEnumerator()
         {

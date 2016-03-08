@@ -9,6 +9,6 @@ namespace Pliant.Automata
 
         void AddTransistion(INfaTransition transition);
 
-        IDictionary<ITerminal, ISet<INfaState>> Closure();
+        IEnumerable<INfaState> Closure();
     }
 }

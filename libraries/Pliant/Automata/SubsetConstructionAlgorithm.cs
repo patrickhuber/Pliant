@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Collections;
+using Pliant.Grammars;
 using System;
 using System.Collections.Generic;
 
@@ -8,102 +9,87 @@ namespace Pliant.Automata
     {
         public IDfaState Transform(INfa nfa)
         {
-            var startState = nfa.Start;            
-            var visited = new HashSet<int>();
-            var queue = new Queue<IEnumerable<INfaState>>();
-
-            var startClosure = startState.Closure();
-
-            // for each terminal in the closure, enqueue the set of states
-            // reachable by that terminal if they haven't been processed yet.
-            foreach (var terminal in startClosure.Keys)
+            var processOnceQueue = new ProcessOnceQueue<NfaClosure>();
+            var start = new NfaClosure(new[] { nfa.Start }, nfa.Start.Equals(nfa.End));
+            processOnceQueue.Enqueue(start);
+            while (processOnceQueue.Count > 0)
             {
-                var set = startClosure[terminal];
+                var nfaClosure = processOnceQueue.Dequeue();
+                var transitions = new Dictionary<ITerminal, ISet<INfaState>>();
 
-                if (set.Count == 0)
-                    continue;
-
-                var key = GetClosureKey(set);
-
-                if (visited.Add(key))
-                    queue.Enqueue(set);
-            }
-
-            while (queue.Count != 0)
-            {
-                var set = queue.Dequeue();
-                var closure = Closure(set);
-                foreach (var terminal in closure.Keys)
+                foreach (var state in nfaClosure.Closure)
                 {
-                    var terminalSet = closure[terminal];
-                    if (terminalSet.Count == 0)
-                        continue;
+                    foreach (var transition in state.Transitions)
+                    {
+                        switch (transition.TransitionType)
+                        {
+                            case NfaTransitionType.Terminal:
+                                var terminalTransition = transition as TerminalNfaTransition;
+                                var terminal = terminalTransition.Terminal;
+                                
+                                if (!transitions.ContainsKey(terminalTransition.Terminal))                                
+                                    transitions[terminal] = new HashSet<INfaState>();
+                                transitions[terminal].Add(transition.Target);
+                                break;
+                        }
+                    }
+                }
 
-                    var key = GetClosureKey(terminalSet);
-
-                    if (visited.Add(key))
-                        queue.Enqueue(terminalSet);
+                foreach (var terminal in transitions.Keys)
+                {
+                    var targetStates = transitions[terminal];
+                    var closure = Closure(targetStates, nfa.End);
+                    closure = processOnceQueue.EnqueueOrGetExisting(closure);
+                    nfaClosure.State.AddTransition(new DfaTransition(terminal, closure.State));
                 }
             }
 
-            throw new NotImplementedException();
+            return start.State;
         }
 
-        public IDictionary<ITerminal, ISet<INfaState>> Closure(IEnumerable<INfaState> states)
+        private NfaClosure Closure(IEnumerable<INfaState> states, INfaState endState)
         {
-            var dictionary = new Dictionary<ITerminal, ISet<INfaState>>();
-            
-            // compute the aggregate over each state's closure
+            var set = new HashSet<INfaState>();
+            bool isFinal = false;
             foreach (var state in states)
-            {
-                var closure = state.Closure();
-                foreach (var terminal in closure.Keys)
+                foreach (var item in state.Closure())
                 {
-                    var terminalClosure = closure[terminal];
-                    if (!dictionary.ContainsKey(terminal))
-                        dictionary[terminal] = new HashSet<INfaState>(terminalClosure);
-                    else
-                        foreach (var terminalClosureState in terminalClosure)
-                            dictionary[terminal].Add(terminalClosureState);
+                    if (item.Equals(endState))
+                        isFinal = true;
+                    set.Add(item);
                 }
-            }
 
-            return dictionary;
+            return new NfaClosure(set, isFinal);
         }
 
-        public int GetClosureKey(IEnumerable<INfaState> closure)
+        private class NfaClosure
         {
-            return HashUtil.ComputeHash(closure);
-        }
+            public IEnumerable<INfaState> Closure { get; }
+            public IDfaState State { get; }
 
-        private class ClosureDfaState : IDfaState
-        {
-            public bool IsFinal { get; private set; }
-            public IEnumerable<INfaState> Closure { get; private set; }
+            private readonly int _hashCode;
 
-            private IList<IDfaTransition> _transitions;
-
-            public IEnumerable<IDfaTransition> Transitions
-            {
-                get { return _transitions; }
-            }
-
-            public ClosureDfaState(IEnumerable<INfaState> closure, bool isFinal)
+            public NfaClosure(IEnumerable<INfaState> closure, bool isFinal)
             {
                 Closure = closure;
-                IsFinal = isFinal;
-                _transitions = new List<IDfaTransition>();
-            }
-
-            public void AddTransition(IDfaTransition edge)
-            {
-                _transitions.Add(edge);
+                _hashCode = HashUtil.ComputeHash(closure);
+                State = new DfaState(isFinal);
             }
 
             public override int GetHashCode()
             {
-                return base.GetHashCode();
+                return _hashCode;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if ((object)obj == null)
+                    return false;
+                var nfaClosure = obj as NfaClosure;
+                if ((object)nfaClosure == null)
+                    return false;
+                return nfaClosure._hashCode.Equals(_hashCode);
             }
         }
-    }
+    }     
 }
