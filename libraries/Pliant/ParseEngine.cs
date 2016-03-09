@@ -412,7 +412,7 @@ namespace Pliant
             INode v,
             int location)
         {
-            Assert.IsNotNull(v, "v");
+            Assert.IsNotNull(v, nameof(v));
             var anyPreDotRuleNull = true;
             if (nextState.Length > 1)
             {

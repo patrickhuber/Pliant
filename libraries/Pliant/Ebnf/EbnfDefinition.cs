@@ -8,6 +8,7 @@ namespace Pliant.Ebnf
 
         public EbnfDefinition(EbnfBlock block)
         {
+            Assert.IsNotNull(block, nameof(block));
             Block = block;
             _hashCode = ComputeHashCode();
         }
@@ -49,6 +50,7 @@ namespace Pliant.Ebnf
         public EbnfDefinitionConcatenation(EbnfBlock block, EbnfDefinition definition)
             : base(block)
         {
+            Assert.IsNotNull(definition, nameof(definition));
             Definition = definition;
             _hashCode = ComputeHashCode();
         }

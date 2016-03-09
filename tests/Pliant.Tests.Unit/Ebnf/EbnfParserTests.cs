@@ -227,6 +227,21 @@ namespace Pliant.Tests.Unit.Ebnf
             ");
             Assert.AreEqual(expected, actual);
         }
+
+        [TestMethod]
+        public void EbnfParserShouldParseSettings()
+        {
+            var actual = Parse(@"
+                :ignore = whitespace; ");
+        }
+
+        [TestMethod]
+        public void EbnfParserShouldParseLexerRule()
+        {
+            var actual = Parse(@"
+                b ~ 'b' ;");
+        }
+
         private static EbnfDefinition Parse(string input)
         {
             var ebnfParser = new EbnfParser();

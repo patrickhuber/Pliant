@@ -280,11 +280,49 @@ namespace Pliant.Ebnf
 
         private EbnfBlockSetting VisitSettingNode(IInternalTreeNode node)
         {
-            throw new NotImplementedException();
+            EbnfSettingIdentifier settingIdentifier = null;
+            EbnfQualifiedIdentifier qualifiedIdentifier = null;
+
+            foreach (var child in node.Children)
+                switch (child.NodeType)
+                {
+                    case TreeNodeType.Token:
+                        var tokenNode = child as ITokenTreeNode;
+                        var token = tokenNode.Token;
+                        if (token.TokenType.Id == "settingIdentifier")
+                            settingIdentifier = new EbnfSettingIdentifier(token.Value);
+                        break;
+
+                    case TreeNodeType.Internal:
+                        var internalNode = child as IInternalTreeNode;
+                        var symbolValue = internalNode.Symbol.Value;
+                        if (EbnfGrammar.QualifiedIdentifier == symbolValue)
+                            qualifiedIdentifier = VisitQualifiedIdentifierNode(internalNode);
+                        break;
+                }                           
+            return new EbnfBlockSetting(
+                new EbnfSetting(settingIdentifier, qualifiedIdentifier));
         }
+
         private EbnfBlockLexerRule VisitLexerRuleNode(IInternalTreeNode node)
         {
-            throw new NotImplementedException();
+            EbnfQualifiedIdentifier qualifiedIdentifier = null;
+            EbnfExpression expression = null;
+
+            foreach (var child in node.Children)
+            {
+                if (child.NodeType != TreeNodeType.Internal)
+                    continue;
+                var internalNode = child as IInternalTreeNode;
+                var symbolValue = internalNode.Symbol.Value;
+                if (EbnfGrammar.QualifiedIdentifier == symbolValue)
+                    qualifiedIdentifier = VisitQualifiedIdentifierNode(internalNode);
+                else if (EbnfGrammar.Expression == symbolValue)
+                    expression = VisitExpressionNode(internalNode);
+                
+            }
+            return new EbnfBlockLexerRule(
+                new EbnfLexerRule(qualifiedIdentifier, expression));
         }
 
     }
