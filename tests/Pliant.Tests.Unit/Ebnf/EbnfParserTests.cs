@@ -233,13 +233,34 @@ namespace Pliant.Tests.Unit.Ebnf
         {
             var actual = Parse(@"
                 :ignore = whitespace; ");
+            Assert.IsNotNull(actual);
+
+            var expected = new EbnfDefinition(
+                new EbnfBlockSetting(
+                    new EbnfSetting(
+                        new EbnfSettingIdentifier(":ignore"),
+                        new EbnfQualifiedIdentifier("whitespace"))));
+
+            Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
         public void EbnfParserShouldParseLexerRule()
         {
+            
             var actual = Parse(@"
                 b ~ 'b' ;");
+            Assert.IsNotNull(actual);
+
+            var expected = new EbnfDefinition(
+                block: new EbnfBlockLexerRule(
+                   lexerRule: new EbnfLexerRule(
+                       qualifiedIdentifier: new EbnfQualifiedIdentifier("b"),
+                       expression: new EbnfExpression(
+                           term: new EbnfTerm(
+                               factor: new EbnfFactorLiteral("b"))))));
+
+            Assert.AreEqual(expected, actual);
         }
 
         private static EbnfDefinition Parse(string input)
