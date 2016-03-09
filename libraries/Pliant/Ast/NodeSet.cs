@@ -6,51 +6,36 @@ namespace Pliant.Ast
 {
     public class NodeSet
     {
-        private readonly IList<ISymbolNode> _symbolNodes;
-        private readonly IList<IIntermediateNode> _intermediateNodes;
+        private readonly IDictionary<int, ISymbolNode> _symbolNodes;
+        private readonly IDictionary<int, IIntermediateNode> _intermediateNodes;
 
         public NodeSet()
         {
-            _symbolNodes = new List<ISymbolNode>();
-            _intermediateNodes = new List<IIntermediateNode>();
+            _symbolNodes = new Dictionary<int, ISymbolNode>();
+            _intermediateNodes = new Dictionary<int, IIntermediateNode>();
         }
 
         public ISymbolNode AddOrGetExistingSymbolNode(ISymbol symbol, int origin, int location)
         {
-            // PERF: Avoid Linq FirstOrDefault due to lambda allocation
-            ISymbolNode symbolNode = null;
-            foreach (var node in _symbolNodes)
-                if (node.Origin == origin
-                    && node.Location == location
-                    && node.Symbol.Equals(symbol))
-                {
-                    symbolNode = node;
-                    break;
-                }
+            var hash = HashUtil.ComputeHash(symbol.GetHashCode(), origin.GetHashCode(), location.GetHashCode());
 
-            if (symbolNode == null)
-            {
-                symbolNode = new SymbolNode(symbol, origin, location);
-                _symbolNodes.Add(symbolNode);
-            }
+            ISymbolNode symbolNode = null;
+            if (_symbolNodes.TryGetValue(hash, out symbolNode))
+                return symbolNode;
+
+            symbolNode = new SymbolNode(symbol, origin, location);
+            _symbolNodes.Add(hash, symbolNode);
             return symbolNode;
         }
 
         public IIntermediateNode AddOrGetExistingIntermediateNode(IState trigger, int origin, int location)
         {
-            // PERF: Avoid Linq FirstOrDefault due to lambda allocation
+            var hash = HashUtil.ComputeHash(trigger.GetHashCode());
             IIntermediateNode intermediateNode = null;
-            foreach (var node in _intermediateNodes)
-                if (node.State.Equals(trigger))
-                {
-                    intermediateNode = node;
-                    break;
-                }
-
-            if (intermediateNode == null)
-            {
-                intermediateNode = new IntermediateNode(trigger, origin, location);
-            }
+            if (_intermediateNodes.TryGetValue(hash, out intermediateNode))
+                return intermediateNode;
+            intermediateNode = new IntermediateNode(trigger, origin, location);
+            _intermediateNodes.Add(hash, intermediateNode);
             return intermediateNode;
         }
 

@@ -23,9 +23,9 @@ namespace Pliant.Charts
 
         public State(IProduction production, int position, int origin)
         {
-            Assert.IsNotNull(production, "production");
-            Assert.IsGreaterThanEqualToZero(position, "position");
-            Assert.IsGreaterThanEqualToZero(origin, "origin");
+            Assert.IsNotNull(production, nameof(production));
+            Assert.IsGreaterThanEqualToZero(position, nameof(position));
+            Assert.IsGreaterThanEqualToZero(origin, nameof(origin));
             Production = production;
             Origin = origin;
             Length = position;
@@ -86,8 +86,10 @@ namespace Pliant.Charts
 
         public override bool Equals(object obj)
         {
+            if ((object)obj == null)
+                return false;
             var state = obj as State;
-            if (state == null)
+            if ((object)state == null)
                 return false;
             // PERF: Hash Codes are Cached, so equality performance is cached as well
             return GetHashCode() == state.GetHashCode();

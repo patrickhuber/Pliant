@@ -261,7 +261,7 @@ namespace Pliant
 
         private void EarleyComplete(IState completed, int k)
         {
-            int j = completed.Origin;
+            var j = completed.Origin;
             var sourceEarleySet = _chart.EarleySets[j];
             for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
             {

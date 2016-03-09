@@ -1,4 +1,6 @@
 ﻿using Pliant.Bnf;
+using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace Pliant.PerfViewApp
@@ -7,27 +9,23 @@ namespace Pliant.PerfViewApp
     {
         private static void Main(string[] args)
         {
-            var sampleBnf = @"
-            <syntax>         ::= <rule> | <rule> <syntax>
-            <rule>           ::= <identifier> ""::="" <expression> <line-end>
-            <expression>     ::= <list> | <list> ""|"" <expression>
-            <line-end>       ::= <EOL> | <line-end> <line-end>
-            <list>           ::= <term > | <term> <list>
-            <term>           ::= <literal > | <identifier>
-            <identifier>     ::= ""<"" <rule-name> "">""
-            <literal>        ::= '""' <text> '""' | ""'"" <text> ""'""";
+            var sampleBnf = File.ReadAllText(
+                Path.Combine(Environment.CurrentDirectory, "AnsiC.bnf"));
 
             var grammar = new BnfGrammar();
 
-            for (long i = 0; i < 10000; i++)
+            var stopwatch = new Stopwatch();
+            for (long i = 0; i < 1000; i++)
             {
+                stopwatch.Restart();
                 var parseEngine = new ParseEngine(grammar);
                 var parseInterface = new ParseInterface(parseEngine, sampleBnf);
-                var stringReader = new StringReader(sampleBnf);
 
                 while (!parseInterface.EndOfStream() && parseInterface.Read()) { }
 
                 var result = parseInterface.ParseEngine.IsAccepted();
+                stopwatch.Stop();
+                Console.WriteLine($"Pass {i} elapsed ms: {stopwatch.ElapsedMilliseconds}");
             }
         }
     }
