@@ -21,6 +21,8 @@ namespace Pliant.Charts
 
         public INode ParseNode { get; set; }
 
+        private readonly int _hashCode;
+
         public State(IProduction production, int position, int origin)
         {
             Assert.IsNotNull(production, nameof(production));
@@ -95,7 +97,6 @@ namespace Pliant.Charts
             return GetHashCode() == state.GetHashCode();
         }
 
-        private readonly int _hashCode;
 
         private int ComputeHashCode()
         {
