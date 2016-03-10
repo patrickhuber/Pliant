@@ -11,6 +11,7 @@ namespace Pliant.Ebnf
         public EbnfSettingIdentifier(string value)
         {
             Value = value;
+            _hashCode = ComputeHashCode();
         }
 
         public override EbnfNodeType NodeType

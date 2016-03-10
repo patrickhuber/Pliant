@@ -21,7 +21,9 @@ namespace Pliant.Ebnf
         {
             SettingIdentifier = settingIdentifier;
             QualifiedIdentifier = qualifiedIdentifier;
+            _hashCode = ComputeHashCode();
         }
+
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
