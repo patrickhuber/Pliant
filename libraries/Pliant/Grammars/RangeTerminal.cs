@@ -18,7 +18,7 @@
 
         public override string ToString()
         {
-            return string.Format("[{0}-{1}]", Start, End);
+            return $"[{Start}-{End}]";
         }
 
         public override int GetHashCode()

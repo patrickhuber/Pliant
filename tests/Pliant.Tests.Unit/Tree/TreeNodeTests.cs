@@ -19,8 +19,8 @@ namespace Pliant.Tests.Unit.Tree
             C.Definition = 'c';
             var grammar = new GrammarBuilder(S, new[] { S, A, B, C }).ToGrammar();
             var input = "abc";
-            InternalTreeNode treeNode = GetTreeNode(grammar, input);
-            int childCount = 0;
+            var treeNode = GetTreeNode(grammar, input);
+            var childCount = 0;
             foreach (var child in treeNode.Children)
             {
                 childCount++;

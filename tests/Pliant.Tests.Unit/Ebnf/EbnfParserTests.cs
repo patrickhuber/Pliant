@@ -40,7 +40,7 @@ namespace Pliant.Tests.Unit.Ebnf
                     new EbnfRule(
                         new EbnfQualifiedIdentifier("Rule"),
                         new EbnfExpression(
-                            new EbnfTermRepetition(
+                            new EbnfTermConcatenation(
                                 new EbnfFactorLiteral("a"),
                                 new EbnfTerm(
                                     new EbnfFactorLiteral("b")))))));
@@ -76,7 +76,7 @@ namespace Pliant.Tests.Unit.Ebnf
                     new EbnfRule(
                         new EbnfQualifiedIdentifier("Rule"),
                         new EbnfExpressionAlteration(
-                            new EbnfTermRepetition(
+                            new EbnfTermConcatenation(
                                 new EbnfFactorLiteral("a"),
                                 new EbnfTerm(
                                     new EbnfFactorLiteral("b"))),
@@ -126,7 +126,7 @@ namespace Pliant.Tests.Unit.Ebnf
                             new EbnfQualifiedIdentifier("Rule"),
                             new EbnfExpression(
                                 new EbnfTerm(
-                                    new EbnfFactorConcatenation(
+                                    new EbnfFactorRepetition(
                                         new EbnfExpression(
                                             new EbnfTerm(
                                                 new EbnfFactorLiteral("a")))))))));
@@ -199,7 +199,7 @@ namespace Pliant.Tests.Unit.Ebnf
                     new EbnfRule(
                         new EbnfQualifiedIdentifier("S"),
                         new EbnfExpression(
-                            new EbnfTermRepetition(
+                            new EbnfTermConcatenation(
                                 new EbnfFactorIdentifier(
                                     new EbnfQualifiedIdentifier("A")),
                                 new EbnfTerm(
@@ -256,9 +256,9 @@ namespace Pliant.Tests.Unit.Ebnf
                 block: new EbnfBlockLexerRule(
                    lexerRule: new EbnfLexerRule(
                        qualifiedIdentifier: new EbnfQualifiedIdentifier("b"),
-                       expression: new EbnfExpression(
-                           term: new EbnfTerm(
-                               factor: new EbnfFactorLiteral("b"))))));
+                       expression:  new EbnfLexerRuleExpression(
+                            term: new EbnfLexerRuleTerm(
+                                factor: new EbnfLexerRuleFactorLiteral("b"))))));
 
             Assert.AreEqual(expected, actual);
         }

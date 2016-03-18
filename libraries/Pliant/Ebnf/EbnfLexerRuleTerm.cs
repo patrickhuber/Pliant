@@ -1,32 +1,22 @@
-﻿using System;
-
-namespace Pliant.Ebnf
+﻿namespace Pliant.Ebnf
 {
-    public class EbnfTerm : EbnfNode
+    public class EbnfLexerRuleTerm : EbnfNode
     {
-        private readonly int _hashCode;
+        public EbnfLexerRuleFactor Factor { get; private set; }
 
-        public EbnfFactor Factor { get; private set; }
-        
-        public EbnfTerm(EbnfFactor factor)
+        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfLexerRuleTerm; } }
+
+        readonly int _hashCode;
+
+        public EbnfLexerRuleTerm(EbnfLexerRuleFactor factor)
         {
             Factor = factor;
             _hashCode = ComputeHashCode();
         }
 
-        public override EbnfNodeType NodeType
-        {
-            get
-            {
-                return EbnfNodeType.EbnfTerm;
-            }
-        }
-
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
-                NodeType.GetHashCode(),
-                Factor.GetHashCode());
+            return HashUtil.ComputeHash(NodeType.GetHashCode(), Factor.GetHashCode());
         }
 
         public override int GetHashCode()
@@ -38,41 +28,33 @@ namespace Pliant.Ebnf
         {
             if ((object)obj == null)
                 return false;
-            var term = obj as EbnfTerm;
+            var term = obj as EbnfLexerRuleTerm;
             if ((object)term == null)
                 return false;
+
             return term.NodeType == NodeType
                 && term.Factor.Equals(Factor);
         }
     }
 
-    public class EbnfTermConcatenation : EbnfTerm
+    public class EbnfLexerRuleTermConcatenation : EbnfLexerRuleTerm
     {
-        private readonly int _hashCode;
+        public EbnfLexerRuleTerm Term { get; private set; }
 
-        public EbnfTerm Term { get; private set; }
+        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfLexerRuleTermConcatenation; } }
 
-        public EbnfTermConcatenation(EbnfFactor factor, EbnfTerm term)
+        readonly int _hashCode;
+
+        public EbnfLexerRuleTermConcatenation(EbnfLexerRuleFactor factor, EbnfLexerRuleTerm term)
             : base(factor)
         {
             Term = term;
             _hashCode = ComputeHashCode();
         }
 
-        public override EbnfNodeType NodeType
-        {
-            get
-            {
-                return EbnfNodeType.EbnfTermRepetition;
-            }
-        }
-
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
-                NodeType.GetHashCode(),
-                Factor.GetHashCode(),
-                Term.GetHashCode());
+            return HashUtil.ComputeHash(NodeType.GetHashCode(), Factor.GetHashCode(), Term.GetHashCode());
         }
 
         public override int GetHashCode()
@@ -84,9 +66,10 @@ namespace Pliant.Ebnf
         {
             if ((object)obj == null)
                 return false;
-            var term = obj as EbnfTermConcatenation;
+            var term = obj as EbnfLexerRuleTermConcatenation;
             if ((object)term == null)
                 return false;
+
             return term.NodeType == NodeType
                 && term.Factor.Equals(Factor)
                 && term.Term.Equals(Term);

@@ -49,7 +49,7 @@ namespace Pliant.Builders
             ProductionBuilder production, 
             ISet<ProductionBuilder> discoveredProductions)
         {
-            bool productionBuilderBeenProcessed = !discoveredProductions.Add(production);
+            var productionBuilderBeenProcessed = !discoveredProductions.Add(production);
             if (productionBuilderBeenProcessed)
                 return;
 

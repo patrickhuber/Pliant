@@ -14,9 +14,7 @@ namespace Pliant.Lexemes
         {
             if (lexerRule.LexerRuleType != LexerRuleType)
                 throw new Exception(
-                    string.Format(
-                        "Unable to create StringLiteralLexeme from type {0}. Expected StringLiteralLexerRule",
-                        lexerRule.GetType().FullName));
+                    $"Unable to create StringLiteralLexeme from type {lexerRule.GetType().FullName}. Expected StringLiteralLexerRule");
             var stringLiteralLexerRule = lexerRule as IStringLiteralLexerRule;
             return new StringLiteralLexeme(stringLiteralLexerRule);
         }

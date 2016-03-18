@@ -11,9 +11,7 @@ namespace Pliant.Lexemes
         {
             if (lexerRule.LexerRuleType != LexerRuleType)
                 throw new Exception(
-                    string.Format(
-                        "Unable to create TerminalLexeme from type {0}. Expected TerminalLexerRule",
-                        lexerRule.GetType().FullName));
+                    $"Unable to create TerminalLexeme from type {lexerRule.GetType().FullName}. Expected TerminalLexerRule");
             var terminalLexerRule = lexerRule as ITerminalLexerRule;
             return new TerminalLexeme(terminalLexerRule);
         }

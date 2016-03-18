@@ -15,7 +15,7 @@ namespace Pliant.Ast
 
         private int GetTraversalPosition(IInternalNode internalNode)
         {
-            int value = 0;
+            var value = 0;
             if (_stateStore.TryGetValue(internalNode, out value))
                 return value;
             SetTraversalPosition(internalNode, value);
@@ -24,13 +24,13 @@ namespace Pliant.Ast
 
         public IAndNode GetCurrentAndNode(IInternalNode internalNode)
         {
-            int value = GetTraversalPosition(internalNode);
+            var value = GetTraversalPosition(internalNode);
             return internalNode.Children[value];
         }
 
         public void MarkAsTraversed(IInternalNode internalNode)
         {
-            int value = GetTraversalPosition(internalNode);
+            var value = GetTraversalPosition(internalNode);
             if (HasMoreTransitions(internalNode) && TryAcquireLock(internalNode))
                 SetTraversalPosition(internalNode, value + 1);
             else
@@ -65,7 +65,7 @@ namespace Pliant.Ast
                 GetTraversalPosition(internalNode));
         }
 
-        private bool HasMoreTransitions(IInternalNode internalNode, int currentPosition)
+        private static bool HasMoreTransitions(IInternalNode internalNode, int currentPosition)
         {
             return currentPosition < internalNode.Children.Count - 1;
         }

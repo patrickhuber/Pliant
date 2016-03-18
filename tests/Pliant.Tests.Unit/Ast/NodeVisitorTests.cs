@@ -13,7 +13,7 @@ namespace Pliant.Tests.Unit.Ast
     {
         private readonly ILexerRule _whitespace;
 
-        private ILexerRule CreateWhitespaceRule()
+        private static ILexerRule CreateWhitespaceRule()
         {
             var start = new DfaState();
             var end = new DfaState(true);
@@ -114,7 +114,7 @@ namespace Pliant.Tests.Unit.Ast
             while (!parseInterface.EndOfStream())
             {
                 Assert.IsTrue(parseInterface.Read(),
-                    string.Format("Error parsing position: {0}", parseInterface.Position));
+                $"Error parsing position: {parseInterface.Position}");
             }
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
         }

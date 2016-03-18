@@ -120,7 +120,7 @@ namespace Pliant
 
         private void ScanPass(int location, IToken token)
         {
-            IEarleySet earleySet = _chart.EarleySets[location];
+            var earleySet = _chart.EarleySets[location];
             var tokenNode = new TokenNode(token, location, location + 1);
             for (int s = 0; s < earleySet.Scans.Count; s++)
             {
@@ -131,7 +131,7 @@ namespace Pliant
 
         private void Scan(IState scan, int j, ITokenNode tokenNode)
         {
-            int i = scan.Origin;
+            var i = scan.Origin;
             var currentSymbol = scan.PostDotSymbol;
             var lexerRule = currentSymbol as ILexerRule;
 
@@ -153,11 +153,11 @@ namespace Pliant
 
         private void ReductionPass(int location)
         {
-            IEarleySet earleySet = _chart.EarleySets[location];
+            var earleySet = _chart.EarleySets[location];
             var resume = true;
 
-            int p = 0,
-                c = 0;
+            var p = 0;
+            var c = 0;
 
             while (resume)
             {
@@ -362,12 +362,12 @@ namespace Pliant
         /// <returns>true if quasi complete, false otherwise</returns>
         private bool IsNextStateQuasiComplete(IState state)
         {
-            int ruleCount = state.Production.RightHandSide.Count;
+            var ruleCount = state.Production.RightHandSide.Count;
             if (ruleCount == 0)
                 return true;
 
-            int nextStatePosition = state.Length + 1;
-            bool isComplete = nextStatePosition == state.Production.RightHandSide.Count;
+            var nextStatePosition = state.Length + 1;
+            var isComplete = nextStatePosition == state.Production.RightHandSide.Count;
             if (isComplete)
                 return true;
 
@@ -474,16 +474,16 @@ namespace Pliant
             Initialize();
         }
 
-        private void Log(string operation, int origin, IState state)
+        private static void Log(string operation, int origin, IState state)
         {
-            Debug.Write(string.Format("{0}\t{1}", origin, state));
-            Debug.WriteLine(string.Format("\t # {0}", operation));
+            Debug.Write($"{origin}\t{state}");
+            Debug.WriteLine($"\t # {operation}");
         }
 
-        private void LogScan(int origin, IState state, IToken token)
+        private static void LogScan(int origin, IState state, IToken token)
         {
-            Debug.Write(string.Format("{0}\t{1}", origin, state));
-            Debug.WriteLine(string.Format("\t # Scan {0}", token.Value));
+            Debug.Write($"{origin}\t{state}");
+            Debug.WriteLine($"\t # Scan {token.Value}");
         }
     }
 }

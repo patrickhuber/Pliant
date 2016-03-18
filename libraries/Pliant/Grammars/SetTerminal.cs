@@ -23,7 +23,7 @@ namespace Pliant.Grammars
 
         public override string ToString()
         {
-            return string.Join(", ", string.Format("'{0}'", _characterSet));
+            return string.Join(", ", $"'{_characterSet}'");
         }
     }
 }

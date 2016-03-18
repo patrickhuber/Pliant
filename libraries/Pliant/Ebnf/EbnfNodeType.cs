@@ -29,5 +29,12 @@ namespace Pliant.Ebnf
         EbnfSettingIdentifier,
         EbnfQualifiedIdentifier,
         EbnfQualifiedIdentifierConcatenation,
+        EbnfFactorRepetition,
+        EbnfLexerRuleTerm,
+        EbnfLexerRuleTermConcatenation,
+        EbnfLexerRuleFactorLiteral,
+        EbnfLexerRuleFactorRegex,
+        EbnfLexerRuleExpression,
+        EbnfLexerRuleExpressionAlteration,
     }
 }

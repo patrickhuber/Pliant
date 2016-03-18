@@ -33,7 +33,7 @@ namespace Pliant.Ast
             {
                 if (andNode.Children.Count != children.Length)
                     continue;
-                bool isMatchedSubTree = IsMatchedSubTree(children, andNode);
+                var isMatchedSubTree = IsMatchedSubTree(children, andNode);
                 if (isMatchedSubTree)
                     return;
             }
@@ -85,7 +85,7 @@ namespace Pliant.Ast
                     return IsSameNode(parameterNode as IIntermediateNode, compareNode as IIntermediateNode);
             }
             throw new InvalidOperationException(
-                string.Format("Unrecognized node type {0} found when comparing nodes.", parameterNode.NodeType));
+                $"Unrecognized node type {parameterNode.NodeType} found when comparing nodes.");
         }
 
         private static bool IsSameNode(ISymbolNode symbolParameterNode, ISymbolNode symbolCompareNode)

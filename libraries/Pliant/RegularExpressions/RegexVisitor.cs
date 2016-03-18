@@ -16,8 +16,8 @@ namespace Pliant.RegularExpressions
         private Regex VisitRegexNode(IInternalTreeNode node)
         {
             RegexExpression expression = null;
-            bool startsWith = false;
-            bool endsWith = false;
+            var startsWith = false;
+            var endsWith = false;
 
             foreach (var child in node.Children)
             {

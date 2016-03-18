@@ -12,19 +12,22 @@ namespace Pliant.Ebnf
         private static readonly IGrammar _ebnfGrammar;
 
         public static readonly string Namespace = "Ebnf";
-        public static readonly FullyQualifiedName Definition = new FullyQualifiedName(Namespace, "Definition");
-        public static readonly FullyQualifiedName Block = new FullyQualifiedName(Namespace, "Block");
-        public static readonly FullyQualifiedName Rule = new FullyQualifiedName(Namespace, "Rule");
-        public static readonly FullyQualifiedName Setting = new FullyQualifiedName(Namespace, "Setting");
-        public static readonly FullyQualifiedName LexerRule = new FullyQualifiedName(Namespace, "LexerRule");
-        public static readonly FullyQualifiedName QualifiedIdentifier = new FullyQualifiedName(Namespace, "QualifiedIdentifier");
-        public static readonly FullyQualifiedName Expression = new FullyQualifiedName(Namespace, "Expression");
-        public static readonly FullyQualifiedName Term = new FullyQualifiedName(Namespace, "Term");
-        public static readonly FullyQualifiedName Factor = new FullyQualifiedName(Namespace, "Factor");
-        public static readonly FullyQualifiedName Literal = new FullyQualifiedName(Namespace, "Literal");
-        public static readonly FullyQualifiedName Grouping = new FullyQualifiedName(Namespace, "Grouping");
-        public static readonly FullyQualifiedName Repetition = new FullyQualifiedName(Namespace, "Repetition");
-        public static readonly FullyQualifiedName Optional = new FullyQualifiedName(Namespace, "Optional");
+        public static readonly FullyQualifiedName Definition = new FullyQualifiedName(Namespace, nameof(Definition));
+        public static readonly FullyQualifiedName Block = new FullyQualifiedName(Namespace, nameof(Block));
+        public static readonly FullyQualifiedName Rule = new FullyQualifiedName(Namespace, nameof(Rule));
+        public static readonly FullyQualifiedName Setting = new FullyQualifiedName(Namespace, nameof(Setting));
+        public static readonly FullyQualifiedName LexerRule = new FullyQualifiedName(Namespace, nameof(LexerRule));
+        public static readonly FullyQualifiedName QualifiedIdentifier = new FullyQualifiedName(Namespace, nameof(QualifiedIdentifier));
+        public static readonly FullyQualifiedName Expression = new FullyQualifiedName(Namespace, nameof(Expression));
+        public static readonly FullyQualifiedName Term = new FullyQualifiedName(Namespace, nameof(Term));
+        public static readonly FullyQualifiedName Factor = new FullyQualifiedName(Namespace, nameof(Factor));
+        public static readonly FullyQualifiedName Literal = new FullyQualifiedName(Namespace, nameof(Literal));
+        public static readonly FullyQualifiedName Grouping = new FullyQualifiedName(Namespace, nameof(Grouping));
+        public static readonly FullyQualifiedName Repetition = new FullyQualifiedName(Namespace, nameof(Repetition));
+        public static readonly FullyQualifiedName Optional = new FullyQualifiedName(Namespace, nameof(Optional));
+        public static readonly FullyQualifiedName LexerRuleExpression = new FullyQualifiedName(Namespace, nameof(LexerRuleExpression));
+        public static readonly FullyQualifiedName LexerRuleTerm = new FullyQualifiedName(Namespace, nameof(LexerRuleTerm));
+        public static readonly FullyQualifiedName LexerRuleFactor = new FullyQualifiedName(Namespace, nameof(LexerRuleFactor));
 
         static EbnfGrammar()
         {
@@ -53,7 +56,10 @@ namespace Pliant.Ebnf
                 literal = Literal,
                 grouping = Grouping,
                 repetition = Repetition,
-                optional = Optional;
+                optional = Optional,
+                lexerRuleExpression = LexerRuleExpression,
+                lexerRuleTerm = LexerRuleTerm,
+                lexerRuleFactor = LexerRuleFactor;
 
             var regexGrammar = new RegexGrammar();
             var regexProductionReference = new ProductionReference(regexGrammar);
@@ -74,7 +80,7 @@ namespace Pliant.Ebnf
                 settingIdentifier + '=' + qualifiedIdentifier + ';';
 
             lexerRule.Definition =
-                qualifiedIdentifier + '~' + expression + ';';
+                qualifiedIdentifier + '~' + lexerRuleExpression + ';';
 
             expression.Definition =
                 term
@@ -108,7 +114,19 @@ namespace Pliant.Ebnf
             qualifiedIdentifier.Definition =
                 identifier
                 | (_)identifier + '.' + qualifiedIdentifier;
-            
+
+            lexerRuleExpression.Definition = 
+                lexerRuleTerm 
+                | lexerRuleTerm + '|' + lexerRuleExpression;
+
+            lexerRuleTerm.Definition =
+                lexerRuleFactor
+                | lexerRuleFactor + lexerRuleTerm;
+
+            lexerRuleFactor.Definition =
+                literal
+                | '/' + regexProductionReference + '/';
+
             var grammarBuilder = new GrammarBuilder(
                 definition,                
                 ignore: new[] { whitespace });

@@ -56,6 +56,7 @@
     <Compile Include="Automata\SubsetConstructionAlgorithmTests.cs" />
     <Compile Include="Builders\ProductionBuilderTests.cs" />
     <Compile Include="Builders\BuilderExpressionTests.cs" />
+    <Compile Include="Ebnf\EbnfGrammarGeneratorTests.cs" />
     <Compile Include="Ebnf\EbnfParserTests.cs" />
     <Compile Include="Ebnf\EbnfTests.cs" />
     <Compile Include="Grammars\AnyTerminalTests.cs" />

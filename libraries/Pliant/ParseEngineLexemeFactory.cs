@@ -12,9 +12,7 @@ namespace Pliant
         {
             if (lexerRule.LexerRuleType != LexerRuleType)
                 throw new Exception(
-                    string.Format(
-                        "Unable to create ParseEngineLexeme from type {0}. Expected TerminalLexerRule",
-                        lexerRule.GetType().FullName));
+                    $"Unable to create ParseEngineLexeme from type {lexerRule.GetType().FullName}. Expected TerminalLexerRule");
 
             var grammarLexerRule = lexerRule as IGrammarLexerRule;
             var parseEngine = new ParseEngine(grammarLexerRule.Grammar);

@@ -453,7 +453,7 @@ namespace Pliant.Tests.Unit
             var input = Tokenize("aaaaaaaaaaaaaaaaaaabbbbbbbbbbb");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
-            Chart chart = GetChartFromParseEngine(parseEngine);
+            var chart = GetChartFromParseEngine(parseEngine);
             // when this count is < 10 we know that quasi complete items are being processed successfully
             Assert.IsTrue(chart.EarleySets[23].Completions.Count < 10);
         }
@@ -513,7 +513,7 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEngineShouldHandleTransitionsFromRightRecursionToNormalGrammar()
         {
-            IGrammar grammar = CreateRegularExpressionStubGrammar();
+            var grammar = CreateRegularExpressionStubGrammar();
 
             var input = Tokenize("aaaa");
             var parseEngine = new ParseEngine(grammar);

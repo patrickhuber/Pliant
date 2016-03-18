@@ -166,7 +166,7 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void EbnfShouldParseOneOrZero()
+        public void EbnfShouldParseZeroOrOne()
         {
             ParseInput(@"
             Rule = [ Expression ];
@@ -210,6 +210,20 @@ namespace Pliant.Tests.Unit.Ebnf
             Regex.CharacterClassCharacter
                 = /[^\]]/
                 | /[\\]./;");
+        }
+
+        [TestMethod]
+        public void EbnfShouldParseLexerRuleAlteration()
+        {
+            ParseInput(@"
+            SomeLexerRule ~ 'a' | 'b'; ");
+        }
+
+        [TestMethod]
+        public void EbnfShouldParseLexerRuleConcatenation()
+        {
+            ParseInput(@"
+            SomeLexerRule ~ 'a' 'b' ;");
         }
 
         [TestMethod]

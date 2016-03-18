@@ -16,7 +16,7 @@ namespace Pliant.Ast
 
         public override string ToString()
         {
-            return string.Format("({0}, {1}, {2})", State, Origin, Location);
+            return $"({State}, {Origin}, {Location})";
         }
 
         public override void Accept(INodeVisitor visitor)

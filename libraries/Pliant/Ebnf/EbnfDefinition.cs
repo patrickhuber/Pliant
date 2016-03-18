@@ -6,18 +6,17 @@ namespace Pliant.Ebnf
     {
         private readonly int _hashCode;
 
+        public EbnfBlock Block { get; private set; }
+
+        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfDefinition; } }
+
         public EbnfDefinition(EbnfBlock block)
         {
             Assert.IsNotNull(block, nameof(block));
             Block = block;
             _hashCode = ComputeHashCode();
         }
-
-
-        public EbnfBlock Block { get; private set; }
-
-        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfDefinition; } }
-
+        
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
@@ -47,6 +46,10 @@ namespace Pliant.Ebnf
     {
         private readonly int _hashCode;
 
+        public EbnfDefinition Definition { get; private set; }
+
+        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfDefinitionConcatenation; } }
+
         public EbnfDefinitionConcatenation(EbnfBlock block, EbnfDefinition definition)
             : base(block)
         {
@@ -54,10 +57,6 @@ namespace Pliant.Ebnf
             Definition = definition;
             _hashCode = ComputeHashCode();
         }
-
-        public EbnfDefinition Definition { get; private set; }
-
-        public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfDefinitionConcatenation; } }
 
         public override bool Equals(object obj)
         {

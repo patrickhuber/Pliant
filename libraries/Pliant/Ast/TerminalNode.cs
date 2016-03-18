@@ -14,12 +14,7 @@
 
         public override string ToString()
         {
-            return string.Format("({0}, {1}, {2})",
-                Capture == '\0'
-                ? "null"
-                : Capture.ToString(),
-                Origin,
-                Location);
+            return $"({(Capture == '\0' ? "null" : Capture.ToString())}, {Origin}, {Location})";
         }
 
         public override void Accept(INodeVisitor visitor)

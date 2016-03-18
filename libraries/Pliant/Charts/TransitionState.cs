@@ -50,7 +50,7 @@ namespace Pliant.Charts
 
         public override string ToString()
         {
-            return string.Format("{0} : {1}", Recognized, base.ToString());
+            return $"{Recognized} : {base.ToString()}";
         }
 
         public override StateType StateType { get { return StateType.Transitive; } }

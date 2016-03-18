@@ -60,7 +60,7 @@ namespace Pliant.Ebnf
                         break;                      
                 }
             }
-            return null;
+            throw UnreachableCodeException();
         }
 
         private EbnfBlockRule VisitRuleNode(IInternalTreeNode node)
@@ -166,7 +166,7 @@ namespace Pliant.Ebnf
 
             if (term == null)
                 return new EbnfTerm(factor);
-            return new EbnfTermRepetition(factor, term);
+            return new EbnfTermConcatenation(factor, term);
         }
 
         private EbnfFactor VisitFactorNode(IInternalTreeNode node)
@@ -206,10 +206,10 @@ namespace Pliant.Ebnf
                     case TreeNodeType.Token:
                         break;
                 }
-            return null;
+            throw UnreachableCodeException();
         }
 
-        private EbnfFactorConcatenation VisitRepetitionNode(IInternalTreeNode node)
+        private EbnfFactorRepetition VisitRepetitionNode(IInternalTreeNode node)
         {
             foreach (var child in node.Children)
                 switch (child.NodeType)
@@ -219,11 +219,11 @@ namespace Pliant.Ebnf
                         var symbolValue = internalNode.Symbol.Value;
                         if (EbnfGrammar.Expression == symbolValue)
                         {
-                            return new EbnfFactorConcatenation(VisitExpressionNode(internalNode));
+                            return new EbnfFactorRepetition(VisitExpressionNode(internalNode));
                         }
                         break;
                 }
-            return null;
+            throw UnreachableCodeException();
         }
 
         private EbnfFactorOptional VisitOptionalNode(IInternalTreeNode node)
@@ -240,7 +240,7 @@ namespace Pliant.Ebnf
                         }
                         break;
                 }
-            return null;
+            throw UnreachableCodeException();
         }
 
         private EbnfFactorGrouping VisitGroupingNode(IInternalTreeNode node)
@@ -257,7 +257,7 @@ namespace Pliant.Ebnf
                         }
                         break;
                 }
-            return null;
+            throw UnreachableCodeException();
         }
 
         private string VisitLiteralNode(IInternalTreeNode node)
@@ -275,7 +275,7 @@ namespace Pliant.Ebnf
                     case TreeNodeType.Internal:
                         break;
                 }
-            return null;
+             throw UnreachableCodeException();
         }
 
         private EbnfBlockSetting VisitSettingNode(IInternalTreeNode node)
@@ -289,7 +289,7 @@ namespace Pliant.Ebnf
                     case TreeNodeType.Token:
                         var tokenNode = child as ITokenTreeNode;
                         var token = tokenNode.Token;
-                        if (token.TokenType.Id == "settingIdentifier")
+                        if (token.TokenType.Id == nameof(settingIdentifier))
                             settingIdentifier = new EbnfSettingIdentifier(token.Value);
                         break;
 
@@ -307,7 +307,7 @@ namespace Pliant.Ebnf
         private EbnfBlockLexerRule VisitLexerRuleNode(IInternalTreeNode node)
         {
             EbnfQualifiedIdentifier qualifiedIdentifier = null;
-            EbnfExpression expression = null;
+            EbnfLexerRuleExpression expression = null;
 
             foreach (var child in node.Children)
             {
@@ -317,13 +317,85 @@ namespace Pliant.Ebnf
                 var symbolValue = internalNode.Symbol.Value;
                 if (EbnfGrammar.QualifiedIdentifier == symbolValue)
                     qualifiedIdentifier = VisitQualifiedIdentifierNode(internalNode);
-                else if (EbnfGrammar.Expression == symbolValue)
-                    expression = VisitExpressionNode(internalNode);
+                else if (EbnfGrammar.LexerRuleExpression == symbolValue)
+                    expression = VisitLexerRuleExpressionNode(internalNode);
                 
             }
             return new EbnfBlockLexerRule(
                 new EbnfLexerRule(qualifiedIdentifier, expression));
         }
 
+        private EbnfLexerRuleExpression VisitLexerRuleExpressionNode(IInternalTreeNode node)
+        {
+            EbnfLexerRuleTerm term = null;
+            EbnfLexerRuleExpression expression = null;
+
+            foreach (var child in node.Children)
+            {
+                if (child.NodeType != TreeNodeType.Internal)
+                    continue;
+                var internalNode = child as IInternalTreeNode;
+                var symbolValue = internalNode.Symbol.Value;
+                if (EbnfGrammar.LexerRuleTerm == symbolValue)
+                    term = VisitLexerRuleTermNode(internalNode);
+                if (EbnfGrammar.LexerRuleExpression == symbolValue)
+                    expression = VisitLexerRuleExpressionNode(internalNode);
+            }
+
+            if (expression == null)
+                return new EbnfLexerRuleExpression(term);
+            return new EbnfLexerRuleExpressionAlteration(term, expression);
+        }
+
+        private EbnfLexerRuleTerm VisitLexerRuleTermNode(IInternalTreeNode node)
+        {
+            EbnfLexerRuleFactor factor = null;
+            EbnfLexerRuleTerm term = null;
+
+            foreach (var child in node.Children)
+            {
+                if (child.NodeType != TreeNodeType.Internal)
+                    continue;
+                var internalNode = child as IInternalTreeNode;
+                var symbolValue = internalNode.Symbol.Value;
+                if (EbnfGrammar.LexerRuleFactor == symbolValue)
+                    factor = VisitLexerRuleFactorNode(internalNode);
+                if (EbnfGrammar.LexerRuleTerm == symbolValue)
+                    term = VisitLexerRuleTermNode(internalNode);
+            }
+
+            if (term == null)
+                return new EbnfLexerRuleTerm(factor);
+
+            return new EbnfLexerRuleTermConcatenation(factor, term);
+        }
+
+        private EbnfLexerRuleFactor VisitLexerRuleFactorNode(IInternalTreeNode node)
+        {
+            foreach (var child in node.Children)
+            {
+                if (child.NodeType != TreeNodeType.Internal)
+                    continue;
+                var internalNode = child as IInternalTreeNode;
+                var symbolValue = internalNode.Symbol.Value;
+
+                if (EbnfGrammar.Literal == symbolValue)                
+                    return new EbnfLexerRuleFactorLiteral(
+                        VisitLiteralNode(internalNode));
+                
+                if (RegexGrammar.Regex == symbolValue)
+                {
+                    var regexVisitor = new RegexVisitor();
+                    internalNode.Accept(regexVisitor);
+                    return new EbnfLexerRuleFactorRegex(regexVisitor.Regex);
+                }
+            }
+            throw UnreachableCodeException();
+        }
+
+        private static Exception UnreachableCodeException()
+        {
+            return new InvalidOperationException("Unreachable Code Detected");
+        }
     }
 }

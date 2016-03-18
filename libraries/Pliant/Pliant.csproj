@@ -49,7 +49,11 @@
     <Compile Include="Ebnf\EbnfDefinition.cs" />
     <Compile Include="Ebnf\EbnfExpression.cs" />
     <Compile Include="Ebnf\EbnfFactor.cs" />
+    <Compile Include="Ebnf\EbnfGrammarGenerator.cs" />
     <Compile Include="Ebnf\EbnfLexerRule.cs" />
+    <Compile Include="Ebnf\EbnfLexerRuleExpression.cs" />
+    <Compile Include="Ebnf\EbnfLexerRuleFactor.cs" />
+    <Compile Include="Ebnf\EbnfLexerRuleTerm.cs" />
     <Compile Include="Ebnf\EbnfNode.cs" />
     <Compile Include="Ebnf\EbnfNodeType.cs" />
     <Compile Include="Ebnf\EbnfParser.cs" />

@@ -5,7 +5,7 @@ namespace Pliant.Ebnf
     public class EbnfLexerRule : EbnfNode
     {
         public EbnfQualifiedIdentifier QualifiedIdentifier { get; private set; }
-        public EbnfExpression Expression { get; private set; }
+        public EbnfLexerRuleExpression Expression { get; private set; }
 
         private readonly int _hashCode;
 
@@ -17,7 +17,7 @@ namespace Pliant.Ebnf
             }
         }
 
-        public EbnfLexerRule(EbnfQualifiedIdentifier qualifiedIdentifier, EbnfExpression expression)
+        public EbnfLexerRule(EbnfQualifiedIdentifier qualifiedIdentifier, EbnfLexerRuleExpression expression)
         {
             QualifiedIdentifier = qualifiedIdentifier;
             Expression = expression;

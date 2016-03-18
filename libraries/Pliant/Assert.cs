@@ -7,7 +7,7 @@ namespace Pliant
         internal static void IsNotNull(object instance, string propertyName)
         {
             if (instance == null)
-                throw new ArgumentNullException(propertyName, string.Format("{0} can not be null.", propertyName));
+                throw new ArgumentNullException(propertyName, $"{propertyName} can not be null.");
         }
 
         internal static void IsNotNull(object instance, string propertyName, string message)
@@ -22,7 +22,7 @@ namespace Pliant
             // PERF: Remove string format from method invocation unless the value is actually null or empty
             if (array == null || array.Length == 0)
             {
-                var message = string.Format("{0} can not be null or empty.", propertyName);
+                var message = $"{propertyName} can not be null or empty.";
                 if (array == null)
                     throw new ArgumentNullException(propertyName, message);
                 if (array.Length == 0)
@@ -43,7 +43,7 @@ namespace Pliant
             if (integer < 0)
                 throw new ArgumentOutOfRangeException(
                     nameof(paramterName),
-                    string.Format("{0} can not be less than zero.", paramterName));
+                    $"{paramterName} can not be less than zero.");
         }
     }
 }

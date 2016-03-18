@@ -161,7 +161,7 @@ namespace Pliant.Tests.Unit
 
             var parseEngine = new ParseEngine(grammar);
             var parseInterface = new ParseInterface(parseEngine, input);
-            Chart chart = GetParseEngineChart(parseEngine);
+            var chart = GetParseEngineChart(parseEngine);
             for (int i = 0; i < 2; i++)
                 Assert.IsTrue(parseInterface.Read());
             Assert.IsTrue(parseInterface.Read());
@@ -235,7 +235,7 @@ namespace Pliant.Tests.Unit
         {
             var parseInterface = new ParseInterface(parseEngine, input);
             for (int i = 0; i < input.Length; i++)
-                Assert.IsTrue(parseInterface.Read(), string.Format("Error parsing at position {0}", i));
+                Assert.IsTrue(parseInterface.Read(), $"Error parsing at position {i}");
             Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
         }
     }
