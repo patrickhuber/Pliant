@@ -52,5 +52,10 @@ namespace Pliant.RegularExpressions
                 Expression.GetHashCode(),
                 EndsWith.GetHashCode());
         }
+
+        public override string ToString()
+        {
+            return $"{(StartsWith ? "^" : string.Empty)}{Expression}{(EndsWith ? "$" : string.Empty)}";
+        }
     }
 }

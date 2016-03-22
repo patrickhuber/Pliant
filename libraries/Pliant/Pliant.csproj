@@ -57,6 +57,7 @@
     <Compile Include="Ebnf\EbnfNode.cs" />
     <Compile Include="Ebnf\EbnfNodeType.cs" />
     <Compile Include="Ebnf\EbnfParser.cs" />
+    <Compile Include="Ebnf\IEbnfProductionNamingStrategy.cs" />
     <Compile Include="Ebnf\EbnfQualifiedIdentifier.cs" />
     <Compile Include="Ebnf\EbnfRule.cs" />
     <Compile Include="Ebnf\EbnfSetting.cs" />

@@ -39,5 +39,10 @@ namespace Pliant.RegularExpressions
                 return false;
             return characterClassCharacter.Value.Equals(Value);
         }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 }

@@ -39,6 +39,11 @@ namespace Pliant.RegularExpressions
         {
             get { return RegexNodeType.RegexCharacterClass; }
         }
+
+        public override string ToString()
+        {
+            return CharacterRange.ToString();
+        }
     }
 
     public class RegexCharacterClassAlteration : RegexCharacterClass
@@ -82,6 +87,11 @@ namespace Pliant.RegularExpressions
         public override RegexNodeType NodeType
         {
             get { return RegexNodeType.RegexCharacterClassAlteration; }
+        }
+
+        public override string ToString()
+        {
+            return $"{CharacterRange}{CharacterClass}";
         }
     }
 }

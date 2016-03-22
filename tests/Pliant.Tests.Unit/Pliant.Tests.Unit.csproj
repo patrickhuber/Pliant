@@ -69,6 +69,7 @@
     <Compile Include="Collections\ProcessOnceQueueTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Grammars\ProductionTests.cs" />
+    <Compile Include="RegularExpressions\RegexClassesTests.cs" />
     <Compile Include="RegularExpressions\RegexParserTests.cs" />
     <Compile Include="RegularExpressions\RegexTests.cs" />
     <Compile Include="Charts\StateTests.cs" />

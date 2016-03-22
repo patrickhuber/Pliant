@@ -74,7 +74,7 @@ namespace Pliant.RegularExpressions
             if (term != null)
                 return new RegexExpressionTerm(term);
 
-            return new RegexExpression();
+            throw new InvalidOperationException("Unable to create null expression.");
         }
 
         private RegexTerm VisitRegexTermNode(IInternalTreeNode internalNode)

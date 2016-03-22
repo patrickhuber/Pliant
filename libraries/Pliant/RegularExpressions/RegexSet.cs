@@ -45,5 +45,10 @@ namespace Pliant.RegularExpressions
         {
             return _hashCode;
         }
+
+        public override string ToString()
+        {
+            return $"[{(Negate ? "^" : string.Empty)}{CharacterClass}]";
+        }
     }
 }
