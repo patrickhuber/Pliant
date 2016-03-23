@@ -42,11 +42,38 @@ namespace Pliant.Ebnf
             return stringBuilder.ToString();
         }
 
+        private static ILexerRule GetLexerRule(EbnfLexerRule lexerRule)
+        {
+            var identifier = GetQualifiedIdentifierValue(lexerRule.QualifiedIdentifier);
+            var expression = lexerRule.Expression;
+            throw new NotImplementedException();
+        }
+
+        private static ILexerRule GetLiteralLexerRule(EbnfLexerRuleFactorLiteral literal, string name)
+        {
+            return new StringLiteralLexerRule(literal.Value, new Tokens.TokenType(name));
+        }
+
+        private static ILexerRule GetLiteralLexerRule(EbnfFactorLiteral literal)
+        {
+            return new StringLiteralLexerRule(literal.Value);
+        }
+
         private ILexerRule GetRegexLexerRule(EbnfFactorRegex factor)
         {
-            var nfa = _thompsonConstructionAlgorithm.Transform(factor.Regex);
+            return GetRegexLexerRule(factor.Regex, factor.Regex.ToString());
+        }
+
+        private ILexerRule GetRegexLexerRule(EbnfLexerRuleFactorRegex factor, string name)
+        {
+            return GetRegexLexerRule(factor.Regex, name);        
+        }
+
+        private ILexerRule GetRegexLexerRule(Regex regex, string name)
+        {
+            var nfa = _thompsonConstructionAlgorithm.Transform(regex);
             var dfa = _subsetConstructionAlgorithm.Transform(nfa);
-            return new DfaLexerRule(dfa, factor.Regex.ToString());
+            return new DfaLexerRule(dfa, name);
         }
     }
 }
