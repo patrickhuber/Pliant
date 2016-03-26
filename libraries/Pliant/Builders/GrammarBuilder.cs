@@ -16,6 +16,7 @@ namespace Pliant.Builders
             ProductionBuilder[] productionBuilder = null,
             ILexerRule[] ignore = null)
         {
+            Assert.IsNotNull(start, nameof(start));
             Start = start.LeftHandSide;
 
             _productions = new HashSet<IProduction>();
@@ -30,6 +31,12 @@ namespace Pliant.Builders
             var shouldAddIgnoreRules = !ignore.IsNullOrEmpty();
             if (shouldAddIgnoreRules)
                 AddIgnoreRules(ignore);
+        }
+
+        public GrammarBuilder()
+        {
+            _productions = new HashSet<IProduction>();
+            _ignoreRules = new HashSet<ILexerRule>();
         }
 
         private void AddIgnoreRules(ILexerRule[] ignore)
@@ -103,6 +110,11 @@ namespace Pliant.Builders
                     _productions.Add(production);
         }
 
+        public void AddProduction(IProduction production)
+        {
+            _productions.Add(production);
+        }
+
         public void AddIgnoreRule(ILexerRule lexerRule)
         {
             _ignoreRules.Add(lexerRule);
@@ -110,32 +122,69 @@ namespace Pliant.Builders
 
         public IGrammar ToGrammar()
         {
-            if (_productions.Count == 0)
-                throw new Exception("no productions were found.");
+            AssertAnyProductionsExist();
 
-            // PERF: Avoid Linq FirstOrDefault due to lambda allocation
-            IProduction startProduction = null;
-            foreach (var production in _productions)
-            {
-                if (Start == null)
-                    Start = production.LeftHandSide;
-
-                if (production.LeftHandSide.Equals(Start))
-                {
-                    startProduction = production;
-                    break;
-                }
-            }
-
-            if (startProduction == null)
-                throw new Exception("no start production found for start symbol");
-
-            var start = startProduction.LeftHandSide;
+            var reachibiltyMatrix = GetReachibiltyMatrix();
+            var startSymbolExists = Start != null;
+            if (startSymbolExists)
+                AssertStartProductionExistsForStartSymbol(reachibiltyMatrix);
+            else
+                Start = GetStartSymbolFromReachibiltyMatrix(reachibiltyMatrix);
 
             return new Grammar(
-                start,
+                Start,
                 _productions,
                 _ignoreRules);
         }
+
+        private void AssertAnyProductionsExist()
+        {
+            if (_productions.Count == 0)
+                throw new Exception("no productions were found.");
+        }
+
+        private IDictionary<INonTerminal, ISet<INonTerminal>> GetReachibiltyMatrix()
+        {
+            var reachibilityMatrix = new Dictionary<INonTerminal, ISet<INonTerminal>>();
+            foreach (var production in _productions)
+            {
+                if (!reachibilityMatrix.ContainsKey(production.LeftHandSide))
+                    reachibilityMatrix[production.LeftHandSide] = new HashSet<INonTerminal>();
+
+                foreach (var symbol in production.RightHandSide)
+                {
+                    if (symbol.SymbolType != SymbolType.NonTerminal)
+                        continue;
+
+                    ISet<INonTerminal> set = null;
+                    if (!reachibilityMatrix.TryGetValue(symbol as INonTerminal, out set))
+                    {
+                        set = new HashSet<INonTerminal>();
+                        reachibilityMatrix[production.LeftHandSide] = set;
+                    }
+
+                    set.Add(production.LeftHandSide);
+                }             
+            }
+            return reachibilityMatrix;
+        }
+
+        private void AssertStartProductionExistsForStartSymbol(IDictionary<INonTerminal, ISet<INonTerminal>> reachibilityMatrix)
+        {
+            if(!reachibilityMatrix.ContainsKey(Start))
+                throw new Exception("no start production found for start symbol");
+        }
+
+        private INonTerminal GetStartSymbolFromReachibiltyMatrix(IDictionary<INonTerminal, ISet<INonTerminal>> reachibiltyMatrix)
+        {
+            foreach (var leftHandSide in reachibiltyMatrix.Keys)
+            {
+                var symbolsReachableByLeftHandSide = reachibiltyMatrix[leftHandSide];
+                if (symbolsReachableByLeftHandSide.Count == 0)
+                    return leftHandSide;
+            }
+            return null;
+        }
+
     }
 }

@@ -146,7 +146,7 @@ namespace Pliant.Ebnf
         {
             get
             {
-                return EbnfNodeType.EbnfFactorConcatenation;
+                return EbnfNodeType.EbnfFactorRepetition;
             }
         }
 

@@ -134,7 +134,23 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void GrammarBuilderGivenReferenceGrammarShouldGenerateWorkingGrammar()
         {
+            Assert.Fail();
+        }
 
+        [TestMethod]
+        public void GrammarBuilderGivenNullStartShouldDetectStartFromProductions()
+        {
+            ProductionBuilder S = "S", A = "A", B = "B";
+            S.Definition = A + B;
+            A.Definition = 'a' + B;
+            B.Definition = 'b';
+            var grammarBuilder = new GrammarBuilder();
+            grammarBuilder.AddProduction(S);
+            grammarBuilder.AddProduction(A);
+            grammarBuilder.AddProduction(B);
+            var grammar = grammarBuilder.ToGrammar();
+            Assert.AreEqual(3, grammar.Productions.Count);
+            Assert.IsNotNull(grammar.Start);
         }
     }
 }

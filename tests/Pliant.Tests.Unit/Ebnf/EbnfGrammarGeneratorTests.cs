@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders;
 using Pliant.Ebnf;
 using Pliant.Grammars;
@@ -20,7 +21,9 @@ namespace Pliant.Tests.Unit.Ebnf
                                 new EbnfFactorLiteral("a"))))));
             var grammar = GenerateGrammar(definition);
             Assert.IsNotNull(grammar);
+            Assert.IsNotNull(grammar.Start);
             Assert.AreEqual(1, grammar.Productions.Count);
+            Assert.AreEqual(1, grammar.Productions[0].RightHandSide.Count);
         }
 
         [TestMethod]
@@ -42,6 +45,8 @@ namespace Pliant.Tests.Unit.Ebnf
                                     new EbnfFactorLiteral("b")))))));
             var grammar = GenerateGrammar(definition);
             Assert.IsNotNull(grammar);
+            Assert.IsNotNull(grammar.Start);
+            Assert.AreEqual(2, grammar.Productions.Count);
         }
 
         [TestMethod]
@@ -60,6 +65,9 @@ namespace Pliant.Tests.Unit.Ebnf
 
             var grammar = GenerateGrammar(definition);
             Assert.IsNotNull(grammar);
+            Assert.IsNotNull(grammar.Start);
+            Assert.AreEqual(1, grammar.Productions.Count);
+            Assert.AreEqual(1, grammar.Productions[0].RightHandSide.Count);
         }
 
         [TestMethod]
@@ -78,6 +86,9 @@ namespace Pliant.Tests.Unit.Ebnf
 
             var grammar = GenerateGrammar(definition);
             Assert.IsNotNull(grammar);
+            Assert.IsNotNull(grammar.Start);
+            Assert.AreEqual(1, grammar.Productions.Count);
+            Assert.AreEqual(1, grammar.Productions[0].RightHandSide.Count);
         }
 
 
@@ -102,13 +113,27 @@ namespace Pliant.Tests.Unit.Ebnf
                 |   (_)null;           
             var expectedGrammar = new GrammarBuilder(R, new[] { R }).ToGrammar();
             Assert.IsNotNull(grammar);
+            Assert.IsNotNull(grammar.Start);
             Assert.AreEqual(expectedGrammar.Productions.Count, grammar.Productions.Count);
 
         }
 
         private static IGrammar GenerateGrammar(EbnfDefinition definition)
         {
-            return new EbnfGrammarGenerator(null).Generate(definition);
+            return new EbnfGrammarGenerator(new GuidEbnfProductionNamingStrategy()).Generate(definition);
+        }
+
+        private class GuidEbnfProductionNamingStrategy : IEbnfProductionNamingStrategy
+        {
+            public INonTerminal GetSymbolForOptional(EbnfFactorOptional optional)
+            {
+                return new NonTerminal(Guid.NewGuid().ToString());
+            }
+
+            public INonTerminal GetSymbolForRepetition(EbnfFactorRepetition repetition)
+            {
+                return new NonTerminal(Guid.NewGuid().ToString());
+            }
         }
     }
 }

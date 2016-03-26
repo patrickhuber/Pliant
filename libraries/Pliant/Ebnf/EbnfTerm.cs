@@ -63,7 +63,7 @@ namespace Pliant.Ebnf
         {
             get
             {
-                return EbnfNodeType.EbnfTermRepetition;
+                return EbnfNodeType.EbnfTermConcatenation;
             }
         }
 
