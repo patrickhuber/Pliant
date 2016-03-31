@@ -48,7 +48,7 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsNotNull(grammar.Start);
             Assert.AreEqual(2, grammar.Productions.Count);
         }
-
+                
         [TestMethod]
         public void EbnfGrammarGeneratorShouldCreateGrammarForRepetition()
         {
@@ -120,7 +120,9 @@ namespace Pliant.Tests.Unit.Ebnf
 
         private static IGrammar GenerateGrammar(EbnfDefinition definition)
         {
-            return new EbnfGrammarGenerator(new GuidEbnfProductionNamingStrategy()).Generate(definition);
+            var strategy = new GuidEbnfProductionNamingStrategy();
+            var generator = new EbnfGrammarGenerator(strategy);
+            return generator.Generate(definition);
         }
 
         private class GuidEbnfProductionNamingStrategy : IEbnfProductionNamingStrategy

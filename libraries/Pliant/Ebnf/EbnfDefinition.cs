@@ -62,13 +62,13 @@ namespace Pliant.Ebnf
         {
             if ((object)obj == null)
                 return false;
-            var ebnfDefinitionRepetition = obj as EbnfDefinitionConcatenation;
-            if ((object)ebnfDefinitionRepetition == null)
+            var ebnfDefinitionConcatenation = obj as EbnfDefinitionConcatenation;
+            if ((object)ebnfDefinitionConcatenation == null)
                 return false;
             
-            return ebnfDefinitionRepetition.NodeType == EbnfNodeType.EbnfDefinitionConcatenation
-                && ebnfDefinitionRepetition.Block.Equals(Block)
-                && ebnfDefinitionRepetition.Definition.Equals(Definition);
+            return ebnfDefinitionConcatenation.NodeType == EbnfNodeType.EbnfDefinitionConcatenation
+                && ebnfDefinitionConcatenation.Block.Equals(Block)
+                && ebnfDefinitionConcatenation.Definition.Equals(Definition);
         }
 
         private int ComputeHashCode()

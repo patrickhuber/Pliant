@@ -25,19 +25,39 @@ namespace Pliant.Ebnf
         public IGrammar Generate(EbnfDefinition ebnf)
         {
             var grammarBuilder = new GrammarBuilder();
-            var block = ebnf.Block;
+            foreach (var production in CreateProductions(ebnf))
+                grammarBuilder.AddProduction(production);
+            return grammarBuilder.ToGrammar();
+        }
+
+        private IEnumerable<IProduction> CreateProductions(EbnfDefinition definition)
+        {
+            var productionList = new List<IProduction>();
+            productionList.AddRange(CreateProductions(definition.Block));
+            switch (definition.NodeType)
+            {
+                case EbnfNodeType.EbnfDefinitionConcatenation:
+                    var definitionConcatenation = definition as EbnfDefinitionConcatenation;
+                    productionList.AddRange(CreateProductions(definitionConcatenation.Definition));
+                    break;
+            }
+            return productionList;
+        }
+
+        private IEnumerable<IProduction> CreateProductions(EbnfBlock block)
+        {
             switch (block.NodeType)
             {
                 case EbnfNodeType.EbnfBlockLexerRule:
                     break;
+
                 case EbnfNodeType.EbnfBlockRule:
-                    foreach(var production in CreateProductions(block as EbnfBlockRule))
-                        grammarBuilder.AddProduction(production);
-                    break;
+                    return CreateProductions(block as EbnfBlockRule);
+
                 case EbnfNodeType.EbnfBlockSetting:
                     break;
             }
-            return grammarBuilder.ToGrammar();
+            throw new InvalidOperationException("Unrecognized block rule type.");
         }
 
         private IEnumerable<IProduction> CreateProductions(EbnfBlockRule blockRule)
@@ -83,8 +103,7 @@ namespace Pliant.Ebnf
             {
                 case EbnfNodeType.EbnfFactorIdentifier:
                     var factorIdentifider = factor as EbnfFactorIdentifier;
-                    var qualifiedIdentifierValue = GetQualifiedIdentifierValue(factorIdentifider.QualifiedIdentifier);
-                    var symbol = new NonTerminal(qualifiedIdentifierValue);
+                    var symbol = GetNonTerminalFromQualifiedIdentifier(factorIdentifider.QualifiedIdentifier);
                     AppendSymbolToAllRules(rightHandSides, symbol);
                     break;
 
@@ -123,23 +142,7 @@ namespace Pliant.Ebnf
             foreach (var rightHandSide in rightHandSides)
                 rightHandSide.Add(symbol);
         }
-
-        private static string GetQualifiedIdentifierValue(EbnfQualifiedIdentifier qualifiedIdentifier)
-        {
-            var stringBuilder = new StringBuilder();
-            var currentQualifiedIdentifier = qualifiedIdentifier;
-            var index = 0;
-            while (currentQualifiedIdentifier.NodeType == EbnfNodeType.EbnfQualifiedIdentifierConcatenation)
-            {
-                if (index > 0)
-                    stringBuilder.Append(".");
-                stringBuilder.Append(currentQualifiedIdentifier.Identifier);
-                currentQualifiedIdentifier = (currentQualifiedIdentifier as EbnfQualifiedIdentifierConcatenation).QualifiedIdentifier;
-                index++;
-            }
-            return stringBuilder.ToString();
-        }
-
+        
         private static INonTerminal GetNonTerminalFromQualifiedIdentifier(EbnfQualifiedIdentifier qualifiedIdentifier)
         {
             var @namespace = new StringBuilder();
@@ -158,7 +161,7 @@ namespace Pliant.Ebnf
 
         private static ILexerRule GetLexerRule(EbnfLexerRule lexerRule)
         {
-            var identifier = GetQualifiedIdentifierValue(lexerRule.QualifiedIdentifier);
+            var symbol = GetNonTerminalFromQualifiedIdentifier(lexerRule.QualifiedIdentifier);
             var expression = lexerRule.Expression;
             throw new NotImplementedException();
         }
@@ -188,6 +191,6 @@ namespace Pliant.Ebnf
             var nfa = _thompsonConstructionAlgorithm.Transform(regex);
             var dfa = _subsetConstructionAlgorithm.Transform(nfa);
             return new DfaLexerRule(dfa, name);
-        }
+        }        
     }
 }
