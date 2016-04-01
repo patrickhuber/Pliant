@@ -48,7 +48,55 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsNotNull(grammar.Start);
             Assert.AreEqual(2, grammar.Productions.Count);
         }
-                
+
+        [TestMethod]
+        public void EbnfGrammarGeneratorShouldCreateGrammarForProductionAlteration()
+        {
+            var definition = new EbnfDefinition(
+                new EbnfBlockRule(
+                    new EbnfRule(
+                        new EbnfQualifiedIdentifier("S"),
+                        new EbnfExpressionAlteration(
+                            new EbnfTerm(
+                                new EbnfFactorLiteral("a")),
+                            new EbnfExpression(
+                                new EbnfTerm(
+                                    new EbnfFactorLiteral("d")))))));
+            var grammar = GenerateGrammar(definition);
+            Assert.IsNotNull(grammar);
+            Assert.IsNotNull(grammar.Start);
+            Assert.AreEqual(2, grammar.Productions.Count);
+        }
+
+        [TestMethod]
+        public void EbnfGrammarGeneratorShouldCreateGrammarForMultipleProductionsWithAlterations()
+        {
+            var definition = new EbnfDefinitionConcatenation(
+                new EbnfBlockRule(
+                    new EbnfRule(
+                        new EbnfQualifiedIdentifier("S"),
+                        new EbnfExpressionAlteration(
+                            new EbnfTerm(
+                                new EbnfFactorLiteral("a")),
+                            new EbnfExpression(
+                                new EbnfTerm(
+                                    new EbnfFactorLiteral("d")))))),
+                new EbnfDefinition(
+                    new EbnfBlockRule(
+                        new EbnfRule(
+                            new EbnfQualifiedIdentifier("S"),
+                            new EbnfExpressionAlteration(
+                                new EbnfTerm(
+                                    new EbnfFactorLiteral("b")),
+                                new EbnfExpression(
+                                    new EbnfTerm(
+                                        new EbnfFactorLiteral("c"))))))));
+            var grammar = GenerateGrammar(definition);
+            Assert.IsNotNull(grammar);
+            Assert.IsNotNull(grammar.Start);
+            Assert.AreEqual(4, grammar.Productions.Count);
+        } 
+
         [TestMethod]
         public void EbnfGrammarGeneratorShouldCreateGrammarForRepetition()
         {
