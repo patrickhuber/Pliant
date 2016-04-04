@@ -94,10 +94,16 @@
     <Compile Include="Ebnf\EbnfGrammar.cs" />
     <Compile Include="Ebnf\EbnfVisitor.cs" />
     <Compile Include="Grammars\BaseTerminal.cs" />
+    <Compile Include="Grammars\Grouping.cs" />
     <Compile Include="Grammars\IGrammarLexerRule.cs" />
+    <Compile Include="Grammars\IGrouping.cs" />
+    <Compile Include="Grammars\IOptional.cs" />
+    <Compile Include="Grammars\IRepetition.cs" />
     <Compile Include="Grammars\IStringLiteralLexerRule.cs" />
     <Compile Include="Grammars\ITerminalLexerRule.cs" />
     <Compile Include="Grammars\LexerRuleType.cs" />
+    <Compile Include="Grammars\Optional.cs" />
+    <Compile Include="Grammars\Repetition.cs" />
     <Compile Include="Grammars\StringLiteralLexerRule.cs" />
     <Compile Include="HashUtil.cs" />
     <Compile Include="Lexemes\ILexemeFactory.cs" />

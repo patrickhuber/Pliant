@@ -155,13 +155,13 @@ namespace Pliant.Tests.Unit.Ebnf
                                             new EbnfFactorLiteral("a")))))))));
 
             var grammar = GenerateGrammar(definition);
+            Assert.IsNotNull(grammar);
+            Assert.IsNotNull(grammar.Start);
 
             ProductionBuilder R = "R";
             R.Definition = 'a' 
-                |   (_)null;           
+                |   (_)null;
             var expectedGrammar = new GrammarBuilder(R, new[] { R }).ToGrammar();
-            Assert.IsNotNull(grammar);
-            Assert.IsNotNull(grammar.Start);
             Assert.AreEqual(expectedGrammar.Productions.Count, grammar.Productions.Count);
 
         }

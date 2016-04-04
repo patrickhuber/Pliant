@@ -72,6 +72,8 @@ namespace Pliant.Ebnf
         private IList<IList<ISymbol>> GetRightHandSideForExpression(EbnfExpression expression)
         {
             var rightHandSides = new List<IList<ISymbol>>();
+            var ruleBuilder = new RuleBuilder();
+
             var currentExpression = expression;
 
             while (currentExpression != null)
