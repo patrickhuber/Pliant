@@ -113,8 +113,9 @@ public static int Main (string[] args)
 	// TODO: use the grammar in a parse.
 }
 ```
+## Recognizing and Parse Trees
 
-### Using Grammars to Recognize Input
+### Using ParseEngine, ParseInterface and Grammars to Recognize Input
 
 Using the calculator grammar from above, we can parse input by constructing
 a parse engine and parse interface instance.
@@ -125,8 +126,8 @@ var input = "(1 + 1) * 3 + 2";
 // use the calculator grammar from above
 var parseEngine = new ParseEngine(grammar);
 
-// use the parse interface to querying the parse engine
-// for state and use that state to select lexer rules.
+// use the parse interface to query the parse engine for state
+// and use that state to select lexer rules.
 var parseInterface = new ParseInterface(parseEngine, input);
 
 // when a parse is recognized, the parse engine is allowed to move
@@ -156,6 +157,30 @@ if(recognized)
 Console.WriteLine($"Recognized: {recognized}, Accepted: {accepted}");
 if(!recognized || !accepted)
 	Console.Error.WriteLine($"Error at position {errorPosition}");
+```
+
+### Using ParseEngine, ParseInterface, Forrest API and Grammars to build a parse tree.
+
+The process for creating a parse tree is the same as recognizing input. 
+In fact, when running the ParseEngine, a Sparsley Packed Parse Forest (SPPF) is created 
+in the background. The parse forest is presented in a specialized format to promote density and allow for 
+computational complexity similar to that of running the recognizer alone. 
+
+The easiest way to use the parse forest is use a internal node tree visitor on the parse forest root 
+with a SinglePassNodeVisitorStateManager instance controling traversal of forest branches.
+
+If the parse is ambiguous, you may want to supply a custom INodeVisitorStateManager. Later updates
+will include a AllPathNodeVisitorStateManager (name in the works) that traverses
+all paths of the parse forest. 
+
+```csharp
+// get the parse forest root from the parse engine
+var parseForest = parseEngine.GetParseForestRoot();
+
+// create a internal tree node and supply the state manager for tree traversal.
+var parseTree = new InternalTreeNode(
+    parseForest as IInternalNode,
+    new SinglePassNodeVisitorStateManager());
 ```
 
 ## References
