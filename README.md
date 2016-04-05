@@ -114,6 +114,50 @@ public static int Main (string[] args)
 }
 ```
 
+### Using Grammars to Recognize Input
+
+Using the calculator grammar from above, we can parse input by constructing
+a parse engine and parse interface instance.
+
+```csharp
+var input = "(1 + 1) / 3 - 2";
+
+// use the calculator grammar from above
+var parseEngine = new ParseEngine(grammar);
+
+// use the parse interface to querying the parse engine
+for state and use that state to select lexer rules.
+var parseInterface = new ParseInterface(parseEngine, input);
+
+// when a parse is recognized, the parse engine is allowed to move
+// forward and continues to accept symbols. 
+var recognzied = false;
+var errorPosition = 0;
+while(!parseInterface.EndOfStream())
+{
+	recognzied = parseInterface.Read();
+	if(!recognized)
+	{	
+		errorPosition = parseInterface.Position;
+		break;
+	}
+}
+
+// For a parse to be accepted, all parse rules are completed and a trace
+// has been made back to the parse root.
+// A parse must be recognized in order for acceptance to have meaning.
+var accepted = false;
+if(recognized)
+{
+	accepted = parseInterface.IsAccepted();
+	if(!accepted)
+		errorPosition = parseInterface.Position;
+}
+Console.WriteLine($"Recognized: {recognized}, Accepted: {accepted}");
+if(!recognized || !accepted)
+	Console.Error.WriteLine($"Error at position {errorPosition}");
+```
+
 ## References
 
 * [berkeley earley cs164](http://inst.eecs.berkeley.edu/~cs164/fa10/earley/earley.html)
@@ -131,3 +175,4 @@ public static int Main (string[] args)
 * [cs theory stackexchange, leo optimization parse tree creation](http://cstheory.stackexchange.com/q/31182/32787)
 * [insights on lexer creation](https://youtu.be/XaScLywH2CI)
 * [incremental reparsing](http://www.aclweb.org/anthology/E89-1033.pdf)
+* [An extension of Earley's Algorithm for extended grammars](http://link.springer.com/chapter/10.1007%2F978-1-4020-3953-9_22)
