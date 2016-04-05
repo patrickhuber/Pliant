@@ -1,6 +1,6 @@
 ﻿using Pliant.Charts;
 
-namespace Pliant.Ast
+namespace Pliant.Forest
 {
     public class IntermediateNode : InternalNode, IIntermediateNode
     {

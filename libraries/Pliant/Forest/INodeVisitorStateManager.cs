@@ -1,4 +1,4 @@
-﻿namespace Pliant.Ast
+﻿namespace Pliant.Forest
 {
     public interface INodeVisitorStateManager
     {

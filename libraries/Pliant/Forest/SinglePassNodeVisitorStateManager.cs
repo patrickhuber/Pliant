@@ -1,4 +1,4 @@
-﻿namespace Pliant.Ast
+﻿namespace Pliant.Forest
 {
     /// <summary>
     /// Implements a single pass node visitor state manager. Basically only

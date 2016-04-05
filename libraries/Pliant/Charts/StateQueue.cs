@@ -5,7 +5,7 @@ namespace Pliant.Charts
 {
     public class StateQueue : ReadWriteList<IState>
     {
-        private ISet<IState> _set;
+        private readonly ISet<IState> _set;
 
         public StateQueue()
         {

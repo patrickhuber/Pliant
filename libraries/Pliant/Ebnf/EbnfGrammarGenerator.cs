@@ -11,8 +11,8 @@ namespace Pliant.Ebnf
     public class EbnfGrammarGenerator
     {
         IEbnfProductionNamingStrategy _strategy;
-        SubsetConstructionAlgorithm _subsetConstructionAlgorithm;
-        ThompsonConstructionAlgorithm _thompsonConstructionAlgorithm;
+        readonly SubsetConstructionAlgorithm _subsetConstructionAlgorithm;
+        readonly ThompsonConstructionAlgorithm _thompsonConstructionAlgorithm;
 
         public EbnfGrammarGenerator(IEbnfProductionNamingStrategy strategy)
         {

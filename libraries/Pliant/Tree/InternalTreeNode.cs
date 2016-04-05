@@ -1,4 +1,4 @@
-﻿using Pliant.Ast;
+﻿using Pliant.Forest;
 using Pliant.Grammars;
 using System;
 using System.Collections.Generic;
@@ -45,11 +45,11 @@ namespace Pliant.Tree
         {
             switch (node.NodeType)
             {
-                case Ast.NodeType.Symbol:
+                case Forest.NodeType.Symbol:
                     Symbol = (node as ISymbolNode).Symbol as INonTerminal;
                     break;
 
-                case Ast.NodeType.Intermediate:
+                case Forest.NodeType.Intermediate:
                     Symbol = (node as IIntermediateNode).State.Production.LeftHandSide;
                     break;
             }
@@ -69,20 +69,20 @@ namespace Pliant.Tree
             {
                 switch (child.NodeType)
                 {
-                    case Ast.NodeType.Intermediate:
+                    case Forest.NodeType.Intermediate:
                         var intermediateNode = child as IIntermediateNode;
                         var currentAndNode = _stateManager.GetCurrentAndNode(intermediateNode);
                         foreach (var otherChild in EnumerateChildren(currentAndNode))
                             yield return otherChild;
                         break;
 
-                    case Ast.NodeType.Symbol:
+                    case Forest.NodeType.Symbol:
                         var symbolNode = child as ISymbolNode;
                         var childAndNode = _stateManager.GetCurrentAndNode(symbolNode);
                         yield return new InternalTreeNode(symbolNode, childAndNode, _stateManager);
                         break;
 
-                    case Ast.NodeType.Token:
+                    case Forest.NodeType.Token:
                         yield return new TokenTreeNode(child as ITokenNode);
                         break;
 

@@ -2,7 +2,7 @@
 using Pliant.Grammars;
 using System.Collections.Generic;
 
-namespace Pliant.Ast
+namespace Pliant.Forest
 {
     public class NodeSet
     {

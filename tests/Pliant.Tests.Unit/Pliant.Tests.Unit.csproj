@@ -65,7 +65,7 @@
     <Compile Include="Grammars\DigitTerminalTests.cs" />
     <Compile Include="Builders\GrammarBuilderTests.cs" />
     <Compile Include="LoggingNodeVisitor.cs" />
-    <Compile Include="Ast\NodeVisitorTests.cs" />
+    <Compile Include="Forest\NodeVisitorTests.cs" />
     <Compile Include="Collections\ProcessOnceQueueTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Grammars\ProductionTests.cs" />

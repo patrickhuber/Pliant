@@ -1,6 +1,6 @@
 ﻿using Pliant.Tokens;
 
-namespace Pliant.Ast
+namespace Pliant.Forest
 {
     public class TokenNode : NodeBase, ITokenNode
     {

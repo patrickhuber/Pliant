@@ -3,7 +3,7 @@ using Pliant.Collections;
 using Pliant.Grammars;
 using System.Collections.Generic;
 
-namespace Pliant.Ast
+namespace Pliant.Forest
 {
     public class VirtualNode : NodeBase, ISymbolNode
     {
