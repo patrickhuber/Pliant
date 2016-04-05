@@ -126,7 +126,7 @@ var input = "(1 + 1) / 3 - 2";
 var parseEngine = new ParseEngine(grammar);
 
 // use the parse interface to querying the parse engine
-for state and use that state to select lexer rules.
+// for state and use that state to select lexer rules.
 var parseInterface = new ParseInterface(parseEngine, input);
 
 // when a parse is recognized, the parse engine is allowed to move
