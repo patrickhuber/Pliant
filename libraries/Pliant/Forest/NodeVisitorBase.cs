@@ -8,12 +8,7 @@
         {
             StateManager = stateManager;
         }
-
-        protected NodeVisitorBase()
-            : this(new NodeVisitorStateManager())
-        {
-        }
-
+        
         public virtual void Visit(IIntermediateNode intermediateNode)
         {
             var currentAndNode = StateManager.GetCurrentAndNode(intermediateNode);

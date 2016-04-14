@@ -30,7 +30,7 @@ namespace Pliant.Tree
 
         public InternalTreeNode(
             IInternalNode internalNode)
-            : this(internalNode, new NodeVisitorStateManager())
+            : this(internalNode, new MultiPassNodeVisitorStateManager())
         {
         }
 

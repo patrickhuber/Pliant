@@ -2,12 +2,12 @@
 
 namespace Pliant.Forest
 {
-    public class NodeVisitorStateManager : INodeVisitorStateManager
+    public class MultiPassNodeVisitorStateManager : INodeVisitorStateManager
     {
         private IInternalNode _lock;
         private IDictionary<IInternalNode, int> _stateStore;
 
-        public NodeVisitorStateManager()
+        public MultiPassNodeVisitorStateManager()
         {
             _lock = null;
             _stateStore = new Dictionary<IInternalNode, int>();

@@ -66,7 +66,7 @@ namespace Pliant.Tests.Unit.Tree
 
             var internalNode = parseForest as IInternalNode;
 
-            var stateManager = new NodeVisitorStateManager();
+            var stateManager = new MultiPassNodeVisitorStateManager();
             var currentAndNode = stateManager.GetCurrentAndNode(internalNode);
             var treeNode = new InternalTreeNode(internalNode, currentAndNode, stateManager);
             return treeNode;

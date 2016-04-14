@@ -37,6 +37,7 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Tree\ParseTreeEnumerator.cs" />
     <Compile Include="Forest\SinglePassNodeVisitorStateManager.cs" />
     <Compile Include="Automata\INfaToDfa.cs" />
     <Compile Include="Automata\SubsetConstructionAlgorithm.cs" />
@@ -148,7 +149,7 @@
     <Compile Include="Forest\ITerminalNode.cs" />
     <Compile Include="Forest\NodeBase.cs" />
     <Compile Include="Forest\NodeVisitorBase.cs" />
-    <Compile Include="Forest\NodeVisitorStateManager.cs" />
+    <Compile Include="Forest\MultiPassNodeVisitorStateManager.cs" />
     <Compile Include="ParseEngineLexemeFactory.cs" />
     <Compile Include="ParseEngineOptions.cs" />
     <Compile Include="RegularExpressions\IRegexToNfa.cs" />
@@ -210,6 +211,7 @@
     <Compile Include="Grammars\WhitespaceTerminal.cs" />
     <Compile Include="Tree\IInternalTreeNode.cs" />
     <Compile Include="Tree\InternalTreeNode.cs" />
+    <Compile Include="Tree\IParseTreeEnumerator.cs" />
     <Compile Include="Tree\ITokenTreeNode.cs" />
     <Compile Include="Tree\ITreeNode.cs" />
     <Compile Include="Tree\ITreeNodeVisitor.cs" />

@@ -42,8 +42,9 @@ namespace Pliant.Tests.Unit.Forest
             }
             Assert.IsTrue(regexParseEngine.IsAccepted());
 
-            var nodeVisitorStateManager = new NodeVisitorStateManager();
-            var nodeVisitor = new LoggingNodeVisitor();
+            var nodeVisitorStateManager = new MultiPassNodeVisitorStateManager();
+            var nodeVisitor = new LoggingNodeVisitor(
+                new SinglePassNodeVisitorStateManager());
             var root = regexParseEngine.GetParseForestRoot();
             root.Accept(nodeVisitor);
             Assert.AreEqual(31, nodeVisitor.VisitLog.Count);

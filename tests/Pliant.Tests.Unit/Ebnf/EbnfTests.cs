@@ -234,7 +234,8 @@ namespace Pliant.Tests.Unit.Ebnf
             ") as ISymbolNode;
             Assert.IsNotNull(node);
 
-            var visitor = new LoggingNodeVisitor();
+            var visitor = new LoggingNodeVisitor(
+                new SinglePassNodeVisitorStateManager());
             node.Accept(visitor);
 
             var log = visitor.VisitLog;
