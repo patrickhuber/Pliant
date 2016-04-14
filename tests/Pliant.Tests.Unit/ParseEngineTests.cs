@@ -6,6 +6,7 @@ using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Collections.Generic;
 using System.Linq;
+using Pliant.Tree;
 
 namespace Pliant.Tests.Unit
 {
@@ -606,6 +607,129 @@ namespace Pliant.Tests.Unit
             var S_0_17 = CastAndCountChildren<ISymbolNode>(root, 2);
         }
 
+        [TestMethod]
+        public void ParseEngineShouldCreateSameParseTreeForNullableRightRecursiveRule()
+        {
+            ProductionBuilder R = "R", E = "E", T = "T", F = "F", A = "A", C = "C";
+            R.Definition =
+                E
+                | '^' + E
+                | E + '$'
+                | '^' + E + '$';
+            E.Definition =
+                T
+                | T + '|' + E
+                | (_)null;
+            T.Definition =
+                F
+                | F + T;
+            F.Definition =
+                A;
+            A.Definition =
+                C;
+            C.Definition = 
+                new TerminalLexerRule(
+                    new SetTerminal('a', 'b'), "[ab]");
+
+            var grammar = new GrammarBuilder(R, new[] { R, E, T, F, A, C})
+                .ToGrammar();
+
+            var leoEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
+            var classicEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
+
+            var input = "a|b";
+
+            var leoInterface = new ParseInterface(leoEngine, input);
+            var classicInterface = new ParseInterface(classicEngine, input);
+
+            Assert.IsTrue(RunParse(leoInterface));
+            Assert.IsTrue(RunParse(classicInterface));
+
+            AssertForestsAreEqual(leoEngine.GetParseForestRoot(), classicEngine.GetParseForestRoot());
+        }
+
+        private static void AssertForestsAreEqual(IAndNode first, IAndNode second)
+        {
+            Assert.AreEqual(first.Children.Count, second.Children.Count);
+            var firstChildrenEnumerator = first.Children.GetEnumerator();
+            var secondChildrenEnumerator = second.Children.GetEnumerator();
+
+            var firstChildEnumeratorMoveNext = false;
+            var secondChildEnumeratorMoveNext = false;
+
+            do
+            {
+                firstChildEnumeratorMoveNext = firstChildrenEnumerator.MoveNext();
+                secondChildEnumeratorMoveNext = secondChildrenEnumerator.MoveNext();
+                Assert.AreEqual(firstChildEnumeratorMoveNext, secondChildEnumeratorMoveNext);
+                if(firstChildEnumeratorMoveNext)
+                    AssertForestsAreEqual(firstChildrenEnumerator.Current, secondChildrenEnumerator.Current);
+            } while (firstChildEnumeratorMoveNext);
+        }
+
+        private static void AssertForestsAreEqual(IInternalNode first, IInternalNode second)
+        {
+            Assert.AreEqual(first.Children.Count, second.Children.Count);
+            var firstChildrenEnumerator = first.Children.GetEnumerator();
+            var secondChildrenEnumerator = second.Children.GetEnumerator();
+
+            var firstChildEnumeratorMoveNext = false;
+            var secondChildEnumeratorMoveNext = false;
+
+            do
+            {
+                firstChildEnumeratorMoveNext = firstChildrenEnumerator.MoveNext();
+                secondChildEnumeratorMoveNext = secondChildrenEnumerator.MoveNext();
+                Assert.AreEqual(firstChildEnumeratorMoveNext, secondChildEnumeratorMoveNext);
+                if(firstChildEnumeratorMoveNext)
+                    AssertForestsAreEqual(firstChildrenEnumerator.Current, secondChildrenEnumerator.Current);
+            } while (firstChildEnumeratorMoveNext);
+        }
+
+        private static void AssertForestsAreEqual(INode first, INode second)
+        {
+            Assert.AreEqual(first.NodeType, second.NodeType);
+            switch (first.NodeType)
+            {
+                case NodeType.Intermediate:
+                    var firstIntermediate = first as IIntermediateNode;
+                    var secondIntermediate = second as IIntermediateNode;
+                    Assert.AreEqual(firstIntermediate.State, secondIntermediate.State);
+                    AssertForestsAreEqual(firstIntermediate, secondIntermediate);
+                    break;
+
+                case NodeType.Symbol:
+                    var firstSymbol = first as ISymbolNode;
+                    var secondSymbol = second as ISymbolNode;
+                    Assert.AreEqual(firstSymbol.Symbol, secondSymbol.Symbol);
+                    AssertForestsAreEqual(firstSymbol, secondSymbol);
+                    break;
+
+                case NodeType.Terminal:
+                    var firstTerminal = first as ITerminalNode;
+                    var secondTerminal = second as ITerminalNode;
+                    Assert.AreEqual(firstTerminal.Capture, secondTerminal.Capture);
+                    break;
+
+                case NodeType.Token:
+                    var firstToken = first as ITokenNode;
+                    var secondToken = second as ITokenNode;
+                    Assert.AreEqual(firstToken.Token.TokenType.Id, secondToken.Token.TokenType.Id);
+                    Assert.AreEqual(firstToken.Token.Value, secondToken.Token.Value);
+                    break;
+            }
+        }
+        
+        private static bool RunParse(ParseInterface parseInterface)
+        {
+            while (!parseInterface.EndOfStream())
+            {
+                if (!parseInterface.Read())
+                    return false;
+            }
+            return parseInterface.ParseEngine.IsAccepted();
+        }
+
         private static IGrammar CreateRegularExpressionStubGrammar()
         {
             ProductionBuilder R = "R", E = "E", T = "T", F = "F", A = "A", I = "I";
@@ -642,7 +766,7 @@ namespace Pliant.Tests.Unit
             Assert.AreEqual(location, node.Location, "Location Match Failed.");
         }
 
-        private T CastAndCountChildren<T>(INode node, int childCount)
+        private static T CastAndCountChildren<T>(INode node, int childCount)
             where T : class, IInternalNode
         {
             var tNode = node as T;
@@ -654,7 +778,7 @@ namespace Pliant.Tests.Unit
             return tNode;
         }
 
-        private T GetAndCastChildAtIndex<T>(IInternalNode node, int index)
+        private static T GetAndCastChildAtIndex<T>(IInternalNode node, int index)
             where T : class, INode
         {
             var firstAndNode = node.Children[0];
@@ -685,29 +809,29 @@ namespace Pliant.Tests.Unit
             return grammar;
         }
 
-        private IToken CreateDigitToken(int value, int position)
+        private static IToken CreateDigitToken(int value, int position)
         {
             return new Token(value.ToString(), position, new TokenType("digit"));
         }
 
-        private IToken CreateCharacterToken(char character, int position)
+        private static IToken CreateCharacterToken(char character, int position)
         {
             return new Token(character.ToString(), position, new TokenType(character.ToString()));
         }
 
-        private IEnumerable<IToken> Tokenize(string input)
+        private static IEnumerable<IToken> Tokenize(string input)
         {
             return input.Select((x, i) =>
                 new Token(x.ToString(), i, new TokenType(x.ToString())));
         }
 
-        private IEnumerable<IToken> Tokenize(string input, string tokenType)
+        private static IEnumerable<IToken> Tokenize(string input, string tokenType)
         {
             return input.Select((x, i) =>
                 new Token(x.ToString(), i, new TokenType(tokenType)));
         }
 
-        private void ParseInput(IParseEngine parseEngine, IEnumerable<IToken> tokens)
+        private static void ParseInput(IParseEngine parseEngine, IEnumerable<IToken> tokens)
         {
             foreach (var token in tokens)
                 Assert.IsTrue(parseEngine.Pulse(token));
