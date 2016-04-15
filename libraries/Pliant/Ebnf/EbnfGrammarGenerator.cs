@@ -113,13 +113,24 @@ namespace Pliant.Ebnf
                     throw new NotImplementedException("Grouping is not implemented.");                    
 
                 case EbnfNodeType.EbnfFactorOptional:
-                    // duplicate every existing right hand side
-                    var alternateRightHandSides = new List<List<ISymbol>>();
+                    var alternateRightHandSides = new List<IList<ISymbol>>();
                     var factorOptional = factor as EbnfFactorOptional;
+
+                    var expressionRightHandSides = GetRightHandSideForExpression(factorOptional.Expression);
                     
                     foreach (var rightHandSide in rightHandSides)
-                        alternateRightHandSides.Add(new List<ISymbol>(rightHandSide));
-                    
+                    {                        
+                        foreach (var expressionRightHandSide in expressionRightHandSides)
+                        {
+                            var rightHandSideClone = new List<ISymbol>(rightHandSide);
+                            rightHandSideClone.AddRange(expressionRightHandSide);
+                            alternateRightHandSides.Add(rightHandSideClone);
+                        }
+                    }
+
+                    foreach (var alternateRightHandSide in alternateRightHandSides)
+                        rightHandSides.Add(alternateRightHandSide);          
+
                     break;
 
                 case EbnfNodeType.EbnfFactorRepetition:
@@ -138,7 +149,7 @@ namespace Pliant.Ebnf
                     break;          
             }
         }
-
+        
         private static void AppendSymbolToAllRules(IList<IList<ISymbol>> rightHandSides, ISymbol symbol)
         {
             foreach (var rightHandSide in rightHandSides)

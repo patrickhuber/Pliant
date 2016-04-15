@@ -565,7 +565,7 @@ namespace Pliant.Tests.Unit
             var input = Tokenize("aaa");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
-
+            
             var R_0_3 = CastAndCountChildren<ISymbolNode>(parseEngine.GetParseForestRoot(), 1);
             AssertNodeProperties(R_0_3, "R", 0, 3);
             var E_0_3 = GetAndCastChildAtIndex<ISymbolNode>(R_0_3, 0);

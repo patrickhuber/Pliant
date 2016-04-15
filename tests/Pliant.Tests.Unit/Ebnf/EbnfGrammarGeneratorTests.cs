@@ -143,6 +143,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void EbnfGrammarGeneratorShouldCreateGrammarForOptional()
         {
+            // R = ['a']
             var definition = new EbnfDefinition(
                 new EbnfBlockRule(
                     new EbnfRule(
@@ -157,13 +158,50 @@ namespace Pliant.Tests.Unit.Ebnf
             var grammar = GenerateGrammar(definition);
             Assert.IsNotNull(grammar);
             Assert.IsNotNull(grammar.Start);
-
+            
             ProductionBuilder R = "R";
             R.Definition = 'a' 
                 |   (_)null;
             var expectedGrammar = new GrammarBuilder(R, new[] { R }).ToGrammar();
             Assert.AreEqual(expectedGrammar.Productions.Count, grammar.Productions.Count);
+        }
 
+        [TestMethod]
+        public void EbnfGrammarGeneratorShouldCreateGrammarForMultipleOptionals()
+        {
+            // R = 'b' ['a'] 'c' ['d']
+            var definition = new EbnfDefinition(
+                new EbnfBlockRule(
+                    new EbnfRule(
+                        new EbnfQualifiedIdentifier("R"),
+                        new EbnfExpression(
+                            new EbnfTermConcatenation(
+                                new EbnfFactorLiteral("b"),
+                                new EbnfTermConcatenation(
+                                    new EbnfFactorOptional(
+                                        new EbnfExpression(
+                                            new EbnfTerm(
+                                                new EbnfFactorLiteral("a")))),
+                                    new EbnfTermConcatenation(
+                                        new EbnfFactorLiteral("c"),
+                                        new EbnfTerm(
+                                            new EbnfFactorOptional(
+                                                new EbnfExpression(
+                                                    new EbnfTerm(
+                                                        new EbnfFactorLiteral("d"))))))))))));
+            var grammar = GenerateGrammar(definition);
+            Assert.IsNotNull(grammar);
+            Assert.IsNotNull(grammar.Start);
+
+            ProductionBuilder R = "R";
+            R.Definition =
+                (_)'b' + 'a' + 'c' + 'd'
+                | (_)'b' + 'c' + 'd'
+                | (_)'b' + 'a' + 'c'
+                | (_)'b' + 'a';
+
+            var expectedGrammar = new GrammarBuilder(R, new[] { R }).ToGrammar();
+            Assert.AreEqual(expectedGrammar.Productions.Count, grammar.Productions.Count);
         }
 
         private static IGrammar GenerateGrammar(EbnfDefinition definition)
