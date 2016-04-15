@@ -50,7 +50,7 @@ namespace Pliant.Automata
         private NfaClosure Closure(IEnumerable<INfaState> states, INfaState endState)
         {
             var set = new HashSet<INfaState>();
-            bool isFinal = false;
+            var isFinal = false;
             foreach (var state in states)
                 foreach (var item in state.Closure())
                 {

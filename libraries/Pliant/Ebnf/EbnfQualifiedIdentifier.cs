@@ -35,7 +35,7 @@ namespace Pliant.Ebnf
 
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(Identifier.GetHashCode(), NodeType.GetHashCode());
+            return HashUtil.ComputeHash(NodeType.GetHashCode(), Identifier.GetHashCode());
         }
 
         public override int GetHashCode()
@@ -82,9 +82,9 @@ namespace Pliant.Ebnf
         int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
+                NodeType.GetHashCode(),
                 Identifier.GetHashCode(), 
-                QualifiedIdentifier.GetHashCode(),
-                NodeType.GetHashCode());
+                QualifiedIdentifier.GetHashCode());
         }
 
         public override int GetHashCode()

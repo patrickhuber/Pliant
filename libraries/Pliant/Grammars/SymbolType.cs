@@ -4,6 +4,9 @@
     {
         Terminal,
         NonTerminal,
-        LexerRule
+        LexerRule,
+        Repetition,
+        Grouping,
+        Optional
     }
 }

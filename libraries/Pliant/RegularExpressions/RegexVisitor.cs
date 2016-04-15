@@ -16,8 +16,8 @@ namespace Pliant.RegularExpressions
         private Regex VisitRegexNode(IInternalTreeNode node)
         {
             RegexExpression expression = null;
-            bool startsWith = false;
-            bool endsWith = false;
+            var startsWith = false;
+            var endsWith = false;
 
             foreach (var child in node.Children)
             {
@@ -74,7 +74,7 @@ namespace Pliant.RegularExpressions
             if (term != null)
                 return new RegexExpressionTerm(term);
 
-            return new RegexExpression();
+            throw new InvalidOperationException("Unable to create null expression.");
         }
 
         private RegexTerm VisitRegexTermNode(IInternalTreeNode internalNode)

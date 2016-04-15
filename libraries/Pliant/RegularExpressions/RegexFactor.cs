@@ -39,6 +39,11 @@ namespace Pliant.RegularExpressions
         {
             get { return RegexNodeType.RegexFactor; }
         }
+
+        public override string ToString()
+        {
+            return Atom.ToString();
+        }
     }
 
     public class RegexFactorIterator : RegexFactor
@@ -79,6 +84,20 @@ namespace Pliant.RegularExpressions
         public override RegexNodeType NodeType
         {
             get { return RegexNodeType.RegexFactorIterator; }
+        }
+
+        public override string ToString()
+        {
+            switch (Iterator)
+            {
+                case RegexIterator.OneOrMany:
+                    return $"{Atom}+";
+                case RegexIterator.ZeroOrMany:
+                    return $"{Atom}*";
+                case RegexIterator.ZeroOrOne:
+                    return $"{Atom}?";
+            }
+            throw new InvalidOperationException("Unexpected RegexIterator encountered.");
         }
     }
 }

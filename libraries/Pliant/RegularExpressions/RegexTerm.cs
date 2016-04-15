@@ -38,6 +38,11 @@ namespace Pliant.RegularExpressions
         {
             return _hashCode;
         }
+
+        public override string ToString()
+        {
+            return Factor.ToString();
+        }
     }
 
     public class RegexTermFactor : RegexTerm
@@ -79,6 +84,11 @@ namespace Pliant.RegularExpressions
         public override RegexNodeType NodeType
         {
             get { return RegexNodeType.RegexTermFactor; }
+        }
+
+        public override string ToString()
+        {
+            return $"{Factor}{Term}";
         }
     }
 }

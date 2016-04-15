@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pliant.Ast;
+using Pliant.Forest;
 using Pliant.Ebnf;
 using Pliant.Grammars;
 
@@ -166,7 +166,7 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void EbnfShouldParseOneOrZero()
+        public void EbnfShouldParseZeroOrOne()
         {
             ParseInput(@"
             Rule = [ Expression ];
@@ -213,6 +213,20 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
+        public void EbnfShouldParseLexerRuleAlteration()
+        {
+            ParseInput(@"
+            SomeLexerRule ~ 'a' | 'b'; ");
+        }
+
+        [TestMethod]
+        public void EbnfShouldParseLexerRuleConcatenation()
+        {
+            ParseInput(@"
+            SomeLexerRule ~ 'a' 'b' ;");
+        }
+
+        [TestMethod]
         public void EbnfShouldCreateCorrectParseTreeForRule()
         {
             var node = ParseInput(@"
@@ -220,7 +234,8 @@ namespace Pliant.Tests.Unit.Ebnf
             ") as ISymbolNode;
             Assert.IsNotNull(node);
 
-            var visitor = new LoggingNodeVisitor();
+            var visitor = new LoggingNodeVisitor(
+                new SinglePassNodeVisitorStateManager());
             node.Accept(visitor);
 
             var log = visitor.VisitLog;

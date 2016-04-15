@@ -14,7 +14,7 @@ namespace Pliant.Builders
                 @name: leftHandSide))
         {
         }
-        
+                
         public ProductionBuilder(INonTerminal leftHandSide)
         {
             LeftHandSide = leftHandSide;
@@ -31,8 +31,7 @@ namespace Pliant.Builders
         }
 
         public RuleBuilder Definition { get; set; }
-
-
+        
         public IEnumerable<IProduction> ToProductions()
         {
             foreach (var builderList in Definition.Data)
@@ -59,7 +58,7 @@ namespace Pliant.Builders
                 yield return new Production(LeftHandSide, symbolList);
             }
         }
-
+        
         public static implicit operator ProductionBuilder(string name)
         {
             return new ProductionBuilder(name);

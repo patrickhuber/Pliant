@@ -136,46 +136,46 @@ namespace Pliant.Ebnf
         }
     }
 
-    public class EbnfFactorConcatenation : EbnfFactor
+    public class EbnfFactorRepetition : EbnfFactor
     {
         private readonly int _hashCode;
 
         public EbnfExpression Expression { get; private set; }
 
-        public EbnfFactorConcatenation(EbnfExpression expression)
-        {
-            Expression = expression;
-            _hashCode = ComputeHashCode();
-        }
-
         public override EbnfNodeType NodeType
         {
             get
             {
-                return EbnfNodeType.EbnfFactorConcatenation;
+                return EbnfNodeType.EbnfFactorRepetition;
             }
         }
-        int ComputeHashCode()
-        {
-            return HashUtil.ComputeHash(
-                NodeType.GetHashCode(),
-                Expression.GetHashCode());
-        }
 
-        public override int GetHashCode()
+        public EbnfFactorRepetition(EbnfExpression expression)
         {
-            return _hashCode;
+            Expression = expression;
+            _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
                 return false;
-            var factor = obj as EbnfFactorConcatenation;
+            var factor = obj as EbnfFactorRepetition;
             if ((object)factor == null)
                 return false;
             return factor.NodeType == NodeType
                 && factor.Expression.Equals(Expression);
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
+        int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(
+                NodeType.GetHashCode(),
+                Expression.GetHashCode());
         }
     }
 

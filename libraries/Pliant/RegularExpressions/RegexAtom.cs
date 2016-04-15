@@ -12,9 +12,31 @@ namespace Pliant.RegularExpressions
 
     public class RegexAtomAny : RegexAtom
     {
+        const string Dot = ".";
+
         public override RegexNodeType NodeType
         {
             get { return RegexNodeType.RegexAtomAny; }
+        }
+
+        public override string ToString()
+        {
+            return Dot;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if ((object)obj == null)
+                return false;
+            var any = obj as RegexAtomAny;
+            if ((object)any == null)
+                return false;
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return Dot.GetHashCode();
         }
     }
 
@@ -54,6 +76,11 @@ namespace Pliant.RegularExpressions
         {
             get { return RegexNodeType.RegexAtomCharacter; }
         }
+
+        public override string ToString()
+        {
+            return Character.ToString();
+        }
     }
 
     public class RegexAtomExpression : RegexAtom
@@ -92,6 +119,11 @@ namespace Pliant.RegularExpressions
         {
             get { return RegexNodeType.RegexAtomExpression; }
         }
+
+        public override string ToString()
+        {
+            return $"({Expression})";
+        }
     }
 
     public class RegexAtomSet : RegexAtom
@@ -129,6 +161,11 @@ namespace Pliant.RegularExpressions
         public override RegexNodeType NodeType
         {
             get { return RegexNodeType.RegexAtomSet; }
+        }
+
+        public override string ToString()
+        {
+            return Set.ToString();            
         }
     }
 }

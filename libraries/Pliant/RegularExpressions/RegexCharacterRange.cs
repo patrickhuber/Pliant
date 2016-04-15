@@ -41,6 +41,11 @@ namespace Pliant.RegularExpressions
         {
             get { return RegexNodeType.RegexCharacterUnitRange; }
         }
+
+        public override string ToString()
+        {
+            return StartCharacter.ToString();
+        }
     }
 
     public class RegexCharacterRange : RegexCharacterUnitRange
@@ -85,6 +90,11 @@ namespace Pliant.RegularExpressions
         public override RegexNodeType NodeType
         {
             get { return RegexNodeType.RegexCharacterRange; }
+        }
+
+        public override string ToString()
+        {
+            return $"{StartCharacter}-{EndCharacter}";
         }
     }
 }

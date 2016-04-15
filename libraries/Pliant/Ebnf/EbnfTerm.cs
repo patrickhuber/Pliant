@@ -46,13 +46,13 @@ namespace Pliant.Ebnf
         }
     }
 
-    public class EbnfTermRepetition : EbnfTerm
+    public class EbnfTermConcatenation : EbnfTerm
     {
         private readonly int _hashCode;
 
         public EbnfTerm Term { get; private set; }
 
-        public EbnfTermRepetition(EbnfFactor factor, EbnfTerm term)
+        public EbnfTermConcatenation(EbnfFactor factor, EbnfTerm term)
             : base(factor)
         {
             Term = term;
@@ -63,7 +63,7 @@ namespace Pliant.Ebnf
         {
             get
             {
-                return EbnfNodeType.EbnfTermRepetition;
+                return EbnfNodeType.EbnfTermConcatenation;
             }
         }
 
@@ -84,7 +84,7 @@ namespace Pliant.Ebnf
         {
             if ((object)obj == null)
                 return false;
-            var term = obj as EbnfTermRepetition;
+            var term = obj as EbnfTermConcatenation;
             if ((object)term == null)
                 return false;
             return term.NodeType == NodeType

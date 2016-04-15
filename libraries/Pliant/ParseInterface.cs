@@ -35,7 +35,7 @@ namespace Pliant
             _lexemeFactoryRegistry.Register(new StringLiteralLexemeFactory());
             _lexemeFactoryRegistry.Register(new DfaLexemeFactory());
 
-            Position = -1;
+            Position = 0;
             ParseEngine = parseEngine;
         }
 
@@ -221,7 +221,7 @@ namespace Pliant
         {
             return new Token(
                 lexeme.Capture,
-                Position - lexeme.Capture.Length,
+                Position - lexeme.Capture.Length - 1,
                 lexeme.TokenType);
         }
     }

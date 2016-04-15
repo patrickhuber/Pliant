@@ -44,7 +44,7 @@ namespace Pliant.Tests.Unit.Automata
             IDfaTransition transition_0_01 = null;
             IDfaTransition transition_0_23 = null;
 
-            int count = 0;
+            var count = 0;
             foreach (var transition in dfa_0.Transitions)
             {
                 var terminal = transition.Terminal;

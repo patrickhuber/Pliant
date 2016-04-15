@@ -2,7 +2,7 @@
 
 namespace Pliant.RegularExpressions
 {
-    public class RegexExpression : RegexNode
+    public abstract class RegexExpression : RegexNode
     {
         public override bool Equals(object obj)
         {
@@ -70,6 +70,11 @@ namespace Pliant.RegularExpressions
                 return RegexNodeType.RegexExpressionTerm;
             }
         }
+
+        public override string ToString()
+        {
+            return Term.ToString();
+        }
     }
 
     public class RegexExpressionAlteration : RegexExpressionTerm
@@ -115,6 +120,11 @@ namespace Pliant.RegularExpressions
             {
                 return RegexNodeType.RegexExpressionAlteration;
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{Term}|{Expression}";
         }
     }
 }

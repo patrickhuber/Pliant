@@ -6,17 +6,17 @@ namespace Pliant.Ebnf
     {
         private readonly int _hashCode;
 
-        public EbnfDefinition(EbnfBlock block)
-        {
-            Block = block;
-            _hashCode = ComputeHashCode();
-        }
-
-
         public EbnfBlock Block { get; private set; }
 
         public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfDefinition; } }
 
+        public EbnfDefinition(EbnfBlock block)
+        {
+            Assert.IsNotNull(block, nameof(block));
+            Block = block;
+            _hashCode = ComputeHashCode();
+        }
+        
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
@@ -46,28 +46,29 @@ namespace Pliant.Ebnf
     {
         private readonly int _hashCode;
 
-        public EbnfDefinitionConcatenation(EbnfBlock block, EbnfDefinition definition)
-            : base(block)
-        {
-            Definition = definition;
-            _hashCode = ComputeHashCode();
-        }
-
         public EbnfDefinition Definition { get; private set; }
 
         public override EbnfNodeType NodeType { get { return EbnfNodeType.EbnfDefinitionConcatenation; } }
+
+        public EbnfDefinitionConcatenation(EbnfBlock block, EbnfDefinition definition)
+            : base(block)
+        {
+            Assert.IsNotNull(definition, nameof(definition));
+            Definition = definition;
+            _hashCode = ComputeHashCode();
+        }
 
         public override bool Equals(object obj)
         {
             if ((object)obj == null)
                 return false;
-            var ebnfDefinitionRepetition = obj as EbnfDefinitionConcatenation;
-            if ((object)ebnfDefinitionRepetition == null)
+            var ebnfDefinitionConcatenation = obj as EbnfDefinitionConcatenation;
+            if ((object)ebnfDefinitionConcatenation == null)
                 return false;
             
-            return ebnfDefinitionRepetition.NodeType == EbnfNodeType.EbnfDefinitionConcatenation
-                && ebnfDefinitionRepetition.Block.Equals(Block)
-                && ebnfDefinitionRepetition.Definition.Equals(Definition);
+            return ebnfDefinitionConcatenation.NodeType == EbnfNodeType.EbnfDefinitionConcatenation
+                && ebnfDefinitionConcatenation.Block.Equals(Block)
+                && ebnfDefinitionConcatenation.Definition.Equals(Definition);
         }
 
         private int ComputeHashCode()

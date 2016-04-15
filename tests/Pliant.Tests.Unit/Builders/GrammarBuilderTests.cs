@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders;
 using Pliant.Grammars;
+using Pliant.RegularExpressions;
 using System.Linq;
 
 namespace Pliant.Tests.Unit
@@ -134,7 +135,31 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void GrammarBuilderGivenReferenceGrammarShouldGenerateWorkingGrammar()
         {
+            var regexGrammar = new RegexGrammar();
+            var regexProductionReference = new ProductionReference(regexGrammar);
+            ProductionBuilder S = "S";
+            S.Definition = regexProductionReference;
+            var grammarBuilder = new GrammarBuilder();
+            grammarBuilder.AddProduction(S);
+            var grammar = grammarBuilder.ToGrammar();
+            Assert.IsNotNull(grammar);
+            Assert.AreEqual(1, grammar.Productions.Count);
+        }
 
+        [TestMethod]
+        public void GrammarBuilderGivenNullStartShouldDetectStartFromProductions()
+        {
+            ProductionBuilder S = "S", A = "A", B = "B";
+            S.Definition = A + B;
+            A.Definition = 'a' + B;
+            B.Definition = 'b';
+            var grammarBuilder = new GrammarBuilder();
+            grammarBuilder.AddProduction(S);
+            grammarBuilder.AddProduction(A);
+            grammarBuilder.AddProduction(B);
+            var grammar = grammarBuilder.ToGrammar();
+            Assert.AreEqual(3, grammar.Productions.Count);
+            Assert.IsNotNull(grammar.Start);
         }
     }
 }

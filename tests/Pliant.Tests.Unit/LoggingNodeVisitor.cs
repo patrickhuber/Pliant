@@ -1,4 +1,4 @@
-﻿using Pliant.Ast;
+﻿using Pliant.Forest;
 using System.Collections.Generic;
 
 namespace Pliant.Tests.Unit
@@ -6,12 +6,7 @@ namespace Pliant.Tests.Unit
     public class LoggingNodeVisitor : NodeVisitorBase
     {
         public IList<string> VisitLog { get; private set; }
-
-        public LoggingNodeVisitor()
-        {
-            Init();
-        }
-
+        
         public LoggingNodeVisitor(INodeVisitorStateManager stateManager)
             : base(stateManager)
         {
