@@ -610,28 +610,18 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEngineShouldCreateSameParseTreeForNullableRightRecursiveRule()
         {
-            ProductionBuilder R = "R", E = "E", T = "T", F = "F", A = "A", C = "C";
+            ProductionBuilder R = "R", E = "E", F = "F";
             R.Definition =
-                E
-                | '^' + E
-                | E + '$'
-                | '^' + E + '$';
+                E;  
             E.Definition =
-                T
-                | T + '|' + E
-                | (_)null;
-            T.Definition =
                 F
-                | F + T;
+                | F + '|' + E
+                | (_)null;
             F.Definition =
-                A;
-            A.Definition =
-                C;
-            C.Definition = 
                 new TerminalLexerRule(
                     new SetTerminal('a', 'b'), "[ab]");
 
-            var grammar = new GrammarBuilder(R, new[] { R, E, T, F, A, C})
+            var grammar = new GrammarBuilder(R, new[] { R, E, F})
                 .ToGrammar();
 
             var leoEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
