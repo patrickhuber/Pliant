@@ -7,12 +7,47 @@ using Pliant.Tokens;
 using System.Collections.Generic;
 using System.Linq;
 using Pliant.Tree;
+using Pliant.Tests.Unit.Forest;
 
 namespace Pliant.Tests.Unit
 {
     [TestClass]
     public class ParseEngineTests
     {
+        [TestMethod]
+        public void ParseEngineGivenAmbiguousNullableRightRecursionShouldCreateMultipleParsePaths()
+        {
+            // example 1 section 3, Elizabeth Scott
+            var tokens = Tokenize("aa");
+
+            ProductionBuilder S = "S", T = "T", B = "B";
+            S.Definition = S + T | "a";
+            B.Definition = (_)null;
+            T.Definition = "a" + B | "a";
+
+            var grammar = new GrammarBuilder(S, new[] { S, T, B }).ToGrammar();
+            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
+            ParseInput(parseEngine, tokens);
+
+            var actual = parseEngine.GetParseForestRoot() as IInternalNode;            
+            
+            var a_1_2 = new FakeTokenNode("a", 1, 2);
+            var expected = 
+                new FakeSymbolNode(S.LeftHandSide, 0, 2, 
+                    new FakeAndNode(
+                        new FakeSymbolNode(S.LeftHandSide, 0, 1, 
+                            new FakeAndNode(
+                                new FakeTokenNode("a", 0, 1))),
+                        new FakeSymbolNode(T.LeftHandSide, 1, 2,
+                            new FakeAndNode(
+                                a_1_2),
+                            new FakeAndNode(
+                                a_1_2,
+                                new FakeSymbolNode(B.LeftHandSide, 2, 2, new FakeAndNode(
+                                    new FakeTokenNode("", 2,2)))))));
+            AssertForestsAreEqual(expected, actual);
+        }
+
         [TestMethod]
         public void ParseEngineGivenAmbiguousGrammarShouldCreateMulipleParsePaths()
         {
@@ -28,7 +63,6 @@ namespace Pliant.Tests.Unit
 
             var grammar = new GrammarBuilder(S, new[] { S, A, B, T })
                 .ToGrammar();
-            var T_Production = grammar.Productions[3];
 
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
@@ -622,15 +656,14 @@ namespace Pliant.Tests.Unit
             var grammar = new GrammarBuilder(E, new[] { E, F})
                 .ToGrammar();
 
-            var leoEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
-            var classicEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
-
             var input = "ab";
 
+            var leoEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
             var leoInterface = new ParseInterface(leoEngine, input);
-            var classicInterface = new ParseInterface(classicEngine, input);
-
             Assert.IsTrue(RunParse(leoInterface));
+
+            var classicEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
+            var classicInterface = new ParseInterface(classicEngine, input);
             Assert.IsTrue(RunParse(classicInterface));
 
             AssertForestsAreEqual(leoEngine.GetParseForestRoot(), classicEngine.GetParseForestRoot());

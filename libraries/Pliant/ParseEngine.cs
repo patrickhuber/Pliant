@@ -476,14 +476,19 @@ namespace Pliant
 
         private static void Log(string operation, int origin, IState state)
         {
-            Debug.Write($"{origin}\t{state}");
-            Debug.WriteLine($"\t # {operation}");
+            LogOriginStateOperation(operation, origin, state);
+            Debug.WriteLine(string.Empty);
+        }
+
+        private static void LogOriginStateOperation(string operation, int origin, IState state)
+        {
+            Debug.Write($"{origin.ToString().PadRight(50)}{state.ToString().PadRight(50)}{operation}");
         }
 
         private static void LogScan(int origin, IState state, IToken token)
         {
-            Debug.Write($"{origin}\t{state}");
-            Debug.WriteLine($"\t # Scan {token.Value}");
-        }
+            LogOriginStateOperation("Scan", origin, state);
+            Debug.WriteLine($" {token.Value}");
+        }        
     }
 }
