@@ -10,16 +10,16 @@ namespace Pliant.RegularExpressions
         {
             var grammar = new RegexGrammar();
             var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
-            var parseInterface = new ParseInterface(parseEngine, regularExpression);
-            while (!parseInterface.EndOfStream())
+            var lexer = new Lexer(parseEngine, regularExpression);
+            while (!lexer.EndOfStream())
             {
-                if (!parseInterface.Read())
+                if (!lexer.Read())
                     throw new Exception(
-                        $"Unable to parse regular expression. Error at position {parseInterface.Position}.");
+                        $"Unable to parse regular expression. Error at position {lexer.Position}.");
             }
             if (!parseEngine.IsAccepted())
                 throw new Exception(
-                    $"Error parsing regular expression. Error at position {parseInterface.Position}");
+                    $"Error parsing regular expression. Error at position {lexer.Position}");
 
             var parseForest = parseEngine.GetParseForestRoot();
             var parseTree = new InternalTreeNode(

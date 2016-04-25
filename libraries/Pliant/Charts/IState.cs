@@ -6,11 +6,17 @@ namespace Pliant.Charts
     public interface IState
     {
         IProduction Production { get; }
+
         int Origin { get; }
+
         StateType StateType { get; }
+
         ISymbol PreDotSymbol { get; }
+
         ISymbol PostDotSymbol { get; }
-        int Length { get; }
+
+        int Position { get; }
+
         bool IsComplete { get; }
 
         IState NextState();

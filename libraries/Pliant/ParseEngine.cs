@@ -20,6 +20,7 @@ namespace Pliant
 
         private Chart _chart;
         private NodeSet _nodeSet;
+        private HorspoolSet _horspoolSet;
 
         public ParseEngine(IGrammar grammar)
             : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
@@ -30,6 +31,7 @@ namespace Pliant
         {
             Options = options;
             _nodeSet = new NodeSet();
+            _horspoolSet = new HorspoolSet();
             Grammar = grammar;
             Initialize();
         }
@@ -196,21 +198,21 @@ namespace Pliant
             if (_chart.Enqueue(j, predictedState))
                 Log("Predict", j, predictedState);
 
-            var stateIsNullable = predictedState.Production.IsEmpty;
-            if (stateIsNullable)
+            var isNullable = Grammar.IsNullable(evidence.PostDotSymbol as INonTerminal);
+            if (isNullable)
             {
-                var aycockHorspoolState = evidence.NextState(j);
-
-                var predictedParseNode = CreateNullParseNode(
-                    predictedState.Production.LeftHandSide, j);
-
-                aycockHorspoolState.ParseNode
-                    = CreateParseNode(
-                        aycockHorspoolState,
-                        evidence.ParseNode,
-                        predictedParseNode,
-                        j);
-
+                var nullParseNode = CreateNullParseNode(evidence.PostDotSymbol, j);
+                var aycockHorspoolState = evidence.NextState();
+                var evidenceParseNode = evidence.ParseNode as IInternalNode;
+                if (evidenceParseNode == null)
+                    aycockHorspoolState.ParseNode = CreateParseNode(aycockHorspoolState, null, nullParseNode, j);
+                else if (evidenceParseNode.Children.Count > 0 
+                    && evidenceParseNode.Children[0].Children.Count > 0)
+                {
+                    var firstChildNode = evidenceParseNode.Children[0].Children[0];
+                    var parseNode = CreateParseNode(aycockHorspoolState, firstChildNode, nullParseNode, j);
+                    aycockHorspoolState.ParseNode = parseNode;
+                }
                 if (_chart.Enqueue(j, aycockHorspoolState))
                     Log("Predict", j, aycockHorspoolState);
             }
@@ -220,6 +222,9 @@ namespace Pliant
         {
             if (completed.ParseNode == null)
                 completed.ParseNode = CreateNullParseNode(completed.Production.LeftHandSide, k);
+
+            if (completed.Origin == k)
+                _horspoolSet.Add(k, completed);
 
             var earleySet = _chart.EarleySets[completed.Origin];
             var searchSymbol = completed.Production.LeftHandSide;
@@ -240,7 +245,7 @@ namespace Pliant
 
         private void LeoComplete(ITransitionState transitionState, IState completed, int k)
         {
-            var earleySet = _chart.EarleySets[transitionState.Position];
+            var earleySet = _chart.EarleySets[transitionState.Index];
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.PreDotSymbol);
 
@@ -251,7 +256,7 @@ namespace Pliant
 
             var topmostItem = new State(
                 transitionState.Production,
-                transitionState.Length,
+                transitionState.Position,
                 transitionState.Origin,
                 virtualParseNode);
 
@@ -263,6 +268,7 @@ namespace Pliant
         {
             var j = completed.Origin;
             var sourceEarleySet = _chart.EarleySets[j];
+                        
             for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
             {
                 var prediction = sourceEarleySet.Predictions[p];
@@ -338,7 +344,7 @@ namespace Pliant
                   searchSymbol,
                   t_rule,
                   sourceState,
-                  previousTransitionState.Position);
+                  previousTransitionState.Index);
 
                 previousTransitionState.NextTransition = currentTransitionState;
             }
@@ -366,7 +372,7 @@ namespace Pliant
             if (ruleCount == 0)
                 return true;
 
-            var nextStatePosition = state.Length + 1;
+            var nextStatePosition = state.Position + 1;
             var isComplete = nextStatePosition == state.Production.RightHandSide.Count;
             if (isComplete)
                 return true;
@@ -404,7 +410,7 @@ namespace Pliant
             var nullNode = new TokenNode(token, location, location);
             symbolNode.AddUniqueFamily(nullNode);
             return symbolNode;
-        }
+        }        
 
         private INode CreateParseNode(
             IState nextState,
@@ -414,11 +420,11 @@ namespace Pliant
         {
             Assert.IsNotNull(v, nameof(v));
             var anyPreDotRuleNull = true;
-            if (nextState.Length > 1)
+            if (nextState.Position > 1)
             {
                 var predotPrecursorSymbol = nextState
                     .Production
-                    .RightHandSide[nextState.Length - 2];
+                    .RightHandSide[nextState.Position - 2];
                 anyPreDotRuleNull = IsSymbolNullable(predotPrecursorSymbol);
             }
             var anyPostDotRuleNull = IsSymbolNullable(nextState.PostDotSymbol);
@@ -443,12 +449,12 @@ namespace Pliant
                         location
                     );
             }
-
+                        
             // if w = null and y doesn't have a family of children (v)
             if (w == null)
                 internalNode.AddUniqueFamily(v);
 
-            // if w != null and y doesn't have a family of children (w, v)
+            // if w != null and y doesn't have a family of children (w, v)            
             else
                 internalNode.AddUniqueFamily(w, v);
 
@@ -461,12 +467,8 @@ namespace Pliant
                 return true;
             if (symbol.SymbolType != SymbolType.NonTerminal)
                 return false;
-            var rules = Grammar.RulesFor(symbol as INonTerminal);
-            // PERF: Avoid LINQ Any because allocates a lambda
-            foreach (var rule in rules)
-                if (rule.IsEmpty)
-                    return true;
-            return false;
+            var nonTerminal = symbol as INonTerminal;
+            return Grammar.IsNullable(nonTerminal);
         }
 
         public void Reset()

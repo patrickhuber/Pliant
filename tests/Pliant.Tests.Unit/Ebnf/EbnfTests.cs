@@ -244,19 +244,19 @@ namespace Pliant.Tests.Unit.Ebnf
 
         private INode ParseInput(string input)
         {
-            var parseInterface = new ParseInterface(_parseEngine, input);
+            var lexer = new Lexer(_parseEngine, input);
             for (int i = 0; i < input.Length; i++)
             {
-                Assert.IsTrue(parseInterface.Read(), "Error found in position {0}", parseInterface.Position);
+                Assert.IsTrue(lexer.Read(), "Error found in position {0}", lexer.Position);
             }
-            Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
-            return parseInterface.ParseEngine.GetParseForestRoot();
+            Assert.IsTrue(lexer.ParseEngine.IsAccepted());
+            return lexer.ParseEngine.GetParseForestRoot();
         }
 
         private void FailParseInput(string input)
         {
-            var parseInterface = new ParseInterface(_parseEngine, input);
-            Assert.IsFalse(parseInterface.ParseEngine.IsAccepted());
+            var lexer = new Lexer(_parseEngine, input);
+            Assert.IsFalse(lexer.ParseEngine.IsAccepted());
         }
     }
 }

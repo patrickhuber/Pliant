@@ -273,5 +273,10 @@ namespace Pliant.Ebnf
         {
             return _ebnfGrammar.StartProductions();
         }
+
+        public bool IsNullable(INonTerminal nonTerminal)
+        {
+            return _ebnfGrammar.IsNullable(nonTerminal);
+        }
     }
 }

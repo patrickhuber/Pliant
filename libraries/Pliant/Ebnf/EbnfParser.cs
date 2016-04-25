@@ -12,16 +12,16 @@ namespace Pliant.Ebnf
         {
             var grammar = new EbnfGrammar();
             var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
-            var parseInterface = new ParseInterface(parseEngine, ebnf);
-            while (!parseInterface.EndOfStream())
+            var lexer = new Lexer(parseEngine, ebnf);
+            while (!lexer.EndOfStream())
             {
-                if (!parseInterface.Read())
+                if (!lexer.Read())
                     throw new Exception(
-                        $"Unable to parse Ebnf. Error at position {parseInterface.Position}.");
+                        $"Unable to parse Ebnf. Error at position {lexer.Position}.");
             }
             if (!parseEngine.IsAccepted())
                 throw new Exception(
-                    $"Unable to parse Ebnf. Error at position {parseInterface.Position}");
+                    $"Unable to parse Ebnf. Error at position {lexer.Position}");
 
             var parseForest = parseEngine.GetParseForestRoot();
             var parseTree = new InternalTreeNode(

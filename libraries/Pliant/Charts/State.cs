@@ -15,7 +15,7 @@ namespace Pliant.Charts
 
         public ISymbol PostDotSymbol { get; private set; }
 
-        public int Length { get; private set; }
+        public int Position { get; private set; }
 
         public virtual StateType StateType { get { return StateType.Normal; } }
 
@@ -30,7 +30,7 @@ namespace Pliant.Charts
             Assert.IsGreaterThanEqualToZero(origin, nameof(origin));
             Production = production;
             Origin = origin;
-            Length = position;
+            Position = position;
             PostDotSymbol = GetPostDotSymbol(position, production);
             PreDotSymbol = GetPreDotSymbol(position, production);
             _hashCode = ComputeHashCode();
@@ -53,7 +53,7 @@ namespace Pliant.Charts
                 return null;
             return new State(
                 Production,
-                Length + 1,
+                Position + 1,
                 Origin,
                 node);
         }
@@ -69,14 +69,14 @@ namespace Pliant.Charts
                 return null;
             return new State(
                 Production,
-                Length + 1,
+                Position + 1,
                 newOrigin,
                 parseNode);
         }
 
         public bool IsComplete
         {
-            get { return Length == Production.RightHandSide.Count; }
+            get { return Position == Production.RightHandSide.Count; }
         }
 
         public bool IsSource(ISymbol searchSymbol)
@@ -101,7 +101,7 @@ namespace Pliant.Charts
         private int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
-                Length.GetHashCode(),
+                Position.GetHashCode(),
                 Origin.GetHashCode(),
                 Production.GetHashCode());
         }
@@ -121,11 +121,11 @@ namespace Pliant.Charts
             {
                 stringBuilder.AppendFormat(
                     "{0}{1}",
-                    p == Length ? Dot : " ",
+                    p == Position ? Dot : " ",
                     Production.RightHandSide[p]);
             }
 
-            if (Length == Production.RightHandSide.Count)
+            if (Position == Production.RightHandSide.Count)
                 stringBuilder.Append(Dot);
 
             stringBuilder.AppendFormat("\t\t({0})", Origin);

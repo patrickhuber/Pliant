@@ -8,12 +8,12 @@ using System;
 namespace Pliant.Tests.Unit
 {
     [TestClass]
-    public class ParseInterfaceTests
+    public class LexerTests
     {
         private GrammarLexerRule _whitespaceRule;
         private GrammarLexerRule _wordRule;
 
-        public ParseInterfaceTests()
+        public LexerTests()
         {
             _whitespaceRule = CreateWhitespaceRule();
             _wordRule = CreateWordRule();
@@ -30,7 +30,7 @@ namespace Pliant.Tests.Unit
                 new WhitespaceTerminal();
 
             var grammar = new GrammarBuilder(S, new[] { S, whitespace }).ToGrammar();
-            return new GrammarLexerRule("whitespace", grammar);
+            return new GrammarLexerRule(nameof(whitespace), grammar);
         }
 
         private static GrammarLexerRule CreateWordRule()
@@ -45,11 +45,11 @@ namespace Pliant.Tests.Unit
                 | new RangeTerminal('0', '9');
 
             var wordGrammar = new GrammarBuilder(W, new[] { W, word }).ToGrammar();
-            return new GrammarLexerRule("word", wordGrammar);
+            return new GrammarLexerRule(nameof(word), wordGrammar);
         }
 
         [TestMethod]
-        public void ParseInterfaceShouldParseSimpleWordSentence()
+        public void LexerShouldParseSimpleWordSentence()
         {
             ProductionBuilder S = "S";
             S.Definition =
@@ -64,7 +64,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void ParseInterfaceShouldIgnoreWhitespace()
+        public void LexerShouldIgnoreWhitespace()
         {
             // a <word boundary> abc <word boundary> a <word boundary> a
             const string input = "a abc a a";
@@ -83,24 +83,24 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void ParseInterfaceShouldEmitTokenBetweenLexerRulesAndEndOfFile()
+        public void LexerShouldEmitTokenBetweenLexerRulesAndEndOfFile()
         {
             const string input = "aa";
             ProductionBuilder S = "S";
             S.Definition = 'a' + S | 'a';
             var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
             var parseEngine = new ParseEngine(grammar);
-            var parseInterface = new ParseInterface(parseEngine, input);
+            var lexer = new Lexer(parseEngine, input);
 
             var chart = GetParseEngineChart(parseEngine);
-            Assert.IsTrue(parseInterface.Read());
+            Assert.IsTrue(lexer.Read());
             Assert.AreEqual(1, chart.EarleySets.Count);
-            Assert.IsTrue(parseInterface.Read());
+            Assert.IsTrue(lexer.Read());
             Assert.AreEqual(3, chart.EarleySets.Count);
         }
 
         [TestMethod]
-        public void ParseInterfaceShouldUseExistingMatchingLexemesToPerformMatch()
+        public void LexerShouldUseExistingMatchingLexemesToPerformMatch()
         {
             const string input = "aaaa";
 
@@ -113,17 +113,17 @@ namespace Pliant.Tests.Unit
             S.Definition = a + S | a;
             var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
             var parseEngine = new ParseEngine(grammar);
-            var parseInterface = new ParseInterface(parseEngine, input);
+            var lexer = new Lexer(parseEngine, input);
 
             var chart = GetParseEngineChart(parseEngine);
-            Assert.IsTrue(parseInterface.Read());
+            Assert.IsTrue(lexer.Read());
             Assert.AreEqual(1, chart.EarleySets.Count);
-            Assert.IsTrue(parseInterface.Read());
+            Assert.IsTrue(lexer.Read());
             Assert.AreEqual(1, chart.EarleySets.Count);
         }
 
         [TestMethod]
-        public void ParseInterfaceWhenNoLexemesMatchCharacterShouldCreateNewLexeme()
+        public void LexerWhenNoLexemesMatchCharacterShouldCreateNewLexeme()
         {
             const string input = "aaaa";
 
@@ -137,16 +137,16 @@ namespace Pliant.Tests.Unit
             var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
-            var parseInterface = new ParseInterface(parseEngine, input);
+            var lexer = new Lexer(parseEngine, input);
 
             var chart = GetParseEngineChart(parseEngine);
             for (int i = 0; i < 3; i++)
-                Assert.IsTrue(parseInterface.Read());
+                Assert.IsTrue(lexer.Read());
             Assert.AreEqual(2, chart.EarleySets.Count);
         }
 
         [TestMethod]
-        public void ParseInterfaceShouldEmitTokenWhenIgnoreCharacterIsEncountered()
+        public void LexerShouldEmitTokenWhenIgnoreCharacterIsEncountered()
         {
             const string input = "aa aa";
             ProductionBuilder S = "S";
@@ -160,16 +160,16 @@ namespace Pliant.Tests.Unit
                 .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
-            var parseInterface = new ParseInterface(parseEngine, input);
+            var lexer = new Lexer(parseEngine, input);
             var chart = GetParseEngineChart(parseEngine);
             for (int i = 0; i < 2; i++)
-                Assert.IsTrue(parseInterface.Read());
-            Assert.IsTrue(parseInterface.Read());
+                Assert.IsTrue(lexer.Read());
+            Assert.IsTrue(lexer.Read());
             Assert.AreEqual(2, chart.EarleySets.Count);
         }
 
         [TestMethod]
-        public void ParseInterfaceShouldEmitTokenWhenCharacterMatchesNextProduction()
+        public void LexerShouldEmitTokenWhenCharacterMatchesNextProduction()
         {
             const string input = "aabb";
             ProductionBuilder A = "A";
@@ -193,10 +193,10 @@ namespace Pliant.Tests.Unit
 
             var parseEngine = new ParseEngine(grammar);
             var chart = GetParseEngineChart(parseEngine);
-            var parseInterface = new ParseInterface(parseEngine, input);
+            var lexer = new Lexer(parseEngine, input);
             for (int i = 0; i < input.Length; i++)
             {
-                Assert.IsTrue(parseInterface.Read());
+                Assert.IsTrue(lexer.Read());
                 if (i < 2)
                     Assert.AreEqual(1, chart.Count);
                 else if (i < 3)
@@ -207,7 +207,7 @@ namespace Pliant.Tests.Unit
         }
 
         [TestMethod]
-        public void ParseInterfaceGivenIgnoreCharactersWhenOverlapWithTerminalShouldChooseTerminal()
+        public void LexerGivenIgnoreCharactersWhenOverlapWithTerminalShouldChooseTerminal()
         {
             var input = "word \t\r\n word";
 
@@ -233,10 +233,10 @@ namespace Pliant.Tests.Unit
 
         private static void RunParse(ParseEngine parseEngine, string input)
         {
-            var parseInterface = new ParseInterface(parseEngine, input);
+            var lexer = new Lexer(parseEngine, input);
             for (int i = 0; i < input.Length; i++)
-                Assert.IsTrue(parseInterface.Read(), $"Error parsing at position {i}");
-            Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
+                Assert.IsTrue(lexer.Read(), $"Error parsing at position {i}");
+            Assert.IsTrue(lexer.ParseEngine.IsAccepted());
         }
     }
 }

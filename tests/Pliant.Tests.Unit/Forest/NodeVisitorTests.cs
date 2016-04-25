@@ -34,11 +34,11 @@ namespace Pliant.Tests.Unit.Forest
         {
             var regexGrammar = new RegexGrammar();
             var regexParseEngine = new ParseEngine(regexGrammar);
-            var regexParseInterface = new ParseInterface(regexParseEngine, @"[(]\d[)]");
-            while (!regexParseInterface.EndOfStream())
+            var regexLexer = new Lexer(regexParseEngine, @"[(]\d[)]");
+            while (!regexLexer.EndOfStream())
             {
-                if (!regexParseInterface.Read())
-                    Assert.Fail("error parsing input at position {0}", regexParseInterface.Position);
+                if (!regexLexer.Read())
+                    Assert.Fail("error parsing input at position {0}", regexLexer.Position);
             }
             Assert.IsTrue(regexParseEngine.IsAccepted());
 
@@ -110,14 +110,14 @@ namespace Pliant.Tests.Unit.Forest
             var sentence = "a panda eats shoots and leaves.";
 
             var parseEngine = new ParseEngine(grammar);
-            var parseInterface = new ParseInterface(parseEngine, sentence);
+            var lexer = new Lexer(parseEngine, sentence);
 
-            while (!parseInterface.EndOfStream())
+            while (!lexer.EndOfStream())
             {
-                Assert.IsTrue(parseInterface.Read(),
-                $"Error parsing position: {parseInterface.Position}");
+                Assert.IsTrue(lexer.Read(),
+                $"Error parsing position: {lexer.Position}");
             }
-            Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
+            Assert.IsTrue(lexer.ParseEngine.IsAccepted());
         }
     }
 }

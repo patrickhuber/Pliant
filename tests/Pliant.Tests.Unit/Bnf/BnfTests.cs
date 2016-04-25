@@ -28,13 +28,13 @@ namespace Pliant.Tests.Unit.Bnf
         {
             var grammar = new BnfGrammar();
             var parseEngine = new ParseEngine(grammar);
-            var parseInterface = new ParseInterface(parseEngine, _bnfText);
+            var lexer = new Lexer(parseEngine, _bnfText);
 
-            while (!parseInterface.EndOfStream())
+            while (!lexer.EndOfStream())
             {
-                if (!parseInterface.Read())
+                if (!lexer.Read())
                 {
-                    var position = parseInterface.Position;
+                    var position = lexer.Position;
                     var startIndex = 0;
                     for (int i = position; i >= 0; i--)
                     {
@@ -53,7 +53,7 @@ namespace Pliant.Tests.Unit.Bnf
                     var length = endIndex - startIndex;
                     var stringBuilder = new StringBuilder();
                     stringBuilder
-                        .AppendFormat("Error parsing input string at position {0}.", parseInterface.Position)
+                        .AppendFormat("Error parsing input string at position {0}.", lexer.Position)
                         .AppendLine()
                         .AppendFormat("start: {0}", startIndex)
                         .AppendLine()
@@ -63,8 +63,8 @@ namespace Pliant.Tests.Unit.Bnf
                 }
             }
             Assert.IsTrue(
-                parseInterface.ParseEngine.IsAccepted(),
-                "error at position {0}", parseInterface.Position);
+                lexer.ParseEngine.IsAccepted(),
+                "error at position {0}", lexer.Position);
         }
 
         [TestMethod]
@@ -76,12 +76,12 @@ namespace Pliant.Tests.Unit.Bnf
 
             var grammar = new BnfGrammar();
             var parseEngine = new ParseEngine(grammar);
-            var parseInterface = new ParseInterface(parseEngine, bnf);
+            var lexer = new Lexer(parseEngine, bnf);
 
-            while (!parseInterface.EndOfStream())
+            while (!lexer.EndOfStream())
             {
-                if (!parseInterface.Read())
-                    Assert.Fail("Error Parsing At Position {0}", parseInterface.Position);
+                if (!lexer.Read())
+                    Assert.Fail("Error Parsing At Position {0}", lexer.Position);
             }
             Assert.IsTrue(parseEngine.IsAccepted());
         }

@@ -21,5 +21,10 @@ namespace Pliant.Tests.Unit.Forest
                 return _children;
             }
         }
+
+        public void Add(INode child)
+        {
+            _children.Add(child);
+        }
     }
 }

@@ -24,6 +24,8 @@ namespace Pliant.Forest
 
         public void AddUniqueFamily(INode source, INode trigger)
         {
+            if(source == this)
+                source = Children[0].Children[0];
             AddUniqueAndNode(source, trigger);
         }
 

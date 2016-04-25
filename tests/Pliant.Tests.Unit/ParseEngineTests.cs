@@ -6,7 +6,6 @@ using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Collections.Generic;
 using System.Linq;
-using Pliant.Tree;
 using Pliant.Tests.Unit.Forest;
 
 namespace Pliant.Tests.Unit
@@ -66,9 +65,10 @@ namespace Pliant.Tests.Unit
 
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
-
+            
             var S_0_4 = parseEngine.GetParseForestRoot() as ISymbolNode;
             Assert.IsNotNull(S_0_4);
+            AssertNodeProperties(S_0_4, nameof(S), 0, 4);
             Assert.AreEqual(2, S_0_4.Children.Count);
 
             var S_0_4_1 = S_0_4.Children[0] as IAndNode;
@@ -81,6 +81,7 @@ namespace Pliant.Tests.Unit
 
             var T_1_4 = S_0_4_1.Children[1] as ISymbolNode;
             Assert.IsNotNull(T_1_4);
+            AssertNodeProperties(T_1_4, nameof(T), 1, 4);
             Assert.AreEqual(1, T_1_4.Children.Count);
 
             var S_0_4_2 = S_0_4.Children[1] as IAndNode;
@@ -89,6 +90,7 @@ namespace Pliant.Tests.Unit
 
             var A_0_1 = S_0_4_2.Children[0] as ISymbolNode;
             Assert.IsNotNull(A_0_1);
+            AssertNodeProperties(A_0_1, nameof(A), 0, 1);
             Assert.AreEqual(2, A_0_1.Children.Count);
 
             var A_0_1_1 = A_0_1.Children[0] as IAndNode;
@@ -105,6 +107,7 @@ namespace Pliant.Tests.Unit
 
             var B_0_0 = A_0_1_2.Children[0] as ISymbolNode;
             Assert.IsNotNull(B_0_0);
+            AssertNodeProperties(B_0_0, nameof(B), 0, 0);
             Assert.AreEqual(1, B_0_0.Children.Count);
 
             var B_0_0_1 = B_0_0.Children[0] as IAndNode;
@@ -659,11 +662,11 @@ namespace Pliant.Tests.Unit
             var input = "ab";
 
             var leoEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
-            var leoInterface = new ParseInterface(leoEngine, input);
+            var leoInterface = new Lexer(leoEngine, input);
             Assert.IsTrue(RunParse(leoInterface));
 
             var classicEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
-            var classicInterface = new ParseInterface(classicEngine, input);
+            var classicInterface = new Lexer(classicEngine, input);
             Assert.IsTrue(RunParse(classicInterface));
 
             AssertForestsAreEqual(leoEngine.GetParseForestRoot(), classicEngine.GetParseForestRoot());
@@ -741,14 +744,14 @@ namespace Pliant.Tests.Unit
             }
         }
         
-        private static bool RunParse(ParseInterface parseInterface)
+        private static bool RunParse(Lexer lexer)
         {
-            while (!parseInterface.EndOfStream())
+            while (!lexer.EndOfStream())
             {
-                if (!parseInterface.Read())
+                if (!lexer.Read())
                     return false;
             }
-            return parseInterface.ParseEngine.IsAccepted();
+            return lexer.ParseEngine.IsAccepted();
         }
 
         private static IGrammar CreateRegularExpressionStubGrammar()

@@ -9,7 +9,7 @@ namespace Pliant.Charts
 
         public IState Reduction { get; private set; }
 
-        public int Position { get; private set; }
+        public int Index { get; private set; }
 
         public ITransitionState NextTransition { get; set; }
 
@@ -17,12 +17,12 @@ namespace Pliant.Charts
             ISymbol recognized,
             IState transition,
             IState reduction,
-            int position)
-            : base(transition.Production, transition.Length, transition.Origin)
+            int index)
+            : base(transition.Production, transition.Position, transition.Origin)
         {
             Reduction = reduction;
             Recognized = recognized;
-            Position = position;
+            Index = index;
             _hashCode = ComputeHashCode();
         }
 

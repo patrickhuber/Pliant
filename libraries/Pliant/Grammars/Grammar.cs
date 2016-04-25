@@ -1,5 +1,6 @@
 ﻿using Pliant.Collections;
 using System.Collections.Generic;
+using System;
 
 namespace Pliant.Grammars
 {
@@ -9,6 +10,8 @@ namespace Pliant.Grammars
         protected ReadWriteList<IProduction> _productions;
         private IDictionary<INonTerminal, IList<IProduction>> _productionIndex;
         private IDictionary<int, IList<ILexerRule>> _ignoreIndex;
+        private ISet<INonTerminal> _nullable;
+        private IDictionary<INonTerminal, ISet<IProduction>> _reverseLookup;
 
         private static readonly IProduction[] EmptyProductionArray = { };
         private static readonly ILexerRule[] EmptyLexerRuleArray = { };
@@ -19,6 +22,8 @@ namespace Pliant.Grammars
             _ignores = new ReadWriteList<ILexerRule>();
             _productionIndex = new Dictionary<INonTerminal, IList<IProduction>>();
             _ignoreIndex = new Dictionary<int, IList<ILexerRule>>();
+            _nullable = new HashSet<INonTerminal>();
+            _reverseLookup = new Dictionary<INonTerminal, ISet<IProduction>>();
         }
 
         public Grammar(
@@ -30,6 +35,7 @@ namespace Pliant.Grammars
             Start = start;
             AddProductions(productions ?? EmptyProductionArray);
             AddIgnoreRules(ignoreRules ?? EmptyLexerRuleArray);
+            FindNullableSymbols();
         }
 
         private void AddIgnoreRules(IEnumerable<ILexerRule> ignoreRules)
@@ -54,12 +60,13 @@ namespace Pliant.Grammars
             get { return _productions; }
         }
 
-        public void AddProduction(IProduction production)
+        private void AddProduction(IProduction production)
         {
             _productions.Add(production);
             AddProductionToIndex(production);
+            AddProductionToReverseLookup(production);
         }
-
+        
         private void AddProductionToIndex(IProduction production)
         {
             var leftHandSide = production.LeftHandSide;
@@ -70,7 +77,61 @@ namespace Pliant.Grammars
             _productionIndex[leftHandSide].Add(production);
         }
 
-        public void AddIgnoreRule(ILexerRule lexerRule)
+        private void AddProductionToReverseLookup(IProduction production)
+        {
+            // get nullable nonterminals: http://cstheory.stackexchange.com/a/2493/32787
+            if (production.IsEmpty)
+                _nullable.Add(production.LeftHandSide);
+            foreach (var symbol in production.RightHandSide)
+            {
+                if (symbol.SymbolType != SymbolType.NonTerminal)
+                    continue;
+                var nonTerminal = symbol as INonTerminal;
+                ISet<IProduction> hashSet = null;
+                if (!_reverseLookup.TryGetValue(nonTerminal, out hashSet))
+                {
+                    hashSet = new HashSet<IProduction>();
+                    _reverseLookup.Add(nonTerminal, hashSet);
+                }
+                hashSet.Add(production);
+            }
+        }
+        
+        private void FindNullableSymbols()
+        {
+            // trace nullability through productions: http://cstheory.stackexchange.com/questions/2479/quickly-finding-empty-string-producing-nonterminals-in-a-cfg
+            var nullableQueue = new Queue<INonTerminal>(_nullable);
+            var productionSizes = new Dictionary<IProduction, int>();
+            // foreach nullable symbol discovered in forming the reverse lookup
+            while (nullableQueue.Count > 0)
+            {
+                var nonTerminal = nullableQueue.Dequeue();
+                ISet<IProduction> productionsContainingNonTerminal = null;
+                if (_reverseLookup.TryGetValue(nonTerminal, out productionsContainingNonTerminal))
+                {
+                    foreach (var production in productionsContainingNonTerminal)
+                    {
+                        var size = 0;
+                        if (!productionSizes.TryGetValue(production, out size))
+                        {
+                            size = production.RightHandSide.Count;
+                            productionSizes[production] = size;
+                        }
+                        foreach (var symbol in production.RightHandSide)
+                        {
+                            if (symbol.SymbolType == SymbolType.NonTerminal 
+                                && nonTerminal.Equals(symbol))
+                                size--;
+                        }
+                        if (size == 0 && _nullable.Add(production.LeftHandSide))
+                            nullableQueue.Enqueue(production.LeftHandSide);
+                        productionSizes[production] = size;
+                    }
+                }
+            }
+        }
+
+        private void AddIgnoreRule(ILexerRule lexerRule)
         {
             _ignores.Add(lexerRule);
             AddIgnoreRuletoIndex(lexerRule);
@@ -100,5 +161,10 @@ namespace Pliant.Grammars
         {
             return RulesFor(Start);
         }
+
+        public bool IsNullable(INonTerminal nonTerminal)
+        {
+            return _nullable.Contains(nonTerminal);
+        }        
     }
 }
