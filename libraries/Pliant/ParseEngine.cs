@@ -20,7 +20,6 @@ namespace Pliant
 
         private Chart _chart;
         private NodeSet _nodeSet;
-        private HorspoolSet _horspoolSet;
 
         public ParseEngine(IGrammar grammar)
             : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
@@ -31,7 +30,6 @@ namespace Pliant
         {
             Options = options;
             _nodeSet = new NodeSet();
-            _horspoolSet = new HorspoolSet();
             Grammar = grammar;
             Initialize();
         }
@@ -222,10 +220,7 @@ namespace Pliant
         {
             if (completed.ParseNode == null)
                 completed.ParseNode = CreateNullParseNode(completed.Production.LeftHandSide, k);
-
-            if (completed.Origin == k)
-                _horspoolSet.Add(k, completed);
-
+            
             var earleySet = _chart.EarleySets[completed.Origin];
             var searchSymbol = completed.Production.LeftHandSide;
 
