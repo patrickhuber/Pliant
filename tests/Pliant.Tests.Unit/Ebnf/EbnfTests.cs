@@ -244,7 +244,7 @@ namespace Pliant.Tests.Unit.Ebnf
 
         private INode ParseInput(string input)
         {
-            var lexer = new Lexer(_parseEngine, input);
+            var parseRunner = new ParseRunner(_parseEngine, input);
             for (int i = 0; i < input.Length; i++)
             {
                 Assert.IsTrue(lexer.Read(), "Error found in position {0}", lexer.Position);
@@ -255,7 +255,7 @@ namespace Pliant.Tests.Unit.Ebnf
 
         private void FailParseInput(string input)
         {
-            var lexer = new Lexer(_parseEngine, input);
+            var parseRunner = new ParseRunner(_parseEngine, input);
             Assert.IsFalse(lexer.ParseEngine.IsAccepted());
         }
     }

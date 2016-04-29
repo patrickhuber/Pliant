@@ -19,7 +19,7 @@ namespace Pliant.PerfViewApp
             {
                 stopwatch.Restart();
                 var parseEngine = new ParseEngine(grammar);
-                var lexer = new Lexer(parseEngine, sampleBnf);
+                var parseRunner = new ParseRunner(parseEngine, sampleBnf);
 
                 while (!lexer.EndOfStream() && lexer.Read()) { }
 

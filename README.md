@@ -115,10 +115,10 @@ public static int Main (string[] args)
 ```
 ## Recognizing and Parse Trees
 
-### Using ParseEngine, Lexer and Grammars to Recognize Input
+### Using ParseEngine, ParseRunner and Grammars to Recognize Input
 
 Using the calculator grammar from above, we can parse input by constructing
-a parse engine and parse interface instance.
+a parse engine and parse runner instance.
 
 ```csharp
 var input = "(1 + 1) * 3 + 2";
@@ -126,9 +126,9 @@ var input = "(1 + 1) * 3 + 2";
 // use the calculator grammar from above
 var parseEngine = new ParseEngine(grammar);
 
-// use the parse interface to query the parse engine for state
+// use the parse runner to query the parse engine for state
 // and use that state to select lexer rules.
-var lexer = new Lexer(parseEngine, input);
+var parseRunner = new ParseRunner(parseEngine, input);
 
 // when a parse is recognized, the parse engine is allowed to move
 // forward and continues to accept symbols. 
@@ -159,7 +159,7 @@ if(!recognized || !accepted)
 	Console.Error.WriteLine($"Error at position {errorPosition}");
 ```
 
-### Using ParseEngine, Lexer, Forrest API and Grammars to build a parse tree.
+### Using ParseEngine, ParseRunner, Forrest API and Grammars to build a parse tree.
 
 The process for creating a parse tree is the same as recognizing input. 
 In fact, when running the ParseEngine, a Sparsley Packed Parse Forest (SPPF) is created 

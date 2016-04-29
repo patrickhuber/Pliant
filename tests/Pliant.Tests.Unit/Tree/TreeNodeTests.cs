@@ -54,7 +54,7 @@ namespace Pliant.Tests.Unit.Tree
         private static InternalTreeNode GetTreeNode(IGrammar grammar, string input)
         {
             var parseEngine = new ParseEngine(grammar);
-            var lexer = new Lexer(parseEngine, input);
+            var parseRunner = new ParseRunner(parseEngine, input);
             while (!lexer.EndOfStream())
             {
                 Assert.IsTrue(lexer.Read());

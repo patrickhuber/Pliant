@@ -662,11 +662,11 @@ namespace Pliant.Tests.Unit
             var input = "ab";
 
             var leoEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
-            var leoInterface = new Lexer(leoEngine, input);
+            var leoInterface = new ParseRunner(leoEngine, input);
             Assert.IsTrue(RunParse(leoInterface));
 
             var classicEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
-            var classicInterface = new Lexer(classicEngine, input);
+            var classicInterface = new ParseRunner(classicEngine, input);
             Assert.IsTrue(RunParse(classicInterface));
 
             AssertForestsAreEqual(leoEngine.GetParseForestRoot(), classicEngine.GetParseForestRoot());
@@ -744,7 +744,7 @@ namespace Pliant.Tests.Unit
             }
         }
         
-        private static bool RunParse(Lexer lexer)
+        private static bool RunParse(ParseRunner lexer)
         {
             while (!lexer.EndOfStream())
             {

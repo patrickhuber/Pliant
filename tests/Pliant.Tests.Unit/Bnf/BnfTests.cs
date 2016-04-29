@@ -28,7 +28,7 @@ namespace Pliant.Tests.Unit.Bnf
         {
             var grammar = new BnfGrammar();
             var parseEngine = new ParseEngine(grammar);
-            var lexer = new Lexer(parseEngine, _bnfText);
+            var parseRunner = new ParseRunner(parseEngine, _bnfText);
 
             while (!lexer.EndOfStream())
             {
@@ -76,7 +76,7 @@ namespace Pliant.Tests.Unit.Bnf
 
             var grammar = new BnfGrammar();
             var parseEngine = new ParseEngine(grammar);
-            var lexer = new Lexer(parseEngine, bnf);
+            var parseRunner = new ParseRunner(parseEngine, bnf);
 
             while (!lexer.EndOfStream())
             {

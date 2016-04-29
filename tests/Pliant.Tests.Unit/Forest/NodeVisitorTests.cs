@@ -34,7 +34,7 @@ namespace Pliant.Tests.Unit.Forest
         {
             var regexGrammar = new RegexGrammar();
             var regexParseEngine = new ParseEngine(regexGrammar);
-            var regexLexer = new Lexer(regexParseEngine, @"[(]\d[)]");
+            var regexLexer = new ParseRunner(regexParseEngine, @"[(]\d[)]");
             while (!regexLexer.EndOfStream())
             {
                 if (!regexLexer.Read())
@@ -110,7 +110,7 @@ namespace Pliant.Tests.Unit.Forest
             var sentence = "a panda eats shoots and leaves.";
 
             var parseEngine = new ParseEngine(grammar);
-            var lexer = new Lexer(parseEngine, sentence);
+            var parseRunner = new ParseRunner(parseEngine, sentence);
 
             while (!lexer.EndOfStream())
             {

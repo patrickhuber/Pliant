@@ -140,7 +140,7 @@
     <Compile Include="INullable.cs" />
     <Compile Include="Forest\IInternalNode.cs" />
     <Compile Include="IParseEngine.cs" />
-    <Compile Include="ILexer.cs" />
+    <Compile Include="IParseRunner.cs" />
     <Compile Include="Grammars\IProduction.cs" />
     <Compile Include="Builders\IRuleBuilder.cs" />
     <Compile Include="Charts\IState.cs" />
@@ -180,7 +180,7 @@
     <Compile Include="Forest\NodeType.cs" />
     <Compile Include="Charts\Optimizer.cs" />
     <Compile Include="ParseEngine.cs" />
-    <Compile Include="Lexer.cs" />
+    <Compile Include="ParseRunner.cs" />
     <Compile Include="Collections\ReadWriteList.cs" />
     <Compile Include="RegularExpressions\RegexGrammar.cs" />
     <Compile Include="RegularExpressions\RegexParser.cs" />

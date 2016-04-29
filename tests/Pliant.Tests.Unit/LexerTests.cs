@@ -90,7 +90,7 @@ namespace Pliant.Tests.Unit
             S.Definition = 'a' + S | 'a';
             var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
             var parseEngine = new ParseEngine(grammar);
-            var lexer = new Lexer(parseEngine, input);
+            var parseRunner = new ParseRunner(parseEngine, input);
 
             var chart = GetParseEngineChart(parseEngine);
             Assert.IsTrue(lexer.Read());
@@ -113,7 +113,7 @@ namespace Pliant.Tests.Unit
             S.Definition = a + S | a;
             var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
             var parseEngine = new ParseEngine(grammar);
-            var lexer = new Lexer(parseEngine, input);
+            var parseRunner = new ParseRunner(parseEngine, input);
 
             var chart = GetParseEngineChart(parseEngine);
             Assert.IsTrue(lexer.Read());
@@ -137,7 +137,7 @@ namespace Pliant.Tests.Unit
             var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
-            var lexer = new Lexer(parseEngine, input);
+            var parseRunner = new ParseRunner(parseEngine, input);
 
             var chart = GetParseEngineChart(parseEngine);
             for (int i = 0; i < 3; i++)
@@ -160,7 +160,7 @@ namespace Pliant.Tests.Unit
                 .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
-            var lexer = new Lexer(parseEngine, input);
+            var parseRunner = new ParseRunner(parseEngine, input);
             var chart = GetParseEngineChart(parseEngine);
             for (int i = 0; i < 2; i++)
                 Assert.IsTrue(lexer.Read());
@@ -193,7 +193,7 @@ namespace Pliant.Tests.Unit
 
             var parseEngine = new ParseEngine(grammar);
             var chart = GetParseEngineChart(parseEngine);
-            var lexer = new Lexer(parseEngine, input);
+            var parseRunner = new ParseRunner(parseEngine, input);
             for (int i = 0; i < input.Length; i++)
             {
                 Assert.IsTrue(lexer.Read());
@@ -233,7 +233,7 @@ namespace Pliant.Tests.Unit
 
         private static void RunParse(ParseEngine parseEngine, string input)
         {
-            var lexer = new Lexer(parseEngine, input);
+            var parseRunner = new ParseRunner(parseEngine, input);
             for (int i = 0; i < input.Length; i++)
                 Assert.IsTrue(lexer.Read(), $"Error parsing at position {i}");
             Assert.IsTrue(lexer.ParseEngine.IsAccepted());

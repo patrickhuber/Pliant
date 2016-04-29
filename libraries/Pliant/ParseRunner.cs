@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Pliant
 {
-    public class Lexer : ILexer
+    public class ParseRunner : IParseRunner
     {
         public IParseEngine ParseEngine { get; private set; }
 
@@ -21,12 +21,12 @@ namespace Pliant
 
         private static readonly ILexeme[] EmptyLexemeArray = { };
 
-        public Lexer(IParseEngine parseEngine, string input)
+        public ParseRunner(IParseEngine parseEngine, string input)
             : this(parseEngine, new StringReader(input))
         {
         }
 
-        public Lexer(IParseEngine parseEngine, TextReader input)
+        public ParseRunner(IParseEngine parseEngine, TextReader input)
         {
             _textReader = input;
             _lexemeFactoryRegistry = new LexemeFactoryRegistry();

@@ -124,7 +124,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
 
         private void FailParseAtPosition(string input, int position)
         {
-            var lexer = new Lexer(_parseEngine, input);
+            var parseRunner = new ParseRunner(_parseEngine, input);
             for (int i = 0; i < input.Length; i++)
                 if (i < position)
                     Assert.IsTrue(lexer.Read(),
@@ -135,7 +135,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
 
         private void ParseInput(string input)
         {
-            var lexer = new Lexer(_parseEngine, input);
+            var parseRunner = new ParseRunner(_parseEngine, input);
             for (int i = 0; i < input.Length; i++)
                 Assert.IsTrue(lexer.Read(),
                         $"Line 0, Column {_parseEngine.Location} : Invalid Character {input[i]}");

@@ -12,7 +12,7 @@ namespace Pliant.Ebnf
         {
             var grammar = new EbnfGrammar();
             var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
-            var lexer = new Lexer(parseEngine, ebnf);
+            var parseRunner = new ParseRunner(parseEngine, ebnf);
             while (!lexer.EndOfStream())
             {
                 if (!lexer.Read())

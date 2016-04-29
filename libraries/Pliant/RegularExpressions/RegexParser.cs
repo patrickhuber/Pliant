@@ -10,7 +10,7 @@ namespace Pliant.RegularExpressions
         {
             var grammar = new RegexGrammar();
             var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
-            var lexer = new Lexer(parseEngine, regularExpression);
+            var parseRunner = new ParseRunner(parseEngine, regularExpression);
             while (!lexer.EndOfStream())
             {
                 if (!lexer.Read())
