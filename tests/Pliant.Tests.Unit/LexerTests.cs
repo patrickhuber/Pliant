@@ -93,9 +93,9 @@ namespace Pliant.Tests.Unit
             var parseRunner = new ParseRunner(parseEngine, input);
 
             var chart = GetParseEngineChart(parseEngine);
-            Assert.IsTrue(lexer.Read());
+            Assert.IsTrue(parseRunner.Read());
             Assert.AreEqual(1, chart.EarleySets.Count);
-            Assert.IsTrue(lexer.Read());
+            Assert.IsTrue(parseRunner.Read());
             Assert.AreEqual(3, chart.EarleySets.Count);
         }
 
@@ -116,9 +116,9 @@ namespace Pliant.Tests.Unit
             var parseRunner = new ParseRunner(parseEngine, input);
 
             var chart = GetParseEngineChart(parseEngine);
-            Assert.IsTrue(lexer.Read());
+            Assert.IsTrue(parseRunner.Read());
             Assert.AreEqual(1, chart.EarleySets.Count);
-            Assert.IsTrue(lexer.Read());
+            Assert.IsTrue(parseRunner.Read());
             Assert.AreEqual(1, chart.EarleySets.Count);
         }
 
@@ -141,7 +141,7 @@ namespace Pliant.Tests.Unit
 
             var chart = GetParseEngineChart(parseEngine);
             for (int i = 0; i < 3; i++)
-                Assert.IsTrue(lexer.Read());
+                Assert.IsTrue(parseRunner.Read());
             Assert.AreEqual(2, chart.EarleySets.Count);
         }
 
@@ -163,8 +163,8 @@ namespace Pliant.Tests.Unit
             var parseRunner = new ParseRunner(parseEngine, input);
             var chart = GetParseEngineChart(parseEngine);
             for (int i = 0; i < 2; i++)
-                Assert.IsTrue(lexer.Read());
-            Assert.IsTrue(lexer.Read());
+                Assert.IsTrue(parseRunner.Read());
+            Assert.IsTrue(parseRunner.Read());
             Assert.AreEqual(2, chart.EarleySets.Count);
         }
 
@@ -196,7 +196,7 @@ namespace Pliant.Tests.Unit
             var parseRunner = new ParseRunner(parseEngine, input);
             for (int i = 0; i < input.Length; i++)
             {
-                Assert.IsTrue(lexer.Read());
+                Assert.IsTrue(parseRunner.Read());
                 if (i < 2)
                     Assert.AreEqual(1, chart.Count);
                 else if (i < 3)
@@ -235,8 +235,8 @@ namespace Pliant.Tests.Unit
         {
             var parseRunner = new ParseRunner(parseEngine, input);
             for (int i = 0; i < input.Length; i++)
-                Assert.IsTrue(lexer.Read(), $"Error parsing at position {i}");
-            Assert.IsTrue(lexer.ParseEngine.IsAccepted());
+                Assert.IsTrue(parseRunner.Read(), $"Error parsing at position {i}");
+            Assert.IsTrue(parseRunner.ParseEngine.IsAccepted());
         }
     }
 }

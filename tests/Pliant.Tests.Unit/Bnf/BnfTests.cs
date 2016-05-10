@@ -30,11 +30,11 @@ namespace Pliant.Tests.Unit.Bnf
             var parseEngine = new ParseEngine(grammar);
             var parseRunner = new ParseRunner(parseEngine, _bnfText);
 
-            while (!lexer.EndOfStream())
+            while (!parseRunner.EndOfStream())
             {
-                if (!lexer.Read())
+                if (!parseRunner.Read())
                 {
-                    var position = lexer.Position;
+                    var position = parseRunner.Position;
                     var startIndex = 0;
                     for (int i = position; i >= 0; i--)
                     {
@@ -53,7 +53,7 @@ namespace Pliant.Tests.Unit.Bnf
                     var length = endIndex - startIndex;
                     var stringBuilder = new StringBuilder();
                     stringBuilder
-                        .AppendFormat("Error parsing input string at position {0}.", lexer.Position)
+                        .AppendFormat("Error parsing input string at position {0}.", parseRunner.Position)
                         .AppendLine()
                         .AppendFormat("start: {0}", startIndex)
                         .AppendLine()
@@ -63,8 +63,8 @@ namespace Pliant.Tests.Unit.Bnf
                 }
             }
             Assert.IsTrue(
-                lexer.ParseEngine.IsAccepted(),
-                "error at position {0}", lexer.Position);
+                parseRunner.ParseEngine.IsAccepted(),
+                "error at position {0}", parseRunner.Position);
         }
 
         [TestMethod]
@@ -78,10 +78,10 @@ namespace Pliant.Tests.Unit.Bnf
             var parseEngine = new ParseEngine(grammar);
             var parseRunner = new ParseRunner(parseEngine, bnf);
 
-            while (!lexer.EndOfStream())
+            while (!parseRunner.EndOfStream())
             {
-                if (!lexer.Read())
-                    Assert.Fail("Error Parsing At Position {0}", lexer.Position);
+                if (!parseRunner.Read())
+                    Assert.Fail("Error Parsing At Position {0}", parseRunner.Position);
             }
             Assert.IsTrue(parseEngine.IsAccepted());
         }

@@ -22,13 +22,18 @@ namespace Pliant.Forest
             int location,
             ITransitionState transitionState,
             INode completedParseNode)
+            : base(GetTargetState(transitionState).Origin, location)
         {
             _transitionState = transitionState;
             _completedParseNode = completedParseNode;
             _children = new ReadWriteList<IAndNode>();
-            Location = location;
-            NodeType = NodeType.Symbol;
-            Initialize(transitionState);
+            Symbol = GetTargetState(transitionState).Production.LeftHandSide;
+        }
+
+
+        public override NodeType NodeType
+        {
+            get { return NodeType.Symbol; }
         }
 
         public IReadOnlyList<IAndNode> Children
@@ -41,19 +46,14 @@ namespace Pliant.Forest
             }
         }
 
-        private void Initialize(ITransitionState transitionState)
+        private static IState GetTargetState(ITransitionState transitionState)
         {
-            IState transitionStateToUse = transitionState;
-
             var parameterTransitionStateHasNoParseNode = transitionState.ParseNode == null;
-
             if (parameterTransitionStateHasNoParseNode)
-                transitionStateToUse = _transitionState.Reduction;
-
-            Symbol = transitionStateToUse.Production.LeftHandSide;
-            Origin = transitionStateToUse.Origin;
+                return transitionState.Reduction;
+            return transitionState;
         }
-
+        
         private void LazyLoadChildren()
         {
             if (_transitionState.NextTransition != null)
@@ -108,5 +108,6 @@ namespace Pliant.Forest
         {
             visitor.Visit(this);
         }
+
     }
 }

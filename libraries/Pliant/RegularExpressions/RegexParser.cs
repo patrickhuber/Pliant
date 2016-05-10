@@ -11,15 +11,15 @@ namespace Pliant.RegularExpressions
             var grammar = new RegexGrammar();
             var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
             var parseRunner = new ParseRunner(parseEngine, regularExpression);
-            while (!lexer.EndOfStream())
+            while (!parseRunner.EndOfStream())
             {
-                if (!lexer.Read())
+                if (!parseRunner.Read())
                     throw new Exception(
-                        $"Unable to parse regular expression. Error at position {lexer.Position}.");
+                        $"Unable to parse regular expression. Error at position {parseRunner.Position}.");
             }
             if (!parseEngine.IsAccepted())
                 throw new Exception(
-                    $"Error parsing regular expression. Error at position {lexer.Position}");
+                    $"Error parsing regular expression. Error at position {parseRunner.Position}");
 
             var parseForest = parseEngine.GetParseForestRoot();
             var parseTree = new InternalTreeNode(

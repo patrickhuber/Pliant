@@ -21,9 +21,9 @@ namespace Pliant.PerfViewApp
                 var parseEngine = new ParseEngine(grammar);
                 var parseRunner = new ParseRunner(parseEngine, sampleBnf);
 
-                while (!lexer.EndOfStream() && lexer.Read()) { }
+                while (!parseRunner.EndOfStream() && parseRunner.Read()) { }
 
-                var result = lexer.ParseEngine.IsAccepted();
+                var result = parseRunner.ParseEngine.IsAccepted();
                 stopwatch.Stop();
                 Console.WriteLine($"Pass {i} elapsed ms: {stopwatch.ElapsedMilliseconds}");
             }

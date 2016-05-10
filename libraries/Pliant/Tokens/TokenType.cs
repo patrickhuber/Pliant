@@ -11,10 +11,10 @@
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if ((object)obj == null)
                 return false;
             var other = obj as TokenType;
-            if (other == null)
+            if ((object)other == null)
                 return false;
             return other.Id.Equals(Id);
         }

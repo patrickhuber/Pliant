@@ -65,7 +65,7 @@ namespace Pliant
             var lastSet = _chart.EarleySets[_chart.Count - 1];
             var start = Grammar.Start;
 
-            // PERF: Avoid Linq expressions due to delegate instantiation
+            // PERF: Avoid Linq expressions due to lambda allocation
             for (int c = 0; c < lastSet.Completions.Count; c++)
             {
                 var completion = lastSet.Completions[c];
@@ -83,7 +83,7 @@ namespace Pliant
             var lastEarleySet = _chart.EarleySets[_chart.Count - 1];
             var startStateSymbol = Grammar.Start;
 
-            // PERF: Avoid LINQ Any due to Lambda allocation
+            // PERF: Avoid LINQ Any due to lambda allocation
             foreach (var completion in lastEarleySet.Completions)
                 if (completion.Origin == 0 && completion.Production.LeftHandSide.Value == startStateSymbol.Value)
                     return true;

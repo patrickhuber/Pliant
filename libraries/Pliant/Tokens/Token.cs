@@ -1,4 +1,6 @@
-﻿namespace Pliant.Tokens
+﻿using System;
+
+namespace Pliant.Tokens
 {
     public class Token : IToken
     {
@@ -13,6 +15,34 @@
             Value = value;
             Origin = origin;
             TokenType = tokenType;
+            _hashCode = ComputeHashCode();
+        }
+
+        private int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(
+                TokenType.GetHashCode(), 
+                Origin.GetHashCode(), 
+                Value.GetHashCode());
+        }
+
+        private readonly int _hashCode;
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if ((object)obj == null)
+                return false;
+            var token = obj as Token;
+            if ((object)token == null)
+                return false;
+            return Value == token.Value
+                && Origin == token.Origin
+                && TokenType.Equals(token.TokenType);
         }
     }
 }

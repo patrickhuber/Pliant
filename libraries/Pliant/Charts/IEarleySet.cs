@@ -6,8 +6,11 @@ namespace Pliant.Charts
     public interface IEarleySet
     {
         IReadOnlyList<IState> Predictions { get; }
+
         IReadOnlyList<IState> Scans { get; }
+
         IReadOnlyList<IState> Completions { get; }
+
         IReadOnlyList<IState> Transitions { get; }
 
         bool Enqueue(IState state);

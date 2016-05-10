@@ -112,12 +112,12 @@ namespace Pliant.Tests.Unit.Forest
             var parseEngine = new ParseEngine(grammar);
             var parseRunner = new ParseRunner(parseEngine, sentence);
 
-            while (!lexer.EndOfStream())
+            while (!parseRunner.EndOfStream())
             {
-                Assert.IsTrue(lexer.Read(),
-                $"Error parsing position: {lexer.Position}");
+                Assert.IsTrue(parseRunner.Read(),
+                $"Error parsing position: {parseRunner.Position}");
             }
-            Assert.IsTrue(lexer.ParseEngine.IsAccepted());
+            Assert.IsTrue(parseRunner.ParseEngine.IsAccepted());
         }
     }
 }

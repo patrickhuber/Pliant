@@ -5,11 +5,14 @@
         public char Capture { get; private set; }
 
         public TerminalNode(char capture, int origin, int location)
+            : base(origin, location)
         {
             Capture = capture;
-            Origin = origin;
-            Location = location;
-            NodeType = NodeType.Terminal;
+        }
+
+        public override NodeType NodeType
+        {
+            get { return NodeType.Terminal; }
         }
 
         public override string ToString()
@@ -20,6 +23,37 @@
         public override void Accept(INodeVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if ((object)obj == null)
+                return false;
+
+            var terminalNode = obj as TerminalNode;
+            if ((object)terminalNode == null)
+                return false;
+
+            return Location == terminalNode.Location
+                && NodeType == terminalNode.NodeType
+                && Origin == terminalNode.Origin
+                && Capture.Equals(terminalNode.Capture);
+        }
+
+        private readonly int _hashCode;
+
+        private int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(
+                NodeType.GetHashCode(),
+                Location.GetHashCode(),
+                Origin.GetHashCode(),
+                Capture.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
         }
     }
 }

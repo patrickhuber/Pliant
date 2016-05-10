@@ -247,16 +247,16 @@ namespace Pliant.Tests.Unit.Ebnf
             var parseRunner = new ParseRunner(_parseEngine, input);
             for (int i = 0; i < input.Length; i++)
             {
-                Assert.IsTrue(lexer.Read(), "Error found in position {0}", lexer.Position);
+                Assert.IsTrue(parseRunner.Read(), "Error found in position {0}", parseRunner.Position);
             }
-            Assert.IsTrue(lexer.ParseEngine.IsAccepted());
-            return lexer.ParseEngine.GetParseForestRoot();
+            Assert.IsTrue(parseRunner.ParseEngine.IsAccepted());
+            return parseRunner.ParseEngine.GetParseForestRoot();
         }
 
         private void FailParseInput(string input)
         {
             var parseRunner = new ParseRunner(_parseEngine, input);
-            Assert.IsFalse(lexer.ParseEngine.IsAccepted());
+            Assert.IsFalse(parseRunner.ParseEngine.IsAccepted());
         }
     }
 }

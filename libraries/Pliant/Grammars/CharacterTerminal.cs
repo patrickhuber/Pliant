@@ -18,8 +18,10 @@
 
         public override bool Equals(object obj)
         {
+            if ((object)obj == null)
+                return false;
             var terminal = obj as CharacterTerminal;
-            if (terminal == null)
+            if ((object)terminal == null)
                 return false;
             return terminal.Character == Character;
         }

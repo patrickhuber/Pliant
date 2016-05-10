@@ -55,9 +55,9 @@ namespace Pliant.Tests.Unit.Tree
         {
             var parseEngine = new ParseEngine(grammar);
             var parseRunner = new ParseRunner(parseEngine, input);
-            while (!lexer.EndOfStream())
+            while (!parseRunner.EndOfStream())
             {
-                Assert.IsTrue(lexer.Read());
+                Assert.IsTrue(parseRunner.Read());
             }
             Assert.IsTrue(parseEngine.IsAccepted());
 
