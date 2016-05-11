@@ -49,7 +49,7 @@ public static int Main(string[] args)
 		
 	var grammar = new GrammarBuilder(
 		Calculator, 
-		new[]{ Calculator, Factor, Term, Expression, Number }, 
+		new []{ Calculator, Factor, Term, Expression, Number }, 
 		new []{ whitespace })
 	.ToGrammar();	
 	
@@ -201,3 +201,4 @@ var parseTree = new InternalTreeNode(
 * [insights on lexer creation](https://youtu.be/XaScLywH2CI)
 * [incremental reparsing](http://www.aclweb.org/anthology/E89-1033.pdf)
 * [An extension of Earley's Algorithm for extended grammars](http://link.springer.com/chapter/10.1007%2F978-1-4020-3953-9_22)
+* [Finding nullable productions in a grammar](http://cstheory.stackexchange.com/a/2493/32787)
