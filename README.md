@@ -179,7 +179,7 @@ var parseForest = parseEngine.GetParseForestRoot();
 
 // create a internal tree node and supply the state manager for tree traversal.
 var parseTree = new InternalTreeNode(
-    parseForest as IInternalNode,
+    parseForest as IInternalForestNode,
     new SinglePassNodeVisitorStateManager());
 ```
 

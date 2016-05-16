@@ -2,7 +2,7 @@
 {
     /// <summary>
     /// Implements a single pass node visitor state manager. Basically only
-    /// returns the first IAndNode in the IInternalNode.Children collection.
+    /// returns the first IAndNode in the IInternalForestNode.Children collection.
     /// </summary>
     public class SinglePassForestNodeVisitorStateManager : IForestNodeVisitorStateManager
     {
