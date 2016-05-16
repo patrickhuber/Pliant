@@ -5,39 +5,39 @@ using System.Collections.Generic;
 
 namespace Pliant.Tests.Unit.Forest
 {
-    public abstract class FakeInternalNode : IInternalNode
+    public abstract class FakeInternalForestNode : IInternalForestNode
     {
-        private ReadWriteList<IAndNode> _children;
+        private ReadWriteList<IAndForestNode> _children;
 
-        protected FakeInternalNode(int origin, int location, params IAndNode[] children)
+        protected FakeInternalForestNode(int origin, int location, params IAndForestNode[] children)
         {
             Origin = origin;
             Location = location;
-            _children = new ReadWriteList<IAndNode>(children);
+            _children = new ReadWriteList<IAndForestNode>(children);
         }
 
-        public IReadOnlyList<IAndNode> Children
+        public IReadOnlyList<IAndForestNode> Children
         {
             get { return _children; }
         }
 
         public int Location { get; private set; }
 
-        public abstract NodeType NodeType { get; }
+        public abstract ForestNodeType NodeType { get; }
 
         public int Origin { get; private set; }
 
-        public void Accept(INodeVisitor visitor)
+        public void Accept(IForestNodeVisitor visitor)
         {
             throw new NotImplementedException();
         }
 
-        public void AddUniqueFamily(INode trigger)
+        public void AddUniqueFamily(IForestNode trigger)
         {
             throw new NotImplementedException();
         }
 
-        public void AddUniqueFamily(INode source, INode trigger)
+        public void AddUniqueFamily(IForestNode source, IForestNode trigger)
         {
             throw new NotImplementedException();
         }

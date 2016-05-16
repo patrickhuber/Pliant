@@ -5,38 +5,38 @@ using System.Collections.Generic;
 
 namespace Pliant.Forest
 {
-    public class VirtualNode : NodeBase, ISymbolNode
+    public class VirtualForestNode : ForestNodeBase, ISymbolForestNode
     {
         private ITransitionState _transitionState;
-        private INode _completedParseNode;
-        private ReadWriteList<IAndNode> _children;
+        private IForestNode _completedParseNode;
+        private ReadWriteList<IAndForestNode> _children;
 
         /// <summary>
         /// A single AND node. Virtual nodes are leo nodes and by nature don't have ambiguity.
         /// </summary>
-        private AndNode _andNode;
+        private AndForestNode _andNode;
 
         public ISymbol Symbol { get; private set; }
 
-        public VirtualNode(
+        public VirtualForestNode(
             int location,
             ITransitionState transitionState,
-            INode completedParseNode)
+            IForestNode completedParseNode)
             : base(GetTargetState(transitionState).Origin, location)
         {
             _transitionState = transitionState;
             _completedParseNode = completedParseNode;
-            _children = new ReadWriteList<IAndNode>();
+            _children = new ReadWriteList<IAndForestNode>();
             Symbol = GetTargetState(transitionState).Production.LeftHandSide;
         }
 
 
-        public override NodeType NodeType
+        public override ForestNodeType NodeType
         {
-            get { return NodeType.Symbol; }
+            get { return ForestNodeType.Symbol; }
         }
 
-        public IReadOnlyList<IAndNode> Children
+        public IReadOnlyList<IAndForestNode> Children
         {
             get
             {
@@ -58,7 +58,7 @@ namespace Pliant.Forest
         {
             if (_transitionState.NextTransition != null)
             {
-                var virtualNode = new VirtualNode(Location, _transitionState.NextTransition, _completedParseNode);
+                var virtualNode = new VirtualForestNode(Location, _transitionState.NextTransition, _completedParseNode);
 
                 if (_transitionState.Reduction.ParseNode == null)
                     AddUniqueFamily(virtualNode);
@@ -80,20 +80,20 @@ namespace Pliant.Forest
             return _andNode != null;
         }
 
-        public void AddUniqueFamily(INode trigger)
+        public void AddUniqueFamily(IForestNode trigger)
         {
             if (_andNode != null)
                 return;
-            _andNode = new AndNode();
+            _andNode = new AndForestNode();
             _andNode.AddChild(trigger);
             _children.Add(_andNode);
         }
 
-        public void AddUniqueFamily(INode source, INode trigger)
+        public void AddUniqueFamily(IForestNode source, IForestNode trigger)
         {
             if (_andNode != null)
                 return;
-            _andNode = new AndNode();
+            _andNode = new AndForestNode();
             _andNode.AddChild(source);
             _andNode.AddChild(trigger);
             _children.Add(_andNode);
@@ -104,7 +104,7 @@ namespace Pliant.Forest
             return $"({Symbol}, {Origin}, {Location})";
         }
 
-        public override void Accept(INodeVisitor visitor)
+        public override void Accept(IForestNodeVisitor visitor)
         {
             visitor.Visit(this);
         }

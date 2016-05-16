@@ -9,7 +9,7 @@ using Pliant.Tokens;
 namespace Pliant.Tests.Unit.Forest
 {
     [TestClass]
-    public class NodeVisitorTests
+    public class ForestNodeVisitorTests
     {
         private readonly ILexerRule _whitespace;
 
@@ -24,7 +24,7 @@ namespace Pliant.Tests.Unit.Forest
             return new DfaLexerRule(start, new TokenType("whitespace"));
         }
 
-        public NodeVisitorTests()
+        public ForestNodeVisitorTests()
         {
             _whitespace = CreateWhitespaceRule();
         }
@@ -42,9 +42,9 @@ namespace Pliant.Tests.Unit.Forest
             }
             Assert.IsTrue(regexParseEngine.IsAccepted());
 
-            var nodeVisitorStateManager = new MultiPassNodeVisitorStateManager();
+            var nodeVisitorStateManager = new MultiPassForestNodeVisitorStateManager();
             var nodeVisitor = new LoggingNodeVisitor(
-                new SinglePassNodeVisitorStateManager());
+                new SinglePassForestNodeVisitorStateManager());
             var root = regexParseEngine.GetParseForestRoot();
             root.Accept(nodeVisitor);
             Assert.AreEqual(31, nodeVisitor.VisitLog.Count);

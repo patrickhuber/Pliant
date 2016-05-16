@@ -1,11 +1,11 @@
 ﻿namespace Pliant.Forest
 {
-    public interface INode : INodeVisitable
+    public interface IForestNode : IForestNodeVisitable
     {
         int Origin { get; }
 
         int Location { get; }
 
-        NodeType NodeType { get; }
+        ForestNodeType NodeType { get; }
     }
 }

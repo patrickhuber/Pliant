@@ -7,9 +7,9 @@ namespace Pliant.Tree
 {
     public class InternalTreeNode : IInternalTreeNode
     {
-        private INodeVisitorStateManager _stateManager;
-        private IAndNode _currentAndNode;
-        private IInternalNode _internalNode;
+        private IForestNodeVisitorStateManager _stateManager;
+        private IAndForestNode _currentAndNode;
+        private IInternalForestNode _internalNode;
 
         public int Origin { get { return _internalNode.Origin; } }
 
@@ -18,9 +18,9 @@ namespace Pliant.Tree
         public INonTerminal Symbol { get; private set; }
 
         public InternalTreeNode(
-            IInternalNode internalNode,
-            IAndNode currentAndNode,
-            INodeVisitorStateManager stateManager)
+            IInternalForestNode internalNode,
+            IAndForestNode currentAndNode,
+            IForestNodeVisitorStateManager stateManager)
         {
             _stateManager = stateManager;
             _currentAndNode = currentAndNode;
@@ -29,28 +29,28 @@ namespace Pliant.Tree
         }
 
         public InternalTreeNode(
-            IInternalNode internalNode)
-            : this(internalNode, new MultiPassNodeVisitorStateManager())
+            IInternalForestNode internalNode)
+            : this(internalNode, new MultiPassForestNodeVisitorStateManager())
         {
         }
 
         public InternalTreeNode(
-            IInternalNode internalNode,
-            INodeVisitorStateManager stateManager)
+            IInternalForestNode internalNode,
+            IForestNodeVisitorStateManager stateManager)
             : this(internalNode, stateManager.GetCurrentAndNode(internalNode), stateManager)
         {
         }
 
-        private void SetRule(IInternalNode node)
+        private void SetRule(IInternalForestNode node)
         {
             switch (node.NodeType)
             {
-                case Forest.NodeType.Symbol:
-                    Symbol = (node as ISymbolNode).Symbol as INonTerminal;
+                case Forest.ForestNodeType.Symbol:
+                    Symbol = (node as ISymbolForestNode).Symbol as INonTerminal;
                     break;
 
-                case Forest.NodeType.Intermediate:
-                    Symbol = (node as IIntermediateNode).State.Production.LeftHandSide;
+                case Forest.ForestNodeType.Intermediate:
+                    Symbol = (node as IIntermediateForestNode).State.Production.LeftHandSide;
                     break;
             }
         }
@@ -63,27 +63,27 @@ namespace Pliant.Tree
             }
         }
 
-        private IEnumerable<ITreeNode> EnumerateChildren(IAndNode andNode)
+        private IEnumerable<ITreeNode> EnumerateChildren(IAndForestNode andNode)
         {
             foreach (var child in andNode.Children)
             {
                 switch (child.NodeType)
                 {
-                    case Forest.NodeType.Intermediate:
-                        var intermediateNode = child as IIntermediateNode;
+                    case Forest.ForestNodeType.Intermediate:
+                        var intermediateNode = child as IIntermediateForestNode;
                         var currentAndNode = _stateManager.GetCurrentAndNode(intermediateNode);
                         foreach (var otherChild in EnumerateChildren(currentAndNode))
                             yield return otherChild;
                         break;
 
-                    case Forest.NodeType.Symbol:
-                        var symbolNode = child as ISymbolNode;
+                    case Forest.ForestNodeType.Symbol:
+                        var symbolNode = child as ISymbolForestNode;
                         var childAndNode = _stateManager.GetCurrentAndNode(symbolNode);
                         yield return new InternalTreeNode(symbolNode, childAndNode, _stateManager);
                         break;
 
-                    case Forest.NodeType.Token:
-                        yield return new TokenTreeNode(child as ITokenNode);
+                    case Forest.ForestNodeType.Token:
+                        yield return new TokenTreeNode(child as ITokenForestNode);
                         break;
 
                     default:

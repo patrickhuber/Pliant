@@ -4,14 +4,14 @@
     /// Implements a single pass node visitor state manager. Basically only
     /// returns the first IAndNode in the IInternalNode.Children collection.
     /// </summary>
-    public class SinglePassNodeVisitorStateManager : INodeVisitorStateManager
+    public class SinglePassForestNodeVisitorStateManager : IForestNodeVisitorStateManager
     {
-        public IAndNode GetCurrentAndNode(IInternalNode internalNode)
+        public IAndForestNode GetCurrentAndNode(IInternalForestNode internalNode)
         {
             return internalNode.Children[0];
         }
 
-        public void MarkAsTraversed(IInternalNode internalNode)
+        public void MarkAsTraversed(IInternalForestNode internalNode)
         {
         }
     }

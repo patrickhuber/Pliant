@@ -2,23 +2,23 @@
 
 namespace Pliant.Forest
 {
-    public class TokenNode : NodeBase, ITokenNode
+    public class TokenForestNode : ForestNodeBase, ITokenForestNode
     {
         public IToken Token { get; private set; }
 
-        public TokenNode(IToken token, int origin, int location)
+        public TokenForestNode(IToken token, int origin, int location)
             : base(origin, location)
         {
             Token = token;
             _hashCode = ComputeHashCode();
         }
 
-        public override NodeType NodeType
+        public override ForestNodeType NodeType
         {
-            get { return NodeType.Token; }
+            get { return ForestNodeType.Token; }
         }
 
-        public override void Accept(INodeVisitor visitor)
+        public override void Accept(IForestNodeVisitor visitor)
         {
             visitor.Visit(this);
         }
@@ -28,7 +28,7 @@ namespace Pliant.Forest
             if ((object)obj == null)
                 return false;
 
-            var tokenNode = obj as TokenNode;
+            var tokenNode = obj as TokenForestNode;
             if ((object)tokenNode == null)
                 return false;
 

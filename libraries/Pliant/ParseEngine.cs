@@ -19,7 +19,7 @@ namespace Pliant
         public ParseEngineOptions Options { get; private set; }
 
         private Chart _chart;
-        private NodeSet _nodeSet;
+        private ForestNodeSet _nodeSet;
 
         public ParseEngine(IGrammar grammar)
             : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
@@ -29,7 +29,7 @@ namespace Pliant
         public ParseEngine(IGrammar grammar, ParseEngineOptions options)
         {
             Options = options;
-            _nodeSet = new NodeSet();
+            _nodeSet = new ForestNodeSet();
             Grammar = grammar;
             Initialize();
         }
@@ -57,7 +57,7 @@ namespace Pliant
             return expectedRuleDictionary.Values;
         }
 
-        public INode GetParseForestRoot()
+        public IForestNode GetParseForestRoot()
         {
             if (!IsAccepted())
                 throw new Exception("Unable to parse expression.");
@@ -121,7 +121,7 @@ namespace Pliant
         private void ScanPass(int location, IToken token)
         {
             var earleySet = _chart.EarleySets[location];
-            var tokenNode = new TokenNode(token, location, location + 1);
+            var tokenNode = new TokenForestNode(token, location, location + 1);
             for (int s = 0; s < earleySet.Scans.Count; s++)
             {
                 var scanState = earleySet.Scans[s];
@@ -129,7 +129,7 @@ namespace Pliant
             }
         }
 
-        private void Scan(IState scan, int j, ITokenNode tokenNode)
+        private void Scan(IState scan, int j, ITokenForestNode tokenNode)
         {
             var i = scan.Origin;
             var currentSymbol = scan.PostDotSymbol;
@@ -201,7 +201,7 @@ namespace Pliant
             {
                 var nullParseNode = CreateNullParseNode(evidence.PostDotSymbol, j);
                 var aycockHorspoolState = evidence.NextState();
-                var evidenceParseNode = evidence.ParseNode as IInternalNode;
+                var evidenceParseNode = evidence.ParseNode as IInternalForestNode;
                 if (evidenceParseNode == null)
                     aycockHorspoolState.ParseNode = CreateParseNode(aycockHorspoolState, null, nullParseNode, j);
                 else if (evidenceParseNode.Children.Count > 0 
@@ -247,7 +247,7 @@ namespace Pliant
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
 
-            var virtualParseNode = new VirtualNode(k, rootTransitionState, completed.ParseNode);
+            var virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
 
             var topmostItem = new State(
                 transitionState.Production,
@@ -398,19 +398,19 @@ namespace Pliant
             return true;
         }
 
-        private INode CreateNullParseNode(ISymbol symbol, int location)
+        private IForestNode CreateNullParseNode(ISymbol symbol, int location)
         {
             var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(symbol, location, location);
             var token = new Token(string.Empty, location, new TokenType(string.Empty));
-            var nullNode = new TokenNode(token, location, location);
+            var nullNode = new TokenForestNode(token, location, location);
             symbolNode.AddUniqueFamily(nullNode);
             return symbolNode;
         }        
 
-        private INode CreateParseNode(
+        private IForestNode CreateParseNode(
             IState nextState,
-            INode w,
-            INode v,
+            IForestNode w,
+            IForestNode v,
             int location)
         {
             Assert.IsNotNull(v, nameof(v));
@@ -426,7 +426,7 @@ namespace Pliant
             if (anyPreDotRuleNull && !anyPostDotRuleNull)
                 return v;
 
-            IInternalNode internalNode;
+            IInternalForestNode internalNode;
             if (anyPostDotRuleNull)
             {
                 internalNode = _nodeSet

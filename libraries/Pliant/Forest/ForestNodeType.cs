@@ -1,6 +1,6 @@
 ﻿namespace Pliant.Forest
 {
-    public enum NodeType
+    public enum ForestNodeType
     {
         Intermediate,
         Symbol,

@@ -26,7 +26,7 @@ namespace Pliant
         /// Gets the root of the parse forest.
         /// </summary>
         /// <returns></returns>
-        INode GetParseForestRoot();
+        IForestNode GetParseForestRoot();
 
         /// <summary>
         /// Returns the list of expected lexer rules based on the current state of the parse.

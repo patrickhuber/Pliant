@@ -231,18 +231,18 @@ namespace Pliant.Tests.Unit.Ebnf
         {
             var node = ParseInput(@"
             SomeRule = 'a' 'b' 'c' ;
-            ") as ISymbolNode;
+            ") as ISymbolForestNode;
             Assert.IsNotNull(node);
 
             var visitor = new LoggingNodeVisitor(
-                new SinglePassNodeVisitorStateManager());
+                new SinglePassForestNodeVisitorStateManager());
             node.Accept(visitor);
 
             var log = visitor.VisitLog;
             Assert.IsTrue(log.Count > 0);
         }
 
-        private INode ParseInput(string input)
+        private IForestNode ParseInput(string input)
         {
             var parseRunner = new ParseRunner(_parseEngine, input);
             for (int i = 0; i < input.Length; i++)

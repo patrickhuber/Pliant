@@ -4,14 +4,14 @@ using Pliant.Tokens;
 
 namespace Pliant.Tests.Unit.Forest
 {
-    public class FakeTokenNode : ITokenNode
+    public class FakeTokenForestNode : ITokenForestNode
     {
-        public FakeTokenNode(string token, int origin, int location)
+        public FakeTokenForestNode(string token, int origin, int location)
             : this(new Token(token, origin, new TokenType(token)), origin, location)
         {
         }
 
-        public FakeTokenNode(IToken token, int origin, int location)
+        public FakeTokenForestNode(IToken token, int origin, int location)
         {
             Token = token;
             Origin = origin;
@@ -20,16 +20,16 @@ namespace Pliant.Tests.Unit.Forest
 
         public int Location { get; private set; }
 
-        public NodeType NodeType
+        public ForestNodeType NodeType
         {
-            get { return NodeType.Token; }
+            get { return ForestNodeType.Token; }
         }
 
         public int Origin { get; private set; }
 
         public IToken Token { get; private set; }
 
-        public void Accept(INodeVisitor visitor)
+        public void Accept(IForestNodeVisitor visitor)
         {
             throw new NotImplementedException();
         }

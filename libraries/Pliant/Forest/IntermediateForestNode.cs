@@ -2,13 +2,13 @@
 
 namespace Pliant.Forest
 {
-    public class IntermediateNode : InternalNode, IIntermediateNode
+    public class IntermediateForestNode : InternalForestNode, IIntermediateForestNode
     {
         public IState State { get; private set; }
 
-        public override NodeType NodeType { get { return NodeType.Intermediate; } }
+        public override ForestNodeType NodeType { get { return ForestNodeType.Intermediate; } }
 
-        public IntermediateNode(IState state, int origin, int location)
+        public IntermediateForestNode(IState state, int origin, int location)
             : base(origin, location)
         {
             State = state;
@@ -20,7 +20,7 @@ namespace Pliant.Forest
             return $"({State}, {Origin}, {Location})";
         }
 
-        public override void Accept(INodeVisitor visitor)
+        public override void Accept(IForestNodeVisitor visitor)
         {
             visitor.Visit(this);
         }
@@ -29,7 +29,7 @@ namespace Pliant.Forest
             if ((object)obj == null)
                 return false;
 
-            var intermediateNode = obj as IntermediateNode;
+            var intermediateNode = obj as IntermediateForestNode;
             if ((object)intermediateNode == null)
                 return false;
 

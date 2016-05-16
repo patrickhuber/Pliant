@@ -4,31 +4,31 @@ using System.Collections.Generic;
 
 namespace Pliant.Forest
 {
-    public abstract class InternalNode : NodeBase, IInternalNode
+    public abstract class InternalForestNode : ForestNodeBase, IInternalForestNode
     {
-        private ReadWriteList<IAndNode> _children;
+        private ReadWriteList<IAndForestNode> _children;
 
-        public IReadOnlyList<IAndNode> Children { get { return _children; } }
+        public IReadOnlyList<IAndForestNode> Children { get { return _children; } }
 
-        protected InternalNode(int origin, int location)
+        protected InternalForestNode(int origin, int location)
             : base(origin, location)
         {
-            _children = new ReadWriteList<IAndNode>();
+            _children = new ReadWriteList<IAndForestNode>();
         }
 
-        public void AddUniqueFamily(INode trigger)
+        public void AddUniqueFamily(IForestNode trigger)
         {
             AddUniqueAndNode(trigger);
         }
 
-        public void AddUniqueFamily(INode source, INode trigger)
+        public void AddUniqueFamily(IForestNode source, IForestNode trigger)
         {
             if(source == this)
                 source = Children[0].Children[0];
             AddUniqueAndNode(source, trigger);
         }
 
-        private void AddUniqueAndNode(params INode[] children)
+        private void AddUniqueAndNode(params IForestNode[] children)
         {
             foreach (var andNode in _children)
             {
@@ -40,14 +40,14 @@ namespace Pliant.Forest
             }
 
             // not found so return new and node
-            var newAndNode = new AndNode();
+            var newAndNode = new AndForestNode();
             foreach (var child in children)
                 newAndNode.AddChild(child);
 
             _children.Add(newAndNode);
         }
 
-        private static bool IsMatchedSubTree(INode[] children, IAndNode andNode)
+        private static bool IsMatchedSubTree(IForestNode[] children, IAndForestNode andNode)
         {
             for (var c = 0; c < andNode.Children.Count; c++)
             {

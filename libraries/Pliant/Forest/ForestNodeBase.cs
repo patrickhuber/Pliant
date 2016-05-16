@@ -1,16 +1,16 @@
 ﻿namespace Pliant.Forest
 {
-    public abstract class NodeBase : INode
+    public abstract class ForestNodeBase : IForestNode
     {
         public int Location { get; private set; }
 
-        public abstract NodeType NodeType { get; }
+        public abstract ForestNodeType NodeType { get; }
 
         public int Origin { get; private set; }
 
-        public abstract void Accept(INodeVisitor visitor);
+        public abstract void Accept(IForestNodeVisitor visitor);
 
-        protected NodeBase(int origin, int location)
+        protected ForestNodeBase(int origin, int location)
         {
             Origin = origin;
             Location = location;
@@ -22,7 +22,7 @@
             if ((object)obj == null)
                 return false;
 
-            var nodeBase = obj as NodeBase;
+            var nodeBase = obj as ForestNodeBase;
             if ((object)nodeBase == null)
                 return false;
 

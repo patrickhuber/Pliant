@@ -4,37 +4,37 @@ using System.Collections.Generic;
 
 namespace Pliant.Forest
 {
-    public class NodeSet
+    public class ForestNodeSet
     {
-        private readonly IDictionary<int, ISymbolNode> _symbolNodes;
-        private readonly IDictionary<int, IIntermediateNode> _intermediateNodes;
+        private readonly IDictionary<int, ISymbolForestNode> _symbolNodes;
+        private readonly IDictionary<int, IIntermediateForestNode> _intermediateNodes;
 
-        public NodeSet()
+        public ForestNodeSet()
         {
-            _symbolNodes = new Dictionary<int, ISymbolNode>();
-            _intermediateNodes = new Dictionary<int, IIntermediateNode>();
+            _symbolNodes = new Dictionary<int, ISymbolForestNode>();
+            _intermediateNodes = new Dictionary<int, IIntermediateForestNode>();
         }
 
-        public ISymbolNode AddOrGetExistingSymbolNode(ISymbol symbol, int origin, int location)
+        public ISymbolForestNode AddOrGetExistingSymbolNode(ISymbol symbol, int origin, int location)
         {
             var hash = HashUtil.ComputeHash(symbol.GetHashCode(), origin.GetHashCode(), location.GetHashCode());
 
-            ISymbolNode symbolNode = null;
+            ISymbolForestNode symbolNode = null;
             if (_symbolNodes.TryGetValue(hash, out symbolNode))
                 return symbolNode;
 
-            symbolNode = new SymbolNode(symbol, origin, location);
+            symbolNode = new SymbolForestNode(symbol, origin, location);
             _symbolNodes.Add(hash, symbolNode);
             return symbolNode;
         }
 
-        public IIntermediateNode AddOrGetExistingIntermediateNode(IState trigger, int origin, int location)
+        public IIntermediateForestNode AddOrGetExistingIntermediateNode(IState trigger, int origin, int location)
         {
             var hash = HashUtil.ComputeHash(trigger.GetHashCode());
-            IIntermediateNode intermediateNode = null;
+            IIntermediateForestNode intermediateNode = null;
             if (_intermediateNodes.TryGetValue(hash, out intermediateNode))
                 return intermediateNode;
-            intermediateNode = new IntermediateNode(trigger, origin, location);
+            intermediateNode = new IntermediateForestNode(trigger, origin, location);
             _intermediateNodes.Add(hash, intermediateNode);
             return intermediateNode;
         }

@@ -3,20 +3,20 @@ using Pliant.Grammars;
 
 namespace Pliant.Forest
 {
-    public class SymbolNode : InternalNode, ISymbolNode
+    public class SymbolForestNode : InternalForestNode, ISymbolForestNode
     {
         public ISymbol Symbol { get; private set; }
 
-        public SymbolNode(ISymbol symbol, int origin, int location)
+        public SymbolForestNode(ISymbol symbol, int origin, int location)
             : base(origin, location)
         {
             Symbol = symbol;
             _hashCode = ComputeHashCode();
         }
 
-        public override NodeType NodeType
+        public override ForestNodeType NodeType
         {
-            get { return NodeType.Symbol; }
+            get { return ForestNodeType.Symbol; }
         }
 
         public override string ToString()
@@ -24,7 +24,7 @@ namespace Pliant.Forest
             return $"({Symbol}, {Origin}, {Location})";
         }
 
-        public override void Accept(INodeVisitor visitor)
+        public override void Accept(IForestNodeVisitor visitor)
         {
             visitor.Visit(this);
         }
@@ -33,7 +33,7 @@ namespace Pliant.Forest
             if ((object)obj == null)
                 return false;
 
-            var symbolNode = obj as SymbolNode;
+            var symbolNode = obj as SymbolForestNode;
             if ((object)symbolNode == null)
                 return false;
 

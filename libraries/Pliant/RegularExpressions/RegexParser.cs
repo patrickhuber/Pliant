@@ -23,8 +23,8 @@ namespace Pliant.RegularExpressions
 
             var parseForest = parseEngine.GetParseForestRoot();
             var parseTree = new InternalTreeNode(
-                parseForest as IInternalNode,
-                new SinglePassNodeVisitorStateManager());
+                parseForest as IInternalForestNode,
+                new SinglePassForestNodeVisitorStateManager());
 
             var regexVisitor = new RegexVisitor();
             parseTree.Accept(regexVisitor);
