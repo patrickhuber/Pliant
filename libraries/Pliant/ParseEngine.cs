@@ -19,7 +19,7 @@ namespace Pliant
         public ParseEngineOptions Options { get; private set; }
 
         private Chart _chart;
-        private NodeSet _nodeSet;
+        private ForestNodeSet _nodeSet;
 
         public ParseEngine(IGrammar grammar)
             : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
@@ -29,7 +29,7 @@ namespace Pliant
         public ParseEngine(IGrammar grammar, ParseEngineOptions options)
         {
             Options = options;
-            _nodeSet = new NodeSet();
+            _nodeSet = new ForestNodeSet();
             Grammar = grammar;
             Initialize();
         }
@@ -57,7 +57,7 @@ namespace Pliant
             return expectedRuleDictionary.Values;
         }
 
-        public INode GetParseForestRoot()
+        public IForestNode GetParseForestRoot()
         {
             if (!IsAccepted())
                 throw new Exception("Unable to parse expression.");
@@ -65,7 +65,7 @@ namespace Pliant
             var lastSet = _chart.EarleySets[_chart.Count - 1];
             var start = Grammar.Start;
 
-            // PERF: Avoid Linq expressions due to delegate instantiation
+            // PERF: Avoid Linq expressions due to lambda allocation
             for (int c = 0; c < lastSet.Completions.Count; c++)
             {
                 var completion = lastSet.Completions[c];
@@ -83,7 +83,7 @@ namespace Pliant
             var lastEarleySet = _chart.EarleySets[_chart.Count - 1];
             var startStateSymbol = Grammar.Start;
 
-            // PERF: Avoid LINQ Any due to Lambda allocation
+            // PERF: Avoid LINQ Any due to lambda allocation
             foreach (var completion in lastEarleySet.Completions)
                 if (completion.Origin == 0 && completion.Production.LeftHandSide.Value == startStateSymbol.Value)
                     return true;
@@ -121,7 +121,7 @@ namespace Pliant
         private void ScanPass(int location, IToken token)
         {
             var earleySet = _chart.EarleySets[location];
-            var tokenNode = new TokenNode(token, location, location + 1);
+            var tokenNode = new TokenForestNode(token, location, location + 1);
             for (int s = 0; s < earleySet.Scans.Count; s++)
             {
                 var scanState = earleySet.Scans[s];
@@ -129,7 +129,7 @@ namespace Pliant
             }
         }
 
-        private void Scan(IState scan, int j, ITokenNode tokenNode)
+        private void Scan(IState scan, int j, ITokenForestNode tokenNode)
         {
             var i = scan.Origin;
             var currentSymbol = scan.PostDotSymbol;
@@ -196,21 +196,21 @@ namespace Pliant
             if (_chart.Enqueue(j, predictedState))
                 Log("Predict", j, predictedState);
 
-            var stateIsNullable = predictedState.Production.IsEmpty;
-            if (stateIsNullable)
+            var isNullable = Grammar.IsNullable(evidence.PostDotSymbol as INonTerminal);
+            if (isNullable)
             {
-                var aycockHorspoolState = evidence.NextState(j);
-
-                var predictedParseNode = CreateNullParseNode(
-                    predictedState.Production.LeftHandSide, j);
-
-                aycockHorspoolState.ParseNode
-                    = CreateParseNode(
-                        aycockHorspoolState,
-                        evidence.ParseNode,
-                        predictedParseNode,
-                        j);
-
+                var nullParseNode = CreateNullParseNode(evidence.PostDotSymbol, j);
+                var aycockHorspoolState = evidence.NextState();
+                var evidenceParseNode = evidence.ParseNode as IInternalForestNode;
+                if (evidenceParseNode == null)
+                    aycockHorspoolState.ParseNode = CreateParseNode(aycockHorspoolState, null, nullParseNode, j);
+                else if (evidenceParseNode.Children.Count > 0 
+                    && evidenceParseNode.Children[0].Children.Count > 0)
+                {
+                    var firstChildNode = evidenceParseNode.Children[0].Children[0];
+                    var parseNode = CreateParseNode(aycockHorspoolState, firstChildNode, nullParseNode, j);
+                    aycockHorspoolState.ParseNode = parseNode;
+                }
                 if (_chart.Enqueue(j, aycockHorspoolState))
                     Log("Predict", j, aycockHorspoolState);
             }
@@ -220,7 +220,7 @@ namespace Pliant
         {
             if (completed.ParseNode == null)
                 completed.ParseNode = CreateNullParseNode(completed.Production.LeftHandSide, k);
-
+            
             var earleySet = _chart.EarleySets[completed.Origin];
             var searchSymbol = completed.Production.LeftHandSide;
 
@@ -240,18 +240,18 @@ namespace Pliant
 
         private void LeoComplete(ITransitionState transitionState, IState completed, int k)
         {
-            var earleySet = _chart.EarleySets[transitionState.Position];
+            var earleySet = _chart.EarleySets[transitionState.Index];
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.PreDotSymbol);
 
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
 
-            var virtualParseNode = new VirtualNode(k, rootTransitionState, completed.ParseNode);
+            var virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
 
             var topmostItem = new State(
                 transitionState.Production,
-                transitionState.Length,
+                transitionState.Position,
                 transitionState.Origin,
                 virtualParseNode);
 
@@ -263,6 +263,7 @@ namespace Pliant
         {
             var j = completed.Origin;
             var sourceEarleySet = _chart.EarleySets[j];
+                        
             for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
             {
                 var prediction = sourceEarleySet.Predictions[p];
@@ -338,7 +339,7 @@ namespace Pliant
                   searchSymbol,
                   t_rule,
                   sourceState,
-                  previousTransitionState.Position);
+                  previousTransitionState.Index);
 
                 previousTransitionState.NextTransition = currentTransitionState;
             }
@@ -366,7 +367,7 @@ namespace Pliant
             if (ruleCount == 0)
                 return true;
 
-            var nextStatePosition = state.Length + 1;
+            var nextStatePosition = state.Position + 1;
             var isComplete = nextStatePosition == state.Production.RightHandSide.Count;
             if (isComplete)
                 return true;
@@ -397,35 +398,35 @@ namespace Pliant
             return true;
         }
 
-        private INode CreateNullParseNode(ISymbol symbol, int location)
+        private IForestNode CreateNullParseNode(ISymbol symbol, int location)
         {
             var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(symbol, location, location);
             var token = new Token(string.Empty, location, new TokenType(string.Empty));
-            var nullNode = new TokenNode(token, location, location);
+            var nullNode = new TokenForestNode(token, location, location);
             symbolNode.AddUniqueFamily(nullNode);
             return symbolNode;
-        }
+        }        
 
-        private INode CreateParseNode(
+        private IForestNode CreateParseNode(
             IState nextState,
-            INode w,
-            INode v,
+            IForestNode w,
+            IForestNode v,
             int location)
         {
             Assert.IsNotNull(v, nameof(v));
             var anyPreDotRuleNull = true;
-            if (nextState.Length > 1)
+            if (nextState.Position > 1)
             {
                 var predotPrecursorSymbol = nextState
                     .Production
-                    .RightHandSide[nextState.Length - 2];
+                    .RightHandSide[nextState.Position - 2];
                 anyPreDotRuleNull = IsSymbolNullable(predotPrecursorSymbol);
             }
             var anyPostDotRuleNull = IsSymbolNullable(nextState.PostDotSymbol);
             if (anyPreDotRuleNull && !anyPostDotRuleNull)
                 return v;
 
-            IInternalNode internalNode;
+            IInternalForestNode internalNode;
             if (anyPostDotRuleNull)
             {
                 internalNode = _nodeSet
@@ -443,12 +444,12 @@ namespace Pliant
                         location
                     );
             }
-
+                        
             // if w = null and y doesn't have a family of children (v)
             if (w == null)
                 internalNode.AddUniqueFamily(v);
 
-            // if w != null and y doesn't have a family of children (w, v)
+            // if w != null and y doesn't have a family of children (w, v)            
             else
                 internalNode.AddUniqueFamily(w, v);
 
@@ -461,12 +462,8 @@ namespace Pliant
                 return true;
             if (symbol.SymbolType != SymbolType.NonTerminal)
                 return false;
-            var rules = Grammar.RulesFor(symbol as INonTerminal);
-            // PERF: Avoid LINQ Any because allocates a lambda
-            foreach (var rule in rules)
-                if (rule.IsEmpty)
-                    return true;
-            return false;
+            var nonTerminal = symbol as INonTerminal;
+            return Grammar.IsNullable(nonTerminal);
         }
 
         public void Reset()
@@ -476,14 +473,19 @@ namespace Pliant
 
         private static void Log(string operation, int origin, IState state)
         {
-            Debug.Write($"{origin}\t{state}");
-            Debug.WriteLine($"\t # {operation}");
+            LogOriginStateOperation(operation, origin, state);
+            Debug.WriteLine(string.Empty);
+        }
+
+        private static void LogOriginStateOperation(string operation, int origin, IState state)
+        {
+            Debug.Write($"{origin.ToString().PadRight(50)}{state.ToString().PadRight(50)}{operation}");
         }
 
         private static void LogScan(int origin, IState state, IToken token)
         {
-            Debug.Write($"{origin}\t{state}");
-            Debug.WriteLine($"\t # Scan {token.Value}");
-        }
+            LogOriginStateOperation("Scan", origin, state);
+            Debug.WriteLine($" {token.Value}");
+        }        
     }
 }

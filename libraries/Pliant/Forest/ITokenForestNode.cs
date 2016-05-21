@@ -2,7 +2,7 @@
 
 namespace Pliant.Forest
 {
-    public interface ITokenNode : INode
+    public interface ITokenForestNode : IForestNode
     {
         IToken Token { get; }
     }

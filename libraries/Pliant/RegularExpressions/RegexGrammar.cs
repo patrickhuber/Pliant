@@ -194,5 +194,10 @@ namespace Pliant.RegularExpressions
         {
             return _regexGrammar.StartProductions();
         }
+        
+        public bool IsNullable(INonTerminal nonTerminal)
+        {
+            return _regexGrammar.IsNullable(nonTerminal);
+        }
     }
 }

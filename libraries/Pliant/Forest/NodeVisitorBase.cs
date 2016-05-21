@@ -1,38 +1,38 @@
 ﻿namespace Pliant.Forest
 {
-    public abstract class NodeVisitorBase : INodeVisitor
+    public abstract class NodeVisitorBase : IForestNodeVisitor
     {
-        public INodeVisitorStateManager StateManager { get; private set; }
+        public IForestNodeVisitorStateManager StateManager { get; private set; }
 
-        protected NodeVisitorBase(INodeVisitorStateManager stateManager)
+        protected NodeVisitorBase(IForestNodeVisitorStateManager stateManager)
         {
             StateManager = stateManager;
         }
         
-        public virtual void Visit(IIntermediateNode intermediateNode)
+        public virtual void Visit(IIntermediateForestNode intermediateNode)
         {
             var currentAndNode = StateManager.GetCurrentAndNode(intermediateNode);
             Visit(currentAndNode);
             StateManager.MarkAsTraversed(intermediateNode);
         }
 
-        public virtual void Visit(ITokenNode tokenNode)
+        public virtual void Visit(ITokenForestNode tokenNode)
         { }
 
-        public virtual void Visit(IAndNode andNode)
+        public virtual void Visit(IAndForestNode andNode)
         {
             foreach (var child in andNode.Children)
                 child.Accept(this);
         }
 
-        public virtual void Visit(ISymbolNode symbolNode)
+        public virtual void Visit(ISymbolForestNode symbolNode)
         {
             var currentAndNode = StateManager.GetCurrentAndNode(symbolNode);
             Visit(currentAndNode);
             StateManager.MarkAsTraversed(symbolNode);
         }
 
-        public virtual void Visit(ITerminalNode terminalNode)
+        public virtual void Visit(ITerminalForestNode terminalNode)
         { }
     }
 }

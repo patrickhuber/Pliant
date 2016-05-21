@@ -15,11 +15,11 @@ namespace Pliant.Charts
 
         public ISymbol PostDotSymbol { get; private set; }
 
-        public int Length { get; private set; }
+        public int Position { get; private set; }
 
         public virtual StateType StateType { get { return StateType.Normal; } }
 
-        public INode ParseNode { get; set; }
+        public IForestNode ParseNode { get; set; }
 
         private readonly int _hashCode;
 
@@ -30,13 +30,13 @@ namespace Pliant.Charts
             Assert.IsGreaterThanEqualToZero(origin, nameof(origin));
             Production = production;
             Origin = origin;
-            Length = position;
+            Position = position;
             PostDotSymbol = GetPostDotSymbol(position, production);
             PreDotSymbol = GetPreDotSymbol(position, production);
             _hashCode = ComputeHashCode();
         }
 
-        public State(IProduction production, int position, int origin, INode parseNode)
+        public State(IProduction production, int position, int origin, IForestNode parseNode)
             : this(production, position, origin)
         {
             ParseNode = parseNode;
@@ -44,16 +44,16 @@ namespace Pliant.Charts
 
         public IState NextState()
         {
-            return NextState(null as INode);
+            return NextState(null as IForestNode);
         }
 
-        public IState NextState(INode node)
+        public IState NextState(IForestNode node)
         {
             if (IsComplete)
                 return null;
             return new State(
                 Production,
-                Length + 1,
+                Position + 1,
                 Origin,
                 node);
         }
@@ -63,20 +63,20 @@ namespace Pliant.Charts
             return NextState(newOrigin, null);
         }
 
-        public IState NextState(int newOrigin, INode parseNode)
+        public IState NextState(int newOrigin, IForestNode parseNode)
         {
             if (IsComplete)
                 return null;
             return new State(
                 Production,
-                Length + 1,
+                Position + 1,
                 newOrigin,
                 parseNode);
         }
 
         public bool IsComplete
         {
-            get { return Length == Production.RightHandSide.Count; }
+            get { return Position == Production.RightHandSide.Count; }
         }
 
         public bool IsSource(ISymbol searchSymbol)
@@ -101,7 +101,7 @@ namespace Pliant.Charts
         private int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
-                Length.GetHashCode(),
+                Position.GetHashCode(),
                 Origin.GetHashCode(),
                 Production.GetHashCode());
         }
@@ -121,11 +121,11 @@ namespace Pliant.Charts
             {
                 stringBuilder.AppendFormat(
                     "{0}{1}",
-                    p == Length ? Dot : " ",
+                    p == Position ? Dot : " ",
                     Production.RightHandSide[p]);
             }
 
-            if (Length == Production.RightHandSide.Count)
+            if (Position == Production.RightHandSide.Count)
                 stringBuilder.Append(Dot);
 
             stringBuilder.AppendFormat("\t\t({0})", Origin);

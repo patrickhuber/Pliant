@@ -1,6 +1,6 @@
 ﻿namespace Pliant
 {
-    public interface IParseInterface
+    public interface IParseRunner
     {
         /// <summary>
         /// Reads a single unit from the token stream. For character based parses, this is a single character.
@@ -14,7 +14,7 @@
         int Position { get; }
 
         /// <summary>
-        /// Gets the current <see cref="IParseEngine">parse engine</see> used by the <see cref="IParseInterface">Pase Interface</see>
+        /// Gets the current <see cref="IParseEngine">parse engine</see> used by the <see cref="IParseRunner">Pase Interface</see>
         /// </summary>
         IParseEngine ParseEngine { get; }
 

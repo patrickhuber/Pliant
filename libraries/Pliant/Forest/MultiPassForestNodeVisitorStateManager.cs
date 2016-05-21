@@ -2,18 +2,18 @@
 
 namespace Pliant.Forest
 {
-    public class MultiPassNodeVisitorStateManager : INodeVisitorStateManager
+    public class MultiPassForestNodeVisitorStateManager : IForestNodeVisitorStateManager
     {
-        private IInternalNode _lock;
-        private IDictionary<IInternalNode, int> _stateStore;
+        private IInternalForestNode _lock;
+        private IDictionary<IInternalForestNode, int> _stateStore;
 
-        public MultiPassNodeVisitorStateManager()
+        public MultiPassForestNodeVisitorStateManager()
         {
             _lock = null;
-            _stateStore = new Dictionary<IInternalNode, int>();
+            _stateStore = new Dictionary<IInternalForestNode, int>();
         }
 
-        private int GetTraversalPosition(IInternalNode internalNode)
+        private int GetTraversalPosition(IInternalForestNode internalNode)
         {
             var value = 0;
             if (_stateStore.TryGetValue(internalNode, out value))
@@ -22,13 +22,13 @@ namespace Pliant.Forest
             return value;
         }
 
-        public IAndNode GetCurrentAndNode(IInternalNode internalNode)
+        public IAndForestNode GetCurrentAndNode(IInternalForestNode internalNode)
         {
             var value = GetTraversalPosition(internalNode);
             return internalNode.Children[value];
         }
 
-        public void MarkAsTraversed(IInternalNode internalNode)
+        public void MarkAsTraversed(IInternalForestNode internalNode)
         {
             var value = GetTraversalPosition(internalNode);
             if (HasMoreTransitions(internalNode) && TryAcquireLock(internalNode))
@@ -37,12 +37,12 @@ namespace Pliant.Forest
                 TryReleaseLock(internalNode);
         }
 
-        private void SetTraversalPosition(IInternalNode internalNode, int value)
+        private void SetTraversalPosition(IInternalForestNode internalNode, int value)
         {
             _stateStore[internalNode] = value;
         }
 
-        private bool TryAcquireLock(IInternalNode internalNode)
+        private bool TryAcquireLock(IInternalForestNode internalNode)
         {
             if (_lock != null)
                 return false;
@@ -50,7 +50,7 @@ namespace Pliant.Forest
             return true;
         }
 
-        private bool TryReleaseLock(IInternalNode internalNode)
+        private bool TryReleaseLock(IInternalForestNode internalNode)
         {
             if (_lock != null && !_lock.Equals(internalNode))
                 return false;
@@ -58,14 +58,14 @@ namespace Pliant.Forest
             return true;
         }
 
-        private bool HasMoreTransitions(IInternalNode internalNode)
+        private bool HasMoreTransitions(IInternalForestNode internalNode)
         {
             return HasMoreTransitions(
                 internalNode,
                 GetTraversalPosition(internalNode));
         }
 
-        private static bool HasMoreTransitions(IInternalNode internalNode, int currentPosition)
+        private static bool HasMoreTransitions(IInternalForestNode internalNode, int currentPosition)
         {
             return currentPosition < internalNode.Children.Count - 1;
         }

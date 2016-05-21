@@ -10,6 +10,6 @@ namespace Pliant.Charts
 
         ITransitionState NextTransition { get; set; }
 
-        int Position { get; }
+        int Index { get; }
     }
 }

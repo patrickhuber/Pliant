@@ -9,7 +9,7 @@ namespace Pliant.Charts
 
         public IState Reduction { get; private set; }
 
-        public int Position { get; private set; }
+        public int Index { get; private set; }
 
         public ITransitionState NextTransition { get; set; }
 
@@ -17,21 +17,25 @@ namespace Pliant.Charts
             ISymbol recognized,
             IState transition,
             IState reduction,
-            int position)
-            : base(transition.Production, transition.Length, transition.Origin)
+            int index)
+            : base(transition.Production, transition.Position, transition.Origin)
         {
             Reduction = reduction;
             Recognized = recognized;
-            Position = position;
+            Index = index;
             _hashCode = ComputeHashCode();
         }
 
         public override bool Equals(object obj)
         {
-            var transitionState = obj as TransitionState;
-            if (transitionState == null)
+            if ((object)obj == null)
                 return false;
-            return base.Equals(obj as State) && this.Recognized.Equals(transitionState.Recognized);
+            var transitionState = obj as TransitionState;
+            if ((object)transitionState == null)
+                return false;
+            return base.Equals(obj as State) 
+                && this.Recognized.Equals(transitionState.Recognized)
+                && this.Index == transitionState.Index;
         }
         
         private readonly int _hashCode;
@@ -39,8 +43,12 @@ namespace Pliant.Charts
         private int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
-                this.Recognized.GetHashCode(),
-                base.GetHashCode());
+                Position.GetHashCode(),
+                Origin.GetHashCode(),
+                Production.GetHashCode(),
+                Recognized.GetHashCode(),
+                Reduction.GetHashCode(),
+                Index.GetHashCode());
         }
 
         public override int GetHashCode()

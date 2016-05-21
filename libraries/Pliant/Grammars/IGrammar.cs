@@ -13,5 +13,7 @@ namespace Pliant.Grammars
         IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal);
 
         IEnumerable<IProduction> StartProductions();
+
+        bool IsNullable(INonTerminal nonTerminal);
     }
 }

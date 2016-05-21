@@ -5,12 +5,12 @@ namespace Pliant.Tree
 {
     public class TokenTreeNode : ITokenTreeNode
     {
-        private ITokenNode _innerNode;
+        private ITokenForestNode _innerNode;
 
         public int Origin { get { return _innerNode.Origin; } }
         public int Location { get { return _innerNode.Location; } }
 
-        public TokenTreeNode(ITokenNode innerNode)
+        public TokenTreeNode(ITokenForestNode innerNode)
         {
             _innerNode = innerNode;
         }

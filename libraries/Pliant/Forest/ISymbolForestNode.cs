@@ -2,7 +2,7 @@
 
 namespace Pliant.Forest
 {
-    public interface ISymbolNode : IInternalNode
+    public interface ISymbolForestNode : IInternalForestNode
     {
         ISymbol Symbol { get; }
     }

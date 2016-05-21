@@ -2,7 +2,7 @@
 
 namespace Pliant.Forest
 {
-    public interface IIntermediateNode : IInternalNode
+    public interface IIntermediateForestNode : IInternalForestNode
     {
         IState State { get; }
     }

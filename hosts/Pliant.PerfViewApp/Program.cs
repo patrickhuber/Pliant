@@ -19,11 +19,11 @@ namespace Pliant.PerfViewApp
             {
                 stopwatch.Restart();
                 var parseEngine = new ParseEngine(grammar);
-                var parseInterface = new ParseInterface(parseEngine, sampleBnf);
+                var parseRunner = new ParseRunner(parseEngine, sampleBnf);
 
-                while (!parseInterface.EndOfStream() && parseInterface.Read()) { }
+                while (!parseRunner.EndOfStream() && parseRunner.Read()) { }
 
-                var result = parseInterface.ParseEngine.IsAccepted();
+                var result = parseRunner.ParseEngine.IsAccepted();
                 stopwatch.Stop();
                 Console.WriteLine($"Pass {i} elapsed ms: {stopwatch.ElapsedMilliseconds}");
             }

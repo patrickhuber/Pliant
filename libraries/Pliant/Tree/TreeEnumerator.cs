@@ -7,10 +7,10 @@ namespace Pliant.Tree
 {
     public class TreeEnumerator : IEnumerator<ITreeNode>
     {
-        private INodeVisitorStateManager _stateManager;
-        private IInternalNode _root;
+        private IForestNodeVisitorStateManager _stateManager;
+        private IInternalForestNode _root;
 
-        public TreeEnumerator(IInternalNode internalNode, INodeVisitorStateManager stateManager)
+        public TreeEnumerator(IInternalForestNode internalNode, IForestNodeVisitorStateManager stateManager)
         {
             _root = internalNode;
             _stateManager = stateManager;

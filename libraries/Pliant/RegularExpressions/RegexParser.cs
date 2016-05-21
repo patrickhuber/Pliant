@@ -10,21 +10,21 @@ namespace Pliant.RegularExpressions
         {
             var grammar = new RegexGrammar();
             var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
-            var parseInterface = new ParseInterface(parseEngine, regularExpression);
-            while (!parseInterface.EndOfStream())
+            var parseRunner = new ParseRunner(parseEngine, regularExpression);
+            while (!parseRunner.EndOfStream())
             {
-                if (!parseInterface.Read())
+                if (!parseRunner.Read())
                     throw new Exception(
-                        $"Unable to parse regular expression. Error at position {parseInterface.Position}.");
+                        $"Unable to parse regular expression. Error at position {parseRunner.Position}.");
             }
             if (!parseEngine.IsAccepted())
                 throw new Exception(
-                    $"Error parsing regular expression. Error at position {parseInterface.Position}");
+                    $"Error parsing regular expression. Error at position {parseRunner.Position}");
 
             var parseForest = parseEngine.GetParseForestRoot();
             var parseTree = new InternalTreeNode(
-                parseForest as IInternalNode,
-                new SinglePassNodeVisitorStateManager());
+                parseForest as IInternalForestNode,
+                new SinglePassForestNodeVisitorStateManager());
 
             var regexVisitor = new RegexVisitor();
             parseTree.Accept(regexVisitor);

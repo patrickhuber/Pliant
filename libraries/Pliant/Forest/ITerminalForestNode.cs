@@ -1,6 +1,6 @@
 ﻿namespace Pliant.Forest
 {
-    public interface ITerminalNode : INode
+    public interface ITerminalForestNode : IForestNode
     {
         char Capture { get; }
     }

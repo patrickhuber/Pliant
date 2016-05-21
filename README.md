@@ -49,7 +49,7 @@ public static int Main(string[] args)
 		
 	var grammar = new GrammarBuilder(
 		Calculator, 
-		new[]{ Calculator, Factor, Term, Expression, Number }, 
+		new []{ Calculator, Factor, Term, Expression, Number }, 
 		new []{ whitespace })
 	.ToGrammar();	
 	
@@ -115,31 +115,31 @@ public static int Main (string[] args)
 ```
 ## Recognizing and Parse Trees
 
-### Using ParseEngine, ParseInterface and Grammars to Recognize Input
+### Using ParseEngine, ParseRunner and Grammars to Recognize Input
 
 Using the calculator grammar from above, we can parse input by constructing
-a parse engine and parse interface instance.
+a parse engine and parse runner instance.
 
 ```csharp
-var input = "(1 + 1) * 3 + 2";
+var input = "1 + 1 * 3 + 2";
 
 // use the calculator grammar from above
 var parseEngine = new ParseEngine(grammar);
 
-// use the parse interface to query the parse engine for state
+// use the parse runner to query the parse engine for state
 // and use that state to select lexer rules.
-var parseInterface = new ParseInterface(parseEngine, input);
+var parseRunner = new ParseRunner(parseEngine, input);
 
 // when a parse is recognized, the parse engine is allowed to move
 // forward and continues to accept symbols. 
 var recognzied = false;
 var errorPosition = 0;
-while(!parseInterface.EndOfStream())
+while(!lexer.EndOfStream())
 {
-	recognzied = parseInterface.Read();
+	recognzied = lexer.Read();
 	if(!recognized)
 	{	
-		errorPosition = parseInterface.Position;
+		errorPosition = lexer.Position;
 		break;
 	}
 }
@@ -150,16 +150,16 @@ while(!parseInterface.EndOfStream())
 var accepted = false;
 if(recognized)
 {
-	accepted = parseInterface.IsAccepted();
+	accepted = lexer.IsAccepted();
 	if(!accepted)
-		errorPosition = parseInterface.Position;
+		errorPosition = lexer.Position;
 }
 Console.WriteLine($"Recognized: {recognized}, Accepted: {accepted}");
 if(!recognized || !accepted)
 	Console.Error.WriteLine($"Error at position {errorPosition}");
 ```
 
-### Using ParseEngine, ParseInterface, Forrest API and Grammars to build a parse tree.
+### Using ParseEngine, ParseRunner, Forrest API and Grammars to build a parse tree.
 
 The process for creating a parse tree is the same as recognizing input. 
 In fact, when running the ParseEngine, a Sparsley Packed Parse Forest (SPPF) is created 
@@ -179,7 +179,7 @@ var parseForest = parseEngine.GetParseForestRoot();
 
 // create a internal tree node and supply the state manager for tree traversal.
 var parseTree = new InternalTreeNode(
-    parseForest as IInternalNode,
+    parseForest as IInternalForestNode,
     new SinglePassNodeVisitorStateManager());
 ```
 
@@ -201,3 +201,4 @@ var parseTree = new InternalTreeNode(
 * [insights on lexer creation](https://youtu.be/XaScLywH2CI)
 * [incremental reparsing](http://www.aclweb.org/anthology/E89-1033.pdf)
 * [An extension of Earley's Algorithm for extended grammars](http://link.springer.com/chapter/10.1007%2F978-1-4020-3953-9_22)
+* [Finding nullable productions in a grammar](http://cstheory.stackexchange.com/a/2493/32787)

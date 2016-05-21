@@ -9,7 +9,7 @@ using Pliant.Tokens;
 namespace Pliant.Tests.Unit.Forest
 {
     [TestClass]
-    public class NodeVisitorTests
+    public class ForestNodeVisitorTests
     {
         private readonly ILexerRule _whitespace;
 
@@ -24,7 +24,7 @@ namespace Pliant.Tests.Unit.Forest
             return new DfaLexerRule(start, new TokenType("whitespace"));
         }
 
-        public NodeVisitorTests()
+        public ForestNodeVisitorTests()
         {
             _whitespace = CreateWhitespaceRule();
         }
@@ -34,17 +34,17 @@ namespace Pliant.Tests.Unit.Forest
         {
             var regexGrammar = new RegexGrammar();
             var regexParseEngine = new ParseEngine(regexGrammar);
-            var regexParseInterface = new ParseInterface(regexParseEngine, @"[(]\d[)]");
-            while (!regexParseInterface.EndOfStream())
+            var regexLexer = new ParseRunner(regexParseEngine, @"[(]\d[)]");
+            while (!regexLexer.EndOfStream())
             {
-                if (!regexParseInterface.Read())
-                    Assert.Fail("error parsing input at position {0}", regexParseInterface.Position);
+                if (!regexLexer.Read())
+                    Assert.Fail("error parsing input at position {0}", regexLexer.Position);
             }
             Assert.IsTrue(regexParseEngine.IsAccepted());
 
-            var nodeVisitorStateManager = new MultiPassNodeVisitorStateManager();
+            var nodeVisitorStateManager = new MultiPassForestNodeVisitorStateManager();
             var nodeVisitor = new LoggingNodeVisitor(
-                new SinglePassNodeVisitorStateManager());
+                new SinglePassForestNodeVisitorStateManager());
             var root = regexParseEngine.GetParseForestRoot();
             root.Accept(nodeVisitor);
             Assert.AreEqual(31, nodeVisitor.VisitLog.Count);
@@ -110,14 +110,14 @@ namespace Pliant.Tests.Unit.Forest
             var sentence = "a panda eats shoots and leaves.";
 
             var parseEngine = new ParseEngine(grammar);
-            var parseInterface = new ParseInterface(parseEngine, sentence);
+            var parseRunner = new ParseRunner(parseEngine, sentence);
 
-            while (!parseInterface.EndOfStream())
+            while (!parseRunner.EndOfStream())
             {
-                Assert.IsTrue(parseInterface.Read(),
-                $"Error parsing position: {parseInterface.Position}");
+                Assert.IsTrue(parseRunner.Read(),
+                $"Error parsing position: {parseRunner.Position}");
             }
-            Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
+            Assert.IsTrue(parseRunner.ParseEngine.IsAccepted());
         }
     }
 }

@@ -9,8 +9,8 @@ namespace Pliant.Tree
         : IParseTreeEnumerator
     {
         public ParseTreeEnumerator(
-            INodeVisitorStateManager stateManager,
-            IInternalNode forestRoot)
+            IForestNodeVisitorStateManager stateManager,
+            IInternalForestNode forestRoot)
         {
             var internalTreeNode = new InternalTreeNode(forestRoot, stateManager);     
         }

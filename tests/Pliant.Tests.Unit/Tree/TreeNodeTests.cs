@@ -54,19 +54,19 @@ namespace Pliant.Tests.Unit.Tree
         private static InternalTreeNode GetTreeNode(IGrammar grammar, string input)
         {
             var parseEngine = new ParseEngine(grammar);
-            var parseInterface = new ParseInterface(parseEngine, input);
-            while (!parseInterface.EndOfStream())
+            var parseRunner = new ParseRunner(parseEngine, input);
+            while (!parseRunner.EndOfStream())
             {
-                Assert.IsTrue(parseInterface.Read());
+                Assert.IsTrue(parseRunner.Read());
             }
             Assert.IsTrue(parseEngine.IsAccepted());
 
             var parseForest = parseEngine.GetParseForestRoot();
-            Assert.IsTrue(parseForest is IInternalNode);
+            Assert.IsTrue(parseForest is IInternalForestNode);
 
-            var internalNode = parseForest as IInternalNode;
+            var internalNode = parseForest as IInternalForestNode;
 
-            var stateManager = new MultiPassNodeVisitorStateManager();
+            var stateManager = new MultiPassForestNodeVisitorStateManager();
             var currentAndNode = stateManager.GetCurrentAndNode(internalNode);
             var treeNode = new InternalTreeNode(internalNode, currentAndNode, stateManager);
             return treeNode;

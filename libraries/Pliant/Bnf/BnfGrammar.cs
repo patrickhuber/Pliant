@@ -168,5 +168,9 @@ namespace Pliant.Bnf
         {
             return _bnfGrammar.StartProductions();
         }
+        public bool IsNullable(INonTerminal nonTerminal)
+        {
+            return _bnfGrammar.IsNullable(nonTerminal);
+        }
     }
 }

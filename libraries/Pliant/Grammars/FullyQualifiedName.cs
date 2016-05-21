@@ -29,8 +29,10 @@
 
         public override bool Equals(object obj)
         {
+            if ((object)obj == null)
+                return false;
             var otherFullyQualifiedName = obj as FullyQualifiedName;
-            if (otherFullyQualifiedName == null)
+            if ((object)otherFullyQualifiedName == null)
                 return false;
             return otherFullyQualifiedName.FullName == FullName;
         }

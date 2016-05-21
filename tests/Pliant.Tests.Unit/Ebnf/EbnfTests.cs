@@ -231,32 +231,32 @@ namespace Pliant.Tests.Unit.Ebnf
         {
             var node = ParseInput(@"
             SomeRule = 'a' 'b' 'c' ;
-            ") as ISymbolNode;
+            ") as ISymbolForestNode;
             Assert.IsNotNull(node);
 
             var visitor = new LoggingNodeVisitor(
-                new SinglePassNodeVisitorStateManager());
+                new SinglePassForestNodeVisitorStateManager());
             node.Accept(visitor);
 
             var log = visitor.VisitLog;
             Assert.IsTrue(log.Count > 0);
         }
 
-        private INode ParseInput(string input)
+        private IForestNode ParseInput(string input)
         {
-            var parseInterface = new ParseInterface(_parseEngine, input);
+            var parseRunner = new ParseRunner(_parseEngine, input);
             for (int i = 0; i < input.Length; i++)
             {
-                Assert.IsTrue(parseInterface.Read(), "Error found in position {0}", parseInterface.Position);
+                Assert.IsTrue(parseRunner.Read(), "Error found in position {0}", parseRunner.Position);
             }
-            Assert.IsTrue(parseInterface.ParseEngine.IsAccepted());
-            return parseInterface.ParseEngine.GetParseForestRoot();
+            Assert.IsTrue(parseRunner.ParseEngine.IsAccepted());
+            return parseRunner.ParseEngine.GetParseForestRoot();
         }
 
         private void FailParseInput(string input)
         {
-            var parseInterface = new ParseInterface(_parseEngine, input);
-            Assert.IsFalse(parseInterface.ParseEngine.IsAccepted());
+            var parseRunner = new ParseRunner(_parseEngine, input);
+            Assert.IsFalse(parseRunner.ParseEngine.IsAccepted());
         }
     }
 }
