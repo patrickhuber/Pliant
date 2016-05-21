@@ -659,7 +659,7 @@ namespace Pliant.Tests.Unit
             var grammar = new GrammarBuilder(E, new[] { E, F})
                 .ToGrammar();
 
-            var input = "ab";
+            var input = "aba";
 
             var leoEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
             var leoInterface = new ParseRunner(leoEngine, input);

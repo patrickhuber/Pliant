@@ -121,7 +121,7 @@ Using the calculator grammar from above, we can parse input by constructing
 a parse engine and parse runner instance.
 
 ```csharp
-var input = "(1 + 1) * 3 + 2";
+var input = "1 + 1 * 3 + 2";
 
 // use the calculator grammar from above
 var parseEngine = new ParseEngine(grammar);

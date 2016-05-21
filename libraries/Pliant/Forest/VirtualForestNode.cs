@@ -10,26 +10,51 @@ namespace Pliant.Forest
         private ITransitionState _transitionState;
         private IForestNode _completedParseNode;
         private ReadWriteList<IAndForestNode> _children;
-
-        /// <summary>
-        /// A single AND node. Virtual nodes are leo nodes and by nature don't have ambiguity.
-        /// </summary>
-        private AndForestNode _andNode;
-
+        
         public ISymbol Symbol { get; private set; }
 
         public VirtualForestNode(
             int location,
             ITransitionState transitionState,
             IForestNode completedParseNode)
-            : base(GetTargetState(transitionState).Origin, location)
+            : this(
+                  location,
+                  transitionState, 
+                  completedParseNode, 
+                  GetTargetState(transitionState))
+        {
+        }
+
+        protected VirtualForestNode(
+            int location,
+            ITransitionState transitionState,
+            IForestNode completedParseNode,
+            IState targetState)
+            : base(targetState.Origin, location)
         {
             _transitionState = transitionState;
             _completedParseNode = completedParseNode;
             _children = new ReadWriteList<IAndForestNode>();
-            Symbol = GetTargetState(transitionState).Production.LeftHandSide;
+            Symbol = targetState.Production.LeftHandSide;
+            var isUniqueSubTreeParseNode = transitionState.Reduction.ParseNode != null
+                && _completedParseNode == transitionState.Reduction.ParseNode
+                && (_completedParseNode.NodeType == ForestNodeType.Intermediate
+                    || _completedParseNode.NodeType == ForestNodeType.Symbol);
+            if (isUniqueSubTreeParseNode)            
+                CloneUniqueChildSubTree(_completedParseNode as IInternalForestNode);
+            
         }
 
+        private void CloneUniqueChildSubTree(IInternalForestNode internalCompletedParseNode)
+        {
+            foreach (var andNode in internalCompletedParseNode.Children)
+            {
+                var newAndNode = new AndForestNode();
+                foreach (var child in andNode.Children)
+                    newAndNode.AddChild(child);
+                _children.Add(newAndNode);
+            }
+        }
 
         public override ForestNodeType NodeType
         {
@@ -77,28 +102,24 @@ namespace Pliant.Forest
 
         private bool ResultCached()
         {
-            return _andNode != null;
+            return _children.Count != 0;
         }
 
         public void AddUniqueFamily(IForestNode trigger)
         {
-            if (_andNode != null)
-                return;
-            _andNode = new AndForestNode();
-            _andNode.AddChild(trigger);
-            _children.Add(_andNode);
+            var andNode = new AndForestNode();
+            andNode.AddChild(trigger);
+            _children.Add(andNode);
         }
 
         public void AddUniqueFamily(IForestNode source, IForestNode trigger)
         {
-            if (_andNode != null)
-                return;
-            _andNode = new AndForestNode();
-            _andNode.AddChild(source);
-            _andNode.AddChild(trigger);
-            _children.Add(_andNode);
+            var andNode = new AndForestNode();
+            andNode.AddChild(source);
+            andNode.AddChild(trigger);
+            _children.Add(andNode);
         }
-
+        
         public override string ToString()
         {
             return $"({Symbol}, {Origin}, {Location})";
