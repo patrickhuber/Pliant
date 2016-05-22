@@ -56,7 +56,7 @@ namespace Pliant.Charts
                 Log("Transition", index, transitionItem);
         }
 
-        private void Log(string operation, int origin, IState state)
+        private static void Log(string operation, int origin, IState state)
         {
             Debug.Write(string.Format("{0}\t{1}", origin, state));
             Debug.WriteLine(string.Format("\t # {0}", operation));

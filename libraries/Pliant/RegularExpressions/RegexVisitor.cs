@@ -261,7 +261,7 @@ namespace Pliant.RegularExpressions
             return new RegexCharacterClass(characterRange);
         }
 
-        private RegexCharacterUnitRange VisitCharacterRangeNode(IInternalTreeNode internalNode)
+        private static RegexCharacterUnitRange VisitCharacterRangeNode(IInternalTreeNode internalNode)
         {
             RegexCharacterClassCharacter start = null;
             RegexCharacterClassCharacter end = null;
@@ -287,7 +287,7 @@ namespace Pliant.RegularExpressions
             return new RegexCharacterUnitRange(start);
         }
 
-        private RegexCharacterClassCharacter VisitCharacterClassCharacterNode(IInternalTreeNode internalNode)
+        private static RegexCharacterClassCharacter VisitCharacterClassCharacterNode(IInternalTreeNode internalNode)
         {
             foreach (var child in internalNode.Children)
             {

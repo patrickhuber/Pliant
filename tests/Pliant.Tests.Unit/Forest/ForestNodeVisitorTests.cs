@@ -69,8 +69,8 @@ namespace Pliant.Tests.Unit.Forest
             var aAn = new GrammarBuilder(AAn, new[] { AAn }).ToGrammar();
 
             ShootsLeaves.Definition =
-                (_)'s' + 'h' + 'o' + 'o' + 't' + 's'
-                | (_)'l' + 'e' + 'a' + 'v' + 'e' + 's';
+                (_)"shoots"
+                | (_)"leaves";
             var shootsLeaves = new GrammarBuilder(ShootsLeaves, new[] { ShootsLeaves }).ToGrammar();
 
             EatsShootsLeaves.Definition =
@@ -96,11 +96,11 @@ namespace Pliant.Tests.Unit.Forest
                 | VP + CC + VP
                 | VP + VP + CC + VP
                 | VBZ;
-            CC.Definition = new GrammarLexerRule("CC", and);
-            DT.Definition = new GrammarLexerRule("DT", aAn);
-            NN.Definition = new GrammarLexerRule("NN", panda);
-            NNS.Definition = new GrammarLexerRule("NNS", shootsLeaves);
-            VBZ.Definition = new GrammarLexerRule("VBZ", eatsShootsLeaves);
+            CC.Definition = new GrammarLexerRule(nameof(CC), and);
+            DT.Definition = new GrammarLexerRule(nameof(DT), aAn);
+            NN.Definition = new GrammarLexerRule(nameof(NN), panda);
+            NNS.Definition = new GrammarLexerRule(nameof(NNS), shootsLeaves);
+            VBZ.Definition = new GrammarLexerRule(nameof(VBZ), eatsShootsLeaves);
 
             var grammar = new GrammarBuilder(
                 S,

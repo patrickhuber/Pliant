@@ -8,6 +8,7 @@
             : base(origin, location)
         {
             Capture = capture;
+            _hashCode = ComputeHashCode();
         }
 
         public override ForestNodeType NodeType

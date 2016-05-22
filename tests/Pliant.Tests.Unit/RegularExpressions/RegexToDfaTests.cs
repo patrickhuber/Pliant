@@ -13,12 +13,6 @@ namespace Pliant.Tests.Unit.RegularExpressions
     [TestClass]
     public class RegexToDfaTests
     {
-        /// <summary>
-        ///Gets or sets the test context which provides
-        ///information about and functionality for the current test run.
-        ///</summary>
-        public TestContext TestContext { get; set; }
-        
         [TestMethod]
         public void RegexToDfaShouldConvertCharacterRegexToDfa()
         {

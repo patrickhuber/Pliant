@@ -12,6 +12,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void EbnfGrammarGeneratorShouldCreateGrammarForSimpleRule()
         {
+            // S = 'a';
             var definition = new EbnfDefinition(
                 new EbnfBlockRule(
                     new EbnfRule(
@@ -29,6 +30,8 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void EbnfGrammarGeneratorShouldCreateGrammarForMultipleProductions()
         {
+            // S = 'a';
+            // S = 'b';
             var definition = new EbnfDefinitionConcatenation(                
                 new EbnfBlockRule(
                     new EbnfRule(
@@ -52,6 +55,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void EbnfGrammarGeneratorShouldCreateGrammarForProductionAlteration()
         {
+            // S = 'a' | 'b';
             var definition = new EbnfDefinition(
                 new EbnfBlockRule(
                     new EbnfRule(
@@ -71,6 +75,8 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void EbnfGrammarGeneratorShouldCreateGrammarForMultipleProductionsWithAlterations()
         {
+            // S = 'a' | 'd';
+            // S = 'b' | 'c';
             var definition = new EbnfDefinitionConcatenation(
                 new EbnfBlockRule(
                     new EbnfRule(
@@ -100,6 +106,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void EbnfGrammarGeneratorShouldCreateGrammarForRepetition()
         {
+            // R = { 'a' } ;
             var definition = new EbnfDefinition(
                 new EbnfBlockRule(
                     new EbnfRule(
@@ -121,6 +128,7 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestMethod]
         public void EbnfGrammarGeneratorShouldCreateGrammarForGrouping()
         {
+            // R = ( 'a' );
             var definition = new EbnfDefinition(
                 new EbnfBlockRule(
                     new EbnfRule(
