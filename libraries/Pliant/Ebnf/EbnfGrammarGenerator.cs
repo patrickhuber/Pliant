@@ -10,14 +10,11 @@ namespace Pliant.Ebnf
 {
     public class EbnfGrammarGenerator
     {
-        IEbnfProductionNamingStrategy _strategy;
         readonly SubsetConstructionAlgorithm _subsetConstructionAlgorithm;
         readonly ThompsonConstructionAlgorithm _thompsonConstructionAlgorithm;
 
-        public EbnfGrammarGenerator(IEbnfProductionNamingStrategy strategy)
+        public EbnfGrammarGenerator()
         {
-            Assert.IsNotNull(strategy, nameof(strategy));
-            _strategy = strategy;
             _thompsonConstructionAlgorithm = new ThompsonConstructionAlgorithm();
             _subsetConstructionAlgorithm = new SubsetConstructionAlgorithm();
         }
@@ -25,26 +22,22 @@ namespace Pliant.Ebnf
         public IGrammar Generate(EbnfDefinition ebnf)
         {
             var grammarBuilder = new GrammarBuilder();
-            foreach (var production in CreateProductions(ebnf))
-                grammarBuilder.AddProduction(production);
+            Definition(ebnf, grammarBuilder);
             return grammarBuilder.ToGrammar();
         }
 
-        private IEnumerable<IProduction> CreateProductions(EbnfDefinition definition)
+        private void Definition(EbnfDefinition definition, GrammarBuilder builder)
         {
-            var productionList = new List<IProduction>();
-            productionList.AddRange(CreateProductions(definition.Block));
-            switch (definition.NodeType)
-            {
-                case EbnfNodeType.EbnfDefinitionConcatenation:
-                    var definitionConcatenation = definition as EbnfDefinitionConcatenation;
-                    productionList.AddRange(CreateProductions(definitionConcatenation.Definition));
-                    break;
-            }
-            return productionList;
+            Block(definition.Block, builder);
+
+            if (definition.NodeType != EbnfNodeType.EbnfDefinitionConcatenation)
+                return;
+
+            var definitionConcatenation = definition as EbnfDefinitionConcatenation;
+            Definition(definitionConcatenation.Definition, builder);                
         }
 
-        private IEnumerable<IProduction> CreateProductions(EbnfBlock block)
+        void Block(EbnfBlock block, GrammarBuilder builder)
         {
             switch (block.NodeType)
             {
@@ -52,111 +45,149 @@ namespace Pliant.Ebnf
                     break;
 
                 case EbnfNodeType.EbnfBlockRule:
-                    return CreateProductions(block as EbnfBlockRule);
+                    var blockRule = block as EbnfBlockRule;
+                    foreach (var production in Rule(blockRule.Rule))
+                        builder.AddProduction(production);
+                    break;
 
                 case EbnfNodeType.EbnfBlockSetting:
                     break;
             }
-            throw new InvalidOperationException("Unrecognized block rule type.");
         }
 
-        private IEnumerable<IProduction> CreateProductions(EbnfBlockRule blockRule)
+        IEnumerable<ProductionBuilder> Rule(EbnfRule rule)
         {
-            var rule = blockRule.Rule;
-            var leftHandSide = GetNonTerminalFromQualifiedIdentifier(rule.QualifiedIdentifier);            
-            var rightHandSides = GetRightHandSideForExpression(rule.Expression);
-            foreach (var rightHandSide in rightHandSides)
-                yield return new Production(leftHandSide, rightHandSide);
+            var nonTerminal = GetNonTerminalFromQualifiedIdentifier(rule.QualifiedIdentifier);
+            var productionBuilder = new ProductionBuilder(nonTerminal);
+            foreach(var production in Expression(rule.Expression, productionBuilder))
+                yield return production;
+            yield return productionBuilder;           
         }
 
-        private IList<IList<ISymbol>> GetRightHandSideForExpression(EbnfExpression expression)
+        IEnumerable<ProductionBuilder> Expression(EbnfExpression expression, ProductionBuilder currentProduction)
         {
-            var rightHandSides = new List<IList<ISymbol>>();
-            var ruleBuilder = new RuleBuilder();
+            foreach (var production in Term(expression.Term, currentProduction))
+                yield return production;
 
-            var currentExpression = expression;
+            if (expression.NodeType != EbnfNodeType.EbnfExpressionAlteration)
+                yield break;
 
-            while (currentExpression != null)
-            {
-                rightHandSides.Add(new List<ISymbol>());
-                SetRightHandSideForTerm(rightHandSides,currentExpression.Term);
-                currentExpression = (EbnfNodeType.EbnfExpressionAlteration == currentExpression.NodeType)
-                    ? (currentExpression as EbnfExpressionAlteration).Expression
-                    : null;
-            }
-            return rightHandSides;
+            var expressionAlteration = expression as EbnfExpressionAlteration;
+            // TODO: Fix this to add OR instead of using lambda
+            currentProduction.Definition.Lambda();
+            foreach (var production in Expression(expressionAlteration.Expression, currentProduction))
+                yield return production;            
         }
 
-        private void SetRightHandSideForTerm(IList<IList<ISymbol>> rightHandSides, EbnfTerm term)
+        IEnumerable<ProductionBuilder> Grouping(EbnfFactorGrouping grouping, ProductionBuilder currentProduction)
         {
-            var currentTerm = term;
-            while (currentTerm != null)
-            {
-                SetRightHandSideForFactor(rightHandSides, currentTerm.Factor);
-                currentTerm = EbnfNodeType.EbnfTermConcatenation == currentTerm.NodeType 
-                    ? (currentTerm as EbnfTermConcatenation).Term
-                    : null;
-            }
+            var name = grouping.ToString();
+            var nonTerminal = new NonTerminal(name);
+            var groupingProduction = new ProductionBuilder(nonTerminal);
+
+            AddWithAnd(currentProduction, new SymbolBuilder(nonTerminal));
+
+            var expression = grouping.Expression;           
+            foreach (var production in Expression(expression, groupingProduction))
+                yield return production; 
+
+            yield return groupingProduction;
         }
 
-        private void SetRightHandSideForFactor(IList<IList<ISymbol>> rightHandSides, EbnfFactor factor)
+        IEnumerable<ProductionBuilder> Optional(EbnfFactorOptional optional, ProductionBuilder currentProduction)
+        {
+            var name = optional.ToString();
+            var nonTerminal = new NonTerminal(name);
+            var optionalProduction = new ProductionBuilder(nonTerminal);
+
+            AddWithAnd(currentProduction, new SymbolBuilder(nonTerminal));
+
+            var expression = optional.Expression;
+            foreach (var production in Expression(expression, optionalProduction))
+                yield return production;
+
+            optionalProduction.Definition.Lambda();
+            yield return optionalProduction;
+        }
+
+        IEnumerable<ProductionBuilder> Repetition(EbnfFactorRepetition repetition, ProductionBuilder currentProduction)
+        {
+            var name = repetition.ToString();
+            var nonTerminal = new NonTerminal(name);
+            var repetitionProduction = new ProductionBuilder(nonTerminal);
+
+            AddWithAnd(currentProduction, new SymbolBuilder(nonTerminal));
+
+            var expression = repetition.Expression;
+            foreach (var production in Expression(expression, repetitionProduction))
+                yield return production;
+
+            AddWithAnd(repetitionProduction, new SymbolBuilder(nonTerminal));
+            repetitionProduction.Definition.Lambda();
+            yield return repetitionProduction;
+        }
+
+        IEnumerable<ProductionBuilder> Term(EbnfTerm term, ProductionBuilder currentProduction)
+        {
+            foreach (var production in Factor(term.Factor, currentProduction))
+                yield return production;
+
+            if (term.NodeType != EbnfNodeType.EbnfTermConcatenation)
+                yield break;
+
+            var concatenation = term as EbnfTermConcatenation;
+            foreach(var production in Term(concatenation.Term, currentProduction))
+                yield return production;                    
+        }
+
+        IEnumerable<ProductionBuilder> Factor(EbnfFactor factor, ProductionBuilder currentProduction)
         {
             switch (factor.NodeType)
             {
-                case EbnfNodeType.EbnfFactorIdentifier:
-                    var factorIdentifider = factor as EbnfFactorIdentifier;
-                    var symbol = GetNonTerminalFromQualifiedIdentifier(factorIdentifider.QualifiedIdentifier);
-                    AppendSymbolToAllRules(rightHandSides, symbol);
-                    break;
-
                 case EbnfNodeType.EbnfFactorGrouping:
-                    throw new NotImplementedException("Grouping is not implemented.");                    
+                    var grouping = factor as EbnfFactorGrouping;
+                    return Grouping(grouping, currentProduction);
 
                 case EbnfNodeType.EbnfFactorOptional:
-                    var alternateRightHandSides = new List<IList<ISymbol>>();
-                    var factorOptional = factor as EbnfFactorOptional;
-
-                    var expressionRightHandSides = GetRightHandSideForExpression(factorOptional.Expression);
-                    
-                    foreach (var rightHandSide in rightHandSides)
-                    {                        
-                        foreach (var expressionRightHandSide in expressionRightHandSides)
-                        {
-                            var rightHandSideClone = new List<ISymbol>(rightHandSide);
-                            rightHandSideClone.AddRange(expressionRightHandSide);
-                            alternateRightHandSides.Add(rightHandSideClone);
-                        }
-                    }
-
-                    foreach (var alternateRightHandSide in alternateRightHandSides)
-                        rightHandSides.Add(alternateRightHandSide);          
-
-                    break;
+                    var optional = factor as EbnfFactorOptional;
+                    return Optional(optional, currentProduction);                    
 
                 case EbnfNodeType.EbnfFactorRepetition:
-                    throw new NotImplementedException("Repetition is not implemented.");
+                    var repetition = factor as EbnfFactorRepetition;
+                    return Repetition(repetition, currentProduction);                    
+
+                case EbnfNodeType.EbnfFactorIdentifier:
+                    var identifier = factor as EbnfFactorIdentifier;
+                    var nonTerminal = GetNonTerminalFromQualifiedIdentifier(identifier.QualifiedIdentifier);                   
+                    AddWithAnd(currentProduction, new SymbolBuilder(nonTerminal));
+                    break;
 
                 case EbnfNodeType.EbnfFactorLiteral:
-                    var factorLiteral = factor as EbnfFactorLiteral;
-                    var literalLexerRule = GetLiteralLexerRule(factorLiteral);
-                    AppendSymbolToAllRules(rightHandSides, literalLexerRule);
+                    var literal = factor as EbnfFactorLiteral;
+                    var stringLiteralRule = new StringLiteralLexerRule(literal.Value);
+                    AddWithAnd(currentProduction, new SymbolBuilder(stringLiteralRule));
                     break;
 
                 case EbnfNodeType.EbnfFactorRegex:
-                    var factorRegex = factor as EbnfFactorRegex;
-                    var regexLexerRule = GetRegexLexerRule(factorRegex);
-                    AppendSymbolToAllRules(rightHandSides, regexLexerRule);
-                    break;          
+                    var regex = factor as EbnfFactorRegex;
+                    var nfa = _thompsonConstructionAlgorithm.Transform(regex.Regex);
+                    var dfa = _subsetConstructionAlgorithm.Transform(nfa);
+                    var dfaLexerRule = new DfaLexerRule(dfa, regex.Regex.ToString());
+                    AddWithAnd(currentProduction, new SymbolBuilder(dfaLexerRule));
+                    break;                
             }
+            return new ProductionBuilder[] { };
         }
-        
-        private static void AppendSymbolToAllRules(IList<IList<ISymbol>> rightHandSides, ISymbol symbol)
+
+        private static void AddWithAnd(ProductionBuilder currentProduction, SymbolBuilder symbolBuilder)
         {
-            foreach (var rightHandSide in rightHandSides)
-                rightHandSide.Add(symbol);
+            if (currentProduction.Definition == null)
+                currentProduction.Definition = new RuleBuilder();
+
+            currentProduction.Definition.AddWithAnd(symbolBuilder);
         }
         
-        private static INonTerminal GetNonTerminalFromQualifiedIdentifier(EbnfQualifiedIdentifier qualifiedIdentifier)
+        private static NonTerminal GetNonTerminalFromQualifiedIdentifier(EbnfQualifiedIdentifier qualifiedIdentifier)
         {
             var @namespace = new StringBuilder();
             var currentQualifiedIdentifier = qualifiedIdentifier;
@@ -170,40 +201,6 @@ namespace Pliant.Ebnf
                 index++;
             }
             return new NonTerminal(@namespace.ToString(), currentQualifiedIdentifier.Identifier);
-        }
-
-        private static ILexerRule GetLexerRule(EbnfLexerRule lexerRule)
-        {
-            var symbol = GetNonTerminalFromQualifiedIdentifier(lexerRule.QualifiedIdentifier);
-            var expression = lexerRule.Expression;
-            throw new NotImplementedException();
-        }
-
-        private static ILexerRule GetLiteralLexerRule(EbnfLexerRuleFactorLiteral literal, string name)
-        {
-            return new StringLiteralLexerRule(literal.Value, new Tokens.TokenType(name));
-        }
-
-        private static ILexerRule GetLiteralLexerRule(EbnfFactorLiteral literal)
-        {
-            return new StringLiteralLexerRule(literal.Value);
-        }
-
-        private ILexerRule GetRegexLexerRule(EbnfFactorRegex factor)
-        {
-            return GetRegexLexerRule(factor.Regex, factor.Regex.ToString());
-        }
-
-        private ILexerRule GetRegexLexerRule(EbnfLexerRuleFactorRegex factor, string name)
-        {
-            return GetRegexLexerRule(factor.Regex, name);        
-        }
-
-        private ILexerRule GetRegexLexerRule(Regex regex, string name)
-        {
-            var nfa = _thompsonConstructionAlgorithm.Transform(regex);
-            var dfa = _subsetConstructionAlgorithm.Transform(nfa);
-            return new DfaLexerRule(dfa, name);
-        }        
+        }   
     }
 }

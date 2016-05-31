@@ -62,47 +62,44 @@ namespace Pliant.Builders
 
         public IRuleBuilder Rule(params object[] symbols)
         {
-            if (!symbols.IsNullOrEmpty())
+            var symbolList = new BaseBuilderList();
+            foreach (var symbol in symbols)
             {
-                var symbolList = new BaseBuilderList();
-                foreach (var symbol in symbols)
+                if (symbol is char)
                 {
-                    if (symbol is char)
-                    {
-                        var terminal = new CharacterTerminal((char)symbol);
-                        var lexerRule = new TerminalLexerRule(
-                            terminal,
-                            new TokenType(terminal.ToString()));
-                        symbolList.Add(
-                            new SymbolBuilder(lexerRule));
-                    }
-                    else if (symbol is ITerminal)
-                    {
-                        var terminal = symbol as ITerminal;
-                        var lexerRule = new TerminalLexerRule(
-                            terminal,
-                            new TokenType(terminal.ToString()));
-                        symbolList.Add(
-                            new SymbolBuilder(lexerRule));
-                    }
-                    else if (symbol is ILexerRule)
-                    {
-                        symbolList.Add(
-                            new SymbolBuilder(symbol as ILexerRule));
-                    }
-                    else if (symbol is string)
-                    {
-                        var terminal = new StringLiteralLexerRule(symbol as string);
-                        symbolList.Add(
-                            new SymbolBuilder(terminal));
-                    }
-                    else if (symbol == null)
-                    { }
-                    else { throw new ArgumentException("unrecognized terminal or nonterminal"); }
+                    var terminal = new CharacterTerminal((char)symbol);
+                    var lexerRule = new TerminalLexerRule(
+                        terminal,
+                        new TokenType(terminal.ToString()));
+                    symbolList.Add(
+                        new SymbolBuilder(lexerRule));
                 }
-
-                Data.Add(symbolList);
+                else if (symbol is ITerminal)
+                {
+                    var terminal = symbol as ITerminal;
+                    var lexerRule = new TerminalLexerRule(
+                        terminal,
+                        new TokenType(terminal.ToString()));
+                    symbolList.Add(
+                        new SymbolBuilder(lexerRule));
+                }
+                else if (symbol is ILexerRule)
+                {
+                    symbolList.Add(
+                        new SymbolBuilder(symbol as ILexerRule));
+                }
+                else if (symbol is string)
+                {
+                    var terminal = new StringLiteralLexerRule(symbol as string);
+                    symbolList.Add(
+                        new SymbolBuilder(terminal));
+                }
+                else if (symbol == null)
+                { }
+                else { throw new ArgumentException("unrecognized terminal or nonterminal"); }
             }
+
+            Data.Add(symbolList);
             return this;
         }
 

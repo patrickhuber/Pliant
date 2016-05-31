@@ -35,5 +35,6 @@ namespace Pliant.Ebnf
         EbnfLexerRuleFactorRegex,
         EbnfLexerRuleExpression,
         EbnfLexerRuleExpressionAlteration,
+        EbnfExpressionEmpty,
     }
 }

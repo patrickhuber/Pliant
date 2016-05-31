@@ -48,6 +48,11 @@ namespace Pliant.Ebnf
             return factor.NodeType == NodeType
                 && factor.QualifiedIdentifier.Equals(QualifiedIdentifier);
         }
+
+        public override string ToString()
+        {
+            return QualifiedIdentifier.ToString();
+        }
     }
 
     public class EbnfFactorLiteral : EbnfFactor
@@ -90,6 +95,11 @@ namespace Pliant.Ebnf
                 return false;
             return factor.NodeType == NodeType
                 && factor.Value.Equals(Value);
+        }
+
+        public override string ToString()
+        {
+            return Value;
         }
     }
 
@@ -134,6 +144,11 @@ namespace Pliant.Ebnf
             return factor.NodeType == NodeType
                 && factor.Regex.Equals(Regex);
         }
+
+        public override string ToString()
+        {
+            return $"/{Regex}/";
+        }
     }
 
     public class EbnfFactorRepetition : EbnfFactor
@@ -176,6 +191,11 @@ namespace Pliant.Ebnf
             return HashUtil.ComputeHash(
                 NodeType.GetHashCode(),
                 Expression.GetHashCode());
+        }
+
+        public override string ToString()
+        {
+            return $"{{{Expression}}}";
         }
     }
 
@@ -220,6 +240,11 @@ namespace Pliant.Ebnf
             return factor.NodeType == NodeType
                 && factor.Expression.Equals(Expression);
         }
+
+        public override string ToString()
+        {
+            return $"[{Expression}]";
+        }
     }
 
     public class EbnfFactorGrouping : EbnfFactor
@@ -262,6 +287,11 @@ namespace Pliant.Ebnf
                 return false;
             return factor.NodeType == NodeType
                 && factor.Expression.Equals(Expression);
+        }
+
+        public override string ToString()
+        {
+            return $"({Expression})";
         }
     }
 }

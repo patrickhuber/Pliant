@@ -44,6 +44,11 @@ namespace Pliant.Ebnf
             return term.NodeType == NodeType
                 && term.Factor.Equals(Factor);
         }
+
+        public override string ToString()
+        {
+            return Factor.ToString();
+        }
     }
 
     public class EbnfTermConcatenation : EbnfTerm
@@ -90,6 +95,11 @@ namespace Pliant.Ebnf
             return term.NodeType == NodeType
                 && term.Factor.Equals(Factor)
                 && term.Term.Equals(Term);
+        }
+
+        public override string ToString()
+        {
+            return $"{Factor} {Term}";
         }
     }
 }

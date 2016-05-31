@@ -25,7 +25,7 @@ namespace Pliant.Builders
             Definition = new RuleBuilder();
             foreach (var symbolBuilder in symbolBuilders)
                 Definition.AddWithAnd(symbolBuilder);
-
+            
             var alterationBuilder = new AlterationBuilder(Definition);
             return alterationBuilder;
         }

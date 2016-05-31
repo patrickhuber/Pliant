@@ -2,7 +2,46 @@
 
 namespace Pliant.Ebnf
 {
-    public class EbnfExpression : EbnfNode
+    public class EbnfExpressionEmpty: EbnfNode
+    {
+        private readonly int _hashCode;
+
+        public EbnfExpressionEmpty()
+        {
+            _hashCode = ComputeHashCode();
+        }
+
+        public override EbnfNodeType NodeType
+        {
+            get
+            {
+                return EbnfNodeType.EbnfExpressionEmpty;
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if ((object)obj == null)
+                return false;
+            var expression = obj as EbnfExpressionEmpty;
+            if ((object)expression == null)
+                return false;
+            return expression.NodeType == NodeType;
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
+        }
+
+        int ComputeHashCode()
+        {
+            return HashUtil.ComputeHash(
+                NodeType.GetHashCode());
+        }
+    }
+
+    public class EbnfExpression : EbnfExpressionEmpty
     {
         private readonly int _hashCode;
 
@@ -36,7 +75,7 @@ namespace Pliant.Ebnf
         int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
-                NodeType.GetHashCode(), 
+                NodeType.GetHashCode(),
                 Term.GetHashCode());
         }
 
@@ -44,8 +83,13 @@ namespace Pliant.Ebnf
         {
             return _hashCode;
         }
+
+        public override string ToString()
+        {
+            return Term.ToString();
+        }
     }
-    
+
     public class EbnfExpressionAlteration : EbnfExpression
     {
         private readonly int _hashCode;
@@ -92,6 +136,11 @@ namespace Pliant.Ebnf
         public override int GetHashCode()
         {
             return _hashCode;
+        }
+
+        public override string ToString()
+        {
+            return $"{Term} | {Expression}";
         }
     }
 }

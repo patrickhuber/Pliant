@@ -121,8 +121,11 @@ namespace Pliant.Tests.Unit.Ebnf
             var grammar = GenerateGrammar(definition);
             Assert.IsNotNull(grammar);
             Assert.IsNotNull(grammar.Start);
-            Assert.AreEqual(1, grammar.Productions.Count);
-            Assert.AreEqual(1, grammar.Productions[0].RightHandSide.Count);
+            Assert.AreEqual(3, grammar.Productions.Count);
+
+            Assert.AreEqual(2, grammar.Productions[0].RightHandSide.Count);
+            Assert.AreEqual(0, grammar.Productions[1].RightHandSide.Count);
+            Assert.AreEqual(1, grammar.Productions[2].RightHandSide.Count);
         }
 
         [TestMethod]
@@ -143,8 +146,9 @@ namespace Pliant.Tests.Unit.Ebnf
             var grammar = GenerateGrammar(definition);
             Assert.IsNotNull(grammar);
             Assert.IsNotNull(grammar.Start);
-            Assert.AreEqual(1, grammar.Productions.Count);
+            Assert.AreEqual(2, grammar.Productions.Count);
             Assert.AreEqual(1, grammar.Productions[0].RightHandSide.Count);
+            Assert.AreEqual(1, grammar.Productions[1].RightHandSide.Count);
         }
 
 
@@ -168,9 +172,13 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsNotNull(grammar.Start);
             
             ProductionBuilder R = "R";
-            R.Definition = 'a' 
-                |   (_)null;
-            var expectedGrammar = new GrammarBuilder(R, new[] { R }).ToGrammar();
+            ProductionBuilder optA = "[a]";
+
+            R.Definition = optA;
+            optA.Definition = 'a'
+                | (_)null;
+
+            var expectedGrammar = new GrammarBuilder(R, new[] { R, optA }).ToGrammar();
             Assert.AreEqual(expectedGrammar.Productions.Count, grammar.Productions.Count);
         }
 
@@ -202,20 +210,21 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsNotNull(grammar.Start);
 
             ProductionBuilder R = "R";
-            R.Definition =
-                (_)'b' + 'a' + 'c' + 'd'
-                | (_)'b' + 'c' + 'd'
-                | (_)'b' + 'a' + 'c'
-                | (_)'b' + 'a';
+            ProductionBuilder optA = "[a]";
+            ProductionBuilder optD = "[d]";
 
-            var expectedGrammar = new GrammarBuilder(R, new[] { R }).ToGrammar();
+            R.Definition =
+                (_)'b' + optA+ 'c' + optD ;
+            optA.Definition = 'a' | (_)null;
+            optD.Definition = 'd' | (_)null;
+
+            var expectedGrammar = new GrammarBuilder(R).ToGrammar();
             Assert.AreEqual(expectedGrammar.Productions.Count, grammar.Productions.Count);
         }
 
         private static IGrammar GenerateGrammar(EbnfDefinition definition)
         {
-            var strategy = new GuidEbnfProductionNamingStrategy();
-            var generator = new EbnfGrammarGenerator(strategy);
+            var generator = new EbnfGrammarGenerator();
             return generator.Generate(definition);
         }
 
