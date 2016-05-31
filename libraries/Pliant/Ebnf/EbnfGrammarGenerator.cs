@@ -85,7 +85,7 @@ namespace Pliant.Ebnf
             var nonTerminal = new NonTerminal(name);
             var groupingProduction = new ProductionBuilder(nonTerminal);
 
-            AddWithAnd(currentProduction, new SymbolBuilder(nonTerminal));
+            currentProduction.AddWithAnd(new SymbolBuilder(nonTerminal));
 
             var expression = grouping.Expression;           
             foreach (var production in Expression(expression, groupingProduction))
@@ -100,7 +100,7 @@ namespace Pliant.Ebnf
             var nonTerminal = new NonTerminal(name);
             var optionalProduction = new ProductionBuilder(nonTerminal);
 
-            AddWithAnd(currentProduction, new SymbolBuilder(nonTerminal));
+            currentProduction.AddWithAnd(new SymbolBuilder(nonTerminal));
 
             var expression = optional.Expression;
             foreach (var production in Expression(expression, optionalProduction))
@@ -116,13 +116,15 @@ namespace Pliant.Ebnf
             var nonTerminal = new NonTerminal(name);
             var repetitionProduction = new ProductionBuilder(nonTerminal);
 
-            AddWithAnd(currentProduction, new SymbolBuilder(nonTerminal));
+            currentProduction.AddWithAnd(new SymbolBuilder(nonTerminal));
 
             var expression = repetition.Expression;
             foreach (var production in Expression(expression, repetitionProduction))
                 yield return production;
 
-            AddWithAnd(repetitionProduction, new SymbolBuilder(nonTerminal));
+
+            repetitionProduction.AddWithAnd(new SymbolBuilder(nonTerminal));
+
             repetitionProduction.Definition.Lambda();
             yield return repetitionProduction;
         }
@@ -159,13 +161,13 @@ namespace Pliant.Ebnf
                 case EbnfNodeType.EbnfFactorIdentifier:
                     var identifier = factor as EbnfFactorIdentifier;
                     var nonTerminal = GetNonTerminalFromQualifiedIdentifier(identifier.QualifiedIdentifier);                   
-                    AddWithAnd(currentProduction, new SymbolBuilder(nonTerminal));
+                    currentProduction.AddWithAnd(new SymbolBuilder(nonTerminal));
                     break;
 
                 case EbnfNodeType.EbnfFactorLiteral:
                     var literal = factor as EbnfFactorLiteral;
                     var stringLiteralRule = new StringLiteralLexerRule(literal.Value);
-                    AddWithAnd(currentProduction, new SymbolBuilder(stringLiteralRule));
+                    currentProduction.AddWithAnd( new SymbolBuilder(stringLiteralRule));
                     break;
 
                 case EbnfNodeType.EbnfFactorRegex:
@@ -173,20 +175,12 @@ namespace Pliant.Ebnf
                     var nfa = _thompsonConstructionAlgorithm.Transform(regex.Regex);
                     var dfa = _subsetConstructionAlgorithm.Transform(nfa);
                     var dfaLexerRule = new DfaLexerRule(dfa, regex.Regex.ToString());
-                    AddWithAnd(currentProduction, new SymbolBuilder(dfaLexerRule));
+                    currentProduction.AddWithAnd(new SymbolBuilder(dfaLexerRule));
                     break;                
             }
             return new ProductionBuilder[] { };
         }
-
-        private static void AddWithAnd(ProductionBuilder currentProduction, SymbolBuilder symbolBuilder)
-        {
-            if (currentProduction.Definition == null)
-                currentProduction.Definition = new RuleBuilder();
-
-            currentProduction.Definition.AddWithAnd(symbolBuilder);
-        }
-        
+                        
         private static NonTerminal GetNonTerminalFromQualifiedIdentifier(EbnfQualifiedIdentifier qualifiedIdentifier)
         {
             var @namespace = new StringBuilder();
