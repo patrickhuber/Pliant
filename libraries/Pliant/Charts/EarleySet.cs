@@ -9,6 +9,7 @@ namespace Pliant.Charts
         private StateQueue _scans;
         private StateQueue _completions;
         private StateQueue _transitions;
+        private StateQueue _extensions;
 
         public EarleySet(int location)
         {
@@ -16,6 +17,7 @@ namespace Pliant.Charts
             _scans = new StateQueue();
             _completions = new StateQueue();
             _transitions = new StateQueue();
+            _extensions = new StateQueue();
             Location = location;
         }
 
@@ -34,8 +36,7 @@ namespace Pliant.Charts
                 var currentSymbol = state.PostDotSymbol;
                 if (currentSymbol.SymbolType == SymbolType.NonTerminal)
                     return _predictions.Enqueue(state);
-                else
-                    return _scans.Enqueue(state);
+                return _scans.Enqueue(state);
             }
             if (state.StateType == StateType.Transitive)
                 return _transitions.Enqueue(state);

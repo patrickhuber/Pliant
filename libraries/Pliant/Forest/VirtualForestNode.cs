@@ -36,13 +36,16 @@ namespace Pliant.Forest
             _completedParseNode = completedParseNode;
             _children = new ReadWriteList<IAndForestNode>();
             Symbol = targetState.Production.LeftHandSide;
-            var isUniqueSubTreeParseNode = transitionState.Reduction.ParseNode != null
-                && _completedParseNode == transitionState.Reduction.ParseNode
+            if (IsUniqueChildSubTree())
+                CloneUniqueChildSubTree(_completedParseNode as IInternalForestNode);
+        }
+
+        private bool IsUniqueChildSubTree()
+        {
+            return _transitionState.Reduction.ParseNode != null
+                && _completedParseNode == _transitionState.Reduction.ParseNode
                 && (_completedParseNode.NodeType == ForestNodeType.Intermediate
                     || _completedParseNode.NodeType == ForestNodeType.Symbol);
-            if (isUniqueSubTreeParseNode)            
-                CloneUniqueChildSubTree(_completedParseNode as IInternalForestNode);
-            
         }
 
         private void CloneUniqueChildSubTree(IInternalForestNode internalCompletedParseNode)

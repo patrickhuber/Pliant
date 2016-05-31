@@ -25,13 +25,20 @@ namespace Pliant.Builders
             Definition = new RuleBuilder();
             foreach (var symbolBuilder in symbolBuilders)
                 Definition.AddWithAnd(symbolBuilder);
-
+            
             var alterationBuilder = new AlterationBuilder(Definition);
             return alterationBuilder;
         }
 
         public RuleBuilder Definition { get; set; }
-        
+
+        public void AddWithAnd(SymbolBuilder symbolBuilder)
+        {
+            if (Definition == null)
+                Definition = new RuleBuilder();
+            Definition.AddWithAnd(symbolBuilder);
+        }
+
         public IEnumerable<IProduction> ToProductions()
         {
             foreach (var builderList in Definition.Data)

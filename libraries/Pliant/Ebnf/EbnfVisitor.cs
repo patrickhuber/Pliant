@@ -260,7 +260,7 @@ namespace Pliant.Ebnf
             throw UnreachableCodeException();
         }
 
-        private string VisitLiteralNode(IInternalTreeNode node)
+        private static string VisitLiteralNode(IInternalTreeNode node)
         {
             foreach(var child in node.Children)
                 switch (child.NodeType)
@@ -370,7 +370,7 @@ namespace Pliant.Ebnf
             return new EbnfLexerRuleTermConcatenation(factor, term);
         }
 
-        private EbnfLexerRuleFactor VisitLexerRuleFactorNode(IInternalTreeNode node)
+        private static EbnfLexerRuleFactor VisitLexerRuleFactorNode(IInternalTreeNode node)
         {
             foreach (var child in node.Children)
             {

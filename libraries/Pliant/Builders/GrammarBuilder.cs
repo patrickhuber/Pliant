@@ -175,7 +175,7 @@ namespace Pliant.Builders
                 throw new Exception("no start production found for start symbol");
         }
 
-        private INonTerminal GetStartSymbolFromReachibiltyMatrix(IDictionary<INonTerminal, ISet<INonTerminal>> reachibiltyMatrix)
+        private static INonTerminal GetStartSymbolFromReachibiltyMatrix(IDictionary<INonTerminal, ISet<INonTerminal>> reachibiltyMatrix)
         {
             foreach (var leftHandSide in reachibiltyMatrix.Keys)
             {

@@ -91,18 +91,17 @@
     <Compile Include="Tree\TreeNodeTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj">
-      <Project>{5c23805f-0ffc-4039-b853-e5acbe63a3c0}</Project>
-      <Name>Pliant</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="App.config" />
     <None Include="Bnf\AnsiC.bnf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj">
+      <Project>{5c23805f-0ffc-4039-b853-e5acbe63a3c0}</Project>
+      <Name>Pliant</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

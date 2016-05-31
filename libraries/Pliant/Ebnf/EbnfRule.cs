@@ -48,5 +48,10 @@ namespace Pliant.Ebnf
                 && rule.QualifiedIdentifier.Equals(QualifiedIdentifier)
                 && rule.Expression.Equals(Expression);
         }
+
+        public override string ToString()
+        {
+            return $"{QualifiedIdentifier} = {Expression}";
+        }
     }
 }
