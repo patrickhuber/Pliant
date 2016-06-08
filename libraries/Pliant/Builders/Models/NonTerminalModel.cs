@@ -17,6 +17,11 @@ namespace Pliant.Builders.Models
         {
         }
 
+        public NonTerminalModel(FullyQualifiedName fullyQualifiedName)
+            : this(new NonTerminal(fullyQualifiedName.Namespace, fullyQualifiedName.Name))
+        {
+        }
+
         public override SymbolModelType ModelType
         {
             get { return SymbolModelType.NonTerminal; }

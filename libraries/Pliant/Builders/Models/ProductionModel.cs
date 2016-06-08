@@ -31,6 +31,11 @@ namespace Pliant.Builders.Models
         {
         }
 
+        public ProductionModel(FullyQualifiedName fullyQualifiedName)
+            : this(new NonTerminalModel(fullyQualifiedName))
+        {
+        }
+
         public IEnumerable<IProduction> ToProductions()
         {
             foreach (var alteration in Alterations)

@@ -32,13 +32,6 @@ namespace Pliant.Builders
 
         public RuleBuilder Definition { get; set; }
 
-        public void AddWithAnd(SymbolBuilder symbolBuilder)
-        {
-            if (Definition == null)
-                Definition = new RuleBuilder();
-            Definition.AddWithAnd(symbolBuilder);
-        }
-
         public IEnumerable<IProduction> ToProductions()
         {
             foreach (var builderList in Definition.Data)

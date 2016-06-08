@@ -33,33 +33,6 @@ namespace Pliant.Builders
             Data[Data.Count - 1].Add(symbolBuilder);
         }
 
-        public void AddWithOr(BaseBuilder symbolBuilder)
-        {
-            var list = new BaseBuilderList();
-            list.Add(symbolBuilder);
-            Data.Add(list);
-        }
-
-        public void AddOptional(ISymbol symbol)
-        {
-            var newData = new List<BaseBuilderList>();
-            foreach (var list in Data)
-            {
-                // clone each window list
-                var listWithSymbol = new BaseBuilderList();
-                listWithSymbol.AddRange(list);
-
-                // add the symbol to the clone
-                listWithSymbol.Add(new SymbolBuilder(symbol));
-
-                // add the listWithSymbol to the aggregate of new data
-                newData.Add(listWithSymbol);
-            }
-
-            // add the new data to the list of existing data
-            Data.AddRange(newData);
-        }
-
         public IRuleBuilder Rule(params object[] symbols)
         {
             var symbolList = new BaseBuilderList();
