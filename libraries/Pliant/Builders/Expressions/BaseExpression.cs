@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Builders.Models;
+using Pliant.Grammars;
 using System;
 using System.Collections.Generic;
 
@@ -13,12 +14,12 @@ namespace Pliant.Builders.Expressions
 
         public static RuleExpression operator +(string lhs, BaseExpression rhs)
         {
-            return AddWithAnd(new SymbolExpression(new StringLiteralLexerRule(lhs)), rhs);
+            return AddWithAnd(new StringLiteralLexerRule(lhs), rhs);
         }
 
         public static RuleExpression operator +(BaseExpression lhs, string rhs)
         {
-            return AddWithAnd(lhs, new SymbolExpression(new StringLiteralLexerRule(rhs)));
+            return AddWithAnd(lhs, new StringLiteralLexerRule(rhs));
         }
 
         public static RuleExpression operator +(char lhs, BaseExpression rhs)
@@ -58,12 +59,12 @@ namespace Pliant.Builders.Expressions
 
         private static RuleExpression AddWithAnd(BaseLexerRule lhs, BaseExpression rhs)
         {
-            return AddWithAnd(new SymbolExpression(lhs), rhs);
+            return AddWithAnd(new SymbolExpression(new LexerRuleModel(lhs)), rhs);
         }
 
         private static RuleExpression AddWithAnd(BaseExpression lhs, BaseLexerRule rhs)
         {
-            return AddWithAnd(lhs, new SymbolExpression(rhs));
+            return AddWithAnd(lhs, new SymbolExpression(new LexerRuleModel(rhs)));
         }
 
         private static RuleExpression AddWithAnd(BaseExpression lhs, BaseExpression rhs)
@@ -75,12 +76,12 @@ namespace Pliant.Builders.Expressions
 
         private static RuleExpression AddWithOr(BaseLexerRule lhs, BaseExpression rhs)
         {
-            return AddWithOr(new SymbolExpression(lhs), rhs);
+            return AddWithOr(new SymbolExpression(new LexerRuleModel(lhs)), rhs);
         }
 
         private static RuleExpression AddWithOr(BaseExpression lhs, BaseLexerRule rhs)
         {
-            return AddWithOr(lhs, new SymbolExpression(rhs));
+            return AddWithOr(lhs, new SymbolExpression(new LexerRuleModel(rhs)));
         }
 
         private static RuleExpression AddWithOr(BaseExpression lhs, BaseExpression rhs)

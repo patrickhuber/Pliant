@@ -10,13 +10,6 @@ namespace Pliant.Builders.Expressions
         public SymbolExpression(SymbolModel symbolModel)
         {
             SymbolModel = symbolModel;
-        }
-
-        public SymbolExpression(ILexerRule symbol)
-            : this(new LexerRuleModel(symbol))
-        {
-        }
-
-
+        }        
     }
 }
