@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="Builders\Expressions\BaseExpression.cs" />
     <Compile Include="Builders\Expressions\Expr.cs" />
+    <Compile Include="Builders\Expressions\NamespaceExpression.cs" />
     <Compile Include="Builders\Expressions\ProductionExpression.cs" />
     <Compile Include="Builders\Expressions\RuleExpression.cs" />
     <Compile Include="Builders\Expressions\SymbolExpression.cs" />
