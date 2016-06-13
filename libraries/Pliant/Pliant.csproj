@@ -39,8 +39,10 @@
   <ItemGroup>
     <Compile Include="Builders\Expressions\BaseExpression.cs" />
     <Compile Include="Builders\Expressions\Expr.cs" />
+    <Compile Include="Builders\Expressions\GrammarExpression.cs" />
     <Compile Include="Builders\Expressions\NamespaceExpression.cs" />
     <Compile Include="Builders\Expressions\ProductionExpression.cs" />
+    <Compile Include="Builders\Expressions\ProductionReferenceExpression.cs" />
     <Compile Include="Builders\Expressions\RuleExpression.cs" />
     <Compile Include="Builders\Expressions\SymbolExpression.cs" />
     <Compile Include="Builders\Fluent\FluentAlterationBuilder.cs" />
@@ -52,6 +54,7 @@
     <Compile Include="Builders\Models\NonTerminalModel.cs" />
     <Compile Include="Builders\Models\ProductionModel.cs" />
     <Compile Include="Builders\Models\LexerRuleModel.cs" />
+    <Compile Include="Builders\Models\ProductionReferenceModel.cs" />
     <Compile Include="Builders\Models\ReachibilityMatrix.cs" />
     <Compile Include="Builders\Models\SymbolModel.cs" />
     <Compile Include="Builders\Models\SymbolModelType.cs" />
@@ -62,7 +65,7 @@
     <Compile Include="Automata\SubsetConstructionAlgorithm.cs" />
     <Compile Include="Builders\BaseBuilder.cs" />
     <Compile Include="Builders\BaseBuilderList.cs" />
-    <Compile Include="Builders\ProductionReference.cs" />
+    <Compile Include="Builders\ProductionReferenceBuilder.cs" />
     <Compile Include="Collections\IQueue.cs" />
     <Compile Include="Collections\ProcessOnceQueue.cs" />
     <Compile Include="Ebnf\EbnfBlock.cs" />

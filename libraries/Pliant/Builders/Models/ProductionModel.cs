@@ -42,7 +42,15 @@ namespace Pliant.Builders.Models
             {
                 var symbols = new List<ISymbol>();
                 foreach (var symbolModel in alteration.Symbols)
+                {
                     symbols.Add(symbolModel.Symbol);
+                    if (symbolModel.ModelType == SymbolModelType.Reference)
+                    {
+                        var productionReferenceModel = symbolModel as ProductionReferenceModel;
+                        foreach (var production in productionReferenceModel.Grammar.Productions)
+                            yield return production;
+                    }
+                }
                 yield return new Production(LeftHandSide.Value, symbols);
             }
         }

@@ -75,10 +75,10 @@ namespace Pliant.Builders
                         TraverseAndAddProductions(
                             builder as ProductionBuilder,
                             discoveredProductions);
-                    else if (builder is ProductionReference)
+                    else if (builder is ProductionReferenceBuilder)
                     {
                         AddReferencedProduction(
-                            builder as ProductionReference,
+                            builder as ProductionReferenceBuilder,
                             discoveredProductions);
                     }
                 }
@@ -86,7 +86,7 @@ namespace Pliant.Builders
         }
 
         private void AddReferencedProduction(
-            ProductionReference productionReference, 
+            ProductionReferenceBuilder productionReference, 
             ISet<ProductionBuilder> discoveredProductions)
         {
             foreach (var production in productionReference.Grammar.Productions)

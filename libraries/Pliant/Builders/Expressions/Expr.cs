@@ -42,5 +42,10 @@ namespace Pliant.Builders.Expressions
                     new LexerRuleModel(
                         new TerminalLexerRule(value, value.ToString()))));
         }
+
+        public static explicit operator Expr(ProductionExpression productionExpression)
+        {
+            return new Expr(productionExpression);
+        }
     }
 }

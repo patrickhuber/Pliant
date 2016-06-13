@@ -11,7 +11,8 @@ namespace Pliant.Tests.Unit.Builders.Models
         public void GrammarModelShouldAddProductionModel()
         {
             var grammar = new GrammarModel();
-            grammar.Productions.Add(new ProductionModel());
+            grammar.Productions.Add(
+                new ProductionModel(""));
             Assert.AreEqual(1, grammar.Productions.Count);
         }
 
@@ -48,7 +49,7 @@ namespace Pliant.Tests.Unit.Builders.Models
 
             grammarModel.IgnoreRules.Add(new LexerRuleModel(space));
 
-            grammarModel.Start = S.LeftHandSide;
+            grammarModel.Start = S;
 
             var grammar = grammarModel.ToGrammar();
             Assert.AreEqual(4, grammar.Productions.Count);            

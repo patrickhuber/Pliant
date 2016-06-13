@@ -33,6 +33,7 @@ namespace Pliant.Builders.Expressions
         {
             set
             {
+                ProductionModel.Alterations.Clear();
                 foreach (var alteration in value.Alterations)
                     ProductionModel.Alterations.Add(
                         GetAlterationModelFromAlterationExpression(alteration));
@@ -55,6 +56,12 @@ namespace Pliant.Builders.Expressions
                     var symbolExpression = symbol as SymbolExpression;
                     alterationModel.Symbols.Add(
                         symbolExpression.SymbolModel);
+                }
+                else if (symbol is ProductionReferenceExpression)
+                {
+                    var productionReferenceExpression = symbol as ProductionReferenceExpression;
+                    alterationModel.Symbols.Add(
+                        productionReferenceExpression.ProductionReferenceModel);
                 }
             }
             return alterationModel;

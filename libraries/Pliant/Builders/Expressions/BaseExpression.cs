@@ -32,6 +32,16 @@ namespace Pliant.Builders.Expressions
             return AddWithAnd(lhs, new TerminalLexerRule(rhs));
         }
 
+        public static RuleExpression operator +(BaseExpression lhs, BaseLexerRule rhs)
+        {
+            return AddWithAnd(lhs, rhs);
+        }
+
+        public static RuleExpression operator +(BaseLexerRule lhs, BaseExpression rhs)
+        {
+            return AddWithAnd(lhs, rhs);
+        }
+
         public static RuleExpression operator |(BaseExpression lhs, BaseExpression rhs)
         {
             return AddWithOr(lhs, rhs);
@@ -55,6 +65,16 @@ namespace Pliant.Builders.Expressions
         public static RuleExpression operator |(BaseExpression lhs, char rhs)
         {
             return AddWithOr(lhs, new TerminalLexerRule(rhs));
+        }
+
+        public static RuleExpression operator |(BaseExpression lhs, BaseLexerRule rhs)
+        {
+            return AddWithOr(lhs, rhs);
+        }
+
+        public static RuleExpression operator |(BaseLexerRule lhs, BaseExpression rhs)
+        {
+            return AddWithOr(lhs, rhs);
         }
 
         private static RuleExpression AddWithAnd(BaseLexerRule lhs, BaseExpression rhs)

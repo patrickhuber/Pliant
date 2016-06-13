@@ -62,5 +62,10 @@ namespace Pliant.Builders.Expressions
                     new LexerRuleModel(
                         new TerminalLexerRule(baseTerminal, baseTerminal.ToString()))));
         }
+
+        public static implicit operator RuleExpression(ProductionReferenceExpression productionReference)
+        {
+            return new RuleExpression(productionReference);
+        }
     }
 }

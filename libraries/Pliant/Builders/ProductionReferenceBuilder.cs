@@ -1,25 +1,21 @@
 ﻿using Pliant.Grammars;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pliant.Builders
 {
-    public class ProductionReference : BaseBuilder
+    public class ProductionReferenceBuilder : BaseBuilder
     {
         public IGrammar Grammar { get; private set; }
         public INonTerminal Reference { get; private set; }
         public override ISymbol Symbol { get { return Reference; } }
 
-        public ProductionReference(IGrammar grammar)
+        public ProductionReferenceBuilder(IGrammar grammar)
         {
             Grammar = grammar;
             Reference = grammar.Start;
         }
 
-        public ProductionReference(IGrammar grammar, INonTerminal reference)
+        public ProductionReferenceBuilder(IGrammar grammar, INonTerminal reference)
         {
             ValidateParamters(grammar, reference);
             Grammar = grammar;

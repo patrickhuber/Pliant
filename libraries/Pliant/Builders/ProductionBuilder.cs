@@ -49,9 +49,9 @@ namespace Pliant.Builders
                         var productionBuilder = baseBuilder as ProductionBuilder;
                         symbolList.Add(productionBuilder.LeftHandSide);
                     }
-                    else if (baseBuilder is ProductionReference)
+                    else if (baseBuilder is ProductionReferenceBuilder)
                     {
-                        var productionReference = baseBuilder as ProductionReference;
+                        var productionReference = baseBuilder as ProductionReferenceBuilder;
                         symbolList.Add(productionReference.Reference);
                     }
                 }

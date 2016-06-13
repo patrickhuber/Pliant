@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders.Expressions;
+using Pliant.Grammars;
 
 namespace Pliant.Tests.Unit.Builders.Expressions
 {
@@ -306,6 +307,37 @@ namespace Pliant.Tests.Unit.Builders.Expressions
             Assert.IsNotNull(B.ProductionModel);
             Assert.AreEqual(1, B.ProductionModel.Alterations.Count);
             Assert.AreEqual(1, B.ProductionModel.Alterations[0].Symbols.Count);
+        }
+
+        [TestMethod]
+        public void ProductionExpressionShouldSupportConcatenationOfTwoBaseLexerRules()
+        {
+            ProductionExpression
+                S = "S";
+            BaseLexerRule 
+                a = new StringLiteralLexerRule("a"),
+                b = new StringLiteralLexerRule("b");
+            S.Rule = (Expr) a + b;
+
+            Assert.IsNotNull(S.ProductionModel);
+            Assert.AreEqual(1, S.ProductionModel.Alterations.Count);
+            Assert.AreEqual(2, S.ProductionModel.Alterations[0].Symbols.Count);
+        }
+
+        [TestMethod]
+        public void ProductionExpressionShouldSupportAlterationOfTwoBaseLexerRules()
+        {
+            ProductionExpression
+                S = "S";
+            BaseLexerRule
+                a = new StringLiteralLexerRule("a"),
+                b = new StringLiteralLexerRule("b");
+            S.Rule = (Expr)a | b;
+
+            Assert.IsNotNull(S.ProductionModel);
+            Assert.AreEqual(2, S.ProductionModel.Alterations.Count);
+            Assert.AreEqual(1, S.ProductionModel.Alterations[0].Symbols.Count);
+            Assert.AreEqual(1, S.ProductionModel.Alterations[1].Symbols.Count);
         }
     }
 }

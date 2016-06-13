@@ -112,7 +112,7 @@ namespace Pliant.Tests.Unit
             A.Definition = 'a';
 
             var ns1Grammar = new GrammarBuilder(S).ToGrammar();
-            var ns1ProductionReference = new ProductionReference(ns1Grammar);
+            var ns1ProductionReference = new ProductionReferenceBuilder(ns1Grammar);
 
             // namespace2.Z -> namesapce2.X namespace1.S
             NamespaceBuilder ns2 = "namespace2";
@@ -136,7 +136,7 @@ namespace Pliant.Tests.Unit
         public void GrammarBuilderGivenReferenceGrammarShouldGenerateWorkingGrammar()
         {
             var regexGrammar = new RegexGrammar();
-            var regexProductionReference = new ProductionReference(regexGrammar);
+            var regexProductionReference = new ProductionReferenceBuilder(regexGrammar);
             ProductionBuilder S = "S";
             S.Definition = regexProductionReference;
             var grammarBuilder = new GrammarBuilder();

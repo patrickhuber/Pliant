@@ -1,21 +1,74 @@
 ﻿using Pliant.Grammars;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Collections;
 
 namespace Pliant.Builders.Models
 {
     public class GrammarModel
     {
-        public ICollection<ProductionModel> Productions { get; private set; }
+        private ObservableCollection<ProductionModel> _productions;
+
+        public ICollection<ProductionModel> Productions { get { return _productions; } }
 
         public ICollection<LexerRuleModel> IgnoreRules { get; private set; }
 
-        public NonTerminalModel Start { get; set; }
+        public ProductionModel Start { get; set; }
+
+        private ReachibilityMatrix _reachibilityMatrix;
 
         public GrammarModel()
         {
-            Productions = new List<ProductionModel>();
+            _productions = new ObservableCollection<ProductionModel>();
+            _productions.CollectionChanged += CollectionChanged;
+            _reachibilityMatrix = new ReachibilityMatrix();
             IgnoreRules = new List<LexerRuleModel>();
+        }
+
+        void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach(object item in e.NewItems)
+                        if(item is ProductionModel)
+                            OnAddProduction(item as ProductionModel);
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (object item in e.NewItems)
+                        if (item is ProductionModel)
+                            OnRemoveProduction(item as ProductionModel);
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    OnResetProductions();
+                    break;
+            }
+        }
+
+        private void OnRemoveProduction(ProductionModel productionModel)
+        {
+            _reachibilityMatrix.RemoveProduction(productionModel);
+        }
+
+        private void OnAddProduction(ProductionModel productionModel)
+        {
+            _reachibilityMatrix.AddProduction(productionModel);
+        }
+
+        public void OnResetProductions()
+        {
+            Start = null;
+            _reachibilityMatrix.ClearProductions();
         }
 
         public IGrammar ToGrammar()
@@ -23,7 +76,7 @@ namespace Pliant.Builders.Models
             ValidateOrAssignStartSymbol();
             var productions = GetProductionsFromProductionsModel();
             var ignoreRules = GetIgnoreRulesFromIgnoreRulesModel();
-            return new Grammar(Start.Value, productions, ignoreRules);
+            return new Grammar(Start.LeftHandSide.Value, productions, ignoreRules);
         }
 
         private List<IProduction> GetProductionsFromProductionsModel()
@@ -45,16 +98,15 @@ namespace Pliant.Builders.Models
 
         private void ValidateOrAssignStartSymbol()
         {
-            var reachibilityMatrix = new ReachibilityMatrix(Productions);
             if (StartSymbolExists())
-                AssertStartProductionExistsForStartSymbol(reachibilityMatrix);
+                AssertStartProductionExistsForStartSymbol(_reachibilityMatrix);
             else
-                Start = reachibilityMatrix.GetStartSymbol();
+                Start = _reachibilityMatrix.GetStartProduction();
         }
 
         private void AssertStartProductionExistsForStartSymbol(ReachibilityMatrix reachibilityMatrix)
         {
-            if (!reachibilityMatrix.ProudctionExistsForSymbol(Start))
+            if (!reachibilityMatrix.ProudctionExistsForSymbol(Start.LeftHandSide))
                 throw new Exception("no start production found for start symbol");
         }
 
