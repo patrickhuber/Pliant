@@ -26,7 +26,7 @@ namespace Pliant.Builders.Models
             _reachibilityMatrix = new ReachibilityMatrix();
             IgnoreRules = new List<LexerRuleModel>();
         }
-
+        
         void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)

@@ -129,28 +129,29 @@ namespace Pliant.Ebnf
                 literal
                 | '/' + regexProductionReference + '/';
 
-            var grammarModel = new GrammarModel();
-            grammarModel.Start = definition.ProductionModel;
-
-            grammarModel.Productions.Add(definition.ProductionModel);
-            grammarModel.Productions.Add(block.ProductionModel);
-            grammarModel.Productions.Add(rule.ProductionModel);
-            grammarModel.Productions.Add(setting.ProductionModel);
-            grammarModel.Productions.Add(lexerRule.ProductionModel);
-            grammarModel.Productions.Add(expression.ProductionModel);
-            grammarModel.Productions.Add(term.ProductionModel);
-            grammarModel.Productions.Add(factor.ProductionModel);
-            grammarModel.Productions.Add(literal.ProductionModel);
-            grammarModel.Productions.Add(repetition.ProductionModel);
-            grammarModel.Productions.Add(optional.ProductionModel);
-            grammarModel.Productions.Add(grouping.ProductionModel);
-            grammarModel.Productions.Add(qualifiedIdentifier.ProductionModel);
-            grammarModel.Productions.Add(lexerRuleExpression.ProductionModel);
-            grammarModel.Productions.Add(lexerRuleTerm.ProductionModel);
-            grammarModel.Productions.Add(lexerRuleFactor.ProductionModel);
-
-            grammarModel.IgnoreRules.Add(new LexerRuleModel(whitespace));
-            _ebnfGrammar = grammarModel.ToGrammar();
+            var grammarExpression = new GrammarExpression(
+                definition, 
+                new[] 
+                {
+                    definition,
+                    block,
+                    rule,
+                    setting,
+                    lexerRule,
+                    expression,
+                    term,
+                    factor,
+                    literal,
+                    repetition,
+                    optional,
+                    grouping,
+                    qualifiedIdentifier, 
+                    lexerRuleExpression,
+                    lexerRuleTerm,
+                    lexerRuleFactor
+                }, 
+                new[] { new LexerRuleModel(whitespace) });
+            _ebnfGrammar = grammarExpression.ToGrammar();
         }
 
         private static BaseLexerRule CreateEscapeCharacterLexerRule()

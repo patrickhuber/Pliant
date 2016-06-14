@@ -1,10 +1,6 @@
 ﻿using Pliant.Builders.Models;
 using Pliant.Grammars;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pliant.Builders.Expressions
 {
@@ -14,15 +10,21 @@ namespace Pliant.Builders.Expressions
 
         public GrammarExpression(
             ProductionExpression start, 
-            IEnumerable<ProductionExpression> productions, 
-            IEnumerable<LexerRuleModel> ignore)
+            IEnumerable<ProductionExpression> productions = null, 
+            IEnumerable<LexerRuleModel> ignore = null)
         {
-            GrammarModel = new GrammarModel();
-            GrammarModel.Start = start.ProductionModel;
-            foreach (var production in productions)
-                GrammarModel.Productions.Add(production.ProductionModel);
-            foreach (var ignoreRule in ignore)
-                GrammarModel.IgnoreRules.Add(ignoreRule);
+            GrammarModel = new GrammarModel
+            {
+                Start = start.ProductionModel
+            };
+
+            if(productions != null)
+                foreach (var production in productions)
+                    GrammarModel.Productions.Add(production.ProductionModel);
+
+            if(ignore != null)
+                foreach (var ignoreRule in ignore)
+                    GrammarModel.IgnoreRules.Add(ignoreRule);
         }
 
         public IGrammar ToGrammar()
