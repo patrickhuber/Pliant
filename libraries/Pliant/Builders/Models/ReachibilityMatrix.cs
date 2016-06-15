@@ -30,11 +30,11 @@ namespace Pliant.Builders.Models
 
         public void AddProduction(ProductionModel production)
         {
-            if (!_matrix.ContainsKey(production.LeftHandSide.Value))
-                _matrix[production.LeftHandSide.Value] = new HashSet<NonTerminalModel>();
+            if (!_matrix.ContainsKey(production.LeftHandSide.NonTerminal))
+                _matrix[production.LeftHandSide.NonTerminal] = new HashSet<NonTerminalModel>();
 
-            if (!_lookup.ContainsKey(production.LeftHandSide.Value))
-                _lookup[production.LeftHandSide.Value] = production;
+            if (!_lookup.ContainsKey(production.LeftHandSide.NonTerminal))
+                _lookup[production.LeftHandSide.NonTerminal] = production;
 
             foreach (var alteration in production.Alterations)
             {
@@ -62,10 +62,10 @@ namespace Pliant.Builders.Models
 
         public void RemoveProduction(ProductionModel productionModel)
         {
-            if (!_matrix.ContainsKey(productionModel.LeftHandSide.Value))
-                _matrix.Remove(productionModel.LeftHandSide.Value);
-            if (!_lookup.ContainsKey(productionModel.LeftHandSide.Value))
-                _lookup.Remove(productionModel.LeftHandSide.Value);
+            if (!_matrix.ContainsKey(productionModel.LeftHandSide.NonTerminal))
+                _matrix.Remove(productionModel.LeftHandSide.NonTerminal);
+            if (!_lookup.ContainsKey(productionModel.LeftHandSide.NonTerminal))
+                _lookup.Remove(productionModel.LeftHandSide.NonTerminal);
         }
 
         public void ClearProductions()
@@ -87,7 +87,7 @@ namespace Pliant.Builders.Models
 
         public bool ProudctionExistsForSymbol(NonTerminalModel nonTerminalModel)
         {
-            return _matrix.ContainsKey(nonTerminalModel.Value);
+            return _matrix.ContainsKey(nonTerminalModel.NonTerminal);
         }
     }
 }

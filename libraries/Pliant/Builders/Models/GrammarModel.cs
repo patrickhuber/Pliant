@@ -76,7 +76,7 @@ namespace Pliant.Builders.Models
             ValidateOrAssignStartSymbol();
             var productions = GetProductionsFromProductionsModel();
             var ignoreRules = GetIgnoreRulesFromIgnoreRulesModel();
-            return new Grammar(Start.LeftHandSide.Value, productions, ignoreRules);
+            return new Grammar(Start.LeftHandSide.NonTerminal, productions, ignoreRules);
         }
 
         private List<IProduction> GetProductionsFromProductionsModel()

@@ -16,7 +16,7 @@ namespace Pliant.Builders.Models
 
         public override ISymbol Symbol
         {
-            get { return LeftHandSide.Value; }
+            get { return LeftHandSide.NonTerminal; }
         }
 
         public ProductionModel()
@@ -49,7 +49,7 @@ namespace Pliant.Builders.Models
         public IEnumerable<IProduction> ToProductions()
         {
             if (Alterations == null || Alterations.Count == 0)
-                yield return new Production(LeftHandSide.Value);
+                yield return new Production(LeftHandSide.NonTerminal);
 
             foreach (var alteration in Alterations)
             {
@@ -64,7 +64,7 @@ namespace Pliant.Builders.Models
                             yield return production;
                     }
                 }
-                yield return new Production(LeftHandSide.Value, symbols);
+                yield return new Production(LeftHandSide.NonTerminal, symbols);
             }
         }
 

@@ -441,5 +441,14 @@ namespace Pliant.Tests.Unit.Builders.Expressions
             Assert.AreEqual(1, S.ProductionModel.Alterations[0].Symbols.Count);
             Assert.AreEqual(1, S.ProductionModel.Alterations[1].Symbols.Count);
         }
+
+        [TestMethod]
+        public void ProductionExpressionShouldSupportNullRuleBody()
+        {
+            ProductionExpression
+                S = "S";
+
+            S.Rule = (Expr)null;
+        }
     }
 }

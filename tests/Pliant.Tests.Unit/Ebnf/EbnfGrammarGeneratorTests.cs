@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders;
 using Pliant.Ebnf;
 using Pliant.Grammars;
+using Pliant.Builders.Expressions;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
@@ -171,14 +172,15 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsNotNull(grammar);
             Assert.IsNotNull(grammar.Start);
             
-            ProductionBuilder R = "R";
-            ProductionBuilder optA = "[a]";
+            ProductionExpression 
+                R = "R",
+                optA = "[a]";
 
-            R.Definition = optA;
-            optA.Definition = 'a'
-                | (_)null;
+            R.Rule = optA;
+            optA.Rule = 'a'
+                | (Expr)null;
 
-            var expectedGrammar = new GrammarBuilder(R, new[] { R, optA }).ToGrammar();
+            var expectedGrammar = new GrammarExpression(R, new[] { R, optA }).ToGrammar();
             Assert.AreEqual(expectedGrammar.Productions.Count, grammar.Productions.Count);
         }
 
@@ -209,16 +211,17 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsNotNull(grammar);
             Assert.IsNotNull(grammar.Start);
 
-            ProductionBuilder R = "R";
-            ProductionBuilder optA = "[a]";
-            ProductionBuilder optD = "[d]";
+            ProductionExpression 
+                R = "R",
+                optA = "[a]",
+                optD = "[d]";
 
-            R.Definition =
-                (_)'b' + optA+ 'c' + optD ;
-            optA.Definition = 'a' | (_)null;
-            optD.Definition = 'd' | (_)null;
+            R.Rule =
+                (Expr)'b' + optA + 'c' + optD ;
+            optA.Rule = 'a' | (Expr)null;
+            optD.Rule = 'd' | (Expr)null;
 
-            var expectedGrammar = new GrammarBuilder(R).ToGrammar();
+            var expectedGrammar = new GrammarExpression(R, new[] { R, optA, optD }).ToGrammar();
             Assert.AreEqual(expectedGrammar.Productions.Count, grammar.Productions.Count);
         }
 

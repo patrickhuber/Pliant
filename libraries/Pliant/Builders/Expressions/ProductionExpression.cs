@@ -33,6 +33,8 @@ namespace Pliant.Builders.Expressions
             set
             {
                 ProductionModel.Alterations.Clear();
+                if (value == null)
+                    return;
                 foreach (var alteration in value.Alterations)
                     ProductionModel.Alterations.Add(
                         GetAlterationModelFromAlterationExpression(alteration));

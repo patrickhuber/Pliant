@@ -9,7 +9,7 @@ namespace Pliant.Builders.Models
 
         public NonTerminalModel(INonTerminal value)
         {
-            Value = value;
+            NonTerminal = value;
         }
 
         public NonTerminalModel(string value)
@@ -27,13 +27,13 @@ namespace Pliant.Builders.Models
             get { return SymbolModelType.NonTerminal; }
         }
 
-        public override ISymbol Symbol { get { return Value; } }
+        public override ISymbol Symbol { get { return NonTerminal; } }
 
-        public INonTerminal Value { get; set; }
+        public INonTerminal NonTerminal { get; set; }
 
         public override int GetHashCode()
         {
-            return Value.GetHashCode();
+            return NonTerminal.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -43,12 +43,12 @@ namespace Pliant.Builders.Models
             var nonTerminalModel = obj as NonTerminalModel;
             if (null == nonTerminalModel)
                 return false;
-            return Value.Equals(nonTerminalModel.Value);
+            return NonTerminal.Equals(nonTerminalModel.NonTerminal);
         }
 
         public override string ToString()
         {
-            return Value.ToString();
+            return NonTerminal.ToString();
         }
     }
 }
