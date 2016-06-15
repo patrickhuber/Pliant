@@ -325,6 +325,20 @@ namespace Pliant.Tests.Unit.Builders.Expressions
         }
 
         [TestMethod]
+        public void ProductionExpressionShouldSupportConcatenationOfLexerRuleAndString()
+        {
+            ProductionExpression
+                S = "S";
+            BaseLexerRule
+                a = new StringLiteralLexerRule("a");
+            S.Rule = a + (Expr)"s";
+
+            Assert.IsNotNull(S.ProductionModel);
+            Assert.AreEqual(1, S.ProductionModel.Alterations.Count);
+            Assert.AreEqual(2, S.ProductionModel.Alterations[0].Symbols.Count);
+        }
+
+        [TestMethod]
         public void ProductionExpressionShouldSupportAlterationOfTwoBaseLexerRules()
         {
             ProductionExpression
@@ -333,6 +347,94 @@ namespace Pliant.Tests.Unit.Builders.Expressions
                 a = new StringLiteralLexerRule("a"),
                 b = new StringLiteralLexerRule("b");
             S.Rule = (Expr)a | b;
+
+            Assert.IsNotNull(S.ProductionModel);
+            Assert.AreEqual(2, S.ProductionModel.Alterations.Count);
+            Assert.AreEqual(1, S.ProductionModel.Alterations[0].Symbols.Count);
+            Assert.AreEqual(1, S.ProductionModel.Alterations[1].Symbols.Count);
+        }
+
+        [TestMethod]
+        public void ProductionExpressionShouldSupportAlterationOfLexerRuleAndString()
+        {
+            ProductionExpression
+                S = "S";
+            BaseLexerRule
+                a = new StringLiteralLexerRule("a");
+            S.Rule = a | (Expr)"b";
+
+            Assert.IsNotNull(S.ProductionModel);
+            Assert.AreEqual(2, S.ProductionModel.Alterations.Count);
+            Assert.AreEqual(1, S.ProductionModel.Alterations[0].Symbols.Count);
+            Assert.AreEqual(1, S.ProductionModel.Alterations[1].Symbols.Count);
+        }
+
+        [TestMethod]
+        public void ProductionExpressionShouldSupportAlterationOfStringAndLexerRule()
+        {
+            ProductionExpression
+                S = "S";
+            BaseLexerRule
+                a = new StringLiteralLexerRule("a");
+            S.Rule = (Expr)"b" | a;
+
+            Assert.IsNotNull(S.ProductionModel);
+            Assert.AreEqual(2, S.ProductionModel.Alterations.Count);
+            Assert.AreEqual(1, S.ProductionModel.Alterations[0].Symbols.Count);
+            Assert.AreEqual(1, S.ProductionModel.Alterations[1].Symbols.Count);
+        }
+
+        [TestMethod]
+        public void ProductionExpressionShouldSupportConcatenationOfTerminalAndString()
+        {
+            ProductionExpression
+                S = "S";
+            BaseTerminal
+                a = new RangeTerminal('a', 'b');
+            S.Rule = a + (Expr)"b";
+
+            Assert.IsNotNull(S.ProductionModel);
+            Assert.AreEqual(1, S.ProductionModel.Alterations.Count);
+            Assert.AreEqual(2, S.ProductionModel.Alterations[0].Symbols.Count);            
+        }
+
+        [TestMethod]
+        public void ProductionExpressionShouldSupportConcatenationOfStringAndTerminal()
+        {
+            ProductionExpression
+                S = "S";
+            BaseTerminal
+                a = new RangeTerminal('a', 'b');
+            S.Rule = (Expr)"b"+ a;
+
+            Assert.IsNotNull(S.ProductionModel);
+            Assert.AreEqual(1, S.ProductionModel.Alterations.Count);
+            Assert.AreEqual(2, S.ProductionModel.Alterations[0].Symbols.Count);
+        }
+
+        [TestMethod]
+        public void ProductionExpressionShouldSupportAlterationOfTerminalAndString()
+        {
+            ProductionExpression
+                S = "S";
+            BaseTerminal
+                a = new RangeTerminal('a', 'b');
+            S.Rule = a | (Expr)"b";
+
+            Assert.IsNotNull(S.ProductionModel);
+            Assert.AreEqual(2, S.ProductionModel.Alterations.Count);
+            Assert.AreEqual(1, S.ProductionModel.Alterations[0].Symbols.Count);
+            Assert.AreEqual(1, S.ProductionModel.Alterations[1].Symbols.Count);
+        }
+
+        [TestMethod]
+        public void ProductionExpressionShouldSupportAlterationOfStringAndTerminal()
+        {
+            ProductionExpression
+                S = "S";
+            BaseTerminal
+                a = new RangeTerminal('a', 'b');
+            S.Rule = (Expr)"b" | a;
 
             Assert.IsNotNull(S.ProductionModel);
             Assert.AreEqual(2, S.ProductionModel.Alterations.Count);

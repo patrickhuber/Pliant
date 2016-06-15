@@ -40,7 +40,7 @@ namespace Pliant.Builders.Models
             {
                 foreach (var symbol in alteration.Symbols)
                 {
-                    if (symbol.ModelType != SymbolModelType.NonTerminal
+                    if (symbol.ModelType != SymbolModelType.Production
                         || symbol.ModelType != SymbolModelType.Reference)
                         continue;
                     AddProductionToNewOrExistingSymbolSet(production, symbol);

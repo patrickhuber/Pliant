@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Pliant.Builders.Models;
 using Pliant.Grammars;
 
@@ -49,7 +48,7 @@ namespace Pliant.Builders.Expressions
                 {
                     var productionExpression = symbol as ProductionExpression;
                     alterationModel.Symbols.Add(
-                        productionExpression.ProductionModel.LeftHandSide);
+                        productionExpression.ProductionModel);
                 }
                 else if (symbol is SymbolExpression)
                 {
@@ -63,8 +62,26 @@ namespace Pliant.Builders.Expressions
                     alterationModel.Symbols.Add(
                         productionReferenceExpression.ProductionReferenceModel);
                 }
+                else if (symbol is Expr)
+                {
+                    foreach (var symbolModel in GetSymbolModelListFromExpr(symbol as Expr))
+                        alterationModel.Symbols.Add(symbolModel);
+                }
             }
             return alterationModel;
+        }
+
+        private static IEnumerable<SymbolModel> GetSymbolModelListFromExpr(Expr expr)
+        {
+            foreach (var alteration in expr.Alterations)
+                foreach (var expression in alteration)
+                {
+                    if (expression is SymbolExpression)
+                    {
+                        var symbolExpression = expression as SymbolExpression;
+                        yield return symbolExpression.SymbolModel;
+                    }
+                }
         }
     }
     

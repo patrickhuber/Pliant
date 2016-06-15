@@ -3,11 +3,21 @@ using System.Collections.Generic;
 
 namespace Pliant.Builders.Models
 {
-    public class ProductionModel
+    public class ProductionModel : SymbolModel
     {
         public IList<AlterationModel> Alterations { get; private set; }
 
         public NonTerminalModel LeftHandSide { get; set; }
+
+        public override SymbolModelType ModelType
+        {
+            get { return SymbolModelType.Production; }
+        }
+
+        public override ISymbol Symbol
+        {
+            get { return LeftHandSide.Value; }
+        }
 
         public ProductionModel()
         {
@@ -38,6 +48,9 @@ namespace Pliant.Builders.Models
 
         public IEnumerable<IProduction> ToProductions()
         {
+            if (Alterations == null || Alterations.Count == 0)
+                yield return new Production(LeftHandSide.Value);
+
             foreach (var alteration in Alterations)
             {
                 var symbols = new List<ISymbol>();

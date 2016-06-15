@@ -3,6 +3,7 @@
     public enum SymbolModelType
     {
         NonTerminal,
+        Production,
         LexerRule,
         Reference
     }
