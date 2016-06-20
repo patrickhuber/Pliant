@@ -56,7 +56,6 @@
     <Compile Include="Automata\SubsetConstructionAlgorithmTests.cs" />
     <Compile Include="Builders\Expressions\NamespaceExpressionTests.cs" />
     <Compile Include="Builders\Expressions\ProductionExpressionTests.cs" />
-    <Compile Include="Builders\Fluent\FluentGrammarBuilderTests.cs" />
     <Compile Include="Builders\GrammarModelTests.cs" />
     <Compile Include="Builders\ProductionModelTests.cs" />
     <Compile Include="Ebnf\EbnfGrammarGeneratorTests.cs" />

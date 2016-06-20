@@ -45,10 +45,6 @@
     <Compile Include="Builders\Expressions\ProductionReferenceExpression.cs" />
     <Compile Include="Builders\Expressions\RuleExpression.cs" />
     <Compile Include="Builders\Expressions\SymbolExpression.cs" />
-    <Compile Include="Builders\Fluent\FluentAlterationBuilder.cs" />
-    <Compile Include="Builders\Fluent\FluentGrammarBuilder.cs" />
-    <Compile Include="Builders\Fluent\FluentProductionBuilder.cs" />
-    <Compile Include="Builders\Fluent\FluentRuleBuilder.cs" />
     <Compile Include="Builders\AlterationModel.cs" />
     <Compile Include="Builders\GrammarModel.cs" />
     <Compile Include="Builders\NonTerminalModel.cs" />
