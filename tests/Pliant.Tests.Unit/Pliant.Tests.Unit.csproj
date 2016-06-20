@@ -57,8 +57,8 @@
     <Compile Include="Builders\Expressions\NamespaceExpressionTests.cs" />
     <Compile Include="Builders\Expressions\ProductionExpressionTests.cs" />
     <Compile Include="Builders\Fluent\FluentGrammarBuilderTests.cs" />
-    <Compile Include="Builders\Models\GrammarModelTests.cs" />
-    <Compile Include="Builders\Models\ProductionModelTests.cs" />
+    <Compile Include="Builders\GrammarModelTests.cs" />
+    <Compile Include="Builders\ProductionModelTests.cs" />
     <Compile Include="Ebnf\EbnfGrammarGeneratorTests.cs" />
     <Compile Include="Ebnf\EbnfParserTests.cs" />
     <Compile Include="Ebnf\EbnfTests.cs" />
@@ -104,6 +104,7 @@
       <Name>Pliant</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

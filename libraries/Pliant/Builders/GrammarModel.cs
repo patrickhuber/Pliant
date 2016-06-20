@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
-namespace Pliant.Builders.Models
+namespace Pliant.Builders
 {
     public class GrammarModel
     {

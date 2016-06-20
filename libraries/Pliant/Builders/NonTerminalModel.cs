@@ -1,6 +1,6 @@
 ﻿using Pliant.Grammars;
 
-namespace Pliant.Builders.Models
+namespace Pliant.Builders
 {
     public class NonTerminalModel 
         : SymbolModel

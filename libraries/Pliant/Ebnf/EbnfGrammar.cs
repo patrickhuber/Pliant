@@ -1,6 +1,6 @@
 ﻿using Pliant.Automata;
 using Pliant.Builders.Expressions;
-using Pliant.Builders.Models;
+using Pliant.Builders;
 using Pliant.Grammars;
 using Pliant.RegularExpressions;
 using Pliant.Tokens;

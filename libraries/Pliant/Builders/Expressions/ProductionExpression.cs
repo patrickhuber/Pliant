@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Pliant.Builders.Models;
+using Pliant.Builders;
 using Pliant.Grammars;
 
 namespace Pliant.Builders.Expressions

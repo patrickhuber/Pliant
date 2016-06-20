@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pliant.Builders.Models;
+using Pliant.Builders;
 using System.Linq;
 
-namespace Pliant.Tests.Unit.Builders.Models
+namespace Pliant.Tests.Unit.Builders
 {
     [TestClass]
     public class ProductionModelTests

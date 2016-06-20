@@ -5,7 +5,7 @@ using Pliant.Grammars;
 using Pliant.RegularExpressions;
 using Pliant.Tokens;
 using Pliant.Builders.Expressions;
-using Pliant.Builders.Models;
+using Pliant.Builders;
 
 namespace Pliant.Tests.Unit.Forest
 {

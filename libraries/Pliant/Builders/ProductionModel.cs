@@ -1,7 +1,7 @@
 ﻿using Pliant.Grammars;
 using System.Collections.Generic;
 
-namespace Pliant.Builders.Models
+namespace Pliant.Builders
 {
     public class ProductionModel : SymbolModel
     {

@@ -1,5 +1,5 @@
 ﻿using Pliant.Automata;
-using Pliant.Builders.Models;
+using Pliant.Builders;
 using Pliant.Grammars;
 using Pliant.RegularExpressions;
 using System.Collections.Generic;
