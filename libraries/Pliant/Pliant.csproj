@@ -63,9 +63,6 @@
     <Compile Include="Forest\SinglePassForestNodeVisitorStateManager.cs" />
     <Compile Include="Automata\INfaToDfa.cs" />
     <Compile Include="Automata\SubsetConstructionAlgorithm.cs" />
-    <Compile Include="Builders\BaseBuilder.cs" />
-    <Compile Include="Builders\BaseBuilderList.cs" />
-    <Compile Include="Builders\ProductionReferenceBuilder.cs" />
     <Compile Include="Collections\IQueue.cs" />
     <Compile Include="Collections\ProcessOnceQueue.cs" />
     <Compile Include="Ebnf\EbnfBlock.cs" />
@@ -87,8 +84,6 @@
     <Compile Include="Ebnf\EbnfSettingIdentifier.cs" />
     <Compile Include="Ebnf\EbnfTerm.cs" />
     <Compile Include="Grammars\FullyQualifiedName.cs" />
-    <Compile Include="Builders\NamespaceBuilder.cs" />
-    <Compile Include="Builders\_.cs" />
     <Compile Include="Charts\IChart.cs" />
     <Compile Include="Charts\IReadOnlyChart.cs" />
     <Compile Include="Grammars\BaseLexerRule.cs" />
@@ -110,10 +105,6 @@
     <Compile Include="Automata\IDfaLexerRule.cs" />
     <Compile Include="Automata\IDfaState.cs" />
     <Compile Include="Automata\StringExtensions.cs" />
-    <Compile Include="Builders\IAlterationBuilder.cs" />
-    <Compile Include="Builders\ProductionBuilder.cs" />
-    <Compile Include="Builders\AlterationBuilder.cs" />
-    <Compile Include="Builders\SymbolBuilder.cs" />
     <Compile Include="Ebnf\EbnfGrammar.cs" />
     <Compile Include="Ebnf\EbnfVisitor.cs" />
     <Compile Include="Grammars\BaseTerminal.cs" />
@@ -144,11 +135,9 @@
     <Compile Include="Grammars\DigitTerminal.cs" />
     <Compile Include="Charts\EarleySet.cs" />
     <Compile Include="Grammars\Grammar.cs" />
-    <Compile Include="Builders\GrammarBuilder.cs" />
     <Compile Include="Forest\IAndForestNode.cs" />
     <Compile Include="Charts\IEarleySet.cs" />
     <Compile Include="Grammars\IGrammar.cs" />
-    <Compile Include="Builders\IGrammarBuilder.cs" />
     <Compile Include="Forest\IIntermediateForestNode.cs" />
     <Compile Include="Lexemes\ILexeme.cs" />
     <Compile Include="Grammars\ILexerRule.cs" />
@@ -163,7 +152,6 @@
     <Compile Include="IParseEngine.cs" />
     <Compile Include="IParseRunner.cs" />
     <Compile Include="Grammars\IProduction.cs" />
-    <Compile Include="Builders\IRuleBuilder.cs" />
     <Compile Include="Charts\IState.cs" />
     <Compile Include="Grammars\ISymbol.cs" />
     <Compile Include="Forest\ISymbolForestNode.cs" />
@@ -212,7 +200,6 @@
     <Compile Include="Reactive\Observer.cs" />
     <Compile Include="Grammars\Production.cs" />
     <Compile Include="Grammars\RangeTerminal.cs" />
-    <Compile Include="Builders\RuleBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Collections\ReadOnlyList.cs" />
     <Compile Include="Charts\State.cs" />

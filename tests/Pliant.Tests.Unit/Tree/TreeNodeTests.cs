@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Forest;
-using Pliant.Builders;
 using Pliant.Grammars;
 using Pliant.Tree;
+using Pliant.Builders.Expressions;
 
 namespace Pliant.Tests.Unit.Tree
 {
@@ -12,12 +12,12 @@ namespace Pliant.Tests.Unit.Tree
         [TestMethod]
         public void TreeNodeShouldFlattenIntermediateNodes()
         {
-            ProductionBuilder S = "S", A = "A", B = "B", C = "C";
-            S.Definition = A + B + C;
-            A.Definition = 'a';
-            B.Definition = 'b';
-            C.Definition = 'c';
-            var grammar = new GrammarBuilder(S, new[] { S, A, B, C }).ToGrammar();
+            ProductionExpression S = "S", A = "A", B = "B", C = "C";
+            S.Rule = A + B + C;
+            A.Rule = 'a';
+            B.Rule = 'b';
+            C.Rule = 'c';
+            var grammar = new GrammarExpression(S, new[] { S, A, B, C }).ToGrammar();
             var input = "abc";
             var treeNode = GetTreeNode(grammar, input);
             var childCount = 0;
@@ -40,12 +40,12 @@ namespace Pliant.Tests.Unit.Tree
         [TestMethod]
         public void TreeNodeWhenAmbiguousParseShouldReturnFirstParseTree()
         {
-            ProductionBuilder A = "A";
-            A.Definition =
+            ProductionExpression A = "A";
+            A.Rule =
                 A + '+' + A
                 | A + '-' + A
                 | 'a';
-            var grammar = new GrammarBuilder(A, new[] { A }).ToGrammar();
+            var grammar = new GrammarExpression(A, new[] { A }).ToGrammar();
 
             var input = "a+a+a";
             var treeNode = GetTreeNode(grammar, input);

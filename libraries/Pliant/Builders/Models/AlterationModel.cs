@@ -10,5 +10,10 @@ namespace Pliant.Builders.Models
         {
             Symbols = new List<SymbolModel>();
         }
+
+        public AlterationModel(IEnumerable<SymbolModel> symbols)
+        {
+            Symbols = new List<SymbolModel>(symbols);
+        }
     }
 }

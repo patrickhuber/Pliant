@@ -27,6 +27,24 @@ namespace Pliant.Builders.Expressions
                     GrammarModel.IgnoreRules.Add(ignoreRule);
         }
 
+        public GrammarExpression(
+            ProductionExpression start,
+            IEnumerable<ProductionExpression> productions,
+            IEnumerable<ILexerRule> ignore)            
+        {
+            GrammarModel = new GrammarModel
+            {
+                Start = start.ProductionModel
+            };
+
+            if (productions != null)
+                foreach (var production in productions)
+                    GrammarModel.Productions.Add(production.ProductionModel);
+            if (ignore != null)
+                foreach (var ignoreRule in ignore)
+                    GrammarModel.IgnoreRules.Add(new LexerRuleModel(ignoreRule));
+        }
+
         public IGrammar ToGrammar()
         {
             return GrammarModel.ToGrammar();

@@ -59,8 +59,6 @@
     <Compile Include="Builders\Fluent\FluentGrammarBuilderTests.cs" />
     <Compile Include="Builders\Models\GrammarModelTests.cs" />
     <Compile Include="Builders\Models\ProductionModelTests.cs" />
-    <Compile Include="Builders\ProductionBuilderTests.cs" />
-    <Compile Include="Builders\BuilderExpressionTests.cs" />
     <Compile Include="Ebnf\EbnfGrammarGeneratorTests.cs" />
     <Compile Include="Ebnf\EbnfParserTests.cs" />
     <Compile Include="Ebnf\EbnfTests.cs" />
@@ -73,7 +71,6 @@
     <Compile Include="Bnf\BnfTests.cs" />
     <Compile Include="Charts\ChartTests.cs" />
     <Compile Include="Grammars\DigitTerminalTests.cs" />
-    <Compile Include="Builders\GrammarBuilderTests.cs" />
     <Compile Include="LoggingNodeVisitor.cs" />
     <Compile Include="Forest\ForestNodeVisitorTests.cs" />
     <Compile Include="Collections\ProcessOnceQueueTests.cs" />

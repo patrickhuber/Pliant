@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Collections;
 
 namespace Pliant.Builders.Models
 {
@@ -25,6 +24,12 @@ namespace Pliant.Builders.Models
             _productions.CollectionChanged += CollectionChanged;
             _reachibilityMatrix = new ReachibilityMatrix();
             IgnoreRules = new List<LexerRuleModel>();
+        }
+
+        public GrammarModel(ProductionModel start)
+            : this()
+        {
+            Start = start;
         }
         
         void CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -73,9 +78,18 @@ namespace Pliant.Builders.Models
 
         public IGrammar ToGrammar()
         {
-            ValidateOrAssignStartSymbol();
+            if (StartSymbolExists())
+            {
+                if (ProductionsAreEmpty())
+                    PopulateMissingProductionsFromStart(Start);
+                AssertStartProductionExistsForStartSymbol(_reachibilityMatrix);
+            }
+            else
+                Start = _reachibilityMatrix.GetStartProduction();
+
             var productions = GetProductionsFromProductionsModel();
             var ignoreRules = GetIgnoreRulesFromIgnoreRulesModel();
+
             return new Grammar(Start.LeftHandSide.NonTerminal, productions, ignoreRules);
         }
 
@@ -95,13 +109,23 @@ namespace Pliant.Builders.Models
                 ignoreRules.Add(ignoreRuleModel.Value);
             return ignoreRules;
         }
-
-        private void ValidateOrAssignStartSymbol()
+        
+        private void PopulateMissingProductionsFromStart(ProductionModel start)
         {
-            if (StartSymbolExists())
-                AssertStartProductionExistsForStartSymbol(_reachibilityMatrix);
-            else
-                Start = _reachibilityMatrix.GetStartProduction();
+            var visited = new HashSet<INonTerminal>();
+            PopulateMissingProductionsRecursively(start, visited);
+        }
+
+        private void PopulateMissingProductionsRecursively(ProductionModel production, ISet<INonTerminal> visited)
+        {
+            if (visited.Add(production.LeftHandSide.NonTerminal))
+            {
+                Productions.Add(production);
+                foreach (var alteration in production.Alterations)
+                    foreach (var symbol in alteration.Symbols)
+                        if (symbol.ModelType == SymbolModelType.Production)
+                            PopulateMissingProductionsRecursively(symbol as ProductionModel, visited);
+            }
         }
 
         private void AssertStartProductionExistsForStartSymbol(ReachibilityMatrix reachibilityMatrix)
@@ -113,6 +137,11 @@ namespace Pliant.Builders.Models
         private bool StartSymbolExists()
         {
             return Start != null;
+        }
+
+        private bool ProductionsAreEmpty()
+        {
+            return Productions.Count == 0;
         }
     }
 }
