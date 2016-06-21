@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pliant.Builders;
+using Pliant.Builders.Expressions;
 using Pliant.Charts;
 using Pliant.Grammars;
 using Pliant.Tokens;
@@ -21,43 +21,48 @@ namespace Pliant.Tests.Unit
 
         private static GrammarLexerRule CreateWhitespaceRule()
         {
-            ProductionBuilder S = "S", whitespace = "whitespace";
+            ProductionExpression 
+                S = "S", 
+                whitespace = "whitespace";
 
-            S.Definition =
+            S.Rule =
                 whitespace
                 | whitespace + S;
-            whitespace.Definition =
+            whitespace.Rule =
                 new WhitespaceTerminal();
 
-            var grammar = new GrammarBuilder(S, new[] { S, whitespace }).ToGrammar();
+            var grammar = new GrammarExpression(S, new[] { S, whitespace }).ToGrammar();
             return new GrammarLexerRule(nameof(whitespace), grammar);
         }
 
         private static GrammarLexerRule CreateWordRule()
         {
-            ProductionBuilder W = "W", word = "word";
-            W.Definition =
+            ProductionExpression 
+                W = "W", 
+                word = "word";
+
+            W.Rule =
                 word
                 | word + W;
-            word.Definition = (_)
+            word.Rule = (Expr)
                 new RangeTerminal('a', 'z')
                 | new RangeTerminal('A', 'Z')
                 | new RangeTerminal('0', '9');
 
-            var wordGrammar = new GrammarBuilder(W, new[] { W, word }).ToGrammar();
+            var wordGrammar = new GrammarExpression(W, new[] { W, word }).ToGrammar();
             return new GrammarLexerRule(nameof(word), wordGrammar);
         }
 
         [TestMethod]
         public void LexerShouldParseSimpleWordSentence()
         {
-            ProductionBuilder S = "S";
-            S.Definition =
+            ProductionExpression S = "S";
+            S.Rule =
                 _whitespaceRule
                 | _whitespaceRule + S
                 | _wordRule
                 | _wordRule + S;
-            var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
             var input = "this is input";
             var parseEngine = new ParseEngine(grammar);
             RunParse(parseEngine, input);
@@ -68,14 +73,14 @@ namespace Pliant.Tests.Unit
         {
             // a <word boundary> abc <word boundary> a <word boundary> a
             const string input = "a abc a a";
-            ProductionBuilder A = "A";
-            A.Definition =
+            ProductionExpression A = "A";
+            A.Rule =
                 _wordRule + A
                 | _wordRule;
-            var grammar = new GrammarBuilder(
+            var grammar = new GrammarExpression(
                 A,
                 new[] { A },
-                new[] { _whitespaceRule })
+                new[] {_whitespaceRule })
                 .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
@@ -86,9 +91,9 @@ namespace Pliant.Tests.Unit
         public void LexerShouldEmitTokenBetweenLexerRulesAndEndOfFile()
         {
             const string input = "aa";
-            ProductionBuilder S = "S";
-            S.Definition = 'a' + S | 'a';
-            var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
+            ProductionExpression S = "S";
+            S.Rule = 'a' + S | 'a';
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseRunner = new ParseRunner(parseEngine, input);
 
@@ -104,14 +109,14 @@ namespace Pliant.Tests.Unit
         {
             const string input = "aaaa";
 
-            ProductionBuilder A = "A";
-            A.Definition = (_)'a' + 'a';
-            var aGrammar = new GrammarBuilder(A, new[] { A }).ToGrammar();
+            ProductionExpression A = "A";
+            A.Rule = (Expr)'a' + 'a';
+            var aGrammar = new GrammarExpression(A, new[] { A }).ToGrammar();
             var a = new GrammarLexerRule("a", aGrammar);
 
-            ProductionBuilder S = "S";
-            S.Definition = a + S | a;
-            var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
+            ProductionExpression S = "S";
+            S.Rule = a + S | a;
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
             var parseEngine = new ParseEngine(grammar);
             var parseRunner = new ParseRunner(parseEngine, input);
 
@@ -127,14 +132,14 @@ namespace Pliant.Tests.Unit
         {
             const string input = "aaaa";
 
-            ProductionBuilder A = "A", S = "S";
+            ProductionExpression A = "A", S = "S";
 
-            A.Definition = (_)'a' + 'a';
-            var aGrammar = new GrammarBuilder(A, new[] { A }).ToGrammar();
+            A.Rule = (Expr)'a' + 'a';
+            var aGrammar = new GrammarExpression(A, new[] { A }).ToGrammar();
             var a = new GrammarLexerRule("a", aGrammar);
 
-            S.Definition = a + S | a;
-            var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
+            S.Rule = a + S | a;
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
             var parseRunner = new ParseRunner(parseEngine, input);
@@ -149,11 +154,11 @@ namespace Pliant.Tests.Unit
         public void LexerShouldEmitTokenWhenIgnoreCharacterIsEncountered()
         {
             const string input = "aa aa";
-            ProductionBuilder S = "S";
+            ProductionExpression S = "S";
 
-            S.Definition = _wordRule + S | _wordRule;
+            S.Rule = _wordRule + S | _wordRule;
 
-            var grammar = new GrammarBuilder(
+            var grammar = new GrammarExpression(
                 S,
                 new[] { S },
                 new[] { _whitespaceRule })
@@ -172,24 +177,24 @@ namespace Pliant.Tests.Unit
         public void LexerShouldEmitTokenWhenCharacterMatchesNextProduction()
         {
             const string input = "aabb";
-            ProductionBuilder A = "A";
-            A.Definition =
+            ProductionExpression A = "A";
+            A.Rule =
                 'a' + A
                 | 'a';
-            var aGrammar = new GrammarBuilder(A, new[] { A }).ToGrammar();
+            var aGrammar = new GrammarExpression(A, new[] { A }).ToGrammar();
             var a = new GrammarLexerRule("a", aGrammar);
 
-            ProductionBuilder B = "B";
-            B.Definition =
+            ProductionExpression B = "B";
+            B.Rule =
                 'b' + B
                 | 'b';
-            var bGrammar = new GrammarBuilder(B, new[] { B }).ToGrammar();
+            var bGrammar = new GrammarExpression(B, new[] { B }).ToGrammar();
             var b = new GrammarLexerRule("b", bGrammar);
 
-            ProductionBuilder S = "S";
-            S.Definition = (_)
+            ProductionExpression S = "S";
+            S.Rule = (Expr)
                 a + b;
-            var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
             var chart = GetParseEngineChart(parseEngine);
@@ -214,9 +219,9 @@ namespace Pliant.Tests.Unit
             var endOfLine = new StringLiteralLexerRule(
                 Environment.NewLine,
                 new TokenType("EOL"));
-            ProductionBuilder S = "S";
-            S.Definition = (_)_wordRule + endOfLine + _wordRule;
-            var grammar = new GrammarBuilder(
+            ProductionExpression S = "S";
+            S.Rule = (Expr)_wordRule + endOfLine + _wordRule;
+            var grammar = new GrammarExpression(
                 S,
                 new[] { S },
                 new[] { _whitespaceRule })

@@ -1,4 +1,5 @@
 ﻿using Pliant.Automata;
+using Pliant.Builders.Expressions;
 using Pliant.Builders;
 using Pliant.Grammars;
 using Pliant.RegularExpressions;
@@ -43,7 +44,7 @@ namespace Pliant.Ebnf
                 escapeCharacter = CreateEscapeCharacterLexerRule(),
                 whitespace = CreateWhitespaceLexerRule();
 
-            ProductionBuilder
+            ProductionExpression
                 definition = Definition,
                 block = Block,
                 rule = Rule,
@@ -62,35 +63,35 @@ namespace Pliant.Ebnf
                 lexerRuleFactor = LexerRuleFactor;
 
             var regexGrammar = new RegexGrammar();
-            var regexProductionReference = new ProductionReference(regexGrammar);
+            var regexProductionReference = new ProductionReferenceExpression(regexGrammar);
                         
-            definition.Definition =
+            definition.Rule =
                 block
                 | block + definition;
 
-            block.Definition =
+            block.Rule =
                 rule
                 | setting
                 | lexerRule;
 
-            rule.Definition =
+            rule.Rule =
                 qualifiedIdentifier + '=' + expression + ';';
 
-            setting.Definition = (_)
+            setting.Rule = (Expr)
                 settingIdentifier + '=' + qualifiedIdentifier + ';';
 
-            lexerRule.Definition =
+            lexerRule.Rule =
                 qualifiedIdentifier + '~' + lexerRuleExpression + ';';
 
-            expression.Definition =
+            expression.Rule =
                 term
                 | term + '|' + expression;
 
-            term.Definition =
+            term.Rule =
                 factor
                 | factor + term;
 
-            factor.Definition
+            factor.Rule
                 = qualifiedIdentifier
                 | literal
                 | '/' + regexProductionReference + '/'
@@ -98,40 +99,58 @@ namespace Pliant.Ebnf
                 | optional
                 | grouping;
 
-            literal.Definition = (_)
+            literal.Rule = (Expr)
                 '"' + notDoubleQuote + '"'
-                | (_)"'" + notSingleQuote + "'";
+                | (Expr)"'" + notSingleQuote + "'";
 
-            repetition.Definition = (_)
+            repetition.Rule = (Expr)
                 '{' + expression + '}';
 
-            optional.Definition = (_)
+            optional.Rule = (Expr)
                 '[' + expression + ']';
 
-            grouping.Definition = (_)
+            grouping.Rule = (Expr)
                 '(' + expression + ')';
 
-            qualifiedIdentifier.Definition =
+            qualifiedIdentifier.Rule =
                 identifier
-                | (_)identifier + '.' + qualifiedIdentifier;
+                | (Expr)identifier + '.' + qualifiedIdentifier;
 
-            lexerRuleExpression.Definition = 
+            lexerRuleExpression.Rule = 
                 lexerRuleTerm 
                 | lexerRuleTerm + '|' + lexerRuleExpression;
 
-            lexerRuleTerm.Definition =
+            lexerRuleTerm.Rule =
                 lexerRuleFactor
                 | lexerRuleFactor + lexerRuleTerm;
 
-            lexerRuleFactor.Definition =
+            lexerRuleFactor.Rule =
                 literal
                 | '/' + regexProductionReference + '/';
 
-            var grammarBuilder = new GrammarBuilder(
-                definition,                
-                ignore: new[] { whitespace });
-
-            _ebnfGrammar = grammarBuilder.ToGrammar();
+            var grammarExpression = new GrammarExpression(
+                definition, 
+                new[] 
+                {
+                    definition,
+                    block,
+                    rule,
+                    setting,
+                    lexerRule,
+                    expression,
+                    term,
+                    factor,
+                    literal,
+                    repetition,
+                    optional,
+                    grouping,
+                    qualifiedIdentifier, 
+                    lexerRuleExpression,
+                    lexerRuleTerm,
+                    lexerRuleFactor
+                }, 
+                new[] { new LexerRuleModel(whitespace) });
+            _ebnfGrammar = grammarExpression.ToGrammar();
         }
 
         private static BaseLexerRule CreateEscapeCharacterLexerRule()

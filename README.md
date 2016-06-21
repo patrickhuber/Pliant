@@ -11,10 +11,11 @@ Pliant is a table driven parser that implements the Earley algorithm. Two optimi
 
 ### Creating Grammars
 
-#### Using the Grammar Builder classes
+#### Using the Grammar Expression classes
 
 ```CSharp
 using Pliant.Builders;
+using Pliant.Builders.Expressions;
 using Pliant.Grammars;
 using Pliant.Automata;
 
@@ -23,34 +24,34 @@ public static int Main(string[] args)
 	var digits = CreateDigitLexerRule();
 	var whitespace = CreateWhitespaceLexerRule();
 	
-	ProductionBuilder 
+	ProductionExpression
 		Calculator = "Calculator",
 		Factor = "Factor",
 		Term = "Term",
 		Expression = "Expression",
 		Number = "Number";
 		
-	Calculator.Definition 
+	Calculator.Rule 
 		= Expression ;
 		
-	Expression.Definition
+	Expression.Rule
 		= Expression + '+' + Term 
 		| Term ;
 
-	Term.Definition 
+	Term.Rule 
 		= Term + '*' + Factor
 		| Factor ;
 		
-	Factor.Definition 
+	Factor.Rule 
 		= Number ;
 		
-	Number.Definition
+	Number.Rule
 		= digits;
 		
-	var grammar = new GrammarBuilder(
+	var grammar = new GrammarExpression(
 		Calculator, 
 		new []{ Calculator, Factor, Term, Expression, Number }, 
-		new []{ whitespace })
+		new []{ new LexerRuleModel(whitespace) })
 	.ToGrammar();	
 	
 	// TODO: Use the grammar in a parse.

@@ -88,7 +88,7 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
-        public void EbnfParserRegularExpression()
+        public void EbnfParserShouldParseRegularExpression()
         {
             var expected = new EbnfDefinition(
                     new EbnfBlockRule(

@@ -1,12 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Forest;
-using Pliant.Builders;
 using Pliant.Charts;
 using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Collections.Generic;
 using System.Linq;
 using Pliant.Tests.Unit.Forest;
+using Pliant.Builders.Expressions;
 
 namespace Pliant.Tests.Unit
 {
@@ -19,12 +19,12 @@ namespace Pliant.Tests.Unit
             // example 1 section 3, Elizabeth Scott
             var tokens = Tokenize("aa");
 
-            ProductionBuilder S = "S", T = "T", B = "B";
-            S.Definition = S + T | "a";
-            B.Definition = (_)null;
-            T.Definition = "a" + B | "a";
+            ProductionExpression S = "S", T = "T", B = "B";
+            S.Rule = S + T | "a";
+            B.Rule = (Expr)null;
+            T.Rule = "a" + B | "a";
 
-            var grammar = new GrammarBuilder(S, new[] { S, T, B }).ToGrammar();
+            var grammar = new GrammarExpression(S, new[] { S, T, B }).ToGrammar();
             var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
             ParseInput(parseEngine, tokens);
 
@@ -32,17 +32,17 @@ namespace Pliant.Tests.Unit
             
             var a_1_2 = new FakeTokenForestNode("a", 1, 2);
             var expected = 
-                new FakeSymbolForestNode(S.LeftHandSide, 0, 2, 
+                new FakeSymbolForestNode(S.ProductionModel.LeftHandSide.NonTerminal, 0, 2, 
                     new FakeAndForestNode(
-                        new FakeSymbolForestNode(S.LeftHandSide, 0, 1, 
+                        new FakeSymbolForestNode(S.ProductionModel.LeftHandSide.NonTerminal, 0, 1, 
                             new FakeAndForestNode(
                                 new FakeTokenForestNode("a", 0, 1))),
-                        new FakeSymbolForestNode(T.LeftHandSide, 1, 2,
+                        new FakeSymbolForestNode(T.ProductionModel.LeftHandSide.NonTerminal, 1, 2,
                             new FakeAndForestNode(
                                 a_1_2),
                             new FakeAndForestNode(
                                 a_1_2,
-                                new FakeSymbolForestNode(B.LeftHandSide, 2, 2, new FakeAndForestNode(
+                                new FakeSymbolForestNode(B.ProductionModel.LeftHandSide.NonTerminal, 2, 2, new FakeAndForestNode(
                                     new FakeTokenForestNode("", 2,2)))))));
             AssertForestsAreEqual(expected, actual);
         }
@@ -53,14 +53,14 @@ namespace Pliant.Tests.Unit
             // example 3 section 4, Elizabeth Scott
             var tokens = Tokenize("abbb");
 
-            ProductionBuilder B = "B", S = "S", T = "T", A = "A";
+            ProductionExpression B = "B", S = "S", T = "T", A = "A";
 
-            S.Definition = (_)A + T | 'a' + T;
-            A.Definition = (_)'a' | B + A;
-            B.Definition = null;
-            T.Definition = (_)'b' + 'b' + 'b';
+            S.Rule = (Expr)A + T | 'a' + T;
+            A.Rule = (Expr)'a' | B + A;
+            B.Rule = null;
+            T.Rule = (Expr)'b' + 'b' + 'b';
 
-            var grammar = new GrammarBuilder(S, new[] { S, A, B, T })
+            var grammar = new GrammarExpression(S, new[] { S, A, B, T })
                 .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
@@ -146,10 +146,10 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEngineWhenScanCompletedShouldCreateInternalAndTerminalNodes()
         {
-            ProductionBuilder S = "S";
-            S.Definition = (_)'a';
+            ProductionExpression S = "S";
+            S.Rule = (Expr)'a';
 
-            var grammar = new GrammarBuilder(S, new[] { S })
+            var grammar = new GrammarExpression(S, new[] { S })
                 .ToGrammar();
 
             var tokens = Tokenize("a");
@@ -175,11 +175,11 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEnginePredicationShouldCreateInternalNode()
         {
-            ProductionBuilder S = "S", A = "A";
-            S.Definition = (_)A;
-            A.Definition = (_)'a';
+            ProductionExpression S = "S", A = "A";
+            S.Rule = (Expr)A;
+            A.Rule = (Expr)'a';
 
-            var grammar = new GrammarBuilder(S, new[] { S, A }).ToGrammar();
+            var grammar = new GrammarExpression(S, new[] { S, A }).ToGrammar();
 
             var tokens = Tokenize("a");
             var parseEngine = new ParseEngine(grammar);
@@ -212,12 +212,12 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEngineLeoItemsShouldGenerateProperParseTree()
         {
-            ProductionBuilder S = "S", A = "A";
+            ProductionExpression S = "S", A = "A";
 
-            S.Definition = A;
-            A.Definition = 'a' + A | 'b';
+            S.Rule = A;
+            A.Rule = 'a' + A | 'b';
 
-            var grammar = new GrammarBuilder(S, new[] { S, A }).ToGrammar();
+            var grammar = new GrammarExpression(S, new[] { S, A }).ToGrammar();
 
             var tokens = Tokenize("ab");
             var parseEngine = new ParseEngine(grammar);
@@ -263,12 +263,12 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEnginePassThroughRecursiveItemsShouldCreateVirtualNodes()
         {
-            ProductionBuilder S = "S", A = "A", B = "B";
-            S.Definition = A;
-            A.Definition = 'a' + B;
-            B.Definition = A | 'b';
+            ProductionExpression S = "S", A = "A", B = "B";
+            S.Rule = A;
+            A.Rule = 'a' + B;
+            B.Rule = A | 'b';
 
-            var grammar = new GrammarBuilder(S, new[] { S, A, B }).ToGrammar();
+            var grammar = new GrammarExpression(S, new[] { S, A, B }).ToGrammar();
             var tokens = Tokenize("aaab");
 
             var parseEngine = new ParseEngine(grammar);
@@ -358,13 +358,13 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEngineShouldParseMidGrammarRightRecursionAndHandleNullRootTransitionItem()
         {
-            ProductionBuilder S = "S", A = "A", B = "B", C = "C";
-            S.Definition = (_)A | A + S;
-            A.Definition = (_)B | B + C;
-            B.Definition = (_)'.';
-            C.Definition = (_)'+' | '?' | '*';
+            ProductionExpression S = "S", A = "A", B = "B", C = "C";
+            S.Rule = (Expr)A | A + S;
+            A.Rule = (Expr)B | B + C;
+            B.Rule = (Expr)'.';
+            C.Rule = (Expr)'+' | '?' | '*';
 
-            var grammar = new GrammarBuilder(S, new[] { S, A, B, C }).ToGrammar();
+            var grammar = new GrammarExpression(S, new[] { S, A, B, C }).ToGrammar();
             var tokens = Tokenize(".+");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
@@ -419,12 +419,12 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEngineShouldParseSimpleSubstitutionGrammar()
         {
-            ProductionBuilder A = "A", B = "B", C = "C";
-            A.Definition = (_)B + C;
-            B.Definition = (_)'b';
-            C.Definition = (_)'c';
+            ProductionExpression A = "A", B = "B", C = "C";
+            A.Rule = (Expr)B + C;
+            B.Rule = (Expr)'b';
+            C.Rule = (Expr)'c';
 
-            var grammar = new GrammarBuilder(A, new[] { A, B, C }).ToGrammar();
+            var grammar = new GrammarExpression(A, new[] { A, B, C }).ToGrammar();
             var parseEngine = new ParseEngine(grammar);
 
             var tokens = Tokenize("bc");
@@ -469,10 +469,10 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEngineShouldParseUnmarkedMiddleRecursion()
         {
-            ProductionBuilder S = "S";
-            S.Definition = 'a' + S + 'a' | 'a';
+            ProductionExpression S = "S";
+            S.Rule = 'a' + S + 'a' | 'a';
 
-            var grammar = new GrammarBuilder(S, new[] { S }).ToGrammar();
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
             var parseEngine = new ParseEngine(grammar);
 
             var tokens = Tokenize("aaaaaaaaa");
@@ -482,12 +482,12 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEngineShouldLeoOptimizeRightRecursiveQuasiCompleteItems()
         {
-            ProductionBuilder S = "S", A = "A", B = "B";
-            S.Definition = A + B;
-            A.Definition = 'a' + A | 'a';
-            B.Definition = 'b' + B | (_)null;
+            ProductionExpression S = "S", A = "A", B = "B";
+            S.Rule = A + B;
+            A.Rule = 'a' + A | 'a';
+            B.Rule = 'b' + B | (Expr)null;
 
-            var grammar = new GrammarBuilder(S, new[] { S, A, B }).ToGrammar();
+            var grammar = new GrammarExpression(S, new[] { S, A, B }).ToGrammar();
             var input = Tokenize("aaaaaaaaaaaaaaaaaaabbbbbbbbbbb");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
@@ -502,12 +502,12 @@ namespace Pliant.Tests.Unit
             var a = new TerminalLexerRule(
                 new CharacterTerminal('a'),
                 new TokenType("a"));
-            ProductionBuilder A = "A";
-            A.Definition =
+            ProductionExpression A = "A";
+            A.Rule =
                 'a' + A
-                | (_)null;
+                | (Expr)null;
 
-            var grammar = new GrammarBuilder(A, new[] { A })
+            var grammar = new GrammarExpression(A, new[] { A })
                 .ToGrammar();
 
             var input = Tokenize("aaaaa");
@@ -538,11 +538,11 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEngineGivenIntermediateStepsShouldCreateTransitionItems()
         {
-            ProductionBuilder S = "S", A = "A", B = "B";
-            S.Definition = A;
-            A.Definition = 'a' + B;
-            B.Definition = A | 'b';
-            var grammar = new GrammarBuilder(S, new[] { S, A, B }).ToGrammar();
+            ProductionExpression S = "S", A = "A", B = "B";
+            S.Rule = A;
+            A.Rule = 'a' + B;
+            B.Rule = A | 'b';
+            var grammar = new GrammarExpression(S, new[] { S, A, B }).ToGrammar();
             var input = Tokenize("aaab");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
@@ -626,15 +626,15 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEngineGivenLongProductionRuleShouldCreateCorrectParseTree()
         {
-            ProductionBuilder S = "S", A = "A", B = "B", C = "C", D = "D";
-            S.Definition = (_)
+            ProductionExpression S = "S", A = "A", B = "B", C = "C", D = "D";
+            S.Rule = (Expr)
                 A + B + C + D + S
                 | '|';
-            A.Definition = 'a';
-            B.Definition = 'b';
-            C.Definition = 'c';
-            D.Definition = 'd';
-            var grammar = new GrammarBuilder(S, new[] { S, A, B, C, D }).ToGrammar();
+            A.Rule = 'a';
+            B.Rule = 'b';
+            C.Rule = 'c';
+            D.Rule = 'd';
+            var grammar = new GrammarExpression(S, new[] { S, A, B, C, D }).ToGrammar();
 
             var input = Tokenize("abcdabcdabcdabcd|");
             var parseEngine = new ParseEngine(grammar);
@@ -647,16 +647,16 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void ParseEngineShouldCreateSameParseTreeForNullableRightRecursiveRule()
         {
-            ProductionBuilder E = "E", F = "F";
-            E.Definition =
+            ProductionExpression E = "E", F = "F";
+            E.Rule =
                 F
                 | F + E
-                | (_)null;
-            F.Definition =
+                | (Expr)null;
+            F.Rule =
                 new TerminalLexerRule(
                     new SetTerminal('a', 'b'), "[ab]");
 
-            var grammar = new GrammarBuilder(E, new[] { E, F})
+            var grammar = new GrammarExpression(E, new[] { E, F})
                 .ToGrammar();
 
             var input = "aba";
@@ -756,30 +756,30 @@ namespace Pliant.Tests.Unit
 
         private static IGrammar CreateRegularExpressionStubGrammar()
         {
-            ProductionBuilder R = "R", E = "E", T = "T", F = "F", A = "A", I = "I";
-            R.Definition = (_)
+            ProductionExpression R = "R", E = "E", T = "T", F = "F", A = "A", I = "I";
+            R.Rule = (Expr)
                 E
                 | '^' + E
                 | E + '$'
                 | '^' + E + '$';
-            E.Definition = (_)
+            E.Rule = (Expr)
                 T
                 | T + '|' + E
-                | (_)null;
-            T.Definition = (_)
+                | (Expr)null;
+            T.Rule = (Expr)
                 F + T
                 | F;
-            F.Definition = (_)
+            F.Rule = (Expr)
                 A
                 | A + I;
-            A.Definition = (_)
+            A.Rule = (Expr)
                 'a';
-            I.Definition = (_)
+            I.Rule = (Expr)
                 '+'
                 | '?'
                 | '*';
 
-            return new GrammarBuilder(R, new[] { R, E, T, F, A, I }).ToGrammar();
+            return new GrammarExpression(R, new[] { R, E, T, F, A, I }).ToGrammar();
         }
 
         private static void AssertNodeProperties(ISymbolForestNode node, string nodeName, int origin, int location)
@@ -824,12 +824,12 @@ namespace Pliant.Tests.Unit
                 new DigitTerminal(),
                 new TokenType("digit"));
 
-            ProductionBuilder S = "S", M = "M", T = "T";
-            S.Definition = S + '+' + M | M;
-            M.Definition = M + '*' + T | T;
-            T.Definition = digit;
+            ProductionExpression S = "S", M = "M", T = "T";
+            S.Rule = S + '+' + M | M;
+            M.Rule = M + '*' + T | T;
+            T.Rule = digit;
 
-            var grammar = new GrammarBuilder(S, new[] { S, M, T }).ToGrammar();
+            var grammar = new GrammarExpression(S, new[] { S, M, T }).ToGrammar();
             return grammar;
         }
 

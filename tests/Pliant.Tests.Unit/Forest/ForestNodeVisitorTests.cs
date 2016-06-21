@@ -1,10 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Forest;
 using Pliant.Automata;
-using Pliant.Builders;
 using Pliant.Grammars;
 using Pliant.RegularExpressions;
 using Pliant.Tokens;
+using Pliant.Builders.Expressions;
+using Pliant.Builders;
 
 namespace Pliant.Tests.Unit.Forest
 {
@@ -53,59 +54,59 @@ namespace Pliant.Tests.Unit.Forest
         [TestMethod]
         public void NodeVisitorShouldEnumerateAllParseTrees()
         {
-            ProductionBuilder And = "AND",
+            ProductionExpression And = "AND",
                 Panda = "Panda",
                 AAn = "AAn",
                 ShootsLeaves = "ShootsAndLeaves",
                 EatsShootsLeaves = "EatsShootsLeaves"
                 ;
-            And.Definition = (_)'a' + 'n' + 'd';
-            var and = new GrammarBuilder(And, new[] { And }).ToGrammar();
+            And.Rule = (Expr)'a' + 'n' + 'd';
+            var and = new GrammarExpression(And, new[] { And }).ToGrammar();
 
-            Panda.Definition = (_)'p' + 'a' + 'n' + 'd' + 'a';
-            var panda = new GrammarBuilder(Panda, new[] { Panda }).ToGrammar();
+            Panda.Rule = (Expr)'p' + 'a' + 'n' + 'd' + 'a';
+            var panda = new GrammarExpression(Panda, new[] { Panda }).ToGrammar();
 
-            AAn.Definition = (_)'a' | (_)'a' + 'n';
-            var aAn = new GrammarBuilder(AAn, new[] { AAn }).ToGrammar();
+            AAn.Rule = (Expr)'a' | (Expr)'a' + 'n';
+            var aAn = new GrammarExpression(AAn, new[] { AAn }).ToGrammar();
 
-            ShootsLeaves.Definition =
-                (_)"shoots"
-                | (_)"leaves";
-            var shootsLeaves = new GrammarBuilder(ShootsLeaves, new[] { ShootsLeaves }).ToGrammar();
+            ShootsLeaves.Rule =
+                (Expr)"shoots"
+                | (Expr)"leaves";
+            var shootsLeaves = new GrammarExpression(ShootsLeaves, new[] { ShootsLeaves }).ToGrammar();
 
-            EatsShootsLeaves.Definition =
-                (_)'e' + 'a' + 't' + 's'
-                | (_)'s' + 'h' + 'o' + 'o' + 't' + 's'
-                | (_)'l' + 'e' + 'a' + 'v' + 'e' + 's';
-            var eatsShootsLeaves = new GrammarBuilder(EatsShootsLeaves, new[] { EatsShootsLeaves }).ToGrammar();
+            EatsShootsLeaves.Rule =
+                (Expr)'e' + 'a' + 't' + 's'
+                | (Expr)'s' + 'h' + 'o' + 'o' + 't' + 's'
+                | (Expr)'l' + 'e' + 'a' + 'v' + 'e' + 's';
+            var eatsShootsLeaves = new GrammarExpression(EatsShootsLeaves, new[] { EatsShootsLeaves }).ToGrammar();
 
-            ProductionBuilder
+            ProductionExpression
                 S = "S", NP = "NP", VP = "VP", NN = "NN",
                 NNS = "NNS", DT = "DT", CC = "CC", VBZ = "VBZ";
 
-            S.Definition =
+            S.Rule =
                 NP + VP + '.';
-            NP.Definition =
+            NP.Rule =
                 NN
                 | NNS
                 | DT + NN
                 | NN + NNS
                 | NNS + CC + NNS;
-            VP.Definition = VBZ + NP
+            VP.Rule = VBZ + NP
                 | VP + VBZ + NNS
                 | VP + CC + VP
                 | VP + VP + CC + VP
                 | VBZ;
-            CC.Definition = new GrammarLexerRule(nameof(CC), and);
-            DT.Definition = new GrammarLexerRule(nameof(DT), aAn);
-            NN.Definition = new GrammarLexerRule(nameof(NN), panda);
-            NNS.Definition = new GrammarLexerRule(nameof(NNS), shootsLeaves);
-            VBZ.Definition = new GrammarLexerRule(nameof(VBZ), eatsShootsLeaves);
+            CC.Rule = new GrammarLexerRule(nameof(CC), and);
+            DT.Rule = new GrammarLexerRule(nameof(DT), aAn);
+            NN.Rule = new GrammarLexerRule(nameof(NN), panda);
+            NNS.Rule = new GrammarLexerRule(nameof(NNS), shootsLeaves);
+            VBZ.Rule = new GrammarLexerRule(nameof(VBZ), eatsShootsLeaves);
 
-            var grammar = new GrammarBuilder(
+            var grammar = new GrammarExpression(
                 S,
                 new[] { S, NP, VP, CC, DT, NN, NNS, VBZ },
-                new[] { _whitespace })
+                new[] { new LexerRuleModel(_whitespace) })
                 .ToGrammar();
             var sentence = "a panda eats shoots and leaves.";
 

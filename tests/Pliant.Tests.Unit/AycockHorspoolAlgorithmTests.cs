@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Pliant.Builders;
+using Pliant.Builders.Expressions;
 using Pliant.Charts;
 using Pliant.Grammars;
 using Pliant.Tokens;
@@ -16,20 +16,21 @@ namespace Pliant.Tests.Unit
                 new CharacterTerminal('a'),
                 new TokenType("a"));
 
-            ProductionBuilder SPrime = "S'";
-            ProductionBuilder S = "S";
-            ProductionBuilder A = "A";
-            ProductionBuilder E = "E";
+            ProductionExpression 
+                SPrime = "S'",
+                S = "S",
+                A = "A",
+                E = "E";
 
-            SPrime.Definition = S;
-            S.Definition = (_)S | A + A + A + A;
-            A.Definition = (_)"a" | E;
+            SPrime.Rule = S;
+            S.Rule = (Expr)S | A + A + A + A;
+            A.Rule = (Expr)"a" | E;
 
-            var grammarBuilder = new GrammarBuilder(
+            var expression = new GrammarExpression(
                 SPrime,
                 new[] { SPrime, S, A, E });
 
-            var grammar = grammarBuilder.ToGrammar();
+            var grammar = expression.ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
             parseEngine.Pulse(new Token("a", 0, a.TokenType));

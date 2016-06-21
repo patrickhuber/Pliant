@@ -1,5 +1,6 @@
 ﻿using Pliant.Automata;
 using Pliant.Builders;
+using Pliant.Builders.Expressions;
 using Pliant.Grammars;
 using System.Collections.Generic;
 
@@ -70,7 +71,7 @@ namespace Pliant.RegularExpressions
             var notCloseBracket = CreateNotCloseBracketLexerRule();
             var escape = CreateEscapeCharacterLexerRule();
 
-            ProductionBuilder
+            ProductionExpression
                 regex = Regex,
                 expression = Expression,
                 term = Term,
@@ -85,62 +86,79 @@ namespace Pliant.RegularExpressions
                 character = Character,
                 characterClassCharacter = CharacterClassCharacter;
             
-            regex.Definition
+            regex.Rule
                 = expression
                 | '^' + expression
                 | expression + '$'
                 | '^' + expression + '$';
 
-            expression.Definition
+            expression.Rule
                 = term
                 | term + '|' + expression;
 
-            term.Definition
+            term.Rule
                 = factor
                 | factor + term;
 
-            factor.Definition
+            factor.Rule
                 = atom
                 | atom + iterator;
 
-            atom.Definition
+            atom.Rule
                 = '.'
                 | character
                 | '(' + expression + ')'
                 | set;
 
-            iterator.Definition = (_)
+            iterator.Rule = (Expr)
                 '*'
                 | '+'
                 | '?';
 
-            set.Definition
+            set.Rule
                 = positiveSet
                 | negativeSet;
 
-            positiveSet.Definition
+            positiveSet.Rule
                 = '[' + characterClass + ']';
 
-            negativeSet.Definition
+            negativeSet.Rule
                 = "[^" + characterClass + ']';
 
-            characterClass.Definition
+            characterClass.Rule
                 = characterRange
                 | characterRange + characterClass;
 
-            characterRange.Definition
+            characterRange.Rule
                 = characterClassCharacter
                 | characterClassCharacter + '-' + characterClassCharacter;
 
-            character.Definition = (_)
+            character.Rule = (Expr)
                 notMeta
                 | escape;
 
-            characterClassCharacter.Definition = (_)
+            characterClassCharacter.Rule = (Expr)
                 notCloseBracket
                 | escape;
 
-            _regexGrammar = new GrammarBuilder(regex)
+            _regexGrammar = new GrammarExpression(
+                regex, 
+                new[] 
+                {
+                    regex,
+                    expression,
+                    term,
+                    factor,
+                    atom,
+                    iterator,
+                    set,
+                    positiveSet,
+                    negativeSet,
+                    characterClass,
+                    characterRange,
+                    character,
+                    characterClassCharacter
+                })
                 .ToGrammar();
         }
 
