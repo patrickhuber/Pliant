@@ -8,10 +8,10 @@ namespace Pliant.Grammars
     {
         protected ReadWriteList<ILexerRule> _ignores;
         protected ReadWriteList<IProduction> _productions;
-        private IDictionary<INonTerminal, IList<IProduction>> _productionIndex;
-        private IDictionary<int, IList<ILexerRule>> _ignoreIndex;
+        private Dictionary<INonTerminal, List<IProduction>> _productionIndex;
+        private Dictionary<int, List<ILexerRule>> _ignoreIndex;
         private ISet<INonTerminal> _nullable;
-        private IDictionary<INonTerminal, ISet<IProduction>> _reverseLookup;
+        private Dictionary<INonTerminal, ISet<IProduction>> _reverseLookup;
 
         private static readonly IProduction[] EmptyProductionArray = { };
         private static readonly ILexerRule[] EmptyLexerRuleArray = { };
@@ -20,8 +20,8 @@ namespace Pliant.Grammars
         {
             _productions = new ReadWriteList<IProduction>();
             _ignores = new ReadWriteList<ILexerRule>();
-            _productionIndex = new Dictionary<INonTerminal, IList<IProduction>>();
-            _ignoreIndex = new Dictionary<int, IList<ILexerRule>>();
+            _productionIndex = new Dictionary<INonTerminal, List<IProduction>>();
+            _ignoreIndex = new Dictionary<int, List<ILexerRule>>();
             _nullable = new HashSet<INonTerminal>();
             _reverseLookup = new Dictionary<INonTerminal, ISet<IProduction>>();
         }
@@ -140,7 +140,7 @@ namespace Pliant.Grammars
         private void AddIgnoreRuletoIndex(ILexerRule lexerRule)
         {
             var key = HashUtil.ComputeHash(
-                                lexerRule.SymbolType.GetHashCode(),
+                                ((int)lexerRule.SymbolType).GetHashCode(),
                                 lexerRule.TokenType.Id.GetHashCode());
             if (!_ignoreIndex.ContainsKey(key))
                 _ignoreIndex.Add(key, new List<ILexerRule>());
@@ -151,7 +151,7 @@ namespace Pliant.Grammars
 
         public IEnumerable<IProduction> RulesFor(INonTerminal symbol)
         {
-            IList<IProduction> list;
+            List<IProduction> list;
             if (!_productionIndex.TryGetValue(symbol, out list))
                 return EmptyProductionArray;
             return list;

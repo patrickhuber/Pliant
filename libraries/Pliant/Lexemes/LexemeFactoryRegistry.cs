@@ -5,7 +5,7 @@ namespace Pliant.Lexemes
 {
     public class LexemeFactoryRegistry : ILexemeFactoryRegistry
     {
-        private readonly IDictionary<LexerRuleType, ILexemeFactory> _registry;
+        private readonly Dictionary<LexerRuleType, ILexemeFactory> _registry;
 
         public LexemeFactoryRegistry()
         {

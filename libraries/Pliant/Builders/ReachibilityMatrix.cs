@@ -5,8 +5,8 @@ namespace Pliant.Builders
 {
     internal class ReachibilityMatrix 
     {
-        private IDictionary<ISymbol, ISet<NonTerminalModel>> _matrix;
-        private IDictionary<ISymbol, ProductionModel> _lookup;
+        private Dictionary<ISymbol, ISet<NonTerminalModel>> _matrix;
+        private Dictionary<ISymbol, ProductionModel> _lookup;
 
         public ReachibilityMatrix(IEnumerable<ProductionModel> productions)
             : this()

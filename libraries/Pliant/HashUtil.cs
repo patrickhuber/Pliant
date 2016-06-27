@@ -7,19 +7,17 @@ namespace Pliant
         private const uint SEED = 2166136261;
         private const int INCREMENTAL = 16777619;
 
-        public static int ComputeHash(params int[] hashCodes)
+        public static int ComputeHash(params int[] hashes)
         {
             unchecked
             {
                 var hash = (int)SEED;
-                for (int i = 0; i < hashCodes.Length; i++)
-                {
-                    hash = hash * INCREMENTAL ^ hashCodes[i];
-                }
+                foreach (var value in hashes)
+                    hash = hash * INCREMENTAL ^ value;
                 return hash;
             }
         }
-
+        
         public static int ComputeHash(IEnumerable<object> items)
         {
             unchecked

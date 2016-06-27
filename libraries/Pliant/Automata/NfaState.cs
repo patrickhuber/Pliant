@@ -1,13 +1,11 @@
-﻿using Pliant.Grammars;
-using System.Collections.Generic;
-using System;
+﻿using System.Collections.Generic;
 using Pliant.Collections;
 
 namespace Pliant.Automata
 {
     public class NfaState : INfaState
     {
-        private IList<INfaTransition> _transitions;
+        private List<INfaTransition> _transitions;
 
         public NfaState()
         {

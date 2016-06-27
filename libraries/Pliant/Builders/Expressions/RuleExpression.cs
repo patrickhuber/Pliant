@@ -6,11 +6,11 @@ namespace Pliant.Builders.Expressions
 {
     public class RuleExpression : BaseExpression
     {
-        public IList<IList<BaseExpression>> Alterations { get; private set; }
+        public List<List<BaseExpression>> Alterations { get; private set; }
 
         public RuleExpression()
         {
-            Alterations = new List<IList<BaseExpression>>();
+            Alterations = new List<List<BaseExpression>>();
         }
 
         public RuleExpression(BaseExpression baseExpression)

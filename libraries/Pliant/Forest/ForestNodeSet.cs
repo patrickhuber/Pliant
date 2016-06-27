@@ -6,8 +6,8 @@ namespace Pliant.Forest
 {
     public class ForestNodeSet
     {
-        private readonly IDictionary<int, ISymbolForestNode> _symbolNodes;
-        private readonly IDictionary<int, IIntermediateForestNode> _intermediateNodes;
+        private readonly Dictionary<int, ISymbolForestNode> _symbolNodes;
+        private readonly Dictionary<int, IIntermediateForestNode> _intermediateNodes;
         
         public ForestNodeSet()
         {
