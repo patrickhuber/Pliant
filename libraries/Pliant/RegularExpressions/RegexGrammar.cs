@@ -203,7 +203,7 @@ namespace Pliant.RegularExpressions
             get { return _regexGrammar.Ignores; }
         }
 
-        public IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal)
+        public IReadOnlyList<IProduction> RulesFor(INonTerminal nonTerminal)
         {
             return _regexGrammar.RulesFor(nonTerminal);
         }

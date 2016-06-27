@@ -10,7 +10,7 @@ namespace Pliant.Grammars
 
         IReadOnlyList<ILexerRule> Ignores { get; }
 
-        IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal);
+        IReadOnlyList<IProduction> RulesFor(INonTerminal nonTerminal);
 
         IEnumerable<IProduction> StartProductions();
 

@@ -159,7 +159,7 @@ namespace Pliant.Bnf
             get { return _bnfGrammar.Ignores; }
         }
 
-        public IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal)
+        public IReadOnlyList<IProduction> RulesFor(INonTerminal nonTerminal)
         {
             return _bnfGrammar.RulesFor(nonTerminal);
         }

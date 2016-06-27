@@ -194,8 +194,13 @@ namespace Pliant
         private void Predict(IState evidence, int j)
         {
             var nonTerminal = evidence.PostDotSymbol as INonTerminal;
-            foreach (var production in Grammar.RulesFor(nonTerminal))
+            var rulesForNonTerminal = Grammar.RulesFor(nonTerminal);
+            // PERF: Avoid boxing enumerable
+#pragma warning disable CC0006 // Use foreach
+            for (int p =0; p<rulesForNonTerminal.Count;p++)
+#pragma warning restore CC0006 // Use foreach
             {
+                var production = rulesForNonTerminal[p];
                 PredictProduction(evidence, j, production);
             }
         }
