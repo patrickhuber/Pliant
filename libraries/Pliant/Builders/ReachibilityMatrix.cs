@@ -38,8 +38,9 @@ namespace Pliant.Builders
 
             foreach (var alteration in production.Alterations)
             {
-                foreach (var symbol in alteration.Symbols)
+                for(var s = 0; s< alteration.Symbols.Count; s++)
                 {
+                    var symbol = alteration.Symbols[s];
                     if (symbol.ModelType != SymbolModelType.Production
                         || symbol.ModelType != SymbolModelType.Reference)
                         continue;
