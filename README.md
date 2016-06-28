@@ -135,12 +135,12 @@ var parseRunner = new ParseRunner(parseEngine, input);
 // forward and continues to accept symbols. 
 var recognzied = false;
 var errorPosition = 0;
-while(!lexer.EndOfStream())
+while(!parseRunner.EndOfStream())
 {
-	recognzied = lexer.Read();
+	recognzied = parseRunner.Read();
 	if(!recognized)
 	{	
-		errorPosition = lexer.Position;
+		errorPosition = parseRunner.Position;
 		break;
 	}
 }
@@ -151,9 +151,9 @@ while(!lexer.EndOfStream())
 var accepted = false;
 if(recognized)
 {
-	accepted = lexer.IsAccepted();
+	accepted = parseRunner.IsAccepted();
 	if(!accepted)
-		errorPosition = lexer.Position;
+		errorPosition = parseRunner.Position;
 }
 Console.WriteLine($"Recognized: {recognized}, Accepted: {accepted}");
 if(!recognized || !accepted)

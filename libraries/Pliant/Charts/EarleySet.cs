@@ -11,6 +11,16 @@ namespace Pliant.Charts
         private StateQueue _transitions;
         private StateQueue _extensions;
 
+        public IReadOnlyList<IState> Predictions { get { return _predictions; } }
+
+        public IReadOnlyList<IState> Scans { get { return _scans; } }
+
+        public IReadOnlyList<IState> Completions { get { return _completions; } }
+
+        public IReadOnlyList<IState> Transitions { get { return _transitions; } }
+
+        public int Location { get; private set; }
+
         public EarleySet(int location)
         {
             _predictions = new StateQueue();
@@ -20,14 +30,6 @@ namespace Pliant.Charts
             _extensions = new StateQueue();
             Location = location;
         }
-
-        public IReadOnlyList<IState> Predictions { get { return _predictions; } }
-
-        public IReadOnlyList<IState> Scans { get { return _scans; } }
-
-        public IReadOnlyList<IState> Completions { get { return _completions; } }
-
-        public IReadOnlyList<IState> Transitions { get { return _transitions; } }
 
         public bool Enqueue(IState state)
         {
@@ -44,7 +46,6 @@ namespace Pliant.Charts
             return _completions.Enqueue(state);
         }
 
-        public int Location { get; private set; }
 
         public ITransitionState FindTransitionState(ISymbol searchSymbol)
         {
