@@ -64,11 +64,7 @@ namespace Pliant.Automata
 
         private class NfaClosure
         {
-            public IEnumerable<INfaState> Closure { get; }
-            public IDfaState State { get; }
-
             private readonly int _hashCode;
-
             public NfaClosure(IEnumerable<INfaState> closure, bool isFinal)
             {
                 Closure = closure;
@@ -76,11 +72,8 @@ namespace Pliant.Automata
                 State = new DfaState(isFinal);
             }
 
-            public override int GetHashCode()
-            {
-                return _hashCode;
-            }
-
+            public IEnumerable<INfaState> Closure { get; }
+            public IDfaState State { get; }
             public override bool Equals(object obj)
             {
                 if ((object)obj == null)
@@ -89,6 +82,11 @@ namespace Pliant.Automata
                 if ((object)nfaClosure == null)
                     return false;
                 return nfaClosure._hashCode.Equals(_hashCode);
+            }
+
+            public override int GetHashCode()
+            {
+                return _hashCode;
             }
         }
     }     

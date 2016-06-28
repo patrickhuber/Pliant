@@ -8,10 +8,10 @@ namespace Pliant.Grammars
     {
         protected ReadWriteList<ILexerRule> _ignores;
         protected ReadWriteList<IProduction> _productions;
-        private IDictionary<INonTerminal, IList<IProduction>> _productionIndex;
-        private IDictionary<int, IList<ILexerRule>> _ignoreIndex;
+        private Dictionary<INonTerminal, ReadWriteList<IProduction>> _productionIndex;
+        private Dictionary<int, ReadWriteList<ILexerRule>> _ignoreIndex;
         private ISet<INonTerminal> _nullable;
-        private IDictionary<INonTerminal, ISet<IProduction>> _reverseLookup;
+        private Dictionary<INonTerminal, ISet<IProduction>> _reverseLookup;
 
         private static readonly IProduction[] EmptyProductionArray = { };
         private static readonly ILexerRule[] EmptyLexerRuleArray = { };
@@ -20,8 +20,8 @@ namespace Pliant.Grammars
         {
             _productions = new ReadWriteList<IProduction>();
             _ignores = new ReadWriteList<ILexerRule>();
-            _productionIndex = new Dictionary<INonTerminal, IList<IProduction>>();
-            _ignoreIndex = new Dictionary<int, IList<ILexerRule>>();
+            _productionIndex = new Dictionary<INonTerminal, ReadWriteList<IProduction>>();
+            _ignoreIndex = new Dictionary<int, ReadWriteList<ILexerRule>>();
             _nullable = new HashSet<INonTerminal>();
             _reverseLookup = new Dictionary<INonTerminal, ISet<IProduction>>();
         }
@@ -72,7 +72,7 @@ namespace Pliant.Grammars
             var leftHandSide = production.LeftHandSide;
             if (!_productionIndex.ContainsKey(leftHandSide))
             {
-                _productionIndex.Add(leftHandSide, new List<IProduction>());
+                _productionIndex.Add(leftHandSide, new ReadWriteList<IProduction>());
             }
             _productionIndex[leftHandSide].Add(production);
         }
@@ -140,18 +140,18 @@ namespace Pliant.Grammars
         private void AddIgnoreRuletoIndex(ILexerRule lexerRule)
         {
             var key = HashUtil.ComputeHash(
-                                lexerRule.SymbolType.GetHashCode(),
-                                lexerRule.TokenType.Id.GetHashCode());
+                lexerRule.SymbolType.GetHashCode(),
+                lexerRule.TokenType.Id.GetHashCode());
             if (!_ignoreIndex.ContainsKey(key))
-                _ignoreIndex.Add(key, new List<ILexerRule>());
+                _ignoreIndex.Add(key, new ReadWriteList<ILexerRule>());
             _ignoreIndex[key].Add(lexerRule);
         }
 
         public INonTerminal Start { get; set; }
 
-        public IEnumerable<IProduction> RulesFor(INonTerminal symbol)
+        public IReadOnlyList<IProduction> RulesFor(INonTerminal symbol)
         {
-            IList<IProduction> list;
+            ReadWriteList<IProduction> list;
             if (!_productionIndex.TryGetValue(symbol, out list))
                 return EmptyProductionArray;
             return list;

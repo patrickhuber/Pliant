@@ -54,7 +54,6 @@
     <Compile Include="Builders\ReachibilityMatrix.cs" />
     <Compile Include="Builders\SymbolModel.cs" />
     <Compile Include="Builders\SymbolModelType.cs" />
-    <Compile Include="Forest\HorspoolSet.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />
     <Compile Include="Forest\SinglePassForestNodeVisitorStateManager.cs" />
     <Compile Include="Automata\INfaToDfa.cs" />
@@ -127,7 +126,6 @@
     <Compile Include="Assert.cs" />
     <Compile Include="Grammars\CharacterClassTerminal.cs" />
     <Compile Include="Charts\Chart.cs" />
-    <Compile Include="Collections\IEnumerableExtensions.cs" />
     <Compile Include="Grammars\DigitTerminal.cs" />
     <Compile Include="Charts\EarleySet.cs" />
     <Compile Include="Grammars\Grammar.cs" />
@@ -224,6 +222,8 @@
     <Compile Include="Tree\TreeEnumerator.cs" />
     <Compile Include="Tree\TreeNodeType.cs" />
     <Compile Include="Tree\TreeNodeVisitorBase.cs" />
+    <Compile Include="Utilities\ObjectPool.cs" />
+    <Compile Include="Utilities\ObjectPoolExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Pliant.nuspec" />

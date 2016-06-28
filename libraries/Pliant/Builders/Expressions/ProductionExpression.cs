@@ -41,7 +41,7 @@ namespace Pliant.Builders.Expressions
             }
         }
 
-        private static AlterationModel GetAlterationModelFromAlterationExpression(IList<BaseExpression> symbols)
+        private static AlterationModel GetAlterationModelFromAlterationExpression(List<BaseExpression> symbols)
         {
             var alterationModel = new AlterationModel();
             foreach (var symbol in symbols)

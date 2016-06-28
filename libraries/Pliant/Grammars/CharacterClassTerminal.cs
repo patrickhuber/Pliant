@@ -4,13 +4,13 @@ namespace Pliant.Grammars
 {
     public class CharacterClassTerminal : ITerminal
     {
-        private readonly IList<ITerminal> _terminals;
+        private readonly List<ITerminal> _terminals;
 
         public SymbolType SymbolType { get { return SymbolType.Terminal; } }
 
         public CharacterClassTerminal(params ITerminal[] terminals)
         {
-            _terminals = terminals;
+            _terminals = new List<ITerminal>(terminals);
         }
 
         public bool IsMatch(char character)

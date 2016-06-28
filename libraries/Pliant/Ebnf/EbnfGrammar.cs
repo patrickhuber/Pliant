@@ -283,7 +283,7 @@ namespace Pliant.Ebnf
             get { return _ebnfGrammar.Start; }
         }
 
-        public IEnumerable<IProduction> RulesFor(INonTerminal nonTerminal)
+        public IReadOnlyList<IProduction> RulesFor(INonTerminal nonTerminal)
         {
             return _ebnfGrammar.RulesFor(nonTerminal);
         }

@@ -5,7 +5,7 @@ namespace Pliant.Forest
     public class MultiPassForestNodeVisitorStateManager : IForestNodeVisitorStateManager
     {
         private IInternalForestNode _lock;
-        private IDictionary<IInternalForestNode, int> _stateStore;
+        private Dictionary<IInternalForestNode, int> _stateStore;
 
         public MultiPassForestNodeVisitorStateManager()
         {

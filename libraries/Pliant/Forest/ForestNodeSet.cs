@@ -6,8 +6,8 @@ namespace Pliant.Forest
 {
     public class ForestNodeSet
     {
-        private readonly IDictionary<int, ISymbolForestNode> _symbolNodes;
-        private readonly IDictionary<int, IIntermediateForestNode> _intermediateNodes;
+        private readonly Dictionary<int, ISymbolForestNode> _symbolNodes;
+        private readonly Dictionary<int, IIntermediateForestNode> _intermediateNodes;
         
         public ForestNodeSet()
         {
@@ -30,12 +30,15 @@ namespace Pliant.Forest
         
         private static int ComputeHashCode(ISymbol symbol, int origin, int location)
         {
-            return HashUtil.ComputeHash(symbol.GetHashCode(), origin.GetHashCode(), location.GetHashCode());
+            return HashUtil.ComputeHash(
+                symbol.GetHashCode(), 
+                origin.GetHashCode(), 
+                location.GetHashCode());
         }
 
         public IIntermediateForestNode AddOrGetExistingIntermediateNode(IState trigger, int origin, int location)
         {
-            var hash = HashUtil.ComputeHash(trigger.GetHashCode());
+            var hash = trigger.GetHashCode();
             IIntermediateForestNode intermediateNode = null;
             if (_intermediateNodes.TryGetValue(hash, out intermediateNode))
                 return intermediateNode;

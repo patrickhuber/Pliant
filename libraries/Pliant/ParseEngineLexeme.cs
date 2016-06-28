@@ -1,6 +1,7 @@
 ﻿using Pliant.Grammars;
 using Pliant.Lexemes;
 using Pliant.Tokens;
+using Pliant.Utilities;
 using System.Collections.Generic;
 using System.Text;
 
@@ -14,10 +15,12 @@ namespace Pliant
 
         private StringBuilder _capture;
         private readonly IParseEngine _parseEngine;
+        private readonly ObjectPool<List<TerminalLexeme>> _terminalLexemeListPool;
 
         public ParseEngineLexeme(IParseEngine parseEngine, TokenType tokenType)
         {
             TokenType = tokenType;
+            _terminalLexemeListPool = new ObjectPool<List<TerminalLexeme>>(()=>new List<TerminalLexeme>());
             _capture = new StringBuilder();
             _parseEngine = parseEngine;
         }
@@ -26,7 +29,7 @@ namespace Pliant
         {
             // get expected lexems
             // PERF: Avoid Linq where, let and select expressions due to lambda allocation
-            var expectedLexemes = new List<TerminalLexeme>();
+            var expectedLexemes = _terminalLexemeListPool.AllocateAndClear();
             foreach (var rule in _parseEngine.GetExpectedLexerRules())
                 if (rule.LexerRuleType == TerminalLexerRule.TerminalLexerRuleType)
                     expectedLexemes.Add(new TerminalLexeme(rule as ITerminalLexerRule));
@@ -40,6 +43,7 @@ namespace Pliant
                     firstPassingRule = lexeme;
                     break;
                 }
+            _terminalLexemeListPool.Free(expectedLexemes);
 
             if (firstPassingRule == null)
                 return false;

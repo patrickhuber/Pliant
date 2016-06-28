@@ -5,8 +5,8 @@ namespace Pliant.Builders
 {
     internal class ReachibilityMatrix 
     {
-        private IDictionary<ISymbol, ISet<NonTerminalModel>> _matrix;
-        private IDictionary<ISymbol, ProductionModel> _lookup;
+        private Dictionary<ISymbol, ISet<NonTerminalModel>> _matrix;
+        private Dictionary<ISymbol, ProductionModel> _lookup;
 
         public ReachibilityMatrix(IEnumerable<ProductionModel> productions)
             : this()
@@ -38,8 +38,9 @@ namespace Pliant.Builders
 
             foreach (var alteration in production.Alterations)
             {
-                foreach (var symbol in alteration.Symbols)
+                for(var s = 0; s< alteration.Symbols.Count; s++)
                 {
+                    var symbol = alteration.Symbols[s];
                     if (symbol.ModelType != SymbolModelType.Production
                         || symbol.ModelType != SymbolModelType.Reference)
                         continue;

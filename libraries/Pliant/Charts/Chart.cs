@@ -7,6 +7,8 @@ namespace Pliant.Charts
     {
         private ReadWriteList<IEarleySet> _earleySets;
 
+        public IReadOnlyList<IEarleySet> EarleySets { get { return _earleySets; } }
+
         public Chart()
         {
             _earleySets = new ReadWriteList<IEarleySet>();
@@ -20,8 +22,6 @@ namespace Pliant.Charts
             var earleySet = _earleySets[index];
             return earleySet.Enqueue(state);
         }
-
-        public IReadOnlyList<IEarleySet> EarleySets { get { return _earleySets; } }
 
         public int Count
         {

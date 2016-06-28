@@ -5,7 +5,7 @@ namespace Pliant.Builders
 {
     public class ProductionModel : SymbolModel
     {
-        public IList<AlterationModel> Alterations { get; private set; }
+        public List<AlterationModel> Alterations { get; private set; }
 
         public NonTerminalModel LeftHandSide { get; set; }
 

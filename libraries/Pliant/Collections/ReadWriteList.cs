@@ -2,7 +2,7 @@
 
 namespace Pliant.Collections
 {
-    public class ReadWriteList<T> : List<T>, IList<T>, IReadOnlyList<T>
+    public class ReadWriteList<T> : List<T>, IReadOnlyList<T>
     {
         public ReadWriteList()
         {

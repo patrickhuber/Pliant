@@ -5,6 +5,7 @@ using Pliant.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Pliant.Utilities;
 
 namespace Pliant
 {
@@ -20,6 +21,7 @@ namespace Pliant
 
         private Chart _chart;
         private ForestNodeSet _nodeSet;
+        private ObjectPool<Dictionary<TokenType, ILexerRule>> _tokenTypeAndILexerRuleDictionaryObjectPool;
 
         public ParseEngine(IGrammar grammar)
             : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
@@ -31,6 +33,8 @@ namespace Pliant
             Options = options;
             _nodeSet = new ForestNodeSet();
             Grammar = grammar;
+            _tokenTypeAndILexerRuleDictionaryObjectPool = new ObjectPool<Dictionary<TokenType, ILexerRule>>(
+                ()=>new Dictionary<TokenType, ILexerRule>());
             Initialize();
         }
 
@@ -41,20 +45,27 @@ namespace Pliant
             var currentEarleySet = earleySets[currentIndex];
             var scanStates = currentEarleySet.Scans;
 
+            var expectedRuleDictionary = _tokenTypeAndILexerRuleDictionaryObjectPool.AllocateAndClear();
             // PERF: Avoid Linq Select, Where due to lambda allocation
-            var expectedRuleDictionary = new Dictionary<TokenType, ILexerRule>();
-            foreach (var scanState in scanStates)
+            // PERF: Avoid foreach enumeration due to IEnumerable boxing
+#pragma warning disable CC0006 // Use foreach
+            for (int s = 0; s < scanStates.Count; s++)
+#pragma warning restore CC0006 // Use foreach
             {
+                var scanState = scanStates[s];
                 var postDotSymbol = scanState.PostDotSymbol;
                 if (postDotSymbol != null
                     && postDotSymbol.SymbolType == SymbolType.LexerRule)
                 {
                     var lexerRule = postDotSymbol as ILexerRule;
                     if (!expectedRuleDictionary.ContainsKey(lexerRule.TokenType))
+                    {
                         expectedRuleDictionary.Add(lexerRule.TokenType, lexerRule);
+                        yield return lexerRule;
+                    }
                 }
             }
-            return expectedRuleDictionary.Values;
+            _tokenTypeAndILexerRuleDictionaryObjectPool.Free(expectedRuleDictionary);
         }
 
         public IForestNode GetParseForestRoot()
@@ -85,7 +96,8 @@ namespace Pliant
 
             // PERF: Avoid LINQ Any due to lambda allocation
             foreach (var completion in lastEarleySet.Completions)
-                if (completion.Origin == 0 && completion.Production.LeftHandSide.Value == startStateSymbol.Value)
+                if (completion.Origin == 0 
+                    && completion.Production.LeftHandSide.Value == startStateSymbol.Value)
                     return true;
             return false;
         }
@@ -183,8 +195,13 @@ namespace Pliant
         private void Predict(IState evidence, int j)
         {
             var nonTerminal = evidence.PostDotSymbol as INonTerminal;
-            foreach (var production in Grammar.RulesFor(nonTerminal))
+            var rulesForNonTerminal = Grammar.RulesFor(nonTerminal);
+            // PERF: Avoid boxing enumerable
+#pragma warning disable CC0006 // Use foreach
+            for (int p =0; p<rulesForNonTerminal.Count;p++)
+#pragma warning restore CC0006 // Use foreach
             {
+                var production = rulesForNonTerminal[p];
                 PredictProduction(evidence, j, production);
             }
         }

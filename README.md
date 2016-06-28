@@ -1,6 +1,9 @@
 # Pliant
 Implementation of a modified Earley parser in C# inspired by the Marpa Parser project.
 
+## Build Status
+![](https://patrickhuber.visualstudio.com/_apis/public/build/definitions/d758f02e-3764-4572-aaff-9378f05b48f9/3/badge)
+
 ## Description
 Pliant is a table driven parser that implements the Earley algorithm. Two optimizations are added to handle issues with the original Earley implementation: 
 
@@ -8,6 +11,14 @@ Pliant is a table driven parser that implements the Earley algorithm. Two optimi
 2. Bug fix from Aycock and Horspool to handle nullable predictions
 
 ## Using the Code
+
+### Getting Started
+
+Add a reference to the Pliant libarary using [NuGet](http://www.nuget.org/packages/Pliant/)
+
+```
+PM> Install-Package Pliant
+```
 
 ### Creating Grammars
 
@@ -135,12 +146,12 @@ var parseRunner = new ParseRunner(parseEngine, input);
 // forward and continues to accept symbols. 
 var recognzied = false;
 var errorPosition = 0;
-while(!lexer.EndOfStream())
+while(!parseRunner.EndOfStream())
 {
-	recognzied = lexer.Read();
+	recognzied = parseRunner.Read();
 	if(!recognized)
 	{	
-		errorPosition = lexer.Position;
+		errorPosition = parseRunner.Position;
 		break;
 	}
 }
@@ -151,9 +162,9 @@ while(!lexer.EndOfStream())
 var accepted = false;
 if(recognized)
 {
-	accepted = lexer.IsAccepted();
+	accepted = parseRunner.IsAccepted();
 	if(!accepted)
-		errorPosition = lexer.Position;
+		errorPosition = parseRunner.Position;
 }
 Console.WriteLine($"Recognized: {recognized}, Accepted: {accepted}");
 if(!recognized || !accepted)

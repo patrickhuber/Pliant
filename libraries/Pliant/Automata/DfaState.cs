@@ -4,12 +4,10 @@ namespace Pliant.Automata
 {
     public class DfaState : IDfaState
     {
-        private readonly IList<IDfaTransition> _transitions;
-
         public bool IsFinal { get; private set; }
 
-        public IEnumerable<IDfaTransition> Transitions { get { return _transitions; } }
-
+        public List<IDfaTransition> Transitions { get; private set; }
+        
         public DfaState()
             : this(false)
         { }
@@ -17,12 +15,12 @@ namespace Pliant.Automata
         public DfaState(bool isFinal)
         {
             IsFinal = isFinal;
-            _transitions = new List<IDfaTransition>();
+            Transitions = new List<IDfaTransition>();
         }
 
         public void AddTransition(IDfaTransition edge)
         {
-            _transitions.Add(edge);
+            Transitions.Add(edge);
         }
     }
 }
