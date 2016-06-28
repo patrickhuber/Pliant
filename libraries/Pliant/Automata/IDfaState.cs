@@ -6,7 +6,7 @@ namespace Pliant.Automata
     {
         bool IsFinal { get; }
 
-        List<IDfaTransition> Transitions { get; }
+        IReadOnlyList<IDfaTransition> Transitions { get; }
 
         void AddTransition(IDfaTransition edge);
     }
