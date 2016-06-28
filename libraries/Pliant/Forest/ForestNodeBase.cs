@@ -36,7 +36,7 @@
         private int ComputeHashCode()
         {
             return HashUtil.ComputeHash(
-                NodeType.GetHashCode(), 
+                ((int)NodeType).GetHashCode(), 
                 Location.GetHashCode(), 
                 Origin.GetHashCode());
         }

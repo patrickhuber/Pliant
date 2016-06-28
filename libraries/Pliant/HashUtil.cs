@@ -6,18 +6,82 @@ namespace Pliant
     {
         private const uint SEED = 2166136261;
         private const int INCREMENTAL = 16777619;
-
-        public static int ComputeHash(params int[] hashes)
+        
+        public static int ComputeHash(int first)
         {
             unchecked
             {
                 var hash = (int)SEED;
-                foreach (var value in hashes)
-                    hash = hash * INCREMENTAL ^ value;
+                hash = hash * INCREMENTAL ^ first;
                 return hash;
             }
         }
-        
+
+        public static int ComputeHash(int first, int second)
+        {
+            unchecked
+            {
+                var hash = (int)SEED;
+                hash = hash * INCREMENTAL ^ first;
+                hash = hash * INCREMENTAL ^ second;
+                return hash;
+            }
+        }
+
+        public static int ComputeHash(int first, int second, int third)
+        {
+            unchecked
+            {
+                var hash = (int)SEED;
+                hash = hash * INCREMENTAL ^ first;
+                hash = hash * INCREMENTAL ^ second;
+                hash = hash * INCREMENTAL ^ third;
+                return hash;
+            }
+        }
+
+        public static int ComputeHash(int first, int second, int third, int fourth)
+        {
+            unchecked
+            {
+                var hash = (int)SEED;
+                hash = hash * INCREMENTAL ^ first;
+                hash = hash * INCREMENTAL ^ second;
+                hash = hash * INCREMENTAL ^ third;
+                hash = hash * INCREMENTAL ^ fourth;
+                return hash;
+            }
+        }
+
+        public static int ComputeHash(int first, int second, int third, int fourth, int fifth)
+        {
+            unchecked
+            {
+                var hash = (int)SEED;
+                hash = hash * INCREMENTAL ^ first;
+                hash = hash * INCREMENTAL ^ second;
+                hash = hash * INCREMENTAL ^ third;
+                hash = hash * INCREMENTAL ^ fourth;
+                hash = hash * INCREMENTAL ^ fifth;
+                return hash;
+            }
+        }
+
+        public static int ComputeHash(int first, int second, int third, int fourth, int fifth, int sixth)
+        {
+            unchecked
+            {
+                var hash = (int)SEED;
+                hash = hash * INCREMENTAL ^ first;
+                hash = hash * INCREMENTAL ^ second;
+                hash = hash * INCREMENTAL ^ third;
+                hash = hash * INCREMENTAL ^ fourth;
+                hash = hash * INCREMENTAL ^ fifth;
+                hash = hash * INCREMENTAL ^ sixth;
+                return hash;
+            }
+        }
+
         public static int ComputeHash(IEnumerable<object> items)
         {
             unchecked
@@ -30,7 +94,7 @@ namespace Pliant
                 return hash;
             }
         }
-
+        
         public static int ComputeIncrementalHash(int hashCode, int accumulator, bool isFirstValue = false)
         {
             unchecked

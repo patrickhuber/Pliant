@@ -96,7 +96,8 @@ namespace Pliant
 
             // PERF: Avoid LINQ Any due to lambda allocation
             foreach (var completion in lastEarleySet.Completions)
-                if (completion.Origin == 0 && completion.Production.LeftHandSide.Value == startStateSymbol.Value)
+                if (completion.Origin == 0 
+                    && completion.Production.LeftHandSide.Value == startStateSymbol.Value)
                     return true;
             return false;
         }
