@@ -1,5 +1,6 @@
 ﻿using Pliant.Charts;
 using Pliant.Grammars;
+using Pliant.Utilities;
 using System.Collections.Generic;
 
 namespace Pliant.Forest
@@ -30,7 +31,7 @@ namespace Pliant.Forest
         
         private static int ComputeHashCode(ISymbol symbol, int origin, int location)
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 symbol.GetHashCode(), 
                 origin.GetHashCode(), 
                 location.GetHashCode());

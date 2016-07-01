@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pliant.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,7 +34,7 @@ namespace Pliant.Ebnf
 
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 NodeType.GetHashCode(),
                 Term.GetHashCode());
         }
@@ -73,7 +74,7 @@ namespace Pliant.Ebnf
 
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 NodeType.GetHashCode(),
                 Term.GetHashCode(),
                 Expression.GetHashCode());

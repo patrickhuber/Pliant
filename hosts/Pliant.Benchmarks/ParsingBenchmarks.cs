@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Pliant.Bnf;
+using Pliant.Runtime;
 using System;
 using System.IO;
 

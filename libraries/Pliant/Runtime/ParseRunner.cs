@@ -7,7 +7,7 @@ using Pliant.Utilities;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Pliant
+namespace Pliant.Runtime
 {
     public class ParseRunner : IParseRunner
     {

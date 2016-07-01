@@ -1,5 +1,7 @@
-﻿using Pliant.Forest;
+﻿using Pliant.Diagnostics;
+using Pliant.Forest;
 using Pliant.Grammars;
+using Pliant.Utilities;
 using System;
 using System.Text;
 
@@ -100,7 +102,7 @@ namespace Pliant.Charts
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 Position.GetHashCode(),
                 Origin.GetHashCode(),
                 Production.GetHashCode());

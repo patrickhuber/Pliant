@@ -1,6 +1,7 @@
 ﻿using Pliant.Collections;
 using System.Collections.Generic;
 using System;
+using Pliant.Utilities;
 
 namespace Pliant.Grammars
 {
@@ -139,7 +140,7 @@ namespace Pliant.Grammars
 
         private void AddIgnoreRuletoIndex(ILexerRule lexerRule)
         {
-            var key = HashUtil.ComputeHash(
+            var key = HashCode.Compute(
                 lexerRule.SymbolType.GetHashCode(),
                 lexerRule.TokenType.Id.GetHashCode());
             if (!_ignoreIndex.ContainsKey(key))

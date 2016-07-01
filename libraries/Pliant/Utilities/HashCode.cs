@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 
-namespace Pliant
+namespace Pliant.Utilities
 {
-    internal static class HashUtil
+    internal static class HashCode
     {
         private const uint SEED = 2166136261;
         private const int INCREMENTAL = 16777619;
         
-        public static int ComputeHash(int first)
+        public static int Compute(int first)
         {
             unchecked
             {
@@ -17,7 +17,7 @@ namespace Pliant
             }
         }
 
-        public static int ComputeHash(int first, int second)
+        public static int Compute(int first, int second)
         {
             unchecked
             {
@@ -28,7 +28,7 @@ namespace Pliant
             }
         }
 
-        public static int ComputeHash(int first, int second, int third)
+        public static int Compute(int first, int second, int third)
         {
             unchecked
             {
@@ -40,7 +40,7 @@ namespace Pliant
             }
         }
 
-        public static int ComputeHash(int first, int second, int third, int fourth)
+        public static int Compute(int first, int second, int third, int fourth)
         {
             unchecked
             {
@@ -53,7 +53,7 @@ namespace Pliant
             }
         }
 
-        public static int ComputeHash(int first, int second, int third, int fourth, int fifth)
+        public static int Compute(int first, int second, int third, int fourth, int fifth)
         {
             unchecked
             {

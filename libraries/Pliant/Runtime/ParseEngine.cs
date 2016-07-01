@@ -6,8 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Pliant.Utilities;
+using Pliant.Diagnostics;
 
-namespace Pliant
+namespace Pliant.Runtime
 {
     public class ParseEngine : IParseEngine
     {

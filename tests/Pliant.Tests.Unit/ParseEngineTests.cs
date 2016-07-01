@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Pliant.Tests.Unit.Forest;
 using Pliant.Builders.Expressions;
+using Pliant.Runtime;
 
 namespace Pliant.Tests.Unit
 {

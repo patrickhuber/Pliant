@@ -1,4 +1,6 @@
-﻿namespace Pliant.Forest
+﻿using Pliant.Utilities;
+
+namespace Pliant.Forest
 {
     public abstract class ForestNodeBase : IForestNode
     {
@@ -38,7 +40,7 @@
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 ((int)NodeType).GetHashCode(), 
                 Location.GetHashCode(), 
                 Origin.GetHashCode());

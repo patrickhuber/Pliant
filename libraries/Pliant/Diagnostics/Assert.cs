@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Pliant
+namespace Pliant.Diagnostics
 {
     internal static class Assert
     {

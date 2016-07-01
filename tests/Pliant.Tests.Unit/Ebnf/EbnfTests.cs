@@ -2,6 +2,7 @@
 using Pliant.Forest;
 using Pliant.Ebnf;
 using Pliant.Grammars;
+using Pliant.Runtime;
 
 namespace Pliant.Tests.Unit.Ebnf
 {

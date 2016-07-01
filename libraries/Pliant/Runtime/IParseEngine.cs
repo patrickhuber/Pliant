@@ -4,7 +4,7 @@ using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Collections.Generic;
 
-namespace Pliant
+namespace Pliant.Runtime
 {
     /// <summary>
     /// Provides the interface for the earley parse engine.

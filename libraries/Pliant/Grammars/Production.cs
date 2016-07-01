@@ -1,4 +1,6 @@
 ﻿using Pliant.Collections;
+using Pliant.Diagnostics;
+using Pliant.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -60,9 +62,9 @@ namespace Pliant.Grammars
 
         private int ComputeHashCode()
         {
-            var hash = HashUtil.ComputeIncrementalHash(LeftHandSide.GetHashCode(), 0, true);
+            var hash = HashCode.ComputeIncrementalHash(LeftHandSide.GetHashCode(), 0, true);
             foreach (var symbol in RightHandSide)
-                hash = HashUtil.ComputeIncrementalHash(symbol.GetHashCode(), hash);
+                hash = HashCode.ComputeIncrementalHash(symbol.GetHashCode(), hash);
             return hash;
         }
 

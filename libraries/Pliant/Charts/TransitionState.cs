@@ -1,4 +1,5 @@
 ﻿using Pliant.Grammars;
+using Pliant.Utilities;
 using System;
 
 namespace Pliant.Charts
@@ -42,7 +43,7 @@ namespace Pliant.Charts
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.ComputeHash(
                 Position.GetHashCode(),
                 Origin.GetHashCode(),
                 Production.GetHashCode(),

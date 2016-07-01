@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Bnf;
+using Pliant.Runtime;
 using System.IO;
 using System.Text;
 
@@ -64,7 +65,7 @@ namespace Pliant.Tests.Unit.Bnf
             }
             Assert.IsTrue(
                 parseRunner.ParseEngine.IsAccepted(),
-                "error at position {0}", parseRunner.Position);
+                $"error at position {parseRunner.Position}");
         }
 
         [TestMethod]
@@ -81,7 +82,7 @@ namespace Pliant.Tests.Unit.Bnf
             while (!parseRunner.EndOfStream())
             {
                 if (!parseRunner.Read())
-                    Assert.Fail("Error Parsing At Position {0}", parseRunner.Position);
+                    Assert.Fail($"Error Parsing At Position {parseRunner.Position}");
             }
             Assert.IsTrue(parseEngine.IsAccepted());
         }

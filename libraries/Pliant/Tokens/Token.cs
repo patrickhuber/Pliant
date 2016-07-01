@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pliant.Utilities;
+using System;
 
 namespace Pliant.Tokens
 {
@@ -20,7 +21,7 @@ namespace Pliant.Tokens
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 TokenType.GetHashCode(), 
                 Origin.GetHashCode(), 
                 Value.GetHashCode());

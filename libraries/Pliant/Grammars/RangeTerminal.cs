@@ -1,4 +1,6 @@
-﻿namespace Pliant.Grammars
+﻿using Pliant.Utilities;
+
+namespace Pliant.Grammars
 {
     public class RangeTerminal : BaseTerminal, ITerminal
     {
@@ -23,7 +25,7 @@
 
         public override int GetHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 Start.GetHashCode(),
                 End.GetHashCode());
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using Pliant.Grammars;
+using Pliant.Utilities;
 
 namespace Pliant.Forest
 {
@@ -47,7 +48,7 @@ namespace Pliant.Forest
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 NodeType.GetHashCode(),
                 Location.GetHashCode(),
                 Origin.GetHashCode(),

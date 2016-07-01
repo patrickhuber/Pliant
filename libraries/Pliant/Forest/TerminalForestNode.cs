@@ -1,4 +1,6 @@
-﻿namespace Pliant.Forest
+﻿using Pliant.Utilities;
+
+namespace Pliant.Forest
 {
     public class TerminalForestNode : ForestNodeBase, ITerminalForestNode
     {
@@ -45,7 +47,7 @@
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 NodeType.GetHashCode(),
                 Location.GetHashCode(),
                 Origin.GetHashCode(),

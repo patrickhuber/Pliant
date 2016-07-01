@@ -5,7 +5,7 @@ using Pliant.Utilities;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Pliant
+namespace Pliant.Runtime
 {
     public class ParseEngineLexeme : ILexeme
     {

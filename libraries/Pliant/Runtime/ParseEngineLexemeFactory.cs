@@ -2,7 +2,7 @@
 using Pliant.Lexemes;
 using System;
 
-namespace Pliant
+namespace Pliant.Runtime
 {
     public class ParseEngineLexemeFactory : ILexemeFactory
     {

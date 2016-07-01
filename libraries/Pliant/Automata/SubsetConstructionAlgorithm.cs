@@ -1,5 +1,6 @@
 ﻿using Pliant.Collections;
 using Pliant.Grammars;
+using Pliant.Utilities;
 using System;
 using System.Collections.Generic;
 
@@ -68,7 +69,7 @@ namespace Pliant.Automata
             public NfaClosure(IEnumerable<INfaState> closure, bool isFinal)
             {
                 Closure = closure;
-                _hashCode = HashUtil.ComputeHash(closure);
+                _hashCode = HashCode.ComputeHash(closure);
                 State = new DfaState(isFinal);
             }
 

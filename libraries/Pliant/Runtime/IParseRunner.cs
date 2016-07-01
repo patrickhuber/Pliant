@@ -1,4 +1,4 @@
-﻿namespace Pliant
+﻿namespace Pliant.Runtime
 {
     public interface IParseRunner
     {
