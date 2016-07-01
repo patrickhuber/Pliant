@@ -7,6 +7,7 @@ using Pliant.Tokens;
 using Pliant.Builders.Expressions;
 using Pliant.Builders;
 using Pliant.Runtime;
+using Pliant.Tests.Unit.Runtime;
 
 namespace Pliant.Tests.Unit.Forest
 {
@@ -40,7 +41,7 @@ namespace Pliant.Tests.Unit.Forest
             while (!regexLexer.EndOfStream())
             {
                 if (!regexLexer.Read())
-                    Assert.Fail("error parsing input at position {0}", regexLexer.Position);
+                    Assert.Fail($"error parsing input at position {regexLexer.Position}");
             }
             Assert.IsTrue(regexParseEngine.IsAccepted());
 

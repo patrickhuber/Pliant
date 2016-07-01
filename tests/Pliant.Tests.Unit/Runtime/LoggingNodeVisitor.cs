@@ -1,7 +1,7 @@
 ﻿using Pliant.Forest;
 using System.Collections.Generic;
 
-namespace Pliant.Tests.Unit
+namespace Pliant.Tests.Unit.Runtime
 {
     public class LoggingNodeVisitor : NodeVisitorBase
     {

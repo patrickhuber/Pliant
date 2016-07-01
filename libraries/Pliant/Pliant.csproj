@@ -218,7 +218,6 @@
     <Compile Include="Tree\ITreeNode.cs" />
     <Compile Include="Tree\ITreeNodeVisitor.cs" />
     <Compile Include="Tree\TokenTreeNode.cs" />
-    <Compile Include="Tree\TreeEnumerator.cs" />
     <Compile Include="Tree\TreeNodeType.cs" />
     <Compile Include="Tree\TreeNodeVisitorBase.cs" />
     <Compile Include="Utilities\ObjectPool.cs" />
