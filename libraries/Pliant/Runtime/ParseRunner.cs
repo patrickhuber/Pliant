@@ -16,7 +16,6 @@ namespace Pliant.Runtime
         private readonly ILexemeFactoryRegistry _lexemeFactoryRegistry;
         private readonly ObjectPool<List<ILexeme>> _lexemeListPool;
         private readonly ObjectPool<List<ILexerRule>> _lexerRuleListPool;
-        private readonly ObjectPool<ReadWriteList<ILexerRule>> _lexerRuleReadWriteListPool;
 
         private readonly TextReader _textReader;
 
