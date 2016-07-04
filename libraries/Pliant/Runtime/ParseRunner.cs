@@ -13,10 +13,12 @@ namespace Pliant.Runtime
     {
         private List<ILexeme> _existingLexemes;
         private List<ILexeme> _ignoreLexemes;
-        private ILexemeFactoryRegistry _lexemeFactoryRegistry;
-        private ObjectPool<List<ILexeme>> _lexemeListPool;
-        private ObjectPool<List<ILexerRule>> _lexerRuleListPool;
-        private TextReader _textReader;
+        private readonly ILexemeFactoryRegistry _lexemeFactoryRegistry;
+        private readonly ObjectPool<List<ILexeme>> _lexemeListPool;
+        private readonly ObjectPool<List<ILexerRule>> _lexerRuleListPool;
+        private readonly ObjectPool<ReadWriteList<ILexerRule>> _lexerRuleReadWriteListPool;
+
+        private readonly TextReader _textReader;
 
         public IParseEngine ParseEngine { get; private set; }
 
@@ -37,8 +39,8 @@ namespace Pliant.Runtime
             _ignoreLexemes = new List<ILexeme>();
             _existingLexemes = new List<ILexeme>();
 
-            _lexemeListPool = new ObjectPool<List<ILexeme>>(() => new List<ILexeme>());
-            _lexerRuleListPool = new ObjectPool<List<ILexerRule>>(() => new List<ILexerRule>());
+            _lexemeListPool = new ObjectPool<List<ILexeme>>();
+            _lexerRuleListPool = new ObjectPool<List<ILexerRule>>();
 
             Position = 0;
             ParseEngine = parseEngine;
@@ -166,8 +168,12 @@ namespace Pliant.Runtime
 
             var ignoreLexerRules = _lexerRuleListPool.AllocateAndClear();
             // PERF: Avoid IEnumerable<T> boxing by calling AddRange
-            foreach (var item in ParseEngine.Grammar.Ignores)
-                ignoreLexerRules.Add(item);
+            // PERF: Avoid foreach loop due to non struct boxing
+            for (int i = 0; i < ParseEngine.Grammar.Ignores.Count; i++)
+            {
+                var ignore = ParseEngine.Grammar.Ignores[i];
+                ignoreLexerRules.Add(ignore);
+            }
 
             var matchingIgnoreLexemes = _lexemeListPool.Allocate();
             var anyMatchingIgnoreLexemes = false;
@@ -193,10 +199,15 @@ namespace Pliant.Runtime
 
         private bool MatchesNewLexemes(char character)
         {
-            var newLexemes = _lexemeListPool.AllocateAndClear();            
+            var newLexemes = _lexemeListPool.AllocateAndClear();
             var anyLexemeScanned = false;
-            foreach (var lexerRule in ParseEngine.GetExpectedLexerRules())
+            
+            var expectedLexerRules = ParseEngine.GetExpectedLexerRules();
+            // PERF: Avoid foreach due to boxing IEnumerable<T>
+#pragma warning disable CC0006 // Use foreach
+            for (var l = 0; l< expectedLexerRules.Count; l++)
             {
+                var lexerRule = expectedLexerRules[l];
                 var lexeme = CreateLexemeForLexerRule(lexerRule);
                 if (lexeme.Scan(character))
                 {
@@ -204,7 +215,8 @@ namespace Pliant.Runtime
                     newLexemes.Add(lexeme);
                 }
             }
-
+#pragma warning restore CC0006 // Use foreach
+                        
             if (!anyLexemeScanned)
                 return false;
             _lexemeListPool.Free(_existingLexemes);

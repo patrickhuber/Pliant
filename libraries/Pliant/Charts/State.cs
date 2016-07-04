@@ -130,7 +130,7 @@ namespace Pliant.Charts
             if (Position == Production.RightHandSide.Count)
                 stringBuilder.Append(Dot);
 
-            stringBuilder.AppendFormat("\t\t({0})", Origin);
+            stringBuilder.Append($"\t\t({Origin})");
             return stringBuilder.ToString();
         }
 

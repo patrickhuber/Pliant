@@ -41,8 +41,8 @@ namespace Pliant.Forest
         private int ComputeHashCode()
         {
             return HashCode.Compute(
-                ((int)NodeType).GetHashCode(), 
-                Location.GetHashCode(), 
+                ((int)NodeType).GetHashCode(),
+                Location.GetHashCode(),
                 Origin.GetHashCode());
         }
     }

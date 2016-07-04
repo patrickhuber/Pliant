@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Pliant.Utilities;
 using Pliant.Diagnostics;
+using Pliant.Collections;
 
 namespace Pliant.Runtime
 {
@@ -21,9 +22,9 @@ namespace Pliant.Runtime
         public ParseEngineOptions Options { get; private set; }
 
         private Chart _chart;
-        private ForestNodeSet _nodeSet;
-        private ObjectPool<Dictionary<TokenType, ILexerRule>> _tokenTypeAndILexerRuleDictionaryObjectPool;
-
+        private readonly ForestNodeSet _nodeSet;
+        private readonly ObjectPool<Dictionary<TokenType, ILexerRule>> _tokenTypeAndILexerRuleDictionaryObjectPool;
+        
         public ParseEngine(IGrammar grammar)
             : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
         {
@@ -34,17 +35,19 @@ namespace Pliant.Runtime
             Options = options;
             _nodeSet = new ForestNodeSet();
             Grammar = grammar;
-            _tokenTypeAndILexerRuleDictionaryObjectPool = new ObjectPool<Dictionary<TokenType, ILexerRule>>(
-                ()=>new Dictionary<TokenType, ILexerRule>());
+            _tokenTypeAndILexerRuleDictionaryObjectPool = new ObjectPool<Dictionary<TokenType, ILexerRule>>();
             Initialize();
         }
 
-        public IEnumerable<ILexerRule> GetExpectedLexerRules()
+        
+        public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
             var earleySets = _chart.EarleySets;
             var currentIndex = earleySets.Count - 1;
             var currentEarleySet = earleySets[currentIndex];
             var scanStates = currentEarleySet.Scans;
+
+            var returnList = new ReadWriteList<ILexerRule>();
 
             var expectedRuleDictionary = _tokenTypeAndILexerRuleDictionaryObjectPool.AllocateAndClear();
             // PERF: Avoid Linq Select, Where due to lambda allocation
@@ -62,11 +65,12 @@ namespace Pliant.Runtime
                     if (!expectedRuleDictionary.ContainsKey(lexerRule.TokenType))
                     {
                         expectedRuleDictionary.Add(lexerRule.TokenType, lexerRule);
-                        yield return lexerRule;
+                        returnList.Add(lexerRule);
                     }
                 }
             }
             _tokenTypeAndILexerRuleDictionaryObjectPool.Free(expectedRuleDictionary);
+            return returnList;
         }
 
         public IForestNode GetParseForestRoot()
@@ -96,10 +100,13 @@ namespace Pliant.Runtime
             var startStateSymbol = Grammar.Start;
 
             // PERF: Avoid LINQ Any due to lambda allocation
-            foreach (var completion in lastEarleySet.Completions)
-                if (completion.Origin == 0 
+            for (var c = 0; c < lastEarleySet.Completions.Count; c++)
+            {
+                var completion = lastEarleySet.Completions[c];
+                if (completion.Origin == 0
                     && completion.Production.LeftHandSide.Value == startStateSymbol.Value)
                     return true;
+            }
             return false;
         }
 
@@ -444,7 +451,7 @@ namespace Pliant.Runtime
             if (anyPreDotRuleNull && !anyPostDotRuleNull)
                 return v;
 
-            IInternalForestNode internalNode;
+            IInternalForestNode internalNode = null; 
             if (anyPostDotRuleNull)
             {
                 internalNode = _nodeSet
