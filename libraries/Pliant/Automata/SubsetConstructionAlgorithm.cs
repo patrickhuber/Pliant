@@ -16,7 +16,7 @@ namespace Pliant.Automata
             while (processOnceQueue.Count > 0)
             {
                 var nfaClosure = processOnceQueue.Dequeue();
-                var transitions = new Dictionary<ITerminal, ISet<INfaState>>();
+                var transitions = new Dictionary<ITerminal, HashSet<INfaState>>();
 
                 foreach (var state in nfaClosure.Closure)
                 {
@@ -49,7 +49,7 @@ namespace Pliant.Automata
             return start.State;
         }
 
-        private NfaClosure Closure(IEnumerable<INfaState> states, INfaState endState)
+        private static NfaClosure Closure(HashSet<INfaState> states, INfaState endState)
         {
             var set = new HashSet<INfaState>();
             var isFinal = false;
