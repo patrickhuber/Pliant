@@ -63,8 +63,11 @@ namespace Pliant.Grammars
         private int ComputeHashCode()
         {
             var hash = HashCode.ComputeIncrementalHash(LeftHandSide.GetHashCode(), 0, true);
-            foreach (var symbol in RightHandSide)
+            for (var s = 0; s < RightHandSide.Count; s++)
+            {
+                var symbol = RightHandSide[s];
                 hash = HashCode.ComputeIncrementalHash(symbol.GetHashCode(), hash);
+            }
             return hash;
         }
 

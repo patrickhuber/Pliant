@@ -12,7 +12,7 @@ namespace Pliant.Grammars
         private Dictionary<INonTerminal, ReadWriteList<IProduction>> _productionIndex;
         private Dictionary<int, ReadWriteList<ILexerRule>> _ignoreIndex;
         private ISet<INonTerminal> _nullable;
-        private Dictionary<INonTerminal, ISet<IProduction>> _reverseLookup;
+        private Dictionary<INonTerminal, HashSet<IProduction>> _reverseLookup;
 
         private static readonly IProduction[] EmptyProductionArray = { };
         private static readonly ILexerRule[] EmptyLexerRuleArray = { };
@@ -24,7 +24,7 @@ namespace Pliant.Grammars
             _productionIndex = new Dictionary<INonTerminal, ReadWriteList<IProduction>>();
             _ignoreIndex = new Dictionary<int, ReadWriteList<ILexerRule>>();
             _nullable = new HashSet<INonTerminal>();
-            _reverseLookup = new Dictionary<INonTerminal, ISet<IProduction>>();
+            _reverseLookup = new Dictionary<INonTerminal, HashSet<IProduction>>();
         }
 
         public Grammar(
@@ -83,12 +83,13 @@ namespace Pliant.Grammars
             // get nullable nonterminals: http://cstheory.stackexchange.com/a/2493/32787
             if (production.IsEmpty)
                 _nullable.Add(production.LeftHandSide);
-            foreach (var symbol in production.RightHandSide)
+            for(var s = 0; s< production.RightHandSide.Count; s++)
             {
+                var symbol = production.RightHandSide[s];
                 if (symbol.SymbolType != SymbolType.NonTerminal)
                     continue;
                 var nonTerminal = symbol as INonTerminal;
-                ISet<IProduction> hashSet = null;
+                HashSet<IProduction> hashSet = null;
                 if (!_reverseLookup.TryGetValue(nonTerminal, out hashSet))
                 {
                     hashSet = new HashSet<IProduction>();
@@ -107,7 +108,7 @@ namespace Pliant.Grammars
             while (nullableQueue.Count > 0)
             {
                 var nonTerminal = nullableQueue.Dequeue();
-                ISet<IProduction> productionsContainingNonTerminal = null;
+                HashSet<IProduction> productionsContainingNonTerminal = null;
                 if (_reverseLookup.TryGetValue(nonTerminal, out productionsContainingNonTerminal))
                 {
                     foreach (var production in productionsContainingNonTerminal)
@@ -118,8 +119,9 @@ namespace Pliant.Grammars
                             size = production.RightHandSide.Count;
                             productionSizes[production] = size;
                         }
-                        foreach (var symbol in production.RightHandSide)
+                        for (var s=0; s< production.RightHandSide.Count; s++)
                         {
+                            var symbol = production.RightHandSide[s];
                             if (symbol.SymbolType == SymbolType.NonTerminal 
                                 && nonTerminal.Equals(symbol))
                                 size--;

@@ -14,7 +14,7 @@ namespace Pliant.Automata
             var startState = new DfaState();
             IDfaState currentState = startState;
 
-            for (int c = 0; c < input.Length; c++)
+            for (var c = 0; c < input.Length; c++)
             {
                 var character = input[c];
                 var isFinal = c == input.Length - 1;

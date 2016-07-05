@@ -50,11 +50,15 @@ namespace Pliant.Forest
 
         private void CloneUniqueChildSubTree(IInternalForestNode internalCompletedParseNode)
         {
-            foreach (var andNode in internalCompletedParseNode.Children)
+            for (var a = 0; a < internalCompletedParseNode.Children.Count; a++)
             {
+                var andNode = internalCompletedParseNode.Children[a];
                 var newAndNode = new AndForestNode();
-                foreach (var child in andNode.Children)
+                for (var c = 0; c < andNode.Children.Count; c++)
+                {
+                    var child = andNode.Children[c];
                     newAndNode.AddChild(child);
+                }
                 _children.Add(newAndNode);
             }
         }

@@ -5,14 +5,14 @@ namespace Pliant.Automata
 {
     public class NfaState : INfaState
     {
-        private List<INfaTransition> _transitions;
+        private ReadWriteList<INfaTransition> _transitions;
 
         public NfaState()
         {
-            _transitions = new List<INfaTransition>();
+            _transitions = new ReadWriteList<INfaTransition>();
         }
 
-        public IEnumerable<INfaTransition> Transitions
+        public IReadOnlyList<INfaTransition> Transitions
         {
             get { return _transitions; }
         }
@@ -35,9 +35,12 @@ namespace Pliant.Automata
             while (queue.Count != 0)
             {
                 var state = queue.Dequeue();
-                foreach (var transition in state.Transitions)
+                for (var t = 0; t < state.Transitions.Count; t++)
+                {
+                    var transition = state.Transitions[t];
                     if (transition.TransitionType == NfaTransitionType.Null)
                         queue.Enqueue(transition.Target);
+                }
             }
 
             return queue.Visited;
