@@ -31,7 +31,7 @@ namespace Pliant.Grammars
             return _innerGrammar.RulesFor(nonTerminal);
         }
 
-        public IReadOnlyList<IProduction> StartProductions()
+        public IEnumerable<IProduction> StartProductions()
         {
             return _innerGrammar.StartProductions();
         }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Pliant.Bnf
 {
-    public class BnfGrammar : IGrammar
+    public class BnfGrammar : GrammarWrapper
     {
         private static readonly IGrammar _bnfGrammar;
 
@@ -38,22 +38,28 @@ namespace Pliant.Bnf
             var doubleQuoteText = new NonTerminal("doubleQuoteText");
             var singleQuoteText = new NonTerminal("singleQuoteText");
 
+            var lessThan = new TerminalLexerRule('<');
+            var greaterThan = new TerminalLexerRule('>');
+            var doubleQuote = new TerminalLexerRule('"');
+            var slash = new TerminalLexerRule('\'');
+            var pipe = new TerminalLexerRule('|');
+
             var productions = new[]
             {
                 new Production(grammar, rule),
                 new Production(grammar, rule, grammar),
                 new Production(rule, identifier, implements, expression),
                 new Production(expression, list),
-                new Production(expression, list, new TerminalLexerRule('|'), expression),
+                new Production(expression, list, pipe, expression),
                 new Production(lineEnd, eol),
                 new Production(lineEnd, lineEnd, lineEnd),
                 new Production(list, term),
                 new Production(list, term, list),
                 new Production(term, literal),
                 new Production(term, identifier),
-                new Production(identifier, new TerminalLexerRule('<'), ruleName, new TerminalLexerRule('>')),
-                new Production(literal, new TerminalLexerRule('"'), notDoubleQuote, new TerminalLexerRule('"')),
-                new Production(literal, new TerminalLexerRule('\''), notSingleQuuote, new TerminalLexerRule('\''))
+                new Production(identifier, lessThan, ruleName, greaterThan),
+                new Production(literal, doubleQuote, notDoubleQuote, doubleQuote),
+                new Production(literal, slash, notSingleQuuote, slash)
             };
 
             var ignore = new[]
@@ -144,33 +150,8 @@ namespace Pliant.Bnf
             return new DfaLexerRule(startState, new TokenType("[\\s]+"));
         }
 
-        public IReadOnlyList<IProduction> Productions
-        {
-            get { return _bnfGrammar.Productions; }
-        }
-
-        public INonTerminal Start
-        {
-            get { return _bnfGrammar.Start; }
-        }
-
-        public IReadOnlyList<ILexerRule> Ignores
-        {
-            get { return _bnfGrammar.Ignores; }
-        }
-
-        public IReadOnlyList<IProduction> RulesFor(INonTerminal nonTerminal)
-        {
-            return _bnfGrammar.RulesFor(nonTerminal);
-        }
-
-        public IEnumerable<IProduction> StartProductions()
-        {
-            return _bnfGrammar.StartProductions();
-        }
-        public bool IsNullable(INonTerminal nonTerminal)
-        {
-            return _bnfGrammar.IsNullable(nonTerminal);
-        }
+        public BnfGrammar() 
+            : base(_bnfGrammar)
+        { }
     }
 }

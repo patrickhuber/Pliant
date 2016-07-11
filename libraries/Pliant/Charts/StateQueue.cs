@@ -5,7 +5,7 @@ namespace Pliant.Charts
 {
     public class StateQueue : ReadWriteList<IState>
     {
-        private readonly ISet<IState> _set;
+        private readonly HashSet<IState> _set;
 
         public StateQueue()
         {
@@ -14,9 +14,27 @@ namespace Pliant.Charts
 
         public bool Enqueue(IState state)
         {
-            if (!_set.Add(state))
-                return false;
+            const int SWITCH_SIZE = 20;
+            if(Count > SWITCH_SIZE)
+            {
+                if (!_set.Add(state))
+                    return false;
+            }
+            else
+            {
+                var duplicate = false;
+                // search for duplicate
+                for (var i = 0; i < Count; i++)
+                {
+                    if (duplicate = state.GetHashCode() == this[i].GetHashCode())
+                        return false;
+                }
+            }
+
             Add(state);
+            if (Count == SWITCH_SIZE)
+                for (int i = 0; i < Count; i++)
+                    _set.Add(this[i]);
             return true;
         }
     }

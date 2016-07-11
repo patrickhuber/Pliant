@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Pliant.Ebnf
 {
-    public class EbnfGrammar : IGrammar
+    public class EbnfGrammar : GrammarWrapper
     {
         private static readonly IGrammar _ebnfGrammar;
 
@@ -153,6 +153,11 @@ namespace Pliant.Ebnf
             _ebnfGrammar = grammarExpression.ToGrammar();
         }
 
+        public EbnfGrammar() 
+            : base(_ebnfGrammar)
+        {
+        }
+
         private static BaseLexerRule CreateEscapeCharacterLexerRule()
         {
             var start = new DfaState();
@@ -266,36 +271,6 @@ namespace Pliant.Ebnf
                     new NegationTerminal(
                         new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')),
                     "notMeta");
-        }
-
-        public IReadOnlyList<ILexerRule> Ignores
-        {
-            get { return _ebnfGrammar.Ignores; }
-        }
-
-        public IReadOnlyList<IProduction> Productions
-        {
-            get { return _ebnfGrammar.Productions; }
-        }
-
-        public INonTerminal Start
-        {
-            get { return _ebnfGrammar.Start; }
-        }
-
-        public IReadOnlyList<IProduction> RulesFor(INonTerminal nonTerminal)
-        {
-            return _ebnfGrammar.RulesFor(nonTerminal);
-        }
-
-        public IEnumerable<IProduction> StartProductions()
-        {
-            return _ebnfGrammar.StartProductions();
-        }
-
-        public bool IsNullable(INonTerminal nonTerminal)
-        {
-            return _ebnfGrammar.IsNullable(nonTerminal);
         }
     }
 }

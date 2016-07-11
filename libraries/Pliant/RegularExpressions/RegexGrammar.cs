@@ -1,12 +1,9 @@
 ﻿using Pliant.Automata;
-using Pliant.Builders;
-using Pliant.Builders.Expressions;
 using Pliant.Grammars;
-using System.Collections.Generic;
 
 namespace Pliant.RegularExpressions
-{    
-    public class RegexGrammar : IGrammar
+{
+    public class RegexGrammar : GrammarWrapper
     {
         private readonly static IGrammar _regexGrammar;
 
@@ -71,97 +68,69 @@ namespace Pliant.RegularExpressions
             var notCloseBracket = CreateNotCloseBracketLexerRule();
             var escape = CreateEscapeCharacterLexerRule();
 
-            ProductionExpression
-                regex = Regex,
-                expression = Expression,
-                term = Term,
-                factor = Factor,
-                atom = Atom,
-                iterator = Iterator,
-                set = Set,
-                positiveSet = PositiveSet,
-                negativeSet = NegativeSet,
-                characterClass = CharacterClass,
-                characterRange = CharacterRange,
-                character = Character,
-                characterClassCharacter = CharacterClassCharacter;
-            
-            regex.Rule
-                = expression
-                | '^' + expression
-                | expression + '$'
-                | '^' + expression + '$';
+            var regex = new NonTerminal(Regex);
+            var expression = new NonTerminal(Expression);
+            var term = new NonTerminal(Term);
+            var factor = new NonTerminal(Factor);
+            var atom = new NonTerminal(Atom);
+            var iterator = new NonTerminal(Iterator);
+            var set = new NonTerminal(Set);
+            var positiveSet = new NonTerminal(PositiveSet);
+            var negativeSet = new NonTerminal(NegativeSet);
+            var characterClass = new NonTerminal(CharacterClass);
+            var characterRange = new NonTerminal(CharacterRange);
+            var character = new NonTerminal(Character);
+            var characterClassCharacter = new NonTerminal(CharacterClassCharacter);
 
-            expression.Rule
-                = term
-                | term + '|' + expression;
+            var caret = new TerminalLexerRule('^');
+            var dollar = new TerminalLexerRule('$');
+            var pipe = new TerminalLexerRule('|');
+            var dot = new TerminalLexerRule('.');
+            var openParen = new TerminalLexerRule('(');
+            var closeParen = new TerminalLexerRule(')');
+            var star = new TerminalLexerRule('*');
+            var plus = new TerminalLexerRule('+');
+            var question = new TerminalLexerRule('?');
+            var openBracket = new TerminalLexerRule('[');
+            var closeBracket = new TerminalLexerRule(']');
+            var minus = new TerminalLexerRule('-');
 
-            term.Rule
-                = factor
-                | factor + term;
+            var productions = new[]
+            {
+                new Production(regex, expression),
+                new Production(regex, caret, expression),
+                new Production(regex, expression, dollar),
+                new Production(regex, caret, expression, dollar),
+                new Production(expression, term),
+                new Production(expression, term, pipe, expression),
+                new Production(term, factor),
+                new Production(term, factor, term),
+                new Production(factor, atom),
+                new Production(factor, atom, iterator),
+                new Production(atom, dot),
+                new Production(atom, character),
+                new Production(atom, openParen, expression, closeParen),
+                new Production(atom, set),
+                new Production(iterator, star),
+                new Production(iterator, plus),
+                new Production(iterator, question),
+                new Production(set, positiveSet),
+                new Production(set, negativeSet),
+                new Production(positiveSet, openBracket, characterClass, closeBracket),
+                new Production(negativeSet, openBracket, caret, characterClass, closeBracket),
+                new Production(characterClass, characterRange),
+                new Production(characterClass, characterRange, characterClass),
+                new Production(characterRange, characterClassCharacter),
+                new Production(characterRange, characterClassCharacter, minus, characterClassCharacter),
+                new Production(character, notMeta),
+                new Production(character, escape),
+                new Production(characterClassCharacter, notCloseBracket),
+                new Production(characterClassCharacter, escape)
+            };
 
-            factor.Rule
-                = atom
-                | atom + iterator;
-
-            atom.Rule
-                = '.'
-                | character
-                | '(' + expression + ')'
-                | set;
-
-            iterator.Rule = (Expr)
-                '*'
-                | '+'
-                | '?';
-
-            set.Rule
-                = positiveSet
-                | negativeSet;
-
-            positiveSet.Rule
-                = '[' + characterClass + ']';
-
-            negativeSet.Rule
-                = "[^" + characterClass + ']';
-
-            characterClass.Rule
-                = characterRange
-                | characterRange + characterClass;
-
-            characterRange.Rule
-                = characterClassCharacter
-                | characterClassCharacter + '-' + characterClassCharacter;
-
-            character.Rule = (Expr)
-                notMeta
-                | escape;
-
-            characterClassCharacter.Rule = (Expr)
-                notCloseBracket
-                | escape;
-
-            _regexGrammar = new GrammarExpression(
-                regex, 
-                new[] 
-                {
-                    regex,
-                    expression,
-                    term,
-                    factor,
-                    atom,
-                    iterator,
-                    set,
-                    positiveSet,
-                    negativeSet,
-                    characterClass,
-                    characterRange,
-                    character,
-                    characterClassCharacter
-                })
-                .ToGrammar();
+            _regexGrammar = new Grammar(regex, productions, null);
         }
-
+        
         private static BaseLexerRule CreateNotMetaLexerRule()
         {
             return new TerminalLexerRule(
@@ -187,35 +156,9 @@ namespace Pliant.RegularExpressions
             escape.AddTransition(new DfaTransition(new AnyTerminal(), final));
             return new DfaLexerRule(start, "escape");
         }
-
-        public IReadOnlyList<IProduction> Productions
+        public RegexGrammar()
+            : base(_regexGrammar)
         {
-            get { return _regexGrammar.Productions; }
-        }
-
-        public INonTerminal Start
-        {
-            get { return _regexGrammar.Start; }
-        }
-
-        public IReadOnlyList<ILexerRule> Ignores
-        {
-            get { return _regexGrammar.Ignores; }
-        }
-
-        public IReadOnlyList<IProduction> RulesFor(INonTerminal nonTerminal)
-        {
-            return _regexGrammar.RulesFor(nonTerminal);
-        }
-
-        public IEnumerable<IProduction> StartProductions()
-        {
-            return _regexGrammar.StartProductions();
-        }
-        
-        public bool IsNullable(INonTerminal nonTerminal)
-        {
-            return _regexGrammar.IsNullable(nonTerminal);
         }
     }
 }

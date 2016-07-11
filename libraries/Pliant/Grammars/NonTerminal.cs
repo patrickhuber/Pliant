@@ -27,6 +27,12 @@
                 Value = $"{Namespace}.{Name}";
         }
 
+        public NonTerminal(FullyQualifiedName fullyQualifiedName)
+            : this(fullyQualifiedName.Namespace, fullyQualifiedName.Name)
+        {
+
+        }
+
         public override int GetHashCode()
         {
             return Value.GetHashCode();
