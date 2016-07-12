@@ -7,11 +7,11 @@ namespace Pliant.Lexemes
     {
         public ITerminal Terminal { get; private set; }
 
-        private string _stringCapture;
-        private char _capture;
-        private bool _captureRendered = false;
-        private bool _isAccepted = false;
-                
+        string _stringCapture;
+        char _capture;
+        bool _captureRendered;
+        bool _isAccepted;
+
         public string Capture
         {
             get
@@ -40,6 +40,8 @@ namespace Pliant.Lexemes
         {
             Terminal = terminal;
             TokenType = tokenType;
+            _captureRendered = false;
+            _isAccepted = false;
         }
 
         public bool IsAccepted()
@@ -47,23 +49,27 @@ namespace Pliant.Lexemes
             return _isAccepted;
         }
 
-        private void SetAccepted(bool value)
+        void SetAccepted(bool value)
         {
             _isAccepted = value;
         }
 
+        void SetCapture(char value)
+        {
+            _capture = value;
+        }
+
         public bool Scan(char c)
         {
-            if (!IsAccepted())
-            {
-                if (Terminal.IsMatch(c))
-                {
-                    _capture = c;
-                    SetAccepted(true);
-                    return true;
-                }
-            }
-            return false;
+            if (IsAccepted())
+                return false;
+
+            if (!Terminal.IsMatch(c))
+                return false;
+            
+            SetCapture(c);
+            SetAccepted(true);
+            return true;
         }
     }
 }
