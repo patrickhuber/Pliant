@@ -223,6 +223,7 @@
     <Compile Include="Tree\TreeNodeVisitorBase.cs" />
     <Compile Include="Utilities\ObjectPool.cs" />
     <Compile Include="Utilities\ObjectPoolExtensions.cs" />
+    <Compile Include="Utilities\SharedPools.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Pliant.nuspec" />

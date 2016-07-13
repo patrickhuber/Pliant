@@ -24,6 +24,16 @@ namespace Pliant.Utilities
             var dictionary = pool.Allocate();
             dictionary.Clear();
             return dictionary;
-        }     
+        }
+
+        internal static void ClearAndFree<T>(this ObjectPool<List<T>> pool, List<T> list)
+        {
+            if (list == null)
+                return;
+            if (pool == null)
+                return;
+            list.Clear();
+            pool.Free(list);
+        } 
     }
 }

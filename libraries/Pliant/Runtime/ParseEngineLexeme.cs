@@ -15,12 +15,10 @@ namespace Pliant.Runtime
 
         private StringBuilder _capture;
         private readonly IParseEngine _parseEngine;
-        private readonly ObjectPool<List<TerminalLexeme>> _terminalLexemeListPool;
 
         public ParseEngineLexeme(IParseEngine parseEngine, TokenType tokenType)
         {
             TokenType = tokenType;
-            _terminalLexemeListPool = new ObjectPool<List<TerminalLexeme>>(()=>new List<TerminalLexeme>());
             _capture = new StringBuilder();
             _parseEngine = parseEngine;
         }
@@ -29,7 +27,7 @@ namespace Pliant.Runtime
         {
             // get expected lexems
             // PERF: Avoid Linq where, let and select expressions due to lambda allocation
-            var expectedLexemes = _terminalLexemeListPool.AllocateAndClear();
+            var expectedLexemes = SharedPools.Default<List<TerminalLexeme>>().AllocateAndClear();
             foreach (var rule in _parseEngine.GetExpectedLexerRules())
                 if (rule.LexerRuleType == TerminalLexerRule.TerminalLexerRuleType)
                     expectedLexemes.Add(new TerminalLexeme(rule as ITerminalLexerRule));
@@ -43,7 +41,7 @@ namespace Pliant.Runtime
                     firstPassingRule = lexeme;
                     break;
                 }
-            _terminalLexemeListPool.Free(expectedLexemes);
+            SharedPools.Default<List<TerminalLexeme>>().Free(expectedLexemes);
 
             if (firstPassingRule == null)
                 return false;

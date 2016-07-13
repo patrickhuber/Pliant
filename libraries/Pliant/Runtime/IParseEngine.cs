@@ -32,7 +32,7 @@ namespace Pliant.Runtime
         /// Returns the list of expected lexer rules based on the current state of the parse.
         /// </summary>
         /// <returns>The enumeration of lexer rules that apply at the current parse position.</returns>
-        IReadOnlyList<ILexerRule> GetExpectedLexerRules();
+        List<ILexerRule> GetExpectedLexerRules();
 
         /// <summary>
         /// Gets the current parse chart for use in recovery rules.

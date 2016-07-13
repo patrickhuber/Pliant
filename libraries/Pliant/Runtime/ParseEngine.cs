@@ -22,8 +22,7 @@ namespace Pliant.Runtime
         public ParseEngineOptions Options { get; private set; }
 
         private Chart _chart;
-        private readonly ForestNodeSet _nodeSet;
-        private readonly ObjectPool<Dictionary<TokenType, ILexerRule>> _tokenTypeAndILexerRuleDictionaryObjectPool;
+        private readonly ForestNodeSet _nodeSet;        
         
         public ParseEngine(IGrammar grammar)
             : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
@@ -35,21 +34,20 @@ namespace Pliant.Runtime
             Options = options;
             _nodeSet = new ForestNodeSet();
             Grammar = grammar;
-            _tokenTypeAndILexerRuleDictionaryObjectPool = new ObjectPool<Dictionary<TokenType, ILexerRule>>();
             Initialize();
         }
 
         
-        public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
+        public List<ILexerRule> GetExpectedLexerRules()
         {
             var earleySets = _chart.EarleySets;
             var currentIndex = earleySets.Count - 1;
             var currentEarleySet = earleySets[currentIndex];
             var scanStates = currentEarleySet.Scans;
 
-            var returnList = new ReadWriteList<ILexerRule>();
+            var returnList = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
+            var expectedRuleDictionary = SharedPools.Default<Dictionary<TokenType, ILexerRule>>().AllocateAndClear();
 
-            var expectedRuleDictionary = _tokenTypeAndILexerRuleDictionaryObjectPool.AllocateAndClear();
             // PERF: Avoid Linq Select, Where due to lambda allocation
             // PERF: Avoid foreach enumeration due to IEnumerable boxing
 #pragma warning disable CC0006 // Use foreach
@@ -69,7 +67,7 @@ namespace Pliant.Runtime
                     }
                 }
             }
-            _tokenTypeAndILexerRuleDictionaryObjectPool.Free(expectedRuleDictionary);
+            SharedPools.Default<Dictionary<TokenType, ILexerRule>>().Free(expectedRuleDictionary);
             return returnList;
         }
 
