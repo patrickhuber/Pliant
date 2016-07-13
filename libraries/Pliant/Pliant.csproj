@@ -152,7 +152,7 @@
     <Compile Include="Grammars\ITerminal.cs" />
     <Compile Include="Forest\ITerminalForestNode.cs" />
     <Compile Include="Forest\ForestNodeBase.cs" />
-    <Compile Include="Forest\NodeVisitorBase.cs" />
+    <Compile Include="Forest\ForestNodeVisitorBase.cs" />
     <Compile Include="Forest\MultiPassForestNodeVisitorStateManager.cs" />
     <Compile Include="Runtime\ParseEngineLexemeFactory.cs" />
     <Compile Include="Runtime\ParseEngineOptions.cs" />

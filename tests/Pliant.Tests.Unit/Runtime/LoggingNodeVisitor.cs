@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Pliant.Tests.Unit.Runtime
 {
-    public class LoggingNodeVisitor : NodeVisitorBase
+    public class LoggingNodeVisitor : ForestNodeVisitorBase
     {
         public IList<string> VisitLog { get; private set; }
         

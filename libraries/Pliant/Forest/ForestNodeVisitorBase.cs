@@ -1,10 +1,10 @@
 ﻿namespace Pliant.Forest
 {
-    public abstract class NodeVisitorBase : IForestNodeVisitor
+    public abstract class ForestNodeVisitorBase : IForestNodeVisitor
     {
         public IForestNodeVisitorStateManager StateManager { get; private set; }
 
-        protected NodeVisitorBase(IForestNodeVisitorStateManager stateManager)
+        protected ForestNodeVisitorBase(IForestNodeVisitorStateManager stateManager)
         {
             StateManager = stateManager;
         }
