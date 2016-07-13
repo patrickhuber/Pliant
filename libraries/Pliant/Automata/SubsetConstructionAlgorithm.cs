@@ -75,13 +75,15 @@ namespace Pliant.Automata
             }
 
             public IEnumerable<INfaState> Closure { get; private set; }
+
             public IDfaState State { get; }
+
             public override bool Equals(object obj)
             {
-                if ((object)obj == null)
+                if (obj == null)
                     return false;
                 var nfaClosure = obj as NfaClosure;
-                if ((object)nfaClosure == null)
+                if (nfaClosure == null)
                     return false;
                 return nfaClosure._hashCode.Equals(_hashCode);
             }

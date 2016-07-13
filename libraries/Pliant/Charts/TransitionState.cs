@@ -29,10 +29,10 @@ namespace Pliant.Charts
 
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
             var transitionState = obj as TransitionState;
-            if ((object)transitionState == null)
+            if (transitionState == null)
                 return false;
             return base.Equals(obj as State) 
                 && this.Recognized.Equals(transitionState.Recognized)

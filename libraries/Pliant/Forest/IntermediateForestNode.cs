@@ -27,11 +27,11 @@ namespace Pliant.Forest
         }
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
 
             var intermediateNode = obj as IntermediateForestNode;
-            if ((object)intermediateNode == null)
+            if (intermediateNode == null)
                 return false;
 
             return Location == intermediateNode.Location

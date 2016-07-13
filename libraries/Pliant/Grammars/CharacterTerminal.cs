@@ -20,10 +20,10 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
             var terminal = obj as CharacterTerminal;
-            if ((object)terminal == null)
+            if (terminal == null)
                 return false;
             return terminal.Character == Character;
         }

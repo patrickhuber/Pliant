@@ -40,11 +40,11 @@
 
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
             
             var nonTerminal = obj as INonTerminal;
-            if ((object)nonTerminal == null)
+            if (nonTerminal == null)
                 return false;
 
             return Value.Equals(nonTerminal.Value);

@@ -90,10 +90,10 @@ namespace Pliant.Charts
 
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
             var state = obj as State;
-            if ((object)state == null)
+            if (state == null)
                 return false;
             // PERF: Hash Codes are Cached, so equality performance is cached as well
             return GetHashCode() == state.GetHashCode();
