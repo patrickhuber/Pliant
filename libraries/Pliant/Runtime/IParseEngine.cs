@@ -4,7 +4,7 @@ using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Collections.Generic;
 
-namespace Pliant
+namespace Pliant.Runtime
 {
     /// <summary>
     /// Provides the interface for the earley parse engine.
@@ -32,7 +32,7 @@ namespace Pliant
         /// Returns the list of expected lexer rules based on the current state of the parse.
         /// </summary>
         /// <returns>The enumeration of lexer rules that apply at the current parse position.</returns>
-        IEnumerable<ILexerRule> GetExpectedLexerRules();
+        List<ILexerRule> GetExpectedLexerRules();
 
         /// <summary>
         /// Gets the current parse chart for use in recovery rules.

@@ -26,38 +26,53 @@ namespace Pliant.Forest
             if(source == this)
                 source = Children[0].Children[0];
             AddUniqueAndNode(source, trigger);
+        }        
+
+        private void AddUniqueAndNode(IForestNode child)
+        {
+            AddUniqueAndNode(child, null);
         }
 
-        private void AddUniqueAndNode(params IForestNode[] children)
+        private void AddUniqueAndNode(IForestNode firstChild, IForestNode secondChild)
         {
-            foreach (var andNode in _children)
+            var childCount = 1 + ((secondChild == null) ? 0 : 1);
+            for (var c = 0; c < _children.Count; c++)
             {
-                if (andNode.Children.Count != children.Length)
+                var andNode = _children[c];
+
+                if (andNode.Children.Count != childCount)
                     continue;
-                var isMatchedSubTree = IsMatchedSubTree(children, andNode);
-                if (isMatchedSubTree)
+
+                if (IsMatchedSubTree(firstChild, secondChild, andNode))
                     return;
             }
 
             // not found so return new and node
             var newAndNode = new AndForestNode();
-            foreach (var child in children)
-                newAndNode.AddChild(child);
+            newAndNode.AddChild(firstChild);
+            if (childCount > 1)
+                newAndNode.AddChild(secondChild);
 
             _children.Add(newAndNode);
         }
 
-        private static bool IsMatchedSubTree(IForestNode[] children, IAndForestNode andNode)
+        private static bool IsMatchedSubTree(IForestNode firstChild, IForestNode secondChild, IAndForestNode andNode)
         {
-            for (var c = 0; c < andNode.Children.Count; c++)
-            {
-                var parameterNode = children[c];
-                var compareNode = andNode.Children[c];
+            var firstCompareNode = andNode.Children[0];
 
-                if (!parameterNode.Equals(compareNode))
-                    return false;
-            }
-            return true;
-        }        
+            // if first child matches the compare node, continue
+            // otherwise return false
+            if (!firstChild.Equals(firstCompareNode))
+                return false;
+
+            if (secondChild == null)
+                return true;
+
+            var secondCompareNode = andNode.Children[1];
+
+            // return true if the second child matches
+            // otherwise return false
+            return secondChild.Equals(secondCompareNode);
+        }              
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pliant.Utilities;
+using System;
 
 namespace Pliant.Ebnf
 {
@@ -33,7 +34,7 @@ namespace Pliant.Ebnf
 
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 Rule.GetHashCode(), 
                 NodeType.GetHashCode());
         }
@@ -69,7 +70,7 @@ namespace Pliant.Ebnf
 
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 Setting.GetHashCode(),
                 NodeType.GetHashCode());
         }
@@ -105,7 +106,7 @@ namespace Pliant.Ebnf
 
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 LexerRule.GetHashCode(),
                 NodeType.GetHashCode());
         }

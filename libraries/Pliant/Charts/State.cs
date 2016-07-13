@@ -1,5 +1,7 @@
-﻿using Pliant.Forest;
+﻿using Pliant.Diagnostics;
+using Pliant.Forest;
 using Pliant.Grammars;
+using Pliant.Utilities;
 using System;
 using System.Text;
 
@@ -88,10 +90,10 @@ namespace Pliant.Charts
 
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
             var state = obj as State;
-            if ((object)state == null)
+            if (state == null)
                 return false;
             // PERF: Hash Codes are Cached, so equality performance is cached as well
             return GetHashCode() == state.GetHashCode();
@@ -100,7 +102,7 @@ namespace Pliant.Charts
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 Position.GetHashCode(),
                 Origin.GetHashCode(),
                 Production.GetHashCode());
@@ -128,7 +130,7 @@ namespace Pliant.Charts
             if (Position == Production.RightHandSide.Count)
                 stringBuilder.Append(Dot);
 
-            stringBuilder.AppendFormat("\t\t({0})", Origin);
+            stringBuilder.Append($"\t\t({Origin})");
             return stringBuilder.ToString();
         }
 

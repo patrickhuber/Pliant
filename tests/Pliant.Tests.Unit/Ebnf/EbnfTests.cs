@@ -2,6 +2,8 @@
 using Pliant.Forest;
 using Pliant.Ebnf;
 using Pliant.Grammars;
+using Pliant.Runtime;
+using Pliant.Tests.Unit.Runtime;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
@@ -233,7 +235,7 @@ namespace Pliant.Tests.Unit.Ebnf
             SomeRule = 'a' 'b' 'c' ;
             ") as ISymbolForestNode;
             Assert.IsNotNull(node);
-
+            
             var visitor = new LoggingNodeVisitor(
                 new SinglePassForestNodeVisitorStateManager());
             node.Accept(visitor);
@@ -247,7 +249,7 @@ namespace Pliant.Tests.Unit.Ebnf
             var parseRunner = new ParseRunner(_parseEngine, input);
             for (int i = 0; i < input.Length; i++)
             {
-                Assert.IsTrue(parseRunner.Read(), "Error found in position {0}", parseRunner.Position);
+                Assert.IsTrue(parseRunner.Read(), $"Error found in position {parseRunner.Position}");
             }
             Assert.IsTrue(parseRunner.ParseEngine.IsAccepted());
             return parseRunner.ParseEngine.GetParseForestRoot();

@@ -1,4 +1,6 @@
-﻿namespace Pliant.Forest
+﻿using Pliant.Utilities;
+
+namespace Pliant.Forest
 {
     public class TerminalForestNode : ForestNodeBase, ITerminalForestNode
     {
@@ -28,11 +30,11 @@
 
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
 
             var terminalNode = obj as TerminalForestNode;
-            if ((object)terminalNode == null)
+            if (terminalNode == null)
                 return false;
 
             return Location == terminalNode.Location
@@ -45,7 +47,7 @@
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 NodeType.GetHashCode(),
                 Location.GetHashCode(),
                 Origin.GetHashCode(),

@@ -1,4 +1,6 @@
-﻿namespace Pliant.Grammars
+﻿using Pliant.Utilities;
+
+namespace Pliant.Grammars
 {
     public class CharacterTerminal : Symbol, ITerminal
     {
@@ -12,16 +14,16 @@
 
         public override int GetHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 Character.GetHashCode());
         }
 
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
             var terminal = obj as CharacterTerminal;
-            if ((object)terminal == null)
+            if (terminal == null)
                 return false;
             return terminal.Character == Character;
         }

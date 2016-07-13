@@ -1,4 +1,6 @@
 ﻿using Pliant.Collections;
+using Pliant.Diagnostics;
+using Pliant.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -35,10 +37,10 @@ namespace Pliant.Grammars
                 
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
             var production = obj as Production;
-            if ((object)production == null)
+            if (production == null)
                 return false;
             if (!LeftHandSide.Equals(production.LeftHandSide))
                 return false;
@@ -60,9 +62,15 @@ namespace Pliant.Grammars
 
         private int ComputeHashCode()
         {
-            var hash = HashUtil.ComputeIncrementalHash(LeftHandSide.GetHashCode(), 0, true);
-            foreach (var symbol in RightHandSide)
-                hash = HashUtil.ComputeIncrementalHash(symbol.GetHashCode(), hash);
+            var hash = HashCode.ComputeIncrementalHash(LeftHandSide.GetHashCode(), 0, true);
+
+#pragma warning disable CC0006 // Use foreach
+            for (var s = 0; s < RightHandSide.Count; s++)
+#pragma warning restore CC0006 // Use foreach
+            {
+                var symbol = RightHandSide[s];
+                hash = HashCode.ComputeIncrementalHash(symbol.GetHashCode(), hash);
+            }
             return hash;
         }
 

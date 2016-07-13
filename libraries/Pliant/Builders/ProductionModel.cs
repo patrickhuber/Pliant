@@ -54,14 +54,15 @@ namespace Pliant.Builders
             foreach (var alteration in Alterations)
             {
                 var symbols = new List<ISymbol>();
-                foreach (var symbolModel in alteration.Symbols)
+                for (var s = 0; s < alteration.Symbols.Count; s++)
                 {
+                    var symbolModel = alteration.Symbols[s];
                     symbols.Add(symbolModel.Symbol);
                     if (symbolModel.ModelType == SymbolModelType.Reference)
                     {
                         var productionReferenceModel = symbolModel as ProductionReferenceModel;
-                        foreach (var production in productionReferenceModel.Grammar.Productions)
-                            yield return production;
+                        for (var p = 0; p < productionReferenceModel.Grammar.Productions.Count; p++)
+                            yield return productionReferenceModel.Grammar.Productions[p];
                     }
                 }
                 yield return new Production(LeftHandSide.NonTerminal, symbols);

@@ -5,7 +5,7 @@ namespace Pliant.Automata
 {
     public interface INfaState
     {
-        IEnumerable<INfaTransition> Transitions { get; }
+        IReadOnlyList<INfaTransition> Transitions { get; }
 
         void AddTransistion(INfaTransition transition);
 

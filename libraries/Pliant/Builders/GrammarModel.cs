@@ -9,10 +9,11 @@ namespace Pliant.Builders
     public class GrammarModel
     {
         private ObservableCollection<ProductionModel> _productions;
+        private List<LexerRuleModel> _ignoreRules;
 
         public ICollection<ProductionModel> Productions { get { return _productions; } }
 
-        public ICollection<LexerRuleModel> IgnoreRules { get; private set; }
+        public ICollection<LexerRuleModel> IgnoreRules { get { return _ignoreRules; } }
 
         public ProductionModel Start { get; set; }
 
@@ -23,7 +24,7 @@ namespace Pliant.Builders
             _productions = new ObservableCollection<ProductionModel>();
             _productions.CollectionChanged += CollectionChanged;
             _reachibilityMatrix = new ReachibilityMatrix();
-            IgnoreRules = new List<LexerRuleModel>();
+            _ignoreRules = new List<LexerRuleModel>();
         }
 
         public GrammarModel(ProductionModel start)
@@ -96,7 +97,7 @@ namespace Pliant.Builders
         private List<IProduction> GetProductionsFromProductionsModel()
         {
             var productions = new List<IProduction>();
-            foreach (var productionModel in Productions)
+            foreach (var productionModel in _productions)
                 foreach (var production in productionModel.ToProductions())
                     productions.Add(production);
             return productions;
@@ -105,7 +106,7 @@ namespace Pliant.Builders
         private List<ILexerRule> GetIgnoreRulesFromIgnoreRulesModel()
         {
             var ignoreRules = new List<ILexerRule>();
-            foreach (var ignoreRuleModel in IgnoreRules)
+            foreach (var ignoreRuleModel in _ignoreRules)
                 ignoreRules.Add(ignoreRuleModel.Value);
             return ignoreRules;
         }
@@ -122,9 +123,12 @@ namespace Pliant.Builders
             {
                 Productions.Add(production);
                 foreach (var alteration in production.Alterations)
-                    foreach (var symbol in alteration.Symbols)
+                    for (var s =0; s< alteration.Symbols.Count; s++)
+                    {
+                        var symbol = alteration.Symbols[s];
                         if (symbol.ModelType == SymbolModelType.Production)
                             PopulateMissingProductionsRecursively(symbol as ProductionModel, visited);
+                    }
             }
         }
 

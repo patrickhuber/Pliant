@@ -1,4 +1,5 @@
 ﻿using Pliant.Tokens;
+using Pliant.Utilities;
 
 namespace Pliant.Forest
 {
@@ -25,11 +26,11 @@ namespace Pliant.Forest
         
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
 
             var tokenNode = obj as TokenForestNode;
-            if ((object)tokenNode == null)
+            if (tokenNode == null)
                 return false;
 
             return Location == tokenNode.Location
@@ -42,8 +43,8 @@ namespace Pliant.Forest
         
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
-                NodeType.GetHashCode(),
+            return HashCode.Compute(
+                ((int)NodeType).GetHashCode(),
                 Location.GetHashCode(),
                 Origin.GetHashCode(),
                 Token.GetHashCode());

@@ -8,7 +8,7 @@
         {
             StateManager = stateManager;
         }
-        
+
         public virtual void Visit(IIntermediateForestNode intermediateNode)
         {
             var currentAndNode = StateManager.GetCurrentAndNode(intermediateNode);
@@ -21,8 +21,11 @@
 
         public virtual void Visit(IAndForestNode andNode)
         {
-            foreach (var child in andNode.Children)
+            for (var c = 0; c < andNode.Children.Count; c++)
+            {
+                var child = andNode.Children[c];
                 child.Accept(this);
+            }
         }
 
         public virtual void Visit(ISymbolForestNode symbolNode)

@@ -58,8 +58,8 @@ namespace Pliant.Charts
 
         private static void Log(string operation, int origin, IState state)
         {
-            Debug.Write(string.Format("{0}\t{1}", origin, state));
-            Debug.WriteLine(string.Format("\t # {0}", operation));
+            Debug.Write($"{origin}\t{state}");
+            Debug.WriteLine($"\t # {operation}");
         }
     }
 }

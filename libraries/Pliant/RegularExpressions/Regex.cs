@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pliant.Utilities;
+using System;
 
 namespace Pliant.RegularExpressions
 {
@@ -47,7 +48,7 @@ namespace Pliant.RegularExpressions
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 StartsWith.GetHashCode(),
                 Expression.GetHashCode(),
                 EndsWith.GetHashCode());

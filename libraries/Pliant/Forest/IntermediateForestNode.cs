@@ -1,4 +1,5 @@
 ﻿using Pliant.Charts;
+using Pliant.Utilities;
 
 namespace Pliant.Forest
 {
@@ -26,11 +27,11 @@ namespace Pliant.Forest
         }
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
 
             var intermediateNode = obj as IntermediateForestNode;
-            if ((object)intermediateNode == null)
+            if (intermediateNode == null)
                 return false;
 
             return Location == intermediateNode.Location
@@ -43,8 +44,8 @@ namespace Pliant.Forest
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
-                NodeType.GetHashCode(),
+            return HashCode.Compute(
+                ((int)NodeType).GetHashCode(),
                 Location.GetHashCode(),
                 Origin.GetHashCode(),
                 State.GetHashCode());

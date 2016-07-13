@@ -2,12 +2,20 @@
 
 namespace Pliant.Utilities
 {
-    internal class ObjectPool<T> where T : class
+    internal class ObjectPool<T> where T : class, new()
     {
         private readonly Queue<T> _queue;
         private readonly ObjectPoolFactory _factory;
 
         internal delegate T ObjectPoolFactory();
+
+        internal ObjectPool()
+            : this(()=>new T())
+        { }
+
+        internal ObjectPool(int size)
+            : this(size, ()=>new T())
+        { }
 
         internal ObjectPool(int size, ObjectPoolFactory factory)
         {
@@ -36,5 +44,6 @@ namespace Pliant.Utilities
         {
             _queue.Enqueue(value);
         }
+        
     }
 }

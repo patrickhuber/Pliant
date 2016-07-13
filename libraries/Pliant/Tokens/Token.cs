@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pliant.Utilities;
+using System;
 
 namespace Pliant.Tokens
 {
@@ -20,7 +21,7 @@ namespace Pliant.Tokens
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 TokenType.GetHashCode(), 
                 Origin.GetHashCode(), 
                 Value.GetHashCode());
@@ -35,10 +36,10 @@ namespace Pliant.Tokens
 
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
             var token = obj as Token;
-            if ((object)token == null)
+            if (token == null)
                 return false;
             return Value == token.Value
                 && Origin == token.Origin

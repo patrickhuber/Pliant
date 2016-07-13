@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pliant.Utilities;
+using System;
 
 namespace Pliant.RegularExpressions
 {
@@ -31,7 +32,7 @@ namespace Pliant.RegularExpressions
         
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(Factor.GetHashCode());
+            return HashCode.Compute(Factor.GetHashCode());
         }
 
         public override int GetHashCode()
@@ -71,7 +72,7 @@ namespace Pliant.RegularExpressions
 
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                     Term.GetHashCode(),
                     Factor.GetHashCode());
         }

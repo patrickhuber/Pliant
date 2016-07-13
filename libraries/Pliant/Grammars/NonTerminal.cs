@@ -27,6 +27,12 @@
                 Value = $"{Namespace}.{Name}";
         }
 
+        public NonTerminal(FullyQualifiedName fullyQualifiedName)
+            : this(fullyQualifiedName.Namespace, fullyQualifiedName.Name)
+        {
+
+        }
+
         public override int GetHashCode()
         {
             return Value.GetHashCode();
@@ -34,11 +40,11 @@
 
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
             
             var nonTerminal = obj as INonTerminal;
-            if ((object)nonTerminal == null)
+            if (nonTerminal == null)
                 return false;
 
             return Value.Equals(nonTerminal.Value);

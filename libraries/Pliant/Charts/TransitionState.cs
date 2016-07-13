@@ -1,4 +1,5 @@
 ﻿using Pliant.Grammars;
+using Pliant.Utilities;
 using System;
 
 namespace Pliant.Charts
@@ -28,10 +29,10 @@ namespace Pliant.Charts
 
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
             var transitionState = obj as TransitionState;
-            if ((object)transitionState == null)
+            if (transitionState == null)
                 return false;
             return base.Equals(obj as State) 
                 && this.Recognized.Equals(transitionState.Recognized)
@@ -42,7 +43,7 @@ namespace Pliant.Charts
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.ComputeHash(
                 Position.GetHashCode(),
                 Origin.GetHashCode(),
                 Production.GetHashCode(),

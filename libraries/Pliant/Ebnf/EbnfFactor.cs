@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pliant.Utilities;
+using System;
 
 namespace Pliant.Ebnf
 {
@@ -28,7 +29,7 @@ namespace Pliant.Ebnf
 
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 NodeType.GetHashCode(),
                 QualifiedIdentifier.GetHashCode());
         }
@@ -76,7 +77,7 @@ namespace Pliant.Ebnf
         }
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 NodeType.GetHashCode(),
                 Value.GetHashCode());
         }
@@ -124,7 +125,7 @@ namespace Pliant.Ebnf
         }
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 NodeType.GetHashCode(),
                 Regex.GetHashCode());
         }
@@ -188,7 +189,7 @@ namespace Pliant.Ebnf
         }
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 NodeType.GetHashCode(),
                 Expression.GetHashCode());
         }
@@ -220,7 +221,7 @@ namespace Pliant.Ebnf
         }
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 NodeType.GetHashCode(),
                 Expression.GetHashCode());
         }
@@ -268,7 +269,7 @@ namespace Pliant.Ebnf
         }
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
+            return HashCode.Compute(
                 NodeType.GetHashCode(),
                 Expression.GetHashCode());
         }

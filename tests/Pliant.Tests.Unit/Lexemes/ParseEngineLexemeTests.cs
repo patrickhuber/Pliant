@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders.Expressions;
 using Pliant.Grammars;
+using Pliant.Runtime;
 using Pliant.Tokens;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace Pliant.Tests.Unit
             var lexeme = new ParseEngineLexeme(parseEngine, new TokenType("whitespace"));
             var input = "\t\r\n\v\f ";
             for (int i = 0; i < input.Length; i++)
-                Assert.IsTrue(lexeme.Scan(input[i]), "Unable to recognize input[{0}]", i);
+                Assert.IsTrue(lexeme.Scan(input[i]), $"Unable to recognize input[{i}]");
             Assert.IsTrue(lexeme.IsAccepted());
         }
 

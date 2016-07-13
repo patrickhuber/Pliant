@@ -2,9 +2,10 @@
 using Pliant.Builders.Expressions;
 using Pliant.Charts;
 using Pliant.Grammars;
+using Pliant.Runtime;
 using Pliant.Tokens;
 
-namespace Pliant.Tests.Unit
+namespace Pliant.Tests.Unit.Runtime
 {
     [TestClass]
     public class AycockHorspoolAlgorithmTests

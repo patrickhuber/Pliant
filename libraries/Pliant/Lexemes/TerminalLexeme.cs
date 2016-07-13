@@ -1,6 +1,5 @@
 ﻿using Pliant.Grammars;
 using Pliant.Tokens;
-using System.Text;
 
 namespace Pliant.Lexemes
 {
@@ -8,11 +7,26 @@ namespace Pliant.Lexemes
     {
         public ITerminal Terminal { get; private set; }
 
-        private readonly StringBuilder _captureBuilder;
+        string _stringCapture;
+        char _capture;
+        bool _captureRendered;
+        bool _isAccepted;
 
         public string Capture
         {
-            get { return _captureBuilder.ToString(); }
+            get
+            {
+                if (!_isAccepted)
+                    return string.Empty;
+
+                if (_captureRendered)
+                    return _stringCapture;
+                
+                _stringCapture = _capture.ToString();
+                _captureRendered = true;
+
+                return _stringCapture;
+            }
         }
 
         public TokenType TokenType { get; private set; }
@@ -26,25 +40,36 @@ namespace Pliant.Lexemes
         {
             Terminal = terminal;
             TokenType = tokenType;
-            _captureBuilder = new StringBuilder();
+            _captureRendered = false;
+            _isAccepted = false;
         }
 
         public bool IsAccepted()
         {
-            return _captureBuilder.Length > 0;
+            return _isAccepted;
+        }
+
+        void SetAccepted(bool value)
+        {
+            _isAccepted = value;
+        }
+
+        void SetCapture(char value)
+        {
+            _capture = value;
         }
 
         public bool Scan(char c)
         {
-            if (!IsAccepted())
-            {
-                if (Terminal.IsMatch(c))
-                {
-                    _captureBuilder.Append(c);
-                    return true;
-                }
-            }
-            return false;
+            if (IsAccepted())
+                return false;
+
+            if (!Terminal.IsMatch(c))
+                return false;
+            
+            SetCapture(c);
+            SetAccepted(true);
+            return true;
         }
     }
 }

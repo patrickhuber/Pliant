@@ -1,5 +1,6 @@
 ﻿using Pliant.Collections;
 using Pliant.Grammars;
+using Pliant.Utilities;
 using System;
 using System.Collections.Generic;
 
@@ -15,12 +16,13 @@ namespace Pliant.Automata
             while (processOnceQueue.Count > 0)
             {
                 var nfaClosure = processOnceQueue.Dequeue();
-                var transitions = new Dictionary<ITerminal, ISet<INfaState>>();
+                var transitions = new Dictionary<ITerminal, HashSet<INfaState>>();
 
                 foreach (var state in nfaClosure.Closure)
                 {
-                    foreach (var transition in state.Transitions)
+                    for(var t=0;t<state.Transitions.Count; t++)
                     {
+                        var transition = state.Transitions[t];
                         switch (transition.TransitionType)
                         {
                             case NfaTransitionType.Terminal:
@@ -47,7 +49,7 @@ namespace Pliant.Automata
             return start.State;
         }
 
-        private NfaClosure Closure(IEnumerable<INfaState> states, INfaState endState)
+        private static NfaClosure Closure(HashSet<INfaState> states, INfaState endState)
         {
             var set = new HashSet<INfaState>();
             var isFinal = false;
@@ -68,18 +70,20 @@ namespace Pliant.Automata
             public NfaClosure(IEnumerable<INfaState> closure, bool isFinal)
             {
                 Closure = closure;
-                _hashCode = HashUtil.ComputeHash(closure);
+                _hashCode = HashCode.ComputeHash(closure);
                 State = new DfaState(isFinal);
             }
 
-            public IEnumerable<INfaState> Closure { get; }
+            public IEnumerable<INfaState> Closure { get; private set; }
+
             public IDfaState State { get; }
+
             public override bool Equals(object obj)
             {
-                if ((object)obj == null)
+                if (obj == null)
                     return false;
                 var nfaClosure = obj as NfaClosure;
-                if ((object)nfaClosure == null)
+                if (nfaClosure == null)
                     return false;
                 return nfaClosure._hashCode.Equals(_hashCode);
             }

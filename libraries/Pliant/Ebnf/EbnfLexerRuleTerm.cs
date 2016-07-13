@@ -1,4 +1,6 @@
-﻿namespace Pliant.Ebnf
+﻿using Pliant.Utilities;
+
+namespace Pliant.Ebnf
 {
     public class EbnfLexerRuleTerm : EbnfNode
     {
@@ -16,7 +18,7 @@
 
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(NodeType.GetHashCode(), Factor.GetHashCode());
+            return HashCode.Compute(NodeType.GetHashCode(), Factor.GetHashCode());
         }
 
         public override int GetHashCode()
@@ -54,7 +56,7 @@
 
         int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(NodeType.GetHashCode(), Factor.GetHashCode(), Term.GetHashCode());
+            return HashCode.Compute(NodeType.GetHashCode(), Factor.GetHashCode(), Term.GetHashCode());
         }
 
         public override int GetHashCode()

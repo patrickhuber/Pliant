@@ -70,7 +70,7 @@
     <Compile Include="Bnf\BnfTests.cs" />
     <Compile Include="Charts\ChartTests.cs" />
     <Compile Include="Grammars\DigitTerminalTests.cs" />
-    <Compile Include="LoggingNodeVisitor.cs" />
+    <Compile Include="Runtime\LoggingNodeVisitor.cs" />
     <Compile Include="Forest\ForestNodeVisitorTests.cs" />
     <Compile Include="Collections\ProcessOnceQueueTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -80,11 +80,11 @@
     <Compile Include="RegularExpressions\RegexTests.cs" />
     <Compile Include="Charts\StateTests.cs" />
     <Compile Include="Grammars\GrammarTests.cs" />
-    <Compile Include="AycockHorspoolAlgorithmTests.cs" />
+    <Compile Include="Runtime\AycockHorspoolAlgorithmTests.cs" />
     <Compile Include="Grammars\RangeTerminalTests.cs" />
-    <Compile Include="ParseEngineTests.cs" />
+    <Compile Include="Runtime\ParseEngineTests.cs" />
     <Compile Include="Lexemes\ParseEngineLexemeTests.cs" />
-    <Compile Include="LexerTests.cs" />
+    <Compile Include="Runtime\ParseRunnerTests.cs" />
     <Compile Include="Lexemes\TerminalLexemeTests.cs" />
     <Compile Include="Grammars\WhitespaceTerminalTests.cs" />
     <Compile Include="RegularExpressions\RegexToDfaTests.cs" />

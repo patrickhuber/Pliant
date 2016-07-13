@@ -30,8 +30,9 @@ namespace Pliant.Automata
 
         public bool Scan(char c)
         {
-            foreach (var edge in _currentState.Transitions)
+            for(var e = 0; e<_currentState.Transitions.Count; e++)
             {
+                var edge = _currentState.Transitions[e];
                 if (edge.Terminal.IsMatch(c))
                 {
                     _currentState = edge.Target;

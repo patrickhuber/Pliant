@@ -54,6 +54,7 @@
     <Compile Include="Builders\ReachibilityMatrix.cs" />
     <Compile Include="Builders\SymbolModel.cs" />
     <Compile Include="Builders\SymbolModelType.cs" />
+    <Compile Include="Grammars\GrammarWrapper.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />
     <Compile Include="Forest\SinglePassForestNodeVisitorStateManager.cs" />
     <Compile Include="Automata\INfaToDfa.cs" />
@@ -114,7 +115,7 @@
     <Compile Include="Grammars\Optional.cs" />
     <Compile Include="Grammars\Repetition.cs" />
     <Compile Include="Grammars\StringLiteralLexerRule.cs" />
-    <Compile Include="HashUtil.cs" />
+    <Compile Include="Utilities\HashCode.cs" />
     <Compile Include="Lexemes\ILexemeFactory.cs" />
     <Compile Include="Lexemes\ILexemeFactoryRegistry.cs" />
     <Compile Include="Lexemes\LexemeFactoryRegistry.cs" />
@@ -123,7 +124,7 @@
     <Compile Include="Lexemes\TerminalLexemeFactory.cs" />
     <Compile Include="Forest\AndForestNode.cs" />
     <Compile Include="Grammars\AnyTerminal.cs" />
-    <Compile Include="Assert.cs" />
+    <Compile Include="Diagnostics\Assert.cs" />
     <Compile Include="Grammars\CharacterClassTerminal.cs" />
     <Compile Include="Charts\Chart.cs" />
     <Compile Include="Grammars\DigitTerminal.cs" />
@@ -141,10 +142,9 @@
     <Compile Include="Forest\IForestNodeVisitor.cs" />
     <Compile Include="Forest\IForestNodeVisitorStateManager.cs" />
     <Compile Include="Forest\IntermediateForestNode.cs" />
-    <Compile Include="INullable.cs" />
     <Compile Include="Forest\IInternalForestNode.cs" />
-    <Compile Include="IParseEngine.cs" />
-    <Compile Include="IParseRunner.cs" />
+    <Compile Include="Runtime\IParseEngine.cs" />
+    <Compile Include="Runtime\IParseRunner.cs" />
     <Compile Include="Grammars\IProduction.cs" />
     <Compile Include="Charts\IState.cs" />
     <Compile Include="Grammars\ISymbol.cs" />
@@ -154,8 +154,8 @@
     <Compile Include="Forest\ForestNodeBase.cs" />
     <Compile Include="Forest\NodeVisitorBase.cs" />
     <Compile Include="Forest\MultiPassForestNodeVisitorStateManager.cs" />
-    <Compile Include="ParseEngineLexemeFactory.cs" />
-    <Compile Include="ParseEngineOptions.cs" />
+    <Compile Include="Runtime\ParseEngineLexemeFactory.cs" />
+    <Compile Include="Runtime\ParseEngineOptions.cs" />
     <Compile Include="RegularExpressions\IRegexToNfa.cs" />
     <Compile Include="RegularExpressions\RegexNode.cs" />
     <Compile Include="RegularExpressions\RegexNodeType.cs" />
@@ -176,14 +176,14 @@
     <Compile Include="Tokens\IToken.cs" />
     <Compile Include="Forest\ITokenForestNode.cs" />
     <Compile Include="Charts\ITransitionState.cs" />
-    <Compile Include="ParseEngineLexeme.cs" />
+    <Compile Include="Runtime\ParseEngineLexeme.cs" />
     <Compile Include="Grammars\GrammarLexerRule.cs" />
     <Compile Include="Forest\InternalForestNode.cs" />
     <Compile Include="Forest\ForestNodeSet.cs" />
     <Compile Include="Forest\ForestNodeType.cs" />
     <Compile Include="Charts\Optimizer.cs" />
-    <Compile Include="ParseEngine.cs" />
-    <Compile Include="ParseRunner.cs" />
+    <Compile Include="Runtime\ParseEngine.cs" />
+    <Compile Include="Runtime\ParseRunner.cs" />
     <Compile Include="Collections\ReadWriteList.cs" />
     <Compile Include="RegularExpressions\RegexGrammar.cs" />
     <Compile Include="RegularExpressions\RegexParser.cs" />
@@ -219,11 +219,11 @@
     <Compile Include="Tree\ITreeNode.cs" />
     <Compile Include="Tree\ITreeNodeVisitor.cs" />
     <Compile Include="Tree\TokenTreeNode.cs" />
-    <Compile Include="Tree\TreeEnumerator.cs" />
     <Compile Include="Tree\TreeNodeType.cs" />
     <Compile Include="Tree\TreeNodeVisitorBase.cs" />
     <Compile Include="Utilities\ObjectPool.cs" />
     <Compile Include="Utilities\ObjectPoolExtensions.cs" />
+    <Compile Include="Utilities\SharedPools.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Pliant.nuspec" />

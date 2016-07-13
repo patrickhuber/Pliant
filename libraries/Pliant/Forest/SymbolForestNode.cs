@@ -1,5 +1,6 @@
 ﻿using System;
 using Pliant.Grammars;
+using Pliant.Utilities;
 
 namespace Pliant.Forest
 {
@@ -30,11 +31,11 @@ namespace Pliant.Forest
         }
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj == null)
                 return false;
 
             var symbolNode = obj as SymbolForestNode;
-            if ((object)symbolNode == null)
+            if (symbolNode == null)
                 return false;
 
             return Location == symbolNode.Location
@@ -47,8 +48,8 @@ namespace Pliant.Forest
 
         private int ComputeHashCode()
         {
-            return HashUtil.ComputeHash(
-                NodeType.GetHashCode(),
+            return HashCode.Compute(
+                ((int)NodeType).GetHashCode(),
                 Location.GetHashCode(),
                 Origin.GetHashCode(),
                 Symbol.GetHashCode());

@@ -3,6 +3,7 @@ using Pliant.Forest;
 using Pliant.Grammars;
 using Pliant.Tree;
 using Pliant.Builders.Expressions;
+using Pliant.Runtime;
 
 namespace Pliant.Tests.Unit.Tree
 {
