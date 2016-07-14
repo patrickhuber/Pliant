@@ -1,0 +1,11 @@
+﻿// This file is used by Code Analysis to maintain SuppressMessage 
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given 
+// a specific target and scoped to a namespace, type, member, etc.
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CC0006:Use foreach", Justification = "Suppressing foreach due to performance of generic IEnumerable<T> vs for.", Scope = "member", Target = "~M:Pliant.Charts.EarleySet.FindSourceState(Pliant.Grammars.ISymbol)~Pliant.Charts.IState")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CC0006:Use foreach", Justification = "Suppressing foreach due to performance of generic IEnumerable<T> vs for.", Scope = "member", Target = "~M:Pliant.Forest.InternalForestNode.AddUniqueAndNode(Pliant.Forest.IForestNode,Pliant.Forest.IForestNode)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CC0006:Use foreach", Justification = "Suppressing foreach due to performance of generic IEnumerable<T> vs for.", Scope = "member", Target = "~M:Pliant.Grammars.Production.ComputeHashCode~System.Int32")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CC0006:Use foreach", Justification = "Suppressing foreach due to performance of generic IEnumerable<T> vs for.", Scope = "member", Target = "~M:Pliant.Grammars.Production.ToString~System.String")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CC0006:Use foreach", Justification = "Suppressing foreach due to performance of generic IEnumerable<T> vs for.", Scope = "member", Target = "~M:Pliant.Runtime.ParseEngine.GetExpectedLexerRules~System.Collections.Generic.List{Pliant.Grammars.ILexerRule}")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CC0006:Use foreach", Justification = "Suppressing foreach due to performance of generic IEnumerable<T> vs for.", Scope = "member", Target = "~M:Pliant.Runtime.ParseEngine.Predict(Pliant.Charts.IState,System.Int32)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CC0006:Use foreach", Justification = "Suppressing foreach due to performance of generic IEnumerable<T> vs for.", Scope = "member", Target = "~M:Pliant.Runtime.ParseRunner.MatchesNewLexemes(System.Char)~System.Boolean")]

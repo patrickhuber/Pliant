@@ -198,7 +198,7 @@ namespace Pliant.Runtime
             
             var expectedLexerRules = ParseEngine.GetExpectedLexerRules();
             // PERF: Avoid foreach due to boxing IEnumerable<T>
-#pragma warning disable CC0006 // Use foreach
+
             for (var l = 0; l< expectedLexerRules.Count; l++)
             {
                 var lexerRule = expectedLexerRules[l];
@@ -209,7 +209,7 @@ namespace Pliant.Runtime
                     newLexemes.Add(lexeme);
                 }
             }
-#pragma warning restore CC0006 // Use foreach
+
             SharedPools.Default<List<ILexerRule>>().Free(expectedLexerRules);
             expectedLexerRules = null;
 

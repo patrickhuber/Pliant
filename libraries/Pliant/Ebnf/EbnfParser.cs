@@ -9,7 +9,6 @@ namespace Pliant.Ebnf
     {
 #pragma warning disable CC0091 // Use static method
         public EbnfDefinition Parse(string ebnf)
-#pragma warning restore CC0091 // Use static method
         {
             var grammar = new EbnfGrammar();
             var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
@@ -32,5 +31,6 @@ namespace Pliant.Ebnf
             parseTree.Accept(ebnfVisitor);
             return ebnfVisitor.Definition;
         }
+#pragma warning restore CC0091 // Use static method
     }
 }

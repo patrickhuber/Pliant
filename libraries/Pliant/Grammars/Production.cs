@@ -63,10 +63,8 @@ namespace Pliant.Grammars
         private int ComputeHashCode()
         {
             var hash = HashCode.ComputeIncrementalHash(LeftHandSide.GetHashCode(), 0, true);
-
-#pragma warning disable CC0006 // Use foreach
+            
             for (var s = 0; s < RightHandSide.Count; s++)
-#pragma warning restore CC0006 // Use foreach
             {
                 var symbol = RightHandSide[s];
                 hash = HashCode.ComputeIncrementalHash(symbol.GetHashCode(), hash);
@@ -78,9 +76,8 @@ namespace Pliant.Grammars
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendFormat("{0} ->", LeftHandSide.Value);
-#pragma warning disable CC0006 // Use foreach
+
             for (int p = 0; p < RightHandSide.Count; p++)
-#pragma warning restore CC0006 // Use foreach
             {
                 var symbol = RightHandSide[p];
                 stringBuilder.AppendFormat(" {0}", symbol);

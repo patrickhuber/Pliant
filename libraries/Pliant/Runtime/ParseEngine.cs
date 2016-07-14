@@ -50,9 +50,9 @@ namespace Pliant.Runtime
 
             // PERF: Avoid Linq Select, Where due to lambda allocation
             // PERF: Avoid foreach enumeration due to IEnumerable boxing
-#pragma warning disable CC0006 // Use foreach
+
             for (int s = 0; s < scanStates.Count; s++)
-#pragma warning restore CC0006 // Use foreach
+
             {
                 var scanState = scanStates[s];
                 var postDotSymbol = scanState.PostDotSymbol;
@@ -203,9 +203,9 @@ namespace Pliant.Runtime
             var nonTerminal = evidence.PostDotSymbol as INonTerminal;
             var rulesForNonTerminal = Grammar.RulesFor(nonTerminal);
             // PERF: Avoid boxing enumerable
-#pragma warning disable CC0006 // Use foreach
+
             for (int p =0; p<rulesForNonTerminal.Count;p++)
-#pragma warning restore CC0006 // Use foreach
+
             {
                 var production = rulesForNonTerminal[p];
                 PredictProduction(evidence, j, production);
