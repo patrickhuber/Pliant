@@ -66,6 +66,7 @@
     <Compile Include="Forest\FakeInternalForestNode.cs" />
     <Compile Include="Forest\FakeSymbolForestNode.cs" />
     <Compile Include="Forest\FakeTokenForestNode.cs" />
+    <Compile Include="Forest\MultiPassForestNodeVisitorStateManagerTests.cs" />
     <Compile Include="Grammars\AnyTerminalTests.cs" />
     <Compile Include="Bnf\BnfTests.cs" />
     <Compile Include="Charts\ChartTests.cs" />

@@ -8,6 +8,7 @@ using Pliant.Builders.Expressions;
 using Pliant.Builders;
 using Pliant.Runtime;
 using Pliant.Tests.Unit.Runtime;
+using System.Linq;
 
 namespace Pliant.Tests.Unit.Forest
 {
@@ -44,11 +45,10 @@ namespace Pliant.Tests.Unit.Forest
                     Assert.Fail($"error parsing input at position {regexLexer.Position}");
             }
             Assert.IsTrue(regexParseEngine.IsAccepted());
-
-            var nodeVisitorStateManager = new MultiPassForestNodeVisitorStateManager();
+            
             var nodeVisitor = new LoggingNodeVisitor(
                 new SinglePassForestNodeVisitorStateManager());
-            var root = regexParseEngine.GetParseForestRoot();
+            var root = regexParseEngine.GetParseForestRootNode().Children[0].Children[0];
             root.Accept(nodeVisitor);
             Assert.AreEqual(31, nodeVisitor.VisitLog.Count);
         }

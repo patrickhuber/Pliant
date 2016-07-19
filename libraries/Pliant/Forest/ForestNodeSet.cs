@@ -9,9 +9,11 @@ namespace Pliant.Forest
     {
         private readonly Dictionary<int, ISymbolForestNode> _symbolNodes;
         private readonly Dictionary<int, IIntermediateForestNode> _intermediateNodes;
-        
-        public ForestNodeSet()
+        private readonly Accumulator _ambiguityAccumulator;
+
+        public ForestNodeSet(Accumulator ambiguityAccumulator)
         {
+            _ambiguityAccumulator = ambiguityAccumulator;
             _symbolNodes = new Dictionary<int, ISymbolForestNode>();
             _intermediateNodes = new Dictionary<int, IIntermediateForestNode>();
         }
@@ -24,7 +26,7 @@ namespace Pliant.Forest
             if (_symbolNodes.TryGetValue(hash, out symbolNode))
                 return symbolNode;
 
-            symbolNode = new SymbolForestNode(symbol, origin, location);
+            symbolNode = new SymbolForestNode(symbol, origin, location, _ambiguityAccumulator);
             _symbolNodes.Add(hash, symbolNode);
             return symbolNode;
         }
@@ -43,7 +45,7 @@ namespace Pliant.Forest
             IIntermediateForestNode intermediateNode = null;
             if (_intermediateNodes.TryGetValue(hash, out intermediateNode))
                 return intermediateNode;
-            intermediateNode = new IntermediateForestNode(trigger, origin, location);
+            intermediateNode = new IntermediateForestNode(trigger, origin, location, _ambiguityAccumulator);
             _intermediateNodes.Add(hash, intermediateNode);
             return intermediateNode;
         }

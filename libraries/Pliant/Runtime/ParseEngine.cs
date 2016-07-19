@@ -22,7 +22,8 @@ namespace Pliant.Runtime
         public ParseEngineOptions Options { get; private set; }
 
         private Chart _chart;
-        private readonly ForestNodeSet _nodeSet;        
+        private readonly ForestNodeSet _nodeSet;
+        private readonly Accumulator _ambiguityAccumulator;     
         
         public ParseEngine(IGrammar grammar)
             : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
@@ -32,7 +33,8 @@ namespace Pliant.Runtime
         public ParseEngine(IGrammar grammar, ParseEngineOptions options)
         {
             Options = options;
-            _nodeSet = new ForestNodeSet();
+            _ambiguityAccumulator = new Accumulator();
+            _nodeSet = new ForestNodeSet(_ambiguityAccumulator);
             Grammar = grammar;
             Initialize();
         }
@@ -70,8 +72,8 @@ namespace Pliant.Runtime
             SharedPools.Default<Dictionary<TokenType, ILexerRule>>().Free(expectedRuleDictionary);
             return returnList;
         }
-
-        public IForestNode GetParseForestRoot()
+        
+        public IForestRootNode GetParseForestRootNode()
         {
             if (!IsAccepted())
                 throw new Exception("Unable to parse expression.");
@@ -79,18 +81,22 @@ namespace Pliant.Runtime
             var lastSet = _chart.EarleySets[_chart.Count - 1];
             var start = Grammar.Start;
 
+            var forestRoot = new ForestRootNode();
+
             // PERF: Avoid Linq expressions due to lambda allocation
             for (int c = 0; c < lastSet.Completions.Count; c++)
             {
                 var completion = lastSet.Completions[c];
-                if (completion.Production.LeftHandSide.Equals(start)
-                    && completion.Origin == 0)
-                    return completion.ParseNode;
+                if (completion.Production.LeftHandSide.Equals(start) && completion.Origin == 0)
+                {
+                    var andNode = new AndForestNode();
+                    andNode.AddChild(completion.ParseNode);
+                    forestRoot.AddChild(andNode);
+                }
             }
-
-            // if not accepted, the first check should handle this case
-            return null;
+            return forestRoot;
         }
+
 
         public bool IsAccepted()
         {

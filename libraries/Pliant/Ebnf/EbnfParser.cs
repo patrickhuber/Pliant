@@ -23,13 +23,16 @@ namespace Pliant.Ebnf
                 throw new Exception(
                     $"Unable to parse Ebnf. Error at position {parseRunner.Position}");
 
-            var parseForest = parseEngine.GetParseForestRoot();
+            var parseForestRoot = parseEngine.GetParseForestRootNode();
+            var parseForest = parseForestRoot.Children[0].Children[0];
+
             var parseTree = new InternalTreeNode(
-                parseForest as IInternalForestNode,
-                new SinglePassForestNodeVisitorStateManager());
+                    parseForest as IInternalForestNode,
+                    new SinglePassForestNodeVisitorStateManager());
+
             var ebnfVisitor = new EbnfVisitor();
             parseTree.Accept(ebnfVisitor);
-            return ebnfVisitor.Definition;
+            return ebnfVisitor.Definition;            
         }
 #pragma warning restore CC0091 // Use static method
     }

@@ -4,6 +4,7 @@ using Pliant.Ebnf;
 using Pliant.Grammars;
 using Pliant.Runtime;
 using Pliant.Tests.Unit.Runtime;
+using System.Linq;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
@@ -252,7 +253,7 @@ namespace Pliant.Tests.Unit.Ebnf
                 Assert.IsTrue(parseRunner.Read(), $"Error found in position {parseRunner.Position}");
             }
             Assert.IsTrue(parseRunner.ParseEngine.IsAccepted());
-            return parseRunner.ParseEngine.GetParseForestRoot();
+            return parseRunner.ParseEngine.GetParseForestRootNode().Children[0].Children[0];
         }
 
         private void FailParseInput(string input)

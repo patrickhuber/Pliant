@@ -21,16 +21,18 @@ namespace Pliant.RegularExpressions
             if (!parseEngine.IsAccepted())
                 throw new Exception(
                     $"Error parsing regular expression. Error at position {parseRunner.Position}");
+            
+            var parseForestRoot = parseEngine.GetParseForestRootNode();
+            var parseForest = parseForestRoot.Children[0].Children[0];
 
-            var parseForest = parseEngine.GetParseForestRoot();
             var parseTree = new InternalTreeNode(
-                parseForest as IInternalForestNode,
-                new SinglePassForestNodeVisitorStateManager());
+                    parseForest as IInternalForestNode,
+                    new SinglePassForestNodeVisitorStateManager());
 
             var regexVisitor = new RegexVisitor();
             parseTree.Accept(regexVisitor);
 
-            return regexVisitor.Regex;
+            return regexVisitor.Regex;            
         }
     }
 }

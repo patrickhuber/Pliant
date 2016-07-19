@@ -54,6 +54,9 @@
     <Compile Include="Builders\ReachibilityMatrix.cs" />
     <Compile Include="Builders\SymbolModel.cs" />
     <Compile Include="Builders\SymbolModelType.cs" />
+    <Compile Include="Forest\Accumulator.cs" />
+    <Compile Include="Forest\ForestRootNode.cs" />
+    <Compile Include="Forest\IForestRootNode.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Grammars\GrammarWrapper.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />

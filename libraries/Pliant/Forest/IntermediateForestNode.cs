@@ -9,8 +9,8 @@ namespace Pliant.Forest
 
         public override ForestNodeType NodeType { get { return ForestNodeType.Intermediate; } }
 
-        public IntermediateForestNode(IState state, int origin, int location)
-            : base(origin, location)
+        public IntermediateForestNode(IState state, int origin, int location, Accumulator ambiguityAccumulator)
+            : base(origin, location, ambiguityAccumulator)
         {
             State = state;
             _hashCode = ComputeHashCode();
@@ -25,6 +25,7 @@ namespace Pliant.Forest
         {
             visitor.Visit(this);
         }
+
         public override bool Equals(object obj)
         {
             if (obj == null)
