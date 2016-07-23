@@ -253,7 +253,7 @@ namespace Pliant.Tests.Unit.Ebnf
                 Assert.IsTrue(parseRunner.Read(), $"Error found in position {parseRunner.Position}");
             }
             Assert.IsTrue(parseRunner.ParseEngine.IsAccepted());
-            return parseRunner.ParseEngine.GetParseForestRootNode().Children[0].Children[0];
+            return parseRunner.ParseEngine.GetParseForestRootNode();
         }
 
         private void FailParseInput(string input)

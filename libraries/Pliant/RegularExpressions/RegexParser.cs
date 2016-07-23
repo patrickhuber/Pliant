@@ -22,8 +22,7 @@ namespace Pliant.RegularExpressions
                 throw new Exception(
                     $"Error parsing regular expression. Error at position {parseRunner.Position}");
             
-            var parseForestRoot = parseEngine.GetParseForestRootNode();
-            var parseForest = parseForestRoot.Children[0].Children[0];
+            var parseForest = parseEngine.GetParseForestRootNode();
 
             var parseTree = new InternalTreeNode(
                     parseForest as IInternalForestNode,

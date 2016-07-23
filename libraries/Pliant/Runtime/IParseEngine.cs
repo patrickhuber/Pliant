@@ -26,7 +26,7 @@ namespace Pliant.Runtime
         /// Gets the root of the parse forest.
         /// </summary>
         /// <returns></returns>
-        IForestRootNode GetParseForestRootNode();
+        IInternalForestNode GetParseForestRootNode();
 
         /// <summary>
         /// Returns the list of expected lexer rules based on the current state of the parse.

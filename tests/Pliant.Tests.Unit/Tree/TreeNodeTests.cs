@@ -62,8 +62,7 @@ namespace Pliant.Tests.Unit.Tree
             }
             Assert.IsTrue(parseEngine.IsAccepted());
             
-            var parseForestRoot = parseEngine.GetParseForestRootNode();
-            var parseForest = parseForestRoot.Children[0].Children[0];
+            var parseForest = parseEngine.GetParseForestRootNode();
 
             Assert.IsTrue(parseForest is IInternalForestNode);
 

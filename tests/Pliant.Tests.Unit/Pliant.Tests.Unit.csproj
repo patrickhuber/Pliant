@@ -66,11 +66,13 @@
     <Compile Include="Forest\FakeInternalForestNode.cs" />
     <Compile Include="Forest\FakeSymbolForestNode.cs" />
     <Compile Include="Forest\FakeTokenForestNode.cs" />
+    <Compile Include="Forest\StatefulForestNodeComparer.cs" />
     <Compile Include="Forest\MultiPassForestNodeVisitorStateManagerTests.cs" />
     <Compile Include="Grammars\AnyTerminalTests.cs" />
     <Compile Include="Bnf\BnfTests.cs" />
     <Compile Include="Charts\ChartTests.cs" />
     <Compile Include="Grammars\DigitTerminalTests.cs" />
+    <Compile Include="ParseTester.cs" />
     <Compile Include="Runtime\LoggingNodeVisitor.cs" />
     <Compile Include="Forest\ForestNodeVisitorTests.cs" />
     <Compile Include="Collections\ProcessOnceQueueTests.cs" />

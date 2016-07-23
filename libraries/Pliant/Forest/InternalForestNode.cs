@@ -1,21 +1,17 @@
 ﻿using Pliant.Collections;
-using System;
 using System.Collections.Generic;
 
 namespace Pliant.Forest
 {
     public abstract class InternalForestNode : ForestNodeBase, IInternalForestNode
     {
-        private ReadWriteList<IAndForestNode> _children;
-        private Accumulator _ambiguityAccumulator;
-
+        private readonly ReadWriteList<IAndForestNode> _children;
         public IReadOnlyList<IAndForestNode> Children { get { return _children; } }
 
-        protected InternalForestNode(int origin, int location, Accumulator ambiguityAccumulator)
+        protected InternalForestNode(int origin, int location)
             : base(origin, location)
         {
             _children = new ReadWriteList<IAndForestNode>();
-            _ambiguityAccumulator = ambiguityAccumulator;
         }
 
         public void AddUniqueFamily(IForestNode trigger)
@@ -57,9 +53,6 @@ namespace Pliant.Forest
                 newAndNode.AddChild(secondChild);
 
             _children.Add(newAndNode);
-
-            if (_children.Count > 1)
-                _ambiguityAccumulator.Increment();
         }
 
         private static bool IsMatchedSubTree(IForestNode firstChild, IForestNode secondChild, IAndForestNode andNode)

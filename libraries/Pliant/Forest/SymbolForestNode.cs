@@ -8,8 +8,8 @@ namespace Pliant.Forest
     {
         public ISymbol Symbol { get; private set; }
 
-        public SymbolForestNode(ISymbol symbol, int origin, int location, Accumulator ambiguityAccumulator)
-            : base(origin, location, ambiguityAccumulator)
+        public SymbolForestNode(ISymbol symbol, int origin, int location)
+            : base(origin, location)
         {
             Symbol = symbol;
             _hashCode = ComputeHashCode();

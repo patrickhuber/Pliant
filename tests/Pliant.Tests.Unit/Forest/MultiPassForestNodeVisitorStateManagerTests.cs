@@ -1,8 +1,5 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders.Expressions;
-using Pliant.Runtime;
-using Pliant.Forest;
 
 namespace Pliant.Tests.Unit.Forest
 {
@@ -10,12 +7,12 @@ namespace Pliant.Tests.Unit.Forest
     public class MultiPassForestNodeVisitorStateManagerTests
     {
         [TestMethod]
-        public void MultiPassForestNodeVisitorStateManagerShouldGenerateTwoTreesForAmbiguousGrammar()
+        public void MultiplePassTreeIteratorShouldGenerateTwoTreesForGrammarWithAmbiguousRoot()
         {
-            ProductionExpression 
-                S = "S", 
-                A = "A", 
-                B = "B", 
+            ProductionExpression
+                S = "S",
+                A = "A",
+                B = "B",
                 C = "C";
 
             S.Rule = A | B;
@@ -25,18 +22,66 @@ namespace Pliant.Tests.Unit.Forest
 
             const string input = "ac";
 
-            var grammar = new GrammarExpression(S, new[] { S, A, B, C }).ToGrammar();
-            var parseEngine = new ParseEngine(grammar);
-            var parseRunner = new ParseRunner(parseEngine, input);
+            var grammarExpression = new GrammarExpression(S, new[] { S, A, B, C });
+            var parseTester = new ParseTester(grammarExpression);
+            parseTester.RunParse(input);
 
-            while (!parseRunner.EndOfStream())
-            {
-                Assert.IsTrue(parseRunner.Read());
-            }
-            Assert.IsTrue(parseEngine.IsAccepted());
+            var parseForestRoot = parseTester.ParseEngine.GetParseForestRootNode();
+            Assert.AreEqual(1, parseForestRoot.Children.Count);
+        }
 
-            var parseForestRoot = parseEngine.GetParseForestRootNode();
-            var multipassVisitor = new MultiPassForestNodeVisitorStateManager();
+        [TestMethod]
+        public void MultiPassTreeIteratorShouldIterateParseTreesForLeafAmbiguities()
+        {
+            ProductionExpression
+                E = "E",
+                F = "F";
+            E.Rule =
+                F
+                | F + E
+                | (Expr)null;
+            F.Rule = 'a';
+
+            const string input = "aaa";
+            
+            var grammarExpression = new GrammarExpression(E, new[] { E, F });
+            var parseTester = new ParseTester(grammarExpression);
+            parseTester.RunParse(input);
+            
+            var parseForestRoot = parseTester.ParseEngine.GetParseForestRootNode();
+            Assert.AreEqual(1, parseForestRoot.Children.Count);
+        }
+
+        [TestMethod]
+        public void MultiPassTreeIteratorShouldIterateParseTreesForNestedAmbiguities()
+        {
+            ProductionExpression
+                Z = "Z",
+                S = "S",
+                A = "A",
+                B = "B",
+                C = "C",
+                D = "D",
+                E = "E",
+                F = "F";
+
+            Z.Rule = S;
+            S.Rule = A | B;
+            A.Rule = '0' + C;
+            B.Rule = '0' + C;
+            C.Rule = D | E;
+            D.Rule = '1' + F;
+            E.Rule = '1' + F;
+            F.Rule = '2';
+
+            const string input = "012";
+
+            var grammarExpression = new GrammarExpression(Z);
+            var parseTester = new ParseTester(grammarExpression);
+            parseTester.RunParse(input);
+            
+            var parseForestRoot = parseTester.ParseEngine.GetParseForestRootNode();
+            Assert.AreEqual(1, parseForestRoot.Children.Count);
         }
     }
 }

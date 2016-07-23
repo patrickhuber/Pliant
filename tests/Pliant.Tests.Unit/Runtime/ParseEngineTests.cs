@@ -22,7 +22,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             ProductionExpression S = "S", T = "T", B = "B";
             S.Rule = S + T | "a";
-            B.Rule = (Expr)null;
+            B.Rule = null;
             T.Rule = "a" + B | "a";
 
             var grammar = new GrammarExpression(S, new[] { S, T, B }).ToGrammar();
@@ -30,7 +30,7 @@ namespace Pliant.Tests.Unit.Runtime
             ParseInput(parseEngine, tokens);
 
             var parseForestRoot = parseEngine.GetParseForestRootNode();
-            var actual = parseForestRoot.Children[0].Children[0] as IInternalForestNode;            
+            var actual = parseForestRoot as IInternalForestNode;            
             
             var a_1_2 = new FakeTokenForestNode("a", 1, 2);
             var expected = 
@@ -67,8 +67,8 @@ namespace Pliant.Tests.Unit.Runtime
 
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
-            
-            var S_0_4 = parseEngine.GetParseForestRootNode().Children[0].Children[0] as ISymbolForestNode;
+
+            var S_0_4 = parseEngine.GetParseForestRootNode() as ISymbolForestNode;
             Assert.IsNotNull(S_0_4);
             AssertNodeProperties(S_0_4, nameof(S), 0, 4);
             Assert.AreEqual(2, S_0_4.Children.Count);
@@ -158,7 +158,7 @@ namespace Pliant.Tests.Unit.Runtime
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
-            var parseNode = parseEngine.GetParseForestRootNode().Children[0].Children[0];
+            var parseNode = parseEngine.GetParseForestRootNode();
             Assert.IsNotNull(parseNode);
 
             var S_0_1 = parseNode as ISymbolForestNode;
@@ -190,7 +190,7 @@ namespace Pliant.Tests.Unit.Runtime
             /*  S_0_1 -> A_0_1
              *  A_0_1 -> 'a'
              */
-            var S_0_1 = parseEngine.GetParseForestRootNode().Children[0].Children[0] as ISymbolForestNode;
+            var S_0_1 = parseEngine.GetParseForestRootNode() as ISymbolForestNode;
             Assert.IsNotNull(S_0_1);
             Assert.AreEqual(1, S_0_1.Children.Count);
 
@@ -230,7 +230,7 @@ namespace Pliant.Tests.Unit.Runtime
              *  A_1_2 -> b_1_2
              */
             var parseForestRoot = parseEngine.GetParseForestRootNode();
-            var root = parseForestRoot.Children[0].Children[0];
+            var root = parseForestRoot;
 
             var S_0_2 = root as ISymbolForestNode;
             Assert.IsNotNull(S_0_2);
@@ -288,7 +288,7 @@ namespace Pliant.Tests.Unit.Runtime
              *  B_3_4 -> 'b'
              */
             var parseForestRoot = parseEngine.GetParseForestRootNode();
-            var root = parseForestRoot.Children[0].Children[0];
+            var root = parseForestRoot;
 
             var S_0_4 = root as ISymbolForestNode;
             Assert.IsNotNull(S_0_4);
@@ -378,7 +378,7 @@ namespace Pliant.Tests.Unit.Runtime
             ParseInput(parseEngine, tokens);
 
             var parseForestRoot = parseEngine.GetParseForestRootNode();
-            var parseForest = parseForestRoot.Children[0].Children[0];
+            var parseForest = parseForestRoot;
             Assert.IsNotNull(parseForest);
 
             // S_0_2 -> A_0_2
@@ -582,8 +582,9 @@ namespace Pliant.Tests.Unit.Runtime
             // F_5_6 -> 'a'
             // T_6_7 -> F_6_7
             // F_6_7 -> 'a'
+            
             var parseForestRoot = parseEngine.GetParseForestRootNode();
-            var root = parseForestRoot.Children[0].Children[0];
+            var root = parseForestRoot;
             var R_0_4 = CastAndCountChildren<ISymbolForestNode>(root, 1);
             AssertNodeProperties(R_0_4, "R", 0, 4);
             var E_0_4 = GetAndCastChildAtIndex<ISymbolForestNode>(R_0_4, 0);
@@ -615,7 +616,7 @@ namespace Pliant.Tests.Unit.Runtime
             ParseInput(parseEngine, input);
 
             var parseForestRoot = parseEngine.GetParseForestRootNode();
-            var parseForest = parseForestRoot.Children[0].Children[0];
+            var parseForest = parseForestRoot;
 
             var R_0_3 = CastAndCountChildren<ISymbolForestNode>(parseForest, 1);
             AssertNodeProperties(R_0_3, "R", 0, 3);
@@ -655,7 +656,7 @@ namespace Pliant.Tests.Unit.Runtime
             ParseInput(parseEngine, input);
 
             var parseForestRoot = parseEngine.GetParseForestRootNode();
-            var pasreForestNode = parseForestRoot.Children[0].Children[0];
+            var pasreForestNode = parseForestRoot;
 
             var S_0_17 = CastAndCountChildren<ISymbolForestNode>(pasreForestNode, 2);
         }
@@ -685,8 +686,8 @@ namespace Pliant.Tests.Unit.Runtime
             var classicInterface = new ParseRunner(classicEngine, input);
             Assert.IsTrue(RunParse(classicInterface));
 
-            var leoEngineParseRoot = leoEngine.GetParseForestRootNode().Children[0].Children[0];
-            var classicEngineParseRoot = classicEngine.GetParseForestRootNode().Children[0].Children[0];
+            var leoEngineParseRoot = leoEngine.GetParseForestRootNode();
+            var classicEngineParseRoot = classicEngine.GetParseForestRootNode();
             AssertForestsAreEqual(leoEngineParseRoot, classicEngineParseRoot);
         }
 
@@ -735,60 +736,13 @@ namespace Pliant.Tests.Unit.Runtime
                     AssertForestsAreEqual(firstChildrenEnumerator.Current, secondChildrenEnumerator.Current);
             } while (firstChildEnumeratorMoveNext);
         }
-
-        private static void AssertForestsAreEqual(IInternalForestNode first, IInternalForestNode second)
+        
+        static void AssertForestsAreEqual(IForestNode expected, IForestNode actual)
         {
-            Assert.AreEqual(first.Children.Count, second.Children.Count);
-            var firstChildrenEnumerator = first.Children.GetEnumerator();
-            var secondChildrenEnumerator = second.Children.GetEnumerator();
-
-            var firstChildEnumeratorMoveNext = false;
-            var secondChildEnumeratorMoveNext = false;
-
-            do
-            {
-                firstChildEnumeratorMoveNext = firstChildrenEnumerator.MoveNext();
-                secondChildEnumeratorMoveNext = secondChildrenEnumerator.MoveNext();
-                Assert.AreEqual(firstChildEnumeratorMoveNext, secondChildEnumeratorMoveNext);
-                if(firstChildEnumeratorMoveNext)
-                    AssertForestsAreEqual(firstChildrenEnumerator.Current, secondChildrenEnumerator.Current);
-            } while (firstChildEnumeratorMoveNext);
+            var comparer = new StatefulForestNodeComparer();
+            Assert.IsTrue(comparer.Equals(expected, actual));
         }
-
-        private static void AssertForestsAreEqual(IForestNode first, IForestNode second)
-        {
-            Assert.AreEqual(first.NodeType, second.NodeType);
-            switch (first.NodeType)
-            {
-                case ForestNodeType.Intermediate:
-                    var firstIntermediate = first as IIntermediateForestNode;
-                    var secondIntermediate = second as IIntermediateForestNode;
-                    Assert.AreEqual(firstIntermediate.State, secondIntermediate.State);
-                    AssertForestsAreEqual(firstIntermediate, secondIntermediate);
-                    break;
-
-                case ForestNodeType.Symbol:
-                    var firstSymbol = first as ISymbolForestNode;
-                    var secondSymbol = second as ISymbolForestNode;
-                    Assert.AreEqual(firstSymbol.Symbol, secondSymbol.Symbol);
-                    AssertForestsAreEqual(firstSymbol, secondSymbol);
-                    break;
-
-                case ForestNodeType.Terminal:
-                    var firstTerminal = first as ITerminalForestNode;
-                    var secondTerminal = second as ITerminalForestNode;
-                    Assert.AreEqual(firstTerminal.Capture, secondTerminal.Capture);
-                    break;
-
-                case ForestNodeType.Token:
-                    var firstToken = first as ITokenForestNode;
-                    var secondToken = second as ITokenForestNode;
-                    Assert.AreEqual(firstToken.Token.TokenType.Id, secondToken.Token.TokenType.Id);
-                    Assert.AreEqual(firstToken.Token.Value, secondToken.Token.Value);
-                    break;
-            }
-        }
-
+        
         private static IParseRunner CreateParseRunner(IGrammar grammar, string input)
         {
             var parseEngine = new ParseEngine(grammar);

@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Forest;
+using Pliant.Grammars;
 using Pliant.Utilities;
 using System;
 
@@ -13,6 +14,24 @@ namespace Pliant.Charts
         public int Index { get; private set; }
 
         public ITransitionState NextTransition { get; set; }
+
+        public IForestNodeReference ForestNodeReference { get; set; }
+
+        public override IForestNode ParseNode
+        {
+            get
+            {
+                return ForestNodeReference == null 
+                    ? null 
+                    : ForestNodeReference.Node;
+            }
+            set
+            {
+                if (ForestNodeReference == null)
+                    ForestNodeReference = new ForestNodeReference();
+                ForestNodeReference.Node = value;
+            }
+        }
 
         public TransitionState(
             ISymbol recognized,

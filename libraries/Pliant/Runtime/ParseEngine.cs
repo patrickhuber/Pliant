@@ -23,7 +23,6 @@ namespace Pliant.Runtime
 
         private Chart _chart;
         private readonly ForestNodeSet _nodeSet;
-        private readonly Accumulator _ambiguityAccumulator;     
         
         public ParseEngine(IGrammar grammar)
             : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
@@ -33,8 +32,7 @@ namespace Pliant.Runtime
         public ParseEngine(IGrammar grammar, ParseEngineOptions options)
         {
             Options = options;
-            _ambiguityAccumulator = new Accumulator();
-            _nodeSet = new ForestNodeSet(_ambiguityAccumulator);
+            _nodeSet = new ForestNodeSet();
             Grammar = grammar;
             Initialize();
         }
@@ -73,28 +71,24 @@ namespace Pliant.Runtime
             return returnList;
         }
         
-        public IForestRootNode GetParseForestRootNode()
+        public IInternalForestNode GetParseForestRootNode()
         {
             if (!IsAccepted())
                 throw new Exception("Unable to parse expression.");
 
             var lastSet = _chart.EarleySets[_chart.Count - 1];
             var start = Grammar.Start;
-
-            var forestRoot = new ForestRootNode();
-
+                        
             // PERF: Avoid Linq expressions due to lambda allocation
             for (int c = 0; c < lastSet.Completions.Count; c++)
             {
                 var completion = lastSet.Completions[c];
                 if (completion.Production.LeftHandSide.Equals(start) && completion.Origin == 0)
                 {
-                    var andNode = new AndForestNode();
-                    andNode.AddChild(completion.ParseNode);
-                    forestRoot.AddChild(andNode);
+                    return completion.ParseNode as IInternalForestNode;
                 }
             }
-            return forestRoot;
+            return null;
         }
 
 
@@ -236,7 +230,7 @@ namespace Pliant.Runtime
                 else if (evidenceParseNode.Children.Count > 0 
                     && evidenceParseNode.Children[0].Children.Count > 0)
                 {
-                    var firstChildNode = evidenceParseNode.Children[0].Children[0];
+                    var firstChildNode = evidenceParseNode;
                     var parseNode = CreateParseNode(aycockHorspoolState, firstChildNode, nullParseNode, j);
                     aycockHorspoolState.ParseNode = parseNode;
                 }
@@ -275,6 +269,8 @@ namespace Pliant.Runtime
 
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
+
+            earleySet.LinkSimilarTransitionStates(rootTransitionState);
 
             var virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
 

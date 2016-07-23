@@ -21,7 +21,7 @@ namespace Pliant.Charts
 
         public virtual StateType StateType { get { return StateType.Normal; } }
 
-        public IForestNode ParseNode { get; set; }
+        public virtual IForestNode ParseNode { get; set; }
 
         private readonly int _hashCode;
 
@@ -46,36 +46,14 @@ namespace Pliant.Charts
 
         public IState NextState()
         {
-            return NextState(null as IForestNode);
-        }
-
-        public IState NextState(IForestNode node)
-        {
             if (IsComplete)
                 return null;
             return new State(
                 Production,
                 Position + 1,
-                Origin,
-                node);
+                Origin);
         }
-
-        public IState NextState(int newOrigin)
-        {
-            return NextState(newOrigin, null);
-        }
-
-        public IState NextState(int newOrigin, IForestNode parseNode)
-        {
-            if (IsComplete)
-                return null;
-            return new State(
-                Production,
-                Position + 1,
-                newOrigin,
-                parseNode);
-        }
-
+        
         public bool IsComplete
         {
             get { return Position == Production.RightHandSide.Count; }
