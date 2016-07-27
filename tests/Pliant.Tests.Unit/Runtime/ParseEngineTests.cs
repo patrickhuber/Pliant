@@ -692,7 +692,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void ParseEngineShouldCreateTwoAndNodesForAmbiguityAtStartProduction()
+        public void ParseEngineAmbiguousRootShouldCreateSameLeoAndClassicForest()
         {
             ProductionExpression
                 S = "S",
@@ -708,14 +708,50 @@ namespace Pliant.Tests.Unit.Runtime
             const string input = "ac";
 
             var grammar = new GrammarExpression(S, new[] { S, A, B, C }).ToGrammar();
-            var parseRunner = CreateParseRunner(grammar, input);
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
+        }
 
-            Assert.IsTrue(RunParse(parseRunner));
+        [TestMethod]
+        public void ParseEngineAmbiguousNestedChildrenShouldCreateSameLeoAndClassicForest()
+        {
+            ProductionExpression
+                Z = "Z",
+                S = "S",
+                A = "A",
+                B = "B",
+                C = "C",
+                D = "D",
+                E = "E",
+                F = "F";
 
-            var parseEngine = parseRunner.ParseEngine;
-            var parseForestRootNode = parseEngine.GetParseForestRootNode();
+            Z.Rule = S;
+            S.Rule = A | B;
+            A.Rule = '0' + C;
+            B.Rule = '0' + C;
+            C.Rule = D | E;
+            D.Rule = '1' + F;
+            E.Rule = '1' + F;
+            F.Rule = '2';
 
-            Assert.AreEqual(2, parseForestRootNode.Children.Count);
+            const string input = "012";
+            
+            var grammar = new GrammarExpression(S, new[] { S, A, B, C }).ToGrammar();
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
+        }
+
+        private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(string input, IGrammar grammar)
+        {
+            var leoEngine = new ParseEngine(grammar);
+            var classicEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
+            var tokens = Tokenize(input);
+
+            Assert.IsTrue(RunParse(leoEngine, tokens));
+            Assert.IsTrue(RunParse(classicEngine, tokens));
+
+            var nodeComparer = new StatefulForestNodeComparer();
+            Assert.IsTrue(nodeComparer.Equals(
+                classicEngine.GetParseForestRootNode(),
+                leoEngine.GetParseForestRootNode()));
         }
 
         private static void AssertForestsAreEqual(IAndForestNode first, IAndForestNode second)
@@ -743,13 +779,6 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsTrue(comparer.Equals(expected, actual));
         }
         
-        private static IParseRunner CreateParseRunner(IGrammar grammar, string input)
-        {
-            var parseEngine = new ParseEngine(grammar);
-            var parseRunner = new ParseRunner(parseEngine, input);
-            return parseRunner;
-        }
-
         private static bool RunParse(IParseRunner lexer)
         {
             while (!lexer.EndOfStream())
@@ -758,6 +787,16 @@ namespace Pliant.Tests.Unit.Runtime
                     return false;
             }
             return lexer.ParseEngine.IsAccepted();
+        }
+
+        private static bool RunParse(IParseEngine parseEngine, IEnumerable<IToken> tokens)
+        {
+            foreach (var token in tokens)
+            {
+                if (!parseEngine.Pulse(token))
+                    return false;
+            }
+            return parseEngine.IsAccepted();
         }
 
         private static IGrammar CreateRegularExpressionStubGrammar()
