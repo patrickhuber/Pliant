@@ -50,9 +50,7 @@ namespace Pliant.Runtime
 
             // PERF: Avoid Linq Select, Where due to lambda allocation
             // PERF: Avoid foreach enumeration due to IEnumerable boxing
-
             for (int s = 0; s < scanStates.Count; s++)
-
             {
                 var scanState = scanStates[s];
                 var postDotSymbol = scanState.PostDotSymbol;
@@ -67,7 +65,9 @@ namespace Pliant.Runtime
                     }
                 }
             }
-            SharedPools.Default<Dictionary<TokenType, ILexerRule>>().Free(expectedRuleDictionary);
+            SharedPools
+                .Default<Dictionary<TokenType, ILexerRule>>()
+                .Free(expectedRuleDictionary);
             return returnList;
         }
         

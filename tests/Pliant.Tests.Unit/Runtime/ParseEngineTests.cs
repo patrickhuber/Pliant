@@ -735,7 +735,37 @@ namespace Pliant.Tests.Unit.Runtime
 
             const string input = "012";
             
-            var grammar = new GrammarExpression(S, new[] { S, A, B, C }).ToGrammar();
+            var grammar = new GrammarExpression(S, new[] { S, A, B, C, D, E, F }).ToGrammar();
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
+        }
+
+        [TestMethod]
+        public void ParseEngineDivergentAmbiguousGrammarShouldCreateSameLeoAndClassicParseForest()
+        {
+            ProductionExpression 
+                S = "S", 
+                A = "A", 
+                B = "B",
+                C = "C", 
+                X = "X",
+                Y = "Y", 
+                Z = "Z";
+            S.Rule = 
+                '0' + A 
+                | '0' + X;
+            A.Rule = '1' + B;
+            B.Rule = '2' + C;
+            C.Rule = '3';
+            X.Rule = '1' + Y;
+            Y.Rule = '2' + Z;
+            Z.Rule = '3';
+
+            const string input = "0123";
+
+            var grammar = new GrammarExpression(
+                S, 
+                new[] { S, A, B, C, X, Y, Z })
+                .ToGrammar();
             AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
         }
 
@@ -745,32 +775,16 @@ namespace Pliant.Tests.Unit.Runtime
             var classicEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
             var tokens = Tokenize(input);
 
-            Assert.IsTrue(RunParse(leoEngine, tokens));
-            Assert.IsTrue(RunParse(classicEngine, tokens));
+            Assert.IsTrue(RunParse(leoEngine, tokens), "Leo Parse Failed");
+            Assert.IsTrue(RunParse(classicEngine, tokens), "Classic Parse Failed");
 
             var nodeComparer = new StatefulForestNodeComparer();
+            var leoParseForestRoot = leoEngine.GetParseForestRootNode();
+            var classicParseForestRoot = classicEngine.GetParseForestRootNode();
             Assert.IsTrue(nodeComparer.Equals(
-                classicEngine.GetParseForestRootNode(),
-                leoEngine.GetParseForestRootNode()));
-        }
-
-        private static void AssertForestsAreEqual(IAndForestNode first, IAndForestNode second)
-        {
-            Assert.AreEqual(first.Children.Count, second.Children.Count);
-            var firstChildrenEnumerator = first.Children.GetEnumerator();
-            var secondChildrenEnumerator = second.Children.GetEnumerator();
-
-            var firstChildEnumeratorMoveNext = false;
-            var secondChildEnumeratorMoveNext = false;
-
-            do
-            {
-                firstChildEnumeratorMoveNext = firstChildrenEnumerator.MoveNext();
-                secondChildEnumeratorMoveNext = secondChildrenEnumerator.MoveNext();
-                Assert.AreEqual(firstChildEnumeratorMoveNext, secondChildEnumeratorMoveNext);
-                if(firstChildEnumeratorMoveNext)
-                    AssertForestsAreEqual(firstChildrenEnumerator.Current, secondChildrenEnumerator.Current);
-            } while (firstChildEnumeratorMoveNext);
+                classicParseForestRoot,
+                leoParseForestRoot),
+                "Leo and Classic Parse Forest mismatch");
         }
         
         static void AssertForestsAreEqual(IForestNode expected, IForestNode actual)
@@ -893,13 +907,7 @@ namespace Pliant.Tests.Unit.Runtime
             return input.Select((x, i) =>
                 new Token(x.ToString(), i, new TokenType(x.ToString())));
         }
-
-        private static IEnumerable<IToken> Tokenize(string input, string tokenType)
-        {
-            return input.Select((x, i) =>
-                new Token(x.ToString(), i, new TokenType(tokenType)));
-        }
-
+        
         private static void ParseInput(IParseEngine parseEngine, IEnumerable<IToken> tokens)
         {
             foreach (var token in tokens)
