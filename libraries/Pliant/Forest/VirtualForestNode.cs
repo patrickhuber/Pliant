@@ -1,18 +1,33 @@
-﻿using Pliant.Charts;
-using Pliant.Collections;
-using Pliant.Grammars;
+﻿using System;
 using System.Collections.Generic;
+using Pliant.Grammars;
+using Pliant.Collections;
+using Pliant.Charts;
 
 namespace Pliant.Forest
 {
     public class VirtualForestNode : ForestNodeBase, ISymbolForestNode
     {
-        private ITransitionState _transitionState;
-        private IForestNode _completedParseNode;
         private ReadWriteList<IAndForestNode> _children;
-        
-        public ISymbol Symbol { get; private set; }
+        private List<VirtualForestNodePath> _paths;
 
+        public IReadOnlyList<IAndForestNode> Children
+        {
+            get
+            {
+                if (!ResultCached())
+                    LazyLoadChildren();
+                return _children;
+            }
+        }
+                
+        public override ForestNodeType NodeType
+        {
+            get { return ForestNodeType.Symbol; }
+        }
+
+        public ISymbol Symbol { get; private set; }
+        
         public VirtualForestNode(
             int location,
             ITransitionState transitionState,
@@ -32,20 +47,26 @@ namespace Pliant.Forest
             IState targetState)
             : base(targetState.Origin, location)
         {
-            _transitionState = transitionState;
-            _completedParseNode = completedParseNode;
             _children = new ReadWriteList<IAndForestNode>();
+            _paths = new List<VirtualForestNodePath>();
+
+            var path = new VirtualForestNodePath(transitionState, completedParseNode);
+            _paths.Add(path);
+
             Symbol = targetState.Production.LeftHandSide;
-            if (IsUniqueChildSubTree())
-                CloneUniqueChildSubTree(_completedParseNode as IInternalForestNode);
+            if (IsUniqueChildSubTree(path))
+                CloneUniqueChildSubTree(path.ForestNode as IInternalForestNode);
         }
 
-        private bool IsUniqueChildSubTree()
+        private bool IsUniqueChildSubTree(VirtualForestNodePath path)
         {
-            return _transitionState.Reduction.ParseNode != null
-                && _completedParseNode == _transitionState.Reduction.ParseNode
-                && (_completedParseNode.NodeType == ForestNodeType.Intermediate
-                    || _completedParseNode.NodeType == ForestNodeType.Symbol);
+            var transitionState = path.TransitionState;
+            var completedParseNode = path.ForestNode;
+
+            return transitionState.Reduction.ParseNode != null
+            && completedParseNode == transitionState.Reduction.ParseNode
+            && (completedParseNode.NodeType == ForestNodeType.Intermediate
+                || completedParseNode.NodeType == ForestNodeType.Symbol);
         }
 
         private void CloneUniqueChildSubTree(IInternalForestNode internalCompletedParseNode)
@@ -62,54 +83,10 @@ namespace Pliant.Forest
                 _children.Add(newAndNode);
             }
         }
-
-        public override ForestNodeType NodeType
-        {
-            get { return ForestNodeType.Symbol; }
-        }
-
-        public IReadOnlyList<IAndForestNode> Children
-        {
-            get
-            {
-                if (!ResultCached())
-                    LazyLoadChildren();
-                return _children;
-            }
-        }
-
-        private static IState GetTargetState(ITransitionState transitionState)
-        {
-            var parameterTransitionStateHasNoParseNode = transitionState.ParseNode == null;
-            if (parameterTransitionStateHasNoParseNode)
-                return transitionState.Reduction;
-            return transitionState;
-        }
         
-        private void LazyLoadChildren()
+        public override void Accept(IForestNodeVisitor visitor)
         {
-            if (_transitionState.NextTransition != null)
-            {
-                var virtualNode = new VirtualForestNode(Location, _transitionState.NextTransition, _completedParseNode);
-
-                if (_transitionState.Reduction.ParseNode == null)
-                    AddUniqueFamily(virtualNode);
-                else
-                    AddUniqueFamily(_transitionState.Reduction.ParseNode, virtualNode);
-            }
-            else if (_transitionState.Reduction.ParseNode != null)
-            {
-                AddUniqueFamily(_transitionState.Reduction.ParseNode, _completedParseNode);
-            }
-            else
-            {
-                AddUniqueFamily(_completedParseNode);
-            }
-        }
-
-        private bool ResultCached()
-        {
-            return _children.Count != 0;
+            visitor.Visit(this);
         }
 
         public void AddUniqueFamily(IForestNode trigger)
@@ -127,15 +104,46 @@ namespace Pliant.Forest
             _children.Add(andNode);
         }
         
-        public override string ToString()
+        private static IState GetTargetState(ITransitionState transitionState)
         {
-            return $"({Symbol}, {Origin}, {Location})";
+            var parameterTransitionStateHasNoParseNode = transitionState.ParseNode == null;
+            if (parameterTransitionStateHasNoParseNode)
+                return transitionState.Reduction;
+            return transitionState;
         }
 
-        public override void Accept(IForestNodeVisitor visitor)
+        private bool ResultCached()
         {
-            visitor.Visit(this);
+            return _children.Count > 0;
         }
 
+        private void LazyLoadChildren()
+        {
+            for (int i = 0; i < _paths.Count; i++)
+                LazyLoadPath(_paths[i]);
+        }
+
+        private void LazyLoadPath(VirtualForestNodePath path)
+        {
+            var transitionState = path.TransitionState;
+            var completedParseNode = path.ForestNode;
+            if (transitionState.NextTransition != null)
+            {
+                var virtualNode = new VirtualForestNode(Location, transitionState.NextTransition, completedParseNode);
+
+                if (transitionState.Reduction.ParseNode == null)
+                    AddUniqueFamily(virtualNode);
+                else
+                    AddUniqueFamily(transitionState.Reduction.ParseNode, virtualNode);
+            }
+            else if (transitionState.Reduction.ParseNode != null)
+            {
+                AddUniqueFamily(transitionState.Reduction.ParseNode, completedParseNode);
+            }
+            else
+            {
+                AddUniqueFamily(completedParseNode);
+            }
+        }
     }
 }

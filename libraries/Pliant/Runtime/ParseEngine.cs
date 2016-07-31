@@ -270,7 +270,7 @@ namespace Pliant.Runtime
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
 
-            var virtualParseNode = new NewVirtualForestNode(k, rootTransitionState, completed.ParseNode);
+            var virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
 
             var topmostItem = new State(
                 transitionState.Production,

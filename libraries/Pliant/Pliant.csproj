@@ -60,7 +60,7 @@
     <Compile Include="Forest\ForestNodeReference.cs" />
     <Compile Include="Forest\MultiplePassForestTraversalPath.cs" />
     <Compile Include="Forest\MultiplePassForestTraversalPathProvider.cs" />
-    <Compile Include="Forest\NewVirtualForestNode.cs" />
+    <Compile Include="Forest\VirtualForestNode.cs" />
     <Compile Include="Forest\SinglePassForestTraversalPath.cs" />
     <Compile Include="Forest\SinglePassForestTraversalPathProvider.cs" />
     <Compile Include="Forest\VirtualForestNodePath.cs" />
@@ -221,7 +221,6 @@
     <Compile Include="Forest\TokenForestNode.cs" />
     <Compile Include="Tokens\TokenType.cs" />
     <Compile Include="Charts\TransitionState.cs" />
-    <Compile Include="Forest\VirtualForestNode.cs" />
     <Compile Include="Grammars\WhitespaceTerminal.cs" />
     <Compile Include="Tree\IInternalTreeNode.cs" />
     <Compile Include="Tree\InternalTreeNode.cs" />
