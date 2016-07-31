@@ -21,7 +21,7 @@ namespace Pliant.Charts
 
         public virtual StateType StateType { get { return StateType.Normal; } }
 
-        public virtual IForestNode ParseNode { get; set; }
+        public IForestNode ParseNode { get; set; }
 
         private readonly int _hashCode;
 

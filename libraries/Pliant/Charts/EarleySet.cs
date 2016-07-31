@@ -79,33 +79,6 @@ namespace Pliant.Charts
                 }
             }
             return sourceItem;
-        }
-
-        public void LinkSimilarTransitionStates(ITransitionState state)
-        {
-            for (int t = 0; t < _transitions.Count; t++)
-            {
-                var compare = _transitions[t] as ITransitionState;
-                if (state.Origin == compare.Origin
-                    && state.Production.LeftHandSide.Equals(compare.Production.LeftHandSide)
-                    && !state.Reduction.Equals(compare.Reduction))
-                {                    
-                    if (state.ForestNodeReference == null && compare.ForestNodeReference == null)
-                    {
-                        var forestNodeReference = new ForestNodeReference();
-                        state.ForestNodeReference = forestNodeReference;
-                        compare.ForestNodeReference = forestNodeReference;
-                    }
-                    else if (state.ForestNodeReference == null)
-                    {
-                        state.ForestNodeReference = compare.ForestNodeReference;
-                    }
-                    else
-                    {
-                        compare.ForestNodeReference = state.ForestNodeReference;
-                    }
-                }
-            }
-        }
+        }        
     }
 }

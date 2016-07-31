@@ -60,8 +60,10 @@
     <Compile Include="Forest\ForestNodeReference.cs" />
     <Compile Include="Forest\MultiplePassForestTraversalPath.cs" />
     <Compile Include="Forest\MultiplePassForestTraversalPathProvider.cs" />
+    <Compile Include="Forest\NewVirtualForestNode.cs" />
     <Compile Include="Forest\SinglePassForestTraversalPath.cs" />
     <Compile Include="Forest\SinglePassForestTraversalPathProvider.cs" />
+    <Compile Include="Forest\VirtualForestNodePath.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Grammars\GrammarWrapper.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />

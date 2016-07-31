@@ -16,23 +16,7 @@ namespace Pliant.Charts
         public ITransitionState NextTransition { get; set; }
 
         public IForestNodeReference ForestNodeReference { get; set; }
-
-        public override IForestNode ParseNode
-        {
-            get
-            {
-                return ForestNodeReference == null 
-                    ? null 
-                    : ForestNodeReference.Node;
-            }
-            set
-            {
-                if (ForestNodeReference == null)
-                    ForestNodeReference = new ForestNodeReference();
-                ForestNodeReference.Node = value;
-            }
-        }
-
+        
         public TransitionState(
             ISymbol recognized,
             IState transition,
