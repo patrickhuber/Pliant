@@ -759,6 +759,32 @@ namespace Pliant.Tests.Unit.Runtime
             AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
         }
 
+        [TestMethod]
+        public void ParseEngineShouldProduceSameLeoAndClassicParseForestWhenGivenLongAmbiguousProduction()
+        {
+            ProductionExpression
+                S = "S", 
+                A = "A", B = "B", C = "C", D= "D", 
+                W = "W", X = "X", Y = "Y", Z = "Z";
+            S.Rule = 
+                A + B + C + D
+                | W + X + Y + Z;
+            A.Rule = '0';
+            B.Rule = '1';
+            C.Rule = '2';
+            D.Rule = '3';
+            W.Rule = '0';
+            X.Rule = '1';
+            Y.Rule = '2';
+            Z.Rule = '3';
+
+            var grammar = new GrammarExpression(
+                S, 
+                new[] { S, A, B, C, D, W, X, Y, Z })
+                .ToGrammar();
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest("0123", grammar);
+        }
+
         private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(IEnumerable<IToken> tokens, IGrammar grammar)
         {
             var leoEngine = new ParseEngine(grammar);
