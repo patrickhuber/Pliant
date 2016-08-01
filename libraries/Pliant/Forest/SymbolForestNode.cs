@@ -35,7 +35,7 @@ namespace Pliant.Forest
             if (obj == null)
                 return false;
 
-            var symbolNode = obj as SymbolForestNode;
+            var symbolNode = obj as ISymbolForestNode;
             if (symbolNode == null)
                 return false;
 

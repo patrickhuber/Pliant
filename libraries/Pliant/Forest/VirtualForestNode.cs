@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using Pliant.Grammars;
 using Pliant.Collections;
 using Pliant.Charts;
+using Pliant.Utilities;
 
 namespace Pliant.Forest
 {
     public class VirtualForestNode : InternalForestNode, ISymbolForestNode
     {
         private List<VirtualForestNodePath> _paths;
+
+        private readonly int _hashCode;
 
         public override IReadOnlyList<IAndForestNode> Children
         {
@@ -49,7 +52,7 @@ namespace Pliant.Forest
             _paths = new List<VirtualForestNodePath>();
             
             Symbol = targetState.Production.LeftHandSide;
-
+            _hashCode = ComputeHashCode();
             var path = new VirtualForestNodePath(transitionState, completedParseNode);
             AddUniquePath(path);
         }
@@ -138,6 +141,35 @@ namespace Pliant.Forest
             {
                 AddUniqueFamily(completedParseNode);
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+
+            var symbolNode = obj as ISymbolForestNode;
+            if (symbolNode == null)
+                return false;
+
+            return Location == symbolNode.Location
+                && NodeType == symbolNode.NodeType
+                && Origin == symbolNode.Origin
+                && Symbol.Equals(symbolNode.Symbol);
+        }
+
+        private int ComputeHashCode()
+        {
+            return HashCode.Compute(
+                ((int)NodeType).GetHashCode(),
+                Location.GetHashCode(),
+                Origin.GetHashCode(),
+                Symbol.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return _hashCode;
         }
 
         public override string ToString()

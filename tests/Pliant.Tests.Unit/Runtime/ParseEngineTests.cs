@@ -774,7 +774,6 @@ namespace Pliant.Tests.Unit.Runtime
                 classicParseForestRoot,
                 leoParseForestRoot),
                 "Leo and Classic Parse Forest mismatch");
-
         }
 
         private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(string input, IGrammar grammar)
