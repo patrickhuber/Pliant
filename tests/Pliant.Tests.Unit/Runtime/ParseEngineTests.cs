@@ -677,18 +677,8 @@ namespace Pliant.Tests.Unit.Runtime
                 .ToGrammar();
 
             var input = "aba";
-
-            var leoEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
-            var leoInterface = new ParseRunner(leoEngine, input);
-            Assert.IsTrue(RunParse(leoInterface));
-
-            var classicEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
-            var classicInterface = new ParseRunner(classicEngine, input);
-            Assert.IsTrue(RunParse(classicInterface));
-
-            var leoEngineParseRoot = leoEngine.GetParseForestRootNode();
-            var classicEngineParseRoot = classicEngine.GetParseForestRootNode();
-            AssertForestsAreEqual(leoEngineParseRoot, classicEngineParseRoot);
+            var tokens = Tokenize(input, "[ab]");
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(tokens, grammar);
         }
 
         [TestMethod]
@@ -769,11 +759,10 @@ namespace Pliant.Tests.Unit.Runtime
             AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
         }
 
-        private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(string input, IGrammar grammar)
+        private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(IEnumerable<IToken> tokens, IGrammar grammar)
         {
             var leoEngine = new ParseEngine(grammar);
             var classicEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
-            var tokens = Tokenize(input);
 
             Assert.IsTrue(RunParse(leoEngine, tokens), "Leo Parse Failed");
             Assert.IsTrue(RunParse(classicEngine, tokens), "Classic Parse Failed");
@@ -785,8 +774,15 @@ namespace Pliant.Tests.Unit.Runtime
                 classicParseForestRoot,
                 leoParseForestRoot),
                 "Leo and Classic Parse Forest mismatch");
+
         }
-        
+
+        private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(string input, IGrammar grammar)
+        {
+            var tokens = Tokenize(input);
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(tokens, grammar);
+        }
+
         static void AssertForestsAreEqual(IForestNode expected, IForestNode actual)
         {
             var comparer = new StatefulForestNodeComparer();
@@ -907,7 +903,18 @@ namespace Pliant.Tests.Unit.Runtime
             return input.Select((x, i) =>
                 new Token(x.ToString(), i, new TokenType(x.ToString())));
         }
-        
+
+        private static IEnumerable<IToken> Tokenize(string input, string tokenType)
+        {
+            return Tokenize(input, new TokenType(tokenType));
+        }
+
+        private static IEnumerable<IToken> Tokenize(string input, TokenType tokenType)
+        {
+            return input.Select((x, i) =>
+                new Token(x.ToString(), i, tokenType));
+        }
+
         private static void ParseInput(IParseEngine parseEngine, IEnumerable<IToken> tokens)
         {
             foreach (var token in tokens)

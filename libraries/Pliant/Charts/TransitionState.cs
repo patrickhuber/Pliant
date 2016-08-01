@@ -14,9 +14,7 @@ namespace Pliant.Charts
         public int Index { get; private set; }
 
         public ITransitionState NextTransition { get; set; }
-
-        public IForestNodeReference ForestNodeReference { get; set; }
-        
+                
         public TransitionState(
             ISymbol recognized,
             IState transition,
@@ -66,5 +64,13 @@ namespace Pliant.Charts
         }
 
         public override StateType StateType { get { return StateType.Transitive; } }
+
+        public IState GetTargetState()
+        {
+            var parameterTransitionStateHasNoParseNode = ParseNode == null;
+            if (parameterTransitionStateHasNoParseNode)
+                return Reduction;
+            return this;
+        }
     }
 }

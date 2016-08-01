@@ -5,8 +5,8 @@ namespace Pliant.Forest
 {
     public abstract class InternalForestNode : ForestNodeBase, IInternalForestNode
     {
-        private readonly ReadWriteList<IAndForestNode> _children;
-        public IReadOnlyList<IAndForestNode> Children { get { return _children; } }
+        protected readonly ReadWriteList<IAndForestNode> _children;
+        public virtual IReadOnlyList<IAndForestNode> Children { get { return _children; } }
 
         protected InternalForestNode(int origin, int location)
             : base(origin, location)

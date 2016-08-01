@@ -13,6 +13,6 @@ namespace Pliant.Charts
 
         int Index { get; }
 
-        IForestNodeReference ForestNodeReference { get; set; }
+        IState GetTargetState();
     }
 }

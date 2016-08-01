@@ -9,11 +9,13 @@ namespace Pliant.Forest
     {
         private readonly Dictionary<int, ISymbolForestNode> _symbolNodes;
         private readonly Dictionary<int, IIntermediateForestNode> _intermediateNodes;
+        private readonly Dictionary<int, VirtualForestNode> _virtualNodes;
 
         public ForestNodeSet()
         {
             _symbolNodes = new Dictionary<int, ISymbolForestNode>();
             _intermediateNodes = new Dictionary<int, IIntermediateForestNode>();
+            _virtualNodes = new Dictionary<int, VirtualForestNode>();
         }
 
         public ISymbolForestNode AddOrGetExistingSymbolNode(ISymbol symbol, int origin, int location)
@@ -46,12 +48,33 @@ namespace Pliant.Forest
             intermediateNode = new IntermediateForestNode(trigger, origin, location);
             _intermediateNodes.Add(hash, intermediateNode);
             return intermediateNode;
-        }        
+        }
+
+        public void AddNewVirtualNode(
+            VirtualForestNode virtualNode)
+        {
+            var hash = ComputeHashCode(
+                virtualNode.Symbol, 
+                virtualNode.Origin, 
+                virtualNode.Location);
+            _virtualNodes.Add(hash, virtualNode);
+        }
+
+        public bool TryGetExistingVirtualNode(
+            int location,
+            ITransitionState transitionState,
+            out VirtualForestNode node)
+        {
+            var targetState = transitionState.GetTargetState();
+            var hash = ComputeHashCode(targetState.Production.LeftHandSide, targetState.Origin, location);
+            return _virtualNodes.TryGetValue(hash, out node);
+        }
 
         public void Clear()
         {
             _symbolNodes.Clear();
             _intermediateNodes.Clear();
+            _virtualNodes.Clear();
         }
     }
 }

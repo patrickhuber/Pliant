@@ -6,12 +6,11 @@ using Pliant.Charts;
 
 namespace Pliant.Forest
 {
-    public class VirtualForestNode : ForestNodeBase, ISymbolForestNode
+    public class VirtualForestNode : InternalForestNode, ISymbolForestNode
     {
-        private ReadWriteList<IAndForestNode> _children;
         private List<VirtualForestNodePath> _paths;
 
-        public IReadOnlyList<IAndForestNode> Children
+        public override IReadOnlyList<IAndForestNode> Children
         {
             get
             {
@@ -35,8 +34,8 @@ namespace Pliant.Forest
             : this(
                   location,
                   transitionState, 
-                  completedParseNode, 
-                  GetTargetState(transitionState))
+                  completedParseNode,
+                  transitionState.GetTargetState())
         {
         }
 
@@ -47,15 +46,38 @@ namespace Pliant.Forest
             IState targetState)
             : base(targetState.Origin, location)
         {
-            _children = new ReadWriteList<IAndForestNode>();
             _paths = new List<VirtualForestNodePath>();
+            
+            Symbol = targetState.Production.LeftHandSide;
 
             var path = new VirtualForestNodePath(transitionState, completedParseNode);
-            _paths.Add(path);
-
-            Symbol = targetState.Production.LeftHandSide;
+            AddUniquePath(path);
+        }
+                
+        public override void Accept(IForestNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+        
+        public void AddUniquePath(VirtualForestNodePath path)
+        {
+            if (!IsUniquePath(path))
+                return;
             if (IsUniqueChildSubTree(path))
                 CloneUniqueChildSubTree(path.ForestNode as IInternalForestNode);
+        
+            _paths.Add(path);
+        }
+
+        private bool IsUniquePath(VirtualForestNodePath path)
+        {
+            for (int p = 0; p < _paths.Count; p++)
+            {
+                var otherPath = _paths[p];
+                if(path.Equals(otherPath))
+                    return false;
+            }
+            return true;
         }
 
         private bool IsUniqueChildSubTree(VirtualForestNodePath path)
@@ -82,34 +104,6 @@ namespace Pliant.Forest
                 }
                 _children.Add(newAndNode);
             }
-        }
-        
-        public override void Accept(IForestNodeVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        public void AddUniqueFamily(IForestNode trigger)
-        {
-            var andNode = new AndForestNode();
-            andNode.AddChild(trigger);
-            _children.Add(andNode);
-        }
-
-        public void AddUniqueFamily(IForestNode source, IForestNode trigger)
-        {
-            var andNode = new AndForestNode();
-            andNode.AddChild(source);
-            andNode.AddChild(trigger);
-            _children.Add(andNode);
-        }
-        
-        private static IState GetTargetState(ITransitionState transitionState)
-        {
-            var parameterTransitionStateHasNoParseNode = transitionState.ParseNode == null;
-            if (parameterTransitionStateHasNoParseNode)
-                return transitionState.Reduction;
-            return transitionState;
         }
 
         private bool ResultCached()
@@ -144,6 +138,11 @@ namespace Pliant.Forest
             {
                 AddUniqueFamily(completedParseNode);
             }
+        }
+
+        public override string ToString()
+        {
+            return $"({Symbol}, {Origin}, {Location})";
         }
     }
 }
