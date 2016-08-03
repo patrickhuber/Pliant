@@ -171,7 +171,7 @@ if(!recognized || !accepted)
 	Console.Error.WriteLine($"Error at position {errorPosition}");
 ```
 
-### Using ParseEngine, ParseRunner, Forrest API and Grammars to build a parse tree.
+### Using ParseEngine, ParseRunner, Forest API and Grammars to build a parse tree.
 
 The process for creating a parse tree is the same as recognizing input. 
 In fact, when running the ParseEngine, a Sparsley Packed Parse Forest (SPPF) is created 
@@ -179,11 +179,9 @@ in the background. The parse forest is presented in a specialized format to prom
 computational complexity similar to that of running the recognizer alone. 
 
 The easiest way to use the parse forest is use a internal node tree visitor on the parse forest root 
-with a SinglePassNodeVisitorStateManager instance controling traversal of forest branches.
+with a SelectFirstChildDisambiguationAlgorithm instance controling disambiguation of thet forest.
 
-If the parse is ambiguous, you may want to supply a custom INodeVisitorStateManager. Later updates
-will include a AllPathNodeVisitorStateManager (name in the works) that traverses
-all paths of the parse forest. 
+If the parse is ambiguous, you may want to supply a custom IForestDisambiguationAlgorithm.
 
 ```csharp
 // get the parse forest root from the parse engine
@@ -192,7 +190,7 @@ var parseForest = parseEngine.GetParseForestRoot();
 // create a internal tree node and supply the state manager for tree traversal.
 var parseTree = new InternalTreeNode(
     parseForest as IInternalForestNode,
-    new SinglePassNodeVisitorStateManager());
+    new SelectFirstChildDisambiguationAlgorithm());
 ```
 
 ## References

@@ -238,7 +238,7 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsNotNull(node);
             
             var visitor = new LoggingNodeVisitor(
-                new SinglePassForestNodeVisitorStateManager());
+                new SelectFirstChildDisambiguationAlgorithm());
             node.Accept(visitor);
 
             var log = visitor.VisitLog;

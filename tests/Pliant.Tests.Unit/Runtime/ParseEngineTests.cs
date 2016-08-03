@@ -785,6 +785,42 @@ namespace Pliant.Tests.Unit.Runtime
             AssertLeoAndClassicParseAlgorithmsCreateSameForest("0123", grammar);
         }
 
+        [TestMethod]
+        public void ParseEngineShouldProduceSameLeoAndClassicForestWhenGivenAmbiuousNonTerminal()
+        {
+            var digit = new DigitTerminal();
+            ProductionExpression E = "E";
+            E.Rule = E + '+' + E
+                | digit;
+            string input = "1+2+3";
+            var tokens = TokenizeNumericExpression(input);
+            var grammar = new GrammarExpression(E, new[] { E }).ToGrammar();
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(tokens, grammar);
+        }
+
+        [TestMethod]
+        [Ignore]
+        public void ParseEngineShouldDisambiguateFollowingOperatorPresidence()
+        {
+            var digit = new DigitTerminal();
+            ProductionExpression E = "E";
+            E.Rule = E + '+' + E
+                | E + '*' + E
+                | digit;
+            string input = "2*3+5*7";
+            var tokens = TokenizeNumericExpression(input);           
+
+        }
+
+        private static IEnumerable<IToken> TokenizeNumericExpression(string input)
+        {
+            return input
+                .Select((x, i) =>
+                    new Token(x.ToString(),
+                    i,
+                    new TokenType(char.IsDigit(x) ? "[0-9]" : x.ToString())));
+        }
+
         private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(IEnumerable<IToken> tokens, IGrammar grammar)
         {
             var leoEngine = new ParseEngine(grammar);

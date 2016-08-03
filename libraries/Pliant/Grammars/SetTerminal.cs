@@ -2,7 +2,7 @@
 
 namespace Pliant.Grammars
 {
-    public class SetTerminal : BaseTerminal, ITerminal
+    public class SetTerminal : BaseTerminal
     {
         private readonly ISet<char> _characterSet;
 

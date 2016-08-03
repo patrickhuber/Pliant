@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Pliant.Grammars;
-using Pliant.Collections;
 using Pliant.Charts;
 using Pliant.Utilities;
 
@@ -17,7 +15,7 @@ namespace Pliant.Forest
         {
             get
             {
-                if (!ResultCached())
+                if (ShouldLoadChildren())
                     LazyLoadChildren();
                 return _children;
             }
@@ -109,9 +107,9 @@ namespace Pliant.Forest
             }
         }
 
-        private bool ResultCached()
+        private bool ShouldLoadChildren()
         {
-            return _children.Count > 0;
+            return _children.Count == 0;
         }
 
         private void LazyLoadChildren()

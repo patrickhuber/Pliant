@@ -68,9 +68,8 @@ namespace Pliant.Tests.Unit.Tree
 
             var internalNode = parseForest as IInternalForestNode;
 
-            var stateManager = new SinglePassForestNodeVisitorStateManager();
-            var currentAndNode = stateManager.GetCurrentAndNode(internalNode);
-            var treeNode = new InternalTreeNode(internalNode, currentAndNode, stateManager);
+            var disambiguationAlgorithm = new SelectFirstChildDisambiguationAlgorithm();
+            var treeNode = new InternalTreeNode(internalNode, disambiguationAlgorithm);
             return treeNode;            
         }
     }

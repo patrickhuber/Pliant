@@ -31,7 +31,7 @@ namespace Pliant.Forest
             if (obj == null)
                 return false;
 
-            var intermediateNode = obj as IntermediateForestNode;
+            var intermediateNode = obj as IIntermediateForestNode;
             if (intermediateNode == null)
                 return false;
 

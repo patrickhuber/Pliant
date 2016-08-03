@@ -2,18 +2,17 @@
 {
     public abstract class ForestNodeVisitorBase : IForestNodeVisitor
     {
-        public IForestNodeVisitorStateManager StateManager { get; private set; }
+        public IForestDisambiguationAlgorithm ForestDisambiguationAlgorithm { get; private set; }
 
-        protected ForestNodeVisitorBase(IForestNodeVisitorStateManager stateManager)
+        protected ForestNodeVisitorBase(IForestDisambiguationAlgorithm forestDisambiguationAlgorithm)
         {
-            StateManager = stateManager;
+            ForestDisambiguationAlgorithm = forestDisambiguationAlgorithm;
         }
 
         public virtual void Visit(IIntermediateForestNode intermediateNode)
         {
-            var currentAndNode = StateManager.GetCurrentAndNode(intermediateNode);
+            var currentAndNode = ForestDisambiguationAlgorithm.GetCurrentAndNode(intermediateNode);
             Visit(currentAndNode);
-            StateManager.MarkAsTraversed(intermediateNode);
         }
 
         public virtual void Visit(ITokenForestNode tokenNode)
@@ -30,9 +29,8 @@
 
         public virtual void Visit(ISymbolForestNode symbolNode)
         {
-            var currentAndNode = StateManager.GetCurrentAndNode(symbolNode);
+            var currentAndNode = ForestDisambiguationAlgorithm.GetCurrentAndNode(symbolNode);
             Visit(currentAndNode);
-            StateManager.MarkAsTraversed(symbolNode);
         }
 
         public virtual void Visit(ITerminalForestNode terminalNode)

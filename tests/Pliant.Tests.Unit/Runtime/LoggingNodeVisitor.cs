@@ -7,7 +7,7 @@ namespace Pliant.Tests.Unit.Runtime
     {
         public IList<string> VisitLog { get; private set; }
         
-        public LoggingNodeVisitor(IForestNodeVisitorStateManager stateManager)
+        public LoggingNodeVisitor(IForestDisambiguationAlgorithm stateManager)
             : base(stateManager)
         {
             Init();

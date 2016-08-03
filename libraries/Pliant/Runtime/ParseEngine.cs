@@ -36,7 +36,6 @@ namespace Pliant.Runtime
             Grammar = grammar;
             Initialize();
         }
-
         
         public List<ILexerRule> GetExpectedLexerRules()
         {
@@ -204,8 +203,7 @@ namespace Pliant.Runtime
             var rulesForNonTerminal = Grammar.RulesFor(nonTerminal);
             // PERF: Avoid boxing enumerable
 
-            for (int p =0; p<rulesForNonTerminal.Count;p++)
-
+            for (int p = 0; p < rulesForNonTerminal.Count; p++)
             {
                 var production = rulesForNonTerminal[p];
                 PredictProduction(evidence, j, production);
@@ -270,20 +268,7 @@ namespace Pliant.Runtime
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
 
-            VirtualForestNode virtualParseNode = null;
-            if (!_nodeSet.TryGetExistingVirtualNode(
-                k,
-                rootTransitionState,
-                out virtualParseNode))
-            {
-                virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
-                _nodeSet.AddNewVirtualNode(virtualParseNode);
-            }
-            else
-            {
-                virtualParseNode.AddUniquePath(
-                    new VirtualForestNodePath(rootTransitionState, completed.ParseNode));
-            }
+            var virtualParseNode = CreateVirtualParseNode(completed, k, rootTransitionState);
 
             var topmostItem = new State(
                 transitionState.Production,
@@ -294,7 +279,7 @@ namespace Pliant.Runtime
             if (_chart.Enqueue(k, topmostItem))
                 Log("Complete", k, topmostItem);
         }
-
+        
         private void EarleyComplete(IState completed, int k)
         {
             var j = completed.Origin;
@@ -490,6 +475,26 @@ namespace Pliant.Runtime
                 internalNode.AddUniqueFamily(w, v);
 
             return internalNode;
+        }
+        
+        private VirtualForestNode CreateVirtualParseNode(IState completed, int k, ITransitionState rootTransitionState)
+        {
+            VirtualForestNode virtualParseNode = null;
+            if (!_nodeSet.TryGetExistingVirtualNode(
+                k,
+                rootTransitionState,
+                out virtualParseNode))
+            {
+                virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
+                _nodeSet.AddNewVirtualNode(virtualParseNode);
+            }
+            else
+            {
+                virtualParseNode.AddUniquePath(
+                    new VirtualForestNodePath(rootTransitionState, completed.ParseNode));
+            }
+
+            return virtualParseNode;
         }
 
         private bool IsSymbolNullable(ISymbol symbol)

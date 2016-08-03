@@ -44,7 +44,7 @@ namespace Pliant.Builders.Expressions
         {
             return AddWithAnd(lhs, rhs);
         }
-
+        
         public static RuleExpression operator +(BaseExpression lhs, BaseTerminal rhs)
         {
             return AddWithAnd(lhs, rhs);

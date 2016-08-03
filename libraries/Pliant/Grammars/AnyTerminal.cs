@@ -1,6 +1,6 @@
 ﻿namespace Pliant.Grammars
 {
-    public class AnyTerminal : BaseTerminal, ITerminal
+    public class AnyTerminal : BaseTerminal
     {
         public override bool IsMatch(char character)
         {

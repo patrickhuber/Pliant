@@ -2,7 +2,7 @@
 
 namespace Pliant.Grammars
 {
-    public class RangeTerminal : BaseTerminal, ITerminal
+    public class RangeTerminal : BaseTerminal
     {
         public char Start { get; private set; }
         public char End { get; private set; }
