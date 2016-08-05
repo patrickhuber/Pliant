@@ -2,6 +2,8 @@
 using Pliant.Builders.Expressions;
 using Pliant.Grammars;
 using Pliant.Runtime;
+using Pliant.Tokens;
+using System.Collections.Generic;
 
 namespace Pliant.Tests.Unit
 {
@@ -26,7 +28,7 @@ namespace Pliant.Tests.Unit
             }
             Assert.IsTrue(ParseRunner.ParseEngine.IsAccepted(), $"Parse was not accepted");
         }
-
+        
         public void Reset()
         {
             ParseEngine = new ParseEngine(Grammar);            

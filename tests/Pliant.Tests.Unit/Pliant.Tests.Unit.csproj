@@ -66,6 +66,7 @@
     <Compile Include="Forest\FakeInternalForestNode.cs" />
     <Compile Include="Forest\FakeSymbolForestNode.cs" />
     <Compile Include="Forest\FakeTokenForestNode.cs" />
+    <Compile Include="Runtime\LargeFileParseTests.cs" />
     <Compile Include="StatefulForestNodeComparer.cs" />
     <Compile Include="Grammars\AnyTerminalTests.cs" />
     <Compile Include="Bnf\BnfTests.cs" />
@@ -96,6 +97,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Bnf\AnsiC.bnf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Runtime\10000.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

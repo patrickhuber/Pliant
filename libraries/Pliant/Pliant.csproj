@@ -57,6 +57,7 @@
     <Compile Include="Charts\IParseNode.cs" />
     <Compile Include="Forest\IForestNodeReference.cs" />
     <Compile Include="Forest\ForestNodeReference.cs" />
+    <Compile Include="Forest\SelectHigherPresedenceDisambiguationAlgorithm.cs" />
     <Compile Include="Forest\VirtualForestNode.cs" />
     <Compile Include="Forest\VirtualForestNodePath.cs" />
     <Compile Include="GlobalSuppressions.cs" />

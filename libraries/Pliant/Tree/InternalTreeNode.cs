@@ -109,7 +109,7 @@ namespace Pliant.Tree
 
         public override string ToString()
         {
-            return $"{Symbol}({Origin}, {Location})";
+            return $"({Symbol}, {Origin}, {Location})";
         }
     }
 }

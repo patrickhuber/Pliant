@@ -19,8 +19,9 @@ namespace Pliant.RegularExpressions
             var startsWith = false;
             var endsWith = false;
 
-            foreach (var child in node.Children)
+            for (var c = 0; c< node.Children.Count; c++)
             {
+                var child = node.Children[c];
                 switch (node.NodeType)
                 {
                     case TreeNodeType.Internal:
@@ -54,8 +55,10 @@ namespace Pliant.RegularExpressions
         {
             RegexExpression expression = null;
             RegexTerm term = null;
-            foreach (var child in internalNode.Children)
+
+            for (var c = 0; c < internalNode.Children.Count; c++)
             {
+                var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
                 var childInternalNode = child as IInternalTreeNode;
@@ -81,8 +84,9 @@ namespace Pliant.RegularExpressions
         {
             RegexFactor factor = null;
             RegexTerm term = null;
-            foreach (var child in internalNode.Children)
+            for (var c = 0; c < internalNode.Children.Count; c++)
             {
+                var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
                 var childInternalNode = child as IInternalTreeNode;
@@ -104,8 +108,9 @@ namespace Pliant.RegularExpressions
             RegexAtom atom = null;
             RegexIterator? iterator = null;
 
-            foreach (var child in internalNode.Children)
+            for (var c = 0; c < internalNode.Children.Count; c++)
             {
+                var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
                 var childInternalNode = child as IInternalTreeNode;
@@ -127,8 +132,9 @@ namespace Pliant.RegularExpressions
 
         private RegexAtom VisitRegexAtomNode(IInternalTreeNode internalNode)
         {
-            foreach (var child in internalNode.Children)
+            for (var c = 0; c < internalNode.Children.Count; c++)
             {
+                var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
                 {
                     var childTokenNode = child as ITokenTreeNode;
@@ -165,8 +171,9 @@ namespace Pliant.RegularExpressions
 
         private RegexIterator VisitRegexIteratorNode(IInternalTreeNode internalNode)
         {
-            foreach (var child in internalNode.Children)
+            for (var c = 0; c < internalNode.Children.Count; c++)
             {
+                var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Token)
                     continue;
                 var tokenChildNode = child as ITokenTreeNode;
@@ -187,12 +194,17 @@ namespace Pliant.RegularExpressions
 
         private RegexCharacter VisitRegexCharacterNode(IInternalTreeNode internalNode)
         {
-            foreach (var child in internalNode.Children)
+            for (var c = 0; c < internalNode.Children.Count; c++)
             {
+                var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Token)
                     continue;
                 var childTokenNode = child as ITokenTreeNode;
-                var value = childTokenNode.Token.Value[0];
+
+                var value = childTokenNode.Token.Value.StartsWith(@"\")
+                    ? childTokenNode.Token.Value[1]
+                    : childTokenNode.Token.Value[0];
+
                 return new RegexCharacter(value);
             }
             throw new Exception("Invalid character detected.");
@@ -200,8 +212,9 @@ namespace Pliant.RegularExpressions
 
         private RegexSet VisitRegexSetNode(IInternalTreeNode internalNode)
         {
-            foreach (var child in internalNode.Children)
+            for (var c = 0; c < internalNode.Children.Count; c++)
             {
+                var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
 
@@ -219,8 +232,9 @@ namespace Pliant.RegularExpressions
 
         private RegexSet VisitInnerSetNode(bool negate, IInternalTreeNode internalNode)
         {
-            foreach (var child in internalNode.Children)
+            for (var c = 0; c < internalNode.Children.Count; c++)
             {
+                var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
                 var childInternalNode = child as IInternalTreeNode;
@@ -239,8 +253,9 @@ namespace Pliant.RegularExpressions
             RegexCharacterUnitRange characterRange = null;
             RegexCharacterClass characterClass = null;
 
-            foreach (var child in internalNode.Children)
+            for (var c = 0; c < internalNode.Children.Count; c++)
             {
+                var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
                 var childInternalNode = child as IInternalTreeNode;
@@ -266,8 +281,9 @@ namespace Pliant.RegularExpressions
             RegexCharacterClassCharacter start = null;
             RegexCharacterClassCharacter end = null;
 
-            foreach (var child in internalNode.Children)
+            for (var c = 0; c < internalNode.Children.Count; c++)
             {
+                var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
 
@@ -289,13 +305,16 @@ namespace Pliant.RegularExpressions
 
         private static RegexCharacterClassCharacter VisitCharacterClassCharacterNode(IInternalTreeNode internalNode)
         {
-            foreach (var child in internalNode.Children)
+            for (var c = 0; c < internalNode.Children.Count; c++)
             {
+                var child = internalNode.Children[c];
                 if (child.NodeType != TreeNodeType.Token)
                     continue;
 
                 var childTokenNode = child as ITokenTreeNode;
-                var value = childTokenNode.Token.Value[0];
+                var value = childTokenNode.Token.Value.StartsWith(@"\")
+                    ? childTokenNode.Token.Value[1]
+                    : childTokenNode.Token.Value[0];
                 return new RegexCharacterClassCharacter(value);
             }
             throw new Exception("Invalid Regex Character Class Character.");

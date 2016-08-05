@@ -8,6 +8,7 @@ using System.Linq;
 using Pliant.Tests.Unit.Forest;
 using Pliant.Builders.Expressions;
 using Pliant.Runtime;
+using Pliant.Tree;
 
 namespace Pliant.Tests.Unit.Runtime
 {
@@ -799,17 +800,28 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        [Ignore]
         public void ParseEngineShouldDisambiguateFollowingOperatorPresidence()
         {
             var digit = new DigitTerminal();
             ProductionExpression E = "E";
-            E.Rule = E + '+' + E
+            E.Rule = 
+                E + '+' + E
                 | E + '*' + E
                 | digit;
             string input = "2*3+5*7";
-            var tokens = TokenizeNumericExpression(input);           
-
+            var parseTester = new ParseTester(new GrammarExpression(E));
+            parseTester.RunParse(input);
+            var forest = parseTester.ParseEngine.GetParseForestRootNode();
+            var tree = new InternalTreeNode(forest);
+            // ((2*3)+(5*7))
+            // (E, 0, 7) = (E, 0, 5) ('*', 5, 6) (E, 6, 7)
+            // (E, 0, 5) = (E, 0, 3) ('+', 3, 4) (E, 4, 5)
+            // (E, 0, 3) = (E, 0, 1) ('*', 1, 2) (E, 2, 3)
+            // (E, 0, 1) = ('2', 0, 1)
+            // (E, 2, 3) = ('3', 2, 3)
+            // (E, 4, 5) = ('5', 4, 5)
+            // (E, 6, 7) = ('7', 6, 7)
+            Assert.Inconclusive();
         }
 
         private static IEnumerable<IToken> TokenizeNumericExpression(string input)

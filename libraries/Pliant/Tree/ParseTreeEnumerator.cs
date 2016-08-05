@@ -1,5 +1,4 @@
 ﻿using Pliant.Forest;
-using System.Collections.Generic;
 using System;
 using System.Collections;
 
@@ -8,11 +7,12 @@ namespace Pliant.Tree
     public class ParseTreeEnumerator
         : IParseTreeEnumerator
     {
+        IInternalForestNode _forestRoot;
+
         public ParseTreeEnumerator(
-            IForestDisambiguationAlgorithm stateManager,
             IInternalForestNode forestRoot)
         {
-            var internalTreeNode = new InternalTreeNode(forestRoot, stateManager);     
+            _forestRoot = forestRoot;
         }
 
         public ITreeNode Current
