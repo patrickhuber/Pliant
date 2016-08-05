@@ -46,7 +46,7 @@ public static int Main(string[] args)
 		= Expression ;
 		
 	Expression.Rule
-		= Expression + '+' + Term 
+		= Edxpression + '+' + Term 
 		| Term ;
 
 	Term.Rule 
@@ -100,7 +100,7 @@ public static int Main (string[] args)
 		= Expression;
 		
 	Expression 
-		= Expression Term
+		= Expression '+' Term
 		| Term;
 		
 	Term 
