@@ -10,7 +10,7 @@ using Pliant.Runtime;
 using Pliant.Tests.Unit.Runtime;
 using System.Linq;
 
-namespace Pliant.Tests.Unit.Forest
+namespace Pliant.Tests.Common.Forest
 {
     [TestClass]
     public class ForestNodeVisitorTests

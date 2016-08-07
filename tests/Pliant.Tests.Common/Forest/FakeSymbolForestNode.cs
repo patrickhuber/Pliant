@@ -1,7 +1,7 @@
 ﻿using Pliant.Forest;
 using Pliant.Grammars;
 
-namespace Pliant.Tests.Unit.Forest
+namespace Pliant.Tests.Common.Forest
 {
     public class FakeSymbolForestNode : FakeInternalForestNode, ISymbolForestNode
     {

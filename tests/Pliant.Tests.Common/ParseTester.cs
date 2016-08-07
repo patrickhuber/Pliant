@@ -5,7 +5,7 @@ using Pliant.Runtime;
 using Pliant.Tokens;
 using System.Collections.Generic;
 
-namespace Pliant.Tests.Unit
+namespace Pliant.Tests.Common
 {
     public class ParseTester
     {

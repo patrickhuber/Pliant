@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Pliant.Tests.Unit
+namespace Pliant.Tests.Common
 {    
     public class StatefulForestNodeComparer : IEqualityComparer<IForestNode>
     {

@@ -1,7 +1,7 @@
 ﻿using Pliant.Charts;
 using Pliant.Forest;
 
-namespace Pliant.Tests.Unit.Forest
+namespace Pliant.Tests.Common.Forest
 {
     public class FakeIntermediateForestNode : FakeInternalForestNode, IIntermediateForestNode
     {

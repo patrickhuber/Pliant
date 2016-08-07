@@ -3,6 +3,7 @@ using Pliant.Automata;
 using Pliant.Builders.Expressions;
 using Pliant.Grammars;
 using Pliant.RegularExpressions;
+using Pliant.Tests.Common;
 using System.IO;
 
 namespace Pliant.Tests.Unit.Runtime
