@@ -81,7 +81,7 @@ namespace Pliant.Forest
             return true;
         }
 
-        private bool IsUniqueChildSubTree(VirtualForestNodePath path)
+        private static bool IsUniqueChildSubTree(VirtualForestNodePath path)
         {
             var transitionState = path.TransitionState;
             var completedParseNode = path.ForestNode;

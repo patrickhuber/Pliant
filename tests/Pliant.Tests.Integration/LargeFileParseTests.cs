@@ -18,7 +18,9 @@ namespace Pliant.Tests.Unit.Runtime
         private ParseTester _parseTester;
 
         [ClassInitialize]
+#pragma warning disable CC0057 // Unused parameters
         public static void Initialize(TestContext testContext)
+#pragma warning restore CC0057 // Unused parameters
         {
             ProductionExpression
                 Json = "Json",

@@ -7,6 +7,12 @@ namespace Pliant.RegularExpressions
         private readonly IRegexToNfa _regexToNfa;
         private readonly INfaToDfa _nfaToDfa;
 
+        public RegexCompiler()
+            : this(
+                new ThompsonConstructionAlgorithm(),
+                new SubsetConstructionAlgorithm())
+        {}
+
         public RegexCompiler(
             IRegexToNfa regexToNfa,
             INfaToDfa nfaToDfa)
