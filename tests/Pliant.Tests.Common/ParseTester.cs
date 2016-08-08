@@ -14,8 +14,13 @@ namespace Pliant.Tests.Common
         public IParseRunner ParseRunner { get; private set; }
 
         public ParseTester(GrammarExpression expression)
+            : this(expression.ToGrammar())
         {
-            Grammar = expression.ToGrammar();
+        }
+
+        public ParseTester(IGrammar grammar)
+        {
+            Grammar = grammar;
             ParseEngine = new ParseEngine(Grammar);
         }
 

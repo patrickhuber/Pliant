@@ -55,6 +55,7 @@
     <Compile Include="Builders\SymbolModel.cs" />
     <Compile Include="Builders\SymbolModelType.cs" />
     <Compile Include="Charts\IParseNode.cs" />
+    <Compile Include="Forest\ForestNodeVisitorBase.cs" />
     <Compile Include="Forest\IForestNodeReference.cs" />
     <Compile Include="Forest\ForestNodeReference.cs" />
     <Compile Include="Forest\SelectHigherPresedenceDisambiguationAlgorithm.cs" />
@@ -62,6 +63,7 @@
     <Compile Include="Forest\VirtualForestNodePath.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Grammars\GrammarWrapper.cs" />
+    <Compile Include="Tree\ParseTreeEnumerable.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />
     <Compile Include="Forest\SelectFirstChildDisambiguationAlgorithm.cs" />
     <Compile Include="Automata\INfaToDfa.cs" />
@@ -159,7 +161,7 @@
     <Compile Include="Grammars\ITerminal.cs" />
     <Compile Include="Forest\ITerminalForestNode.cs" />
     <Compile Include="Forest\ForestNodeBase.cs" />
-    <Compile Include="Forest\ForestNodeVisitorBase.cs" />
+    <Compile Include="Forest\DisambiguatingForestNodeVisitorBase.cs" />
     <Compile Include="Runtime\ParseEngineLexemeFactory.cs" />
     <Compile Include="Runtime\ParseEngineOptions.cs" />
     <Compile Include="RegularExpressions\IRegexToNfa.cs" />

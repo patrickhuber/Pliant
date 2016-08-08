@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Expressions\SimpleExpressionGrammar.cs" />
     <Compile Include="Forest\FakeAndForestNode.cs" />
     <Compile Include="Forest\FakeIntermediateForestNode.cs" />
     <Compile Include="Forest\FakeInternalForestNode.cs" />
