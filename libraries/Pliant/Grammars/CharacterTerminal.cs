@@ -2,12 +2,11 @@
 
 namespace Pliant.Grammars
 {
-    public class CharacterTerminal : Symbol, ITerminal
+    public class CharacterTerminal : BaseTerminal
     {
         public char Character { get; private set; }
 
         public CharacterTerminal(char character)
-            : base(SymbolType.Terminal)
         {
             Character = character;
         }
@@ -28,7 +27,7 @@ namespace Pliant.Grammars
             return terminal.Character == Character;
         }
 
-        public virtual bool IsMatch(char character)
+        public override bool IsMatch(char character)
         {
             return Character == character;
         }

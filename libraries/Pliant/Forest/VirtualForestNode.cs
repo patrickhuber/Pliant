@@ -1,18 +1,33 @@
-﻿using Pliant.Charts;
-using Pliant.Collections;
+﻿using System.Collections.Generic;
 using Pliant.Grammars;
-using System.Collections.Generic;
+using Pliant.Charts;
+using Pliant.Utilities;
 
 namespace Pliant.Forest
 {
-    public class VirtualForestNode : ForestNodeBase, ISymbolForestNode
+    public class VirtualForestNode : InternalForestNode, ISymbolForestNode
     {
-        private ITransitionState _transitionState;
-        private IForestNode _completedParseNode;
-        private ReadWriteList<IAndForestNode> _children;
-        
-        public ISymbol Symbol { get; private set; }
+        private List<VirtualForestNodePath> _paths;
 
+        private readonly int _hashCode;
+
+        public override IReadOnlyList<IAndForestNode> Children
+        {
+            get
+            {
+                if (ShouldLoadChildren())
+                    LazyLoadChildren();
+                return _children;
+            }
+        }
+                
+        public override ForestNodeType NodeType
+        {
+            get { return ForestNodeType.Symbol; }
+        }
+
+        public ISymbol Symbol { get; private set; }
+        
         public VirtualForestNode(
             int location,
             ITransitionState transitionState,
@@ -20,8 +35,8 @@ namespace Pliant.Forest
             : this(
                   location,
                   transitionState, 
-                  completedParseNode, 
-                  GetTargetState(transitionState))
+                  completedParseNode,
+                  transitionState.GetTargetState())
         {
         }
 
@@ -32,20 +47,49 @@ namespace Pliant.Forest
             IState targetState)
             : base(targetState.Origin, location)
         {
-            _transitionState = transitionState;
-            _completedParseNode = completedParseNode;
-            _children = new ReadWriteList<IAndForestNode>();
+            _paths = new List<VirtualForestNodePath>();
+            
             Symbol = targetState.Production.LeftHandSide;
-            if (IsUniqueChildSubTree())
-                CloneUniqueChildSubTree(_completedParseNode as IInternalForestNode);
+            _hashCode = ComputeHashCode();
+            var path = new VirtualForestNodePath(transitionState, completedParseNode);
+            AddUniquePath(path);
+        }
+                
+        public override void Accept(IForestNodeVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+        
+        public void AddUniquePath(VirtualForestNodePath path)
+        {
+            if (!IsUniquePath(path))
+                return;
+            if (IsUniqueChildSubTree(path))
+                CloneUniqueChildSubTree(path.ForestNode as IInternalForestNode);
+        
+            _paths.Add(path);
         }
 
-        private bool IsUniqueChildSubTree()
+        private bool IsUniquePath(VirtualForestNodePath path)
         {
-            return _transitionState.Reduction.ParseNode != null
-                && _completedParseNode == _transitionState.Reduction.ParseNode
-                && (_completedParseNode.NodeType == ForestNodeType.Intermediate
-                    || _completedParseNode.NodeType == ForestNodeType.Symbol);
+            for (int p = 0; p < _paths.Count; p++)
+            {
+                var otherPath = _paths[p];
+                if(path.Equals(otherPath))
+                    return false;
+            }
+            return true;
+        }
+
+        private static bool IsUniqueChildSubTree(VirtualForestNodePath path)
+        {
+            var transitionState = path.TransitionState;
+            var completedParseNode = path.ForestNode;
+
+            return transitionState.Reduction.ParseNode != null
+            && completedParseNode == transitionState.Reduction.ParseNode
+            && (completedParseNode.NodeType == ForestNodeType.Intermediate
+                || completedParseNode.NodeType == ForestNodeType.Symbol);
         }
 
         private void CloneUniqueChildSubTree(IInternalForestNode internalCompletedParseNode)
@@ -63,79 +107,72 @@ namespace Pliant.Forest
             }
         }
 
-        public override ForestNodeType NodeType
+        private bool ShouldLoadChildren()
         {
-            get { return ForestNodeType.Symbol; }
+            return _children.Count == 0;
         }
 
-        public IReadOnlyList<IAndForestNode> Children
-        {
-            get
-            {
-                if (!ResultCached())
-                    LazyLoadChildren();
-                return _children;
-            }
-        }
-
-        private static IState GetTargetState(ITransitionState transitionState)
-        {
-            var parameterTransitionStateHasNoParseNode = transitionState.ParseNode == null;
-            if (parameterTransitionStateHasNoParseNode)
-                return transitionState.Reduction;
-            return transitionState;
-        }
-        
         private void LazyLoadChildren()
         {
-            if (_transitionState.NextTransition != null)
-            {
-                var virtualNode = new VirtualForestNode(Location, _transitionState.NextTransition, _completedParseNode);
+            for (int i = 0; i < _paths.Count; i++)
+                LazyLoadPath(_paths[i]);
+        }
 
-                if (_transitionState.Reduction.ParseNode == null)
+        private void LazyLoadPath(VirtualForestNodePath path)
+        {
+            var transitionState = path.TransitionState;
+            var completedParseNode = path.ForestNode;
+            if (transitionState.NextTransition != null)
+            {
+                var virtualNode = new VirtualForestNode(Location, transitionState.NextTransition, completedParseNode);
+
+                if (transitionState.Reduction.ParseNode == null)
                     AddUniqueFamily(virtualNode);
                 else
-                    AddUniqueFamily(_transitionState.Reduction.ParseNode, virtualNode);
+                    AddUniqueFamily(transitionState.Reduction.ParseNode, virtualNode);
             }
-            else if (_transitionState.Reduction.ParseNode != null)
+            else if (transitionState.Reduction.ParseNode != null)
             {
-                AddUniqueFamily(_transitionState.Reduction.ParseNode, _completedParseNode);
+                AddUniqueFamily(transitionState.Reduction.ParseNode, completedParseNode);
             }
             else
             {
-                AddUniqueFamily(_completedParseNode);
+                AddUniqueFamily(completedParseNode);
             }
         }
 
-        private bool ResultCached()
+        public override bool Equals(object obj)
         {
-            return _children.Count != 0;
+            if (obj == null)
+                return false;
+
+            var symbolNode = obj as ISymbolForestNode;
+            if (symbolNode == null)
+                return false;
+
+            return Location == symbolNode.Location
+                && NodeType == symbolNode.NodeType
+                && Origin == symbolNode.Origin
+                && Symbol.Equals(symbolNode.Symbol);
         }
 
-        public void AddUniqueFamily(IForestNode trigger)
+        private int ComputeHashCode()
         {
-            var andNode = new AndForestNode();
-            andNode.AddChild(trigger);
-            _children.Add(andNode);
+            return HashCode.Compute(
+                ((int)NodeType).GetHashCode(),
+                Location.GetHashCode(),
+                Origin.GetHashCode(),
+                Symbol.GetHashCode());
         }
 
-        public void AddUniqueFamily(IForestNode source, IForestNode trigger)
+        public override int GetHashCode()
         {
-            var andNode = new AndForestNode();
-            andNode.AddChild(source);
-            andNode.AddChild(trigger);
-            _children.Add(andNode);
+            return _hashCode;
         }
-        
+
         public override string ToString()
         {
             return $"({Symbol}, {Origin}, {Location})";
         }
-
-        public override void Accept(IForestNodeVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
     }
 }

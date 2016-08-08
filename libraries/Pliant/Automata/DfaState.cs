@@ -7,7 +7,7 @@ namespace Pliant.Automata
     {
         public bool IsFinal { get; private set; }
 
-        private ReadWriteList<IDfaTransition> _transitions;
+        private readonly ReadWriteList<IDfaTransition> _transitions;
 
         public IReadOnlyList<IDfaTransition> Transitions { get { return _transitions; } }
         

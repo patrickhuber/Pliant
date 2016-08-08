@@ -1,14 +1,12 @@
 ﻿using Pliant.Collections;
-using System;
 using System.Collections.Generic;
 
 namespace Pliant.Forest
 {
     public abstract class InternalForestNode : ForestNodeBase, IInternalForestNode
     {
-        private ReadWriteList<IAndForestNode> _children;
-
-        public IReadOnlyList<IAndForestNode> Children { get { return _children; } }
+        protected readonly ReadWriteList<IAndForestNode> _children;
+        public virtual IReadOnlyList<IAndForestNode> Children { get { return _children; } }
 
         protected InternalForestNode(int origin, int location)
             : base(origin, location)
@@ -36,6 +34,7 @@ namespace Pliant.Forest
         private void AddUniqueAndNode(IForestNode firstChild, IForestNode secondChild)
         {
             var childCount = 1 + ((secondChild == null) ? 0 : 1);
+
             for (var c = 0; c < _children.Count; c++)
             {
                 var andNode = _children[c];

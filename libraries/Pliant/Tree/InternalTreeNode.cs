@@ -1,4 +1,5 @@
-﻿using Pliant.Forest;
+﻿using Pliant.Collections;
+using Pliant.Forest;
 using Pliant.Grammars;
 using System;
 using System.Collections.Generic;
@@ -7,9 +8,9 @@ namespace Pliant.Tree
 {
     public class InternalTreeNode : IInternalTreeNode
     {
-        private IForestNodeVisitorStateManager _stateManager;
-        private IAndForestNode _currentAndNode;
+        private IForestDisambiguationAlgorithm _disambiguationAlgorithm;
         private IInternalForestNode _internalNode;
+        private ReadWriteList<ITreeNode> _children;
 
         public int Origin { get { return _internalNode.Origin; } }
 
@@ -19,29 +20,21 @@ namespace Pliant.Tree
 
         public InternalTreeNode(
             IInternalForestNode internalNode,
-            IAndForestNode currentAndNode,
-            IForestNodeVisitorStateManager stateManager)
+            IForestDisambiguationAlgorithm stateManager)
         {
-            _stateManager = stateManager;
-            _currentAndNode = currentAndNode;
+            _disambiguationAlgorithm = stateManager;
             _internalNode = internalNode;
-            SetRule(_internalNode);
+            _children = new ReadWriteList<ITreeNode>();
+            SetSymbol(_internalNode);
         }
 
         public InternalTreeNode(
             IInternalForestNode internalNode)
-            : this(internalNode, new MultiPassForestNodeVisitorStateManager())
+            : this(internalNode, new SelectFirstChildDisambiguationAlgorithm())
         {
         }
-
-        public InternalTreeNode(
-            IInternalForestNode internalNode,
-            IForestNodeVisitorStateManager stateManager)
-            : this(internalNode, stateManager.GetCurrentAndNode(internalNode), stateManager)
-        {
-        }
-
-        private void SetRule(IInternalForestNode node)
+        
+        private void SetSymbol(IInternalForestNode node)
         {
             switch (node.NodeType)
             {
@@ -55,43 +48,55 @@ namespace Pliant.Tree
             }
         }
 
-        public IEnumerable<ITreeNode> Children
+        public IReadOnlyList<ITreeNode> Children
         {
             get
             {
-                return EnumerateChildren(_currentAndNode);
+                if (ShouldLoadChildren())
+                {
+                    var andNode = _disambiguationAlgorithm.GetCurrentAndNode(_internalNode);
+                    LazyLoadChildren(andNode);
+                }
+                return _children;
             }
         }
 
-        private IEnumerable<ITreeNode> EnumerateChildren(IAndForestNode andNode)
+        private void LazyLoadChildren(IAndForestNode andNode)
         {
-            foreach (var child in andNode.Children)
+            for (int c = 0; c < andNode.Children.Count; c++)
             {
+                var child = andNode.Children[c];
                 switch (child.NodeType)
                 {
-                    case Forest.ForestNodeType.Intermediate:
+                    // skip intermediate nodes by enumerating children only
+                    case ForestNodeType.Intermediate:
                         var intermediateNode = child as IIntermediateForestNode;
-                        var currentAndNode = _stateManager.GetCurrentAndNode(intermediateNode);
-                        foreach (var otherChild in EnumerateChildren(currentAndNode))
-                            yield return otherChild;
+                        var currentAndNode = _disambiguationAlgorithm.GetCurrentAndNode(intermediateNode);
+                        LazyLoadChildren(currentAndNode);
                         break;
 
-                    case Forest.ForestNodeType.Symbol:
+                    // create a internal tree node for symbol forest nodes
+                    case ForestNodeType.Symbol:
                         var symbolNode = child as ISymbolForestNode;
-                        var childAndNode = _stateManager.GetCurrentAndNode(symbolNode);
-                        yield return new InternalTreeNode(symbolNode, childAndNode, _stateManager);
+                        _children.Add(new InternalTreeNode(symbolNode, _disambiguationAlgorithm));
                         break;
-
-                    case Forest.ForestNodeType.Token:
-                        yield return new TokenTreeNode(child as ITokenForestNode);
+                        
+                    // create a tree token node for token forest nodes
+                    case ForestNodeType.Token:
+                        _children.Add(new TokenTreeNode(child as ITokenForestNode));
                         break;
 
                     default:
                         throw new Exception("Unrecognized NodeType");
                 }
-            }
+            }            
         }
 
+        private bool ShouldLoadChildren()
+        {
+            return _children.Count == 0;
+        }
+        
         public TreeNodeType NodeType
         {
             get { return TreeNodeType.Internal; }
@@ -104,7 +109,7 @@ namespace Pliant.Tree
 
         public override string ToString()
         {
-            return $"{Symbol}({Origin}, {Location})";
+            return $"({Symbol}, {Origin}, {Location})";
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Pliant.Runtime
         public ParseEngineOptions Options { get; private set; }
 
         private Chart _chart;
-        private readonly ForestNodeSet _nodeSet;        
+        private readonly ForestNodeSet _nodeSet;
         
         public ParseEngine(IGrammar grammar)
             : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
@@ -36,7 +36,6 @@ namespace Pliant.Runtime
             Grammar = grammar;
             Initialize();
         }
-
         
         public List<ILexerRule> GetExpectedLexerRules()
         {
@@ -50,9 +49,7 @@ namespace Pliant.Runtime
 
             // PERF: Avoid Linq Select, Where due to lambda allocation
             // PERF: Avoid foreach enumeration due to IEnumerable boxing
-#pragma warning disable CC0006 // Use foreach
             for (int s = 0; s < scanStates.Count; s++)
-#pragma warning restore CC0006 // Use foreach
             {
                 var scanState = scanStates[s];
                 var postDotSymbol = scanState.PostDotSymbol;
@@ -67,30 +64,32 @@ namespace Pliant.Runtime
                     }
                 }
             }
-            SharedPools.Default<Dictionary<TokenType, ILexerRule>>().Free(expectedRuleDictionary);
+            SharedPools
+                .Default<Dictionary<TokenType, ILexerRule>>()
+                .Free(expectedRuleDictionary);
             return returnList;
         }
-
-        public IForestNode GetParseForestRoot()
+        
+        public IInternalForestNode GetParseForestRootNode()
         {
             if (!IsAccepted())
                 throw new Exception("Unable to parse expression.");
 
             var lastSet = _chart.EarleySets[_chart.Count - 1];
             var start = Grammar.Start;
-
+                        
             // PERF: Avoid Linq expressions due to lambda allocation
             for (int c = 0; c < lastSet.Completions.Count; c++)
             {
                 var completion = lastSet.Completions[c];
-                if (completion.Production.LeftHandSide.Equals(start)
-                    && completion.Origin == 0)
-                    return completion.ParseNode;
+                if (completion.Production.LeftHandSide.Equals(start) && completion.Origin == 0)
+                {
+                    return completion.ParseNode as IInternalForestNode;
+                }
             }
-
-            // if not accepted, the first check should handle this case
             return null;
         }
+
 
         public bool IsAccepted()
         {
@@ -203,9 +202,8 @@ namespace Pliant.Runtime
             var nonTerminal = evidence.PostDotSymbol as INonTerminal;
             var rulesForNonTerminal = Grammar.RulesFor(nonTerminal);
             // PERF: Avoid boxing enumerable
-#pragma warning disable CC0006 // Use foreach
-            for (int p =0; p<rulesForNonTerminal.Count;p++)
-#pragma warning restore CC0006 // Use foreach
+
+            for (int p = 0; p < rulesForNonTerminal.Count; p++)
             {
                 var production = rulesForNonTerminal[p];
                 PredictProduction(evidence, j, production);
@@ -230,7 +228,7 @@ namespace Pliant.Runtime
                 else if (evidenceParseNode.Children.Count > 0 
                     && evidenceParseNode.Children[0].Children.Count > 0)
                 {
-                    var firstChildNode = evidenceParseNode.Children[0].Children[0];
+                    var firstChildNode = evidenceParseNode;
                     var parseNode = CreateParseNode(aycockHorspoolState, firstChildNode, nullParseNode, j);
                     aycockHorspoolState.ParseNode = parseNode;
                 }
@@ -270,7 +268,7 @@ namespace Pliant.Runtime
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
 
-            var virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
+            var virtualParseNode = CreateVirtualParseNode(completed, k, rootTransitionState);
 
             var topmostItem = new State(
                 transitionState.Production,
@@ -281,7 +279,7 @@ namespace Pliant.Runtime
             if (_chart.Enqueue(k, topmostItem))
                 Log("Complete", k, topmostItem);
         }
-
+        
         private void EarleyComplete(IState completed, int k)
         {
             var j = completed.Origin;
@@ -477,6 +475,26 @@ namespace Pliant.Runtime
                 internalNode.AddUniqueFamily(w, v);
 
             return internalNode;
+        }
+        
+        private VirtualForestNode CreateVirtualParseNode(IState completed, int k, ITransitionState rootTransitionState)
+        {
+            VirtualForestNode virtualParseNode = null;
+            if (!_nodeSet.TryGetExistingVirtualNode(
+                k,
+                rootTransitionState,
+                out virtualParseNode))
+            {
+                virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
+                _nodeSet.AddNewVirtualNode(virtualParseNode);
+            }
+            else
+            {
+                virtualParseNode.AddUniquePath(
+                    new VirtualForestNodePath(rootTransitionState, completed.ParseNode));
+            }
+
+            return virtualParseNode;
         }
 
         private bool IsSymbolNullable(ISymbol symbol)

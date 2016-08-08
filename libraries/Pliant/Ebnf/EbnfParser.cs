@@ -9,7 +9,6 @@ namespace Pliant.Ebnf
     {
 #pragma warning disable CC0091 // Use static method
         public EbnfDefinition Parse(string ebnf)
-#pragma warning restore CC0091 // Use static method
         {
             var grammar = new EbnfGrammar();
             var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
@@ -24,13 +23,16 @@ namespace Pliant.Ebnf
                 throw new Exception(
                     $"Unable to parse Ebnf. Error at position {parseRunner.Position}");
 
-            var parseForest = parseEngine.GetParseForestRoot();
+            var parseForest = parseEngine.GetParseForestRootNode();
+
             var parseTree = new InternalTreeNode(
-                parseForest as IInternalForestNode,
-                new SinglePassForestNodeVisitorStateManager());
+                    parseForest as IInternalForestNode,
+                    new SelectFirstChildDisambiguationAlgorithm());
+
             var ebnfVisitor = new EbnfVisitor();
             parseTree.Accept(ebnfVisitor);
-            return ebnfVisitor.Definition;
+            return ebnfVisitor.Definition;            
         }
+#pragma warning restore CC0091 // Use static method
     }
 }

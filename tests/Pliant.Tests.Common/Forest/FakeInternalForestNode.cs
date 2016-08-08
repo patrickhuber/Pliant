@@ -3,7 +3,7 @@ using Pliant.Forest;
 using System;
 using System.Collections.Generic;
 
-namespace Pliant.Tests.Unit.Forest
+namespace Pliant.Tests.Common.Forest
 {
     public abstract class FakeInternalForestNode : IInternalForestNode
     {

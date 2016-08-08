@@ -19,8 +19,9 @@ namespace Pliant.Ebnf
             EbnfBlock block = null;
             EbnfDefinition definition = null;
             
-            foreach (var child in node.Children)
+            for (int c = 0; c< node.Children.Count; c++)
             {
+                var child = node.Children[c];
                 switch (child.NodeType)
                 {
                     case TreeNodeType.Internal:
@@ -43,8 +44,9 @@ namespace Pliant.Ebnf
 
         private EbnfBlock VisitBlockNode(IInternalTreeNode node)
         {
-            foreach (var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
             {
+                var child = node.Children[c];
                 switch (child.NodeType)
                 {
                     case TreeNodeType.Internal:
@@ -68,7 +70,9 @@ namespace Pliant.Ebnf
             EbnfQualifiedIdentifier qualifiedIdentifier = null;
             EbnfExpression expression = null;
 
-            foreach(var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
+            {
+                var child = node.Children[c];
                 switch (child.NodeType)
                 {
                     case TreeNodeType.Internal:
@@ -84,7 +88,7 @@ namespace Pliant.Ebnf
                     case TreeNodeType.Token:
                         break;
                 }
-
+            }
             return new EbnfBlockRule(
                 new EbnfRule(qualifiedIdentifier, expression));
         }
@@ -93,7 +97,9 @@ namespace Pliant.Ebnf
         {
             EbnfQualifiedIdentifier repetitionIdentifier = null;
             string identifier = null;
-            foreach(var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
+            {
+                var child = node.Children[c];
                 switch (child.NodeType)
                 {
                     case TreeNodeType.Internal:
@@ -110,7 +116,7 @@ namespace Pliant.Ebnf
                             identifier = token.Value;
                         break;
                 }
-
+            }
             if (repetitionIdentifier == null)
                 return new EbnfQualifiedIdentifier(identifier);
 
@@ -122,7 +128,9 @@ namespace Pliant.Ebnf
             EbnfTerm term = null;
             EbnfExpression expression = null;
 
-            foreach(var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
+            {
+                var child = node.Children[c];
                 switch (child.NodeType)
                 {
                     case TreeNodeType.Internal:
@@ -137,7 +145,7 @@ namespace Pliant.Ebnf
                     case TreeNodeType.Token:
                         break;
                 }
-
+            }
             if (expression == null)
                 return new EbnfExpression(term);
             return new EbnfExpressionAlteration(term, expression);
@@ -148,7 +156,9 @@ namespace Pliant.Ebnf
             EbnfFactor factor = null;
             EbnfTerm term = null;
 
-            foreach(var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
+            {
+                var child = node.Children[c];
                 switch (child.NodeType)
                 {
                     case TreeNodeType.Internal:
@@ -157,13 +167,13 @@ namespace Pliant.Ebnf
                         if (EbnfGrammar.Factor == symbolValue)
                             factor = VisitFactorNode(internalNode);
                         else if (EbnfGrammar.Term == symbolValue)
-                            term = VisitTermNode(internalNode);                                
+                            term = VisitTermNode(internalNode);
                         break;
 
                     case TreeNodeType.Token:
                         break;
                 }
-
+            }
             if (term == null)
                 return new EbnfTerm(factor);
             return new EbnfTermConcatenation(factor, term);
@@ -171,7 +181,9 @@ namespace Pliant.Ebnf
 
         private EbnfFactor VisitFactorNode(IInternalTreeNode node)
         {
-            foreach (var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
+            {
+                var child = node.Children[c];
                 switch (child.NodeType)
                 {
                     case TreeNodeType.Internal:
@@ -206,12 +218,15 @@ namespace Pliant.Ebnf
                     case TreeNodeType.Token:
                         break;
                 }
+            }
             throw UnreachableCodeException();
         }
 
         private EbnfFactorRepetition VisitRepetitionNode(IInternalTreeNode node)
         {
-            foreach (var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
+            {
+                var child = node.Children[c];
                 switch (child.NodeType)
                 {
                     case TreeNodeType.Internal:
@@ -223,12 +238,15 @@ namespace Pliant.Ebnf
                         }
                         break;
                 }
+            }
             throw UnreachableCodeException();
         }
 
         private EbnfFactorOptional VisitOptionalNode(IInternalTreeNode node)
         {
-            foreach (var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
+            {
+                var child = node.Children[c];
                 switch (child.NodeType)
                 {
                     case TreeNodeType.Internal:
@@ -240,12 +258,15 @@ namespace Pliant.Ebnf
                         }
                         break;
                 }
+            }
             throw UnreachableCodeException();
         }
 
         private EbnfFactorGrouping VisitGroupingNode(IInternalTreeNode node)
         {
-            foreach (var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
+            {
+                var child = node.Children[c];
                 switch (child.NodeType)
                 {
                     case TreeNodeType.Internal:
@@ -257,12 +278,15 @@ namespace Pliant.Ebnf
                         }
                         break;
                 }
+            }
             throw UnreachableCodeException();
         }
 
         private static string VisitLiteralNode(IInternalTreeNode node)
         {
-            foreach(var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
+            {
+                var child = node.Children[c];
                 switch (child.NodeType)
                 {
                     case TreeNodeType.Token:
@@ -275,7 +299,8 @@ namespace Pliant.Ebnf
                     case TreeNodeType.Internal:
                         break;
                 }
-             throw UnreachableCodeException();
+            }
+            throw UnreachableCodeException();
         }
 
         private EbnfBlockSetting VisitSettingNode(IInternalTreeNode node)
@@ -283,7 +308,9 @@ namespace Pliant.Ebnf
             EbnfSettingIdentifier settingIdentifier = null;
             EbnfQualifiedIdentifier qualifiedIdentifier = null;
 
-            foreach (var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
+            {
+                var child = node.Children[c];
                 switch (child.NodeType)
                 {
                     case TreeNodeType.Token:
@@ -299,7 +326,8 @@ namespace Pliant.Ebnf
                         if (EbnfGrammar.QualifiedIdentifier == symbolValue)
                             qualifiedIdentifier = VisitQualifiedIdentifierNode(internalNode);
                         break;
-                }                           
+                }
+            }
             return new EbnfBlockSetting(
                 new EbnfSetting(settingIdentifier, qualifiedIdentifier));
         }
@@ -309,8 +337,9 @@ namespace Pliant.Ebnf
             EbnfQualifiedIdentifier qualifiedIdentifier = null;
             EbnfLexerRuleExpression expression = null;
 
-            foreach (var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
             {
+                var child = node.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
                 var internalNode = child as IInternalTreeNode;
@@ -330,8 +359,9 @@ namespace Pliant.Ebnf
             EbnfLexerRuleTerm term = null;
             EbnfLexerRuleExpression expression = null;
 
-            foreach (var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
             {
+                var child = node.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
                 var internalNode = child as IInternalTreeNode;
@@ -352,8 +382,9 @@ namespace Pliant.Ebnf
             EbnfLexerRuleFactor factor = null;
             EbnfLexerRuleTerm term = null;
 
-            foreach (var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
             {
+                var child = node.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
                 var internalNode = child as IInternalTreeNode;
@@ -372,8 +403,9 @@ namespace Pliant.Ebnf
 
         private static EbnfLexerRuleFactor VisitLexerRuleFactorNode(IInternalTreeNode node)
         {
-            foreach (var child in node.Children)
+            for (int c = 0; c < node.Children.Count; c++)
             {
+                var child = node.Children[c];
                 if (child.NodeType != TreeNodeType.Internal)
                     continue;
                 var internalNode = child as IInternalTreeNode;

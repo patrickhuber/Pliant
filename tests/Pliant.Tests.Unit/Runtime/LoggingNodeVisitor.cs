@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Pliant.Tests.Unit.Runtime
 {
-    public class LoggingNodeVisitor : NodeVisitorBase
+    public class LoggingNodeVisitor : DisambiguatingForestNodeVisitorBase
     {
         public IList<string> VisitLog { get; private set; }
         
-        public LoggingNodeVisitor(IForestNodeVisitorStateManager stateManager)
+        public LoggingNodeVisitor(IForestDisambiguationAlgorithm stateManager)
             : base(stateManager)
         {
             Init();

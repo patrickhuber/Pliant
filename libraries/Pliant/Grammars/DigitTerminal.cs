@@ -1,17 +1,12 @@
 ﻿namespace Pliant.Grammars
 {
-    public class DigitTerminal : ITerminal
+    public class DigitTerminal : BaseTerminal
     {
-        public bool IsMatch(char character)
+        public override bool IsMatch(char character)
         {
             return char.IsDigit(character);
         }
-
-        public SymbolType SymbolType
-        {
-            get { return SymbolType.Terminal; }
-        }
-
+        
         private const string ToStringValue = "[0-9]";
 
         public override string ToString()
@@ -21,6 +16,8 @@
 
         public override bool Equals(object obj)
         {
+            if (((object)obj) == null)
+                return false;
             return obj is DigitTerminal;
         }
 

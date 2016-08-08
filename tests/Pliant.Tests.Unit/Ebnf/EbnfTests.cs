@@ -4,6 +4,7 @@ using Pliant.Ebnf;
 using Pliant.Grammars;
 using Pliant.Runtime;
 using Pliant.Tests.Unit.Runtime;
+using System.Linq;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
@@ -237,7 +238,7 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.IsNotNull(node);
             
             var visitor = new LoggingNodeVisitor(
-                new SinglePassForestNodeVisitorStateManager());
+                new SelectFirstChildDisambiguationAlgorithm());
             node.Accept(visitor);
 
             var log = visitor.VisitLog;
@@ -252,7 +253,7 @@ namespace Pliant.Tests.Unit.Ebnf
                 Assert.IsTrue(parseRunner.Read(), $"Error found in position {parseRunner.Position}");
             }
             Assert.IsTrue(parseRunner.ParseEngine.IsAccepted());
-            return parseRunner.ParseEngine.GetParseForestRoot();
+            return parseRunner.ParseEngine.GetParseForestRootNode();
         }
 
         private void FailParseInput(string input)

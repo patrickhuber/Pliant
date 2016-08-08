@@ -61,11 +61,6 @@
     <Compile Include="Ebnf\EbnfGrammarGeneratorTests.cs" />
     <Compile Include="Ebnf\EbnfParserTests.cs" />
     <Compile Include="Ebnf\EbnfTests.cs" />
-    <Compile Include="Forest\FakeAndForestNode.cs" />
-    <Compile Include="Forest\FakeIntermediateForestNode.cs" />
-    <Compile Include="Forest\FakeInternalForestNode.cs" />
-    <Compile Include="Forest\FakeSymbolForestNode.cs" />
-    <Compile Include="Forest\FakeTokenForestNode.cs" />
     <Compile Include="Grammars\AnyTerminalTests.cs" />
     <Compile Include="Bnf\BnfTests.cs" />
     <Compile Include="Charts\ChartTests.cs" />
@@ -90,6 +85,7 @@
     <Compile Include="RegularExpressions\RegexToDfaTests.cs" />
     <Compile Include="RegularExpressions\ThompsonConstructionTests.cs" />
     <Compile Include="Tree\TreeNodeTests.cs" />
+    <Compile Include="Tree\ParseTreeEnumerableTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -101,6 +97,10 @@
     <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj">
       <Project>{5c23805f-0ffc-4039-b853-e5acbe63a3c0}</Project>
       <Name>Pliant</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Pliant.Tests.Common\Pliant.Tests.Common.csproj">
+      <Project>{695b08ba-6b90-4b25-a99b-a09e4f84dfee}</Project>
+      <Name>Pliant.Tests.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

@@ -1,5 +1,7 @@
 ﻿using Pliant.Grammars;
 using System.Collections.Generic;
+using System;
+using Pliant.Forest;
 
 namespace Pliant.Charts
 {
@@ -63,9 +65,8 @@ namespace Pliant.Charts
             // TODO: speed up by using a index lookup
             var sourceItemCount = 0;
             IState sourceItem = null;
-#pragma warning disable CC0006 // Use foreach
+
             for (int s = 0; s < Predictions.Count; s++)
-#pragma warning restore CC0006 // Use foreach
             {
                 var state = Predictions[s];
                 if (state.IsSource(searchSymbol))
@@ -78,6 +79,6 @@ namespace Pliant.Charts
                 }
             }
             return sourceItem;
-        }
+        }        
     }
 }

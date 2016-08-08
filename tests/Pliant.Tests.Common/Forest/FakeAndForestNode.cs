@@ -2,7 +2,7 @@
 using Pliant.Forest;
 using System.Collections.Generic;
 
-namespace Pliant.Tests.Unit.Forest
+namespace Pliant.Tests.Common.Forest
 {
     public class FakeAndForestNode : IAndForestNode
     {

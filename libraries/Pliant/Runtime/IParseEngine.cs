@@ -21,12 +21,12 @@ namespace Pliant.Runtime
         /// </summary>
         /// <returns>true if the parse is in a accepted state / false otherwise. </returns>
         bool IsAccepted();
-
+        
         /// <summary>
         /// Gets the root of the parse forest.
         /// </summary>
         /// <returns></returns>
-        IForestNode GetParseForestRoot();
+        IInternalForestNode GetParseForestRootNode();
 
         /// <summary>
         /// Returns the list of expected lexer rules based on the current state of the parse.

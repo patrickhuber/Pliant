@@ -7,6 +7,8 @@ namespace Pliant.Charts
     {
         private readonly HashSet<IState> _set;
 
+        private const int THRESHOLD = 20;
+
         public StateQueue()
         {
             _set = new HashSet<IState>();
@@ -14,25 +16,23 @@ namespace Pliant.Charts
 
         public bool Enqueue(IState state)
         {
-            const int SWITCH_SIZE = 20;
-            if(Count > SWITCH_SIZE)
+            if(Count > THRESHOLD)
             {
                 if (!_set.Add(state))
                     return false;
             }
             else
             {
-                var duplicate = false;
                 // search for duplicate
                 for (var i = 0; i < Count; i++)
                 {
-                    if (duplicate = state.GetHashCode() == this[i].GetHashCode())
+                    if (state.GetHashCode() == this[i].GetHashCode())
                         return false;
                 }
             }
 
             Add(state);
-            if (Count == SWITCH_SIZE)
+            if (Count == THRESHOLD)
                 for (int i = 0; i < Count; i++)
                     _set.Add(this[i]);
             return true;

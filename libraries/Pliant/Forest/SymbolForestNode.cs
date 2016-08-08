@@ -29,12 +29,13 @@ namespace Pliant.Forest
         {
             visitor.Visit(this);
         }
+
         public override bool Equals(object obj)
         {
             if (obj == null)
                 return false;
 
-            var symbolNode = obj as SymbolForestNode;
+            var symbolNode = obj as ISymbolForestNode;
             if (symbolNode == null)
                 return false;
 

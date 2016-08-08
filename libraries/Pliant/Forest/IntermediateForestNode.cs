@@ -25,12 +25,13 @@ namespace Pliant.Forest
         {
             visitor.Visit(this);
         }
+
         public override bool Equals(object obj)
         {
             if (obj == null)
                 return false;
 
-            var intermediateNode = obj as IntermediateForestNode;
+            var intermediateNode = obj as IIntermediateForestNode;
             if (intermediateNode == null)
                 return false;
 

@@ -11,16 +11,24 @@ namespace Pliant.Automata
         public IDfaState Transform(INfa nfa)
         {
             var processOnceQueue = new ProcessOnceQueue<NfaClosure>();
-            var start = new NfaClosure(new[] { nfa.Start }, nfa.Start.Equals(nfa.End));
+
+            var set = new HashSet<INfaState>();
+            foreach(var state in nfa.Start.Closure())
+                set.Add(state);
+
+            var start = new NfaClosure(set, nfa.Start.Equals(nfa.End));
             processOnceQueue.Enqueue(start);
+
             while (processOnceQueue.Count > 0)
             {
                 var nfaClosure = processOnceQueue.Dequeue();
-                var transitions = new Dictionary<ITerminal, HashSet<INfaState>>();
+                var transitions = SharedPools
+                    .Default<Dictionary<ITerminal, HashSet<INfaState>>>()
+                    .AllocateAndClear();
 
                 foreach (var state in nfaClosure.Closure)
                 {
-                    for(var t=0;t<state.Transitions.Count; t++)
+                    for (var t = 0; t < state.Transitions.Count; t++)
                     {
                         var transition = state.Transitions[t];
                         switch (transition.TransitionType)
@@ -28,8 +36,8 @@ namespace Pliant.Automata
                             case NfaTransitionType.Terminal:
                                 var terminalTransition = transition as TerminalNfaTransition;
                                 var terminal = terminalTransition.Terminal;
-                                
-                                if (!transitions.ContainsKey(terminalTransition.Terminal))                                
+
+                                if (!transitions.ContainsKey(terminalTransition.Terminal))
                                     transitions[terminal] = new HashSet<INfaState>();
                                 transitions[terminal].Add(transition.Target);
                                 break;
@@ -42,8 +50,13 @@ namespace Pliant.Automata
                     var targetStates = transitions[terminal];
                     var closure = Closure(targetStates, nfa.End);
                     closure = processOnceQueue.EnqueueOrGetExisting(closure);
-                    nfaClosure.State.AddTransition(new DfaTransition(terminal, closure.State));
+                    nfaClosure.State.AddTransition(
+                        new DfaTransition(terminal, closure.State));
                 }
+
+                SharedPools
+                    .Default<Dictionary<ITerminal, HashSet<INfaState>>>()
+                    .Free(transitions);
             }
 
             return start.State;
@@ -67,14 +80,14 @@ namespace Pliant.Automata
         private class NfaClosure
         {
             private readonly int _hashCode;
-            public NfaClosure(IEnumerable<INfaState> closure, bool isFinal)
+            public NfaClosure(HashSet<INfaState> closure, bool isFinal)
             {
                 Closure = closure;
                 _hashCode = HashCode.ComputeHash(closure);
                 State = new DfaState(isFinal);
             }
 
-            public IEnumerable<INfaState> Closure { get; private set; }
+            public HashSet<INfaState> Closure { get; private set; }
 
             public IDfaState State { get; }
 

@@ -2,7 +2,7 @@
 using System;
 using Pliant.Tokens;
 
-namespace Pliant.Tests.Unit.Forest
+namespace Pliant.Tests.Common.Forest
 {
     public class FakeTokenForestNode : ITokenForestNode
     {

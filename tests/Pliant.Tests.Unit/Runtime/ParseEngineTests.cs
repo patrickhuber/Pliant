@@ -5,9 +5,11 @@ using Pliant.Grammars;
 using Pliant.Tokens;
 using System.Collections.Generic;
 using System.Linq;
-using Pliant.Tests.Unit.Forest;
 using Pliant.Builders.Expressions;
 using Pliant.Runtime;
+using Pliant.Tree;
+using Pliant.Tests.Common.Forest;
+using Pliant.Tests.Common;
 
 namespace Pliant.Tests.Unit.Runtime
 {
@@ -22,14 +24,15 @@ namespace Pliant.Tests.Unit.Runtime
 
             ProductionExpression S = "S", T = "T", B = "B";
             S.Rule = S + T | "a";
-            B.Rule = (Expr)null;
+            B.Rule = null;
             T.Rule = "a" + B | "a";
 
             var grammar = new GrammarExpression(S, new[] { S, T, B }).ToGrammar();
             var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
             ParseInput(parseEngine, tokens);
 
-            var actual = parseEngine.GetParseForestRoot() as IInternalForestNode;            
+            var parseForestRoot = parseEngine.GetParseForestRootNode();
+            var actual = parseForestRoot as IInternalForestNode;            
             
             var a_1_2 = new FakeTokenForestNode("a", 1, 2);
             var expected = 
@@ -66,8 +69,8 @@ namespace Pliant.Tests.Unit.Runtime
 
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
-            
-            var S_0_4 = parseEngine.GetParseForestRoot() as ISymbolForestNode;
+
+            var S_0_4 = parseEngine.GetParseForestRootNode() as ISymbolForestNode;
             Assert.IsNotNull(S_0_4);
             AssertNodeProperties(S_0_4, nameof(S), 0, 4);
             Assert.AreEqual(2, S_0_4.Children.Count);
@@ -157,7 +160,7 @@ namespace Pliant.Tests.Unit.Runtime
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
-            var parseNode = parseEngine.GetParseForestRoot();
+            var parseNode = parseEngine.GetParseForestRootNode();
             Assert.IsNotNull(parseNode);
 
             var S_0_1 = parseNode as ISymbolForestNode;
@@ -189,7 +192,7 @@ namespace Pliant.Tests.Unit.Runtime
             /*  S_0_1 -> A_0_1
              *  A_0_1 -> 'a'
              */
-            var S_0_1 = parseEngine.GetParseForestRoot() as ISymbolForestNode;
+            var S_0_1 = parseEngine.GetParseForestRootNode() as ISymbolForestNode;
             Assert.IsNotNull(S_0_1);
             Assert.AreEqual(1, S_0_1.Children.Count);
 
@@ -228,7 +231,10 @@ namespace Pliant.Tests.Unit.Runtime
              *  A_0_2 -> a_0_1 A_1_2
              *  A_1_2 -> b_1_2
              */
-            var S_0_2 = parseEngine.GetParseForestRoot() as ISymbolForestNode;
+            var parseForestRoot = parseEngine.GetParseForestRootNode();
+            var root = parseForestRoot;
+
+            var S_0_2 = root as ISymbolForestNode;
             Assert.IsNotNull(S_0_2);
             Assert.AreEqual(1, S_0_2.Children.Count);
 
@@ -283,7 +289,10 @@ namespace Pliant.Tests.Unit.Runtime
              *  A_2_4 -> 'a' B_3_4
              *  B_3_4 -> 'b'
              */
-            var S_0_4 = parseEngine.GetParseForestRoot() as ISymbolForestNode;
+            var parseForestRoot = parseEngine.GetParseForestRootNode();
+            var root = parseForestRoot;
+
+            var S_0_4 = root as ISymbolForestNode;
             Assert.IsNotNull(S_0_4);
             Assert.AreEqual(1, S_0_4.Children.Count);
 
@@ -370,7 +379,8 @@ namespace Pliant.Tests.Unit.Runtime
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
-            var parseForest = parseEngine.GetParseForestRoot();
+            var parseForestRoot = parseEngine.GetParseForestRootNode();
+            var parseForest = parseForestRoot;
             Assert.IsNotNull(parseForest);
 
             // S_0_2 -> A_0_2
@@ -574,7 +584,10 @@ namespace Pliant.Tests.Unit.Runtime
             // F_5_6 -> 'a'
             // T_6_7 -> F_6_7
             // F_6_7 -> 'a'
-            var R_0_4 = CastAndCountChildren<ISymbolForestNode>(parseEngine.GetParseForestRoot(), 1);
+            
+            var parseForestRoot = parseEngine.GetParseForestRootNode();
+            var root = parseForestRoot;
+            var R_0_4 = CastAndCountChildren<ISymbolForestNode>(root, 1);
             AssertNodeProperties(R_0_4, "R", 0, 4);
             var E_0_4 = GetAndCastChildAtIndex<ISymbolForestNode>(R_0_4, 0);
             AssertNodeProperties(E_0_4, "E", 0, 4);
@@ -603,8 +616,11 @@ namespace Pliant.Tests.Unit.Runtime
             var input = Tokenize("aaa");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
-            
-            var R_0_3 = CastAndCountChildren<ISymbolForestNode>(parseEngine.GetParseForestRoot(), 1);
+
+            var parseForestRoot = parseEngine.GetParseForestRootNode();
+            var parseForest = parseForestRoot;
+
+            var R_0_3 = CastAndCountChildren<ISymbolForestNode>(parseForest, 1);
             AssertNodeProperties(R_0_3, "R", 0, 3);
             var E_0_3 = GetAndCastChildAtIndex<ISymbolForestNode>(R_0_3, 0);
             AssertNodeProperties(E_0_3, "E", 0, 3);
@@ -640,9 +656,11 @@ namespace Pliant.Tests.Unit.Runtime
             var input = Tokenize("abcdabcdabcdabcd|");
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, input);
-            var root = parseEngine.GetParseForestRoot();
 
-            var S_0_17 = CastAndCountChildren<ISymbolForestNode>(root, 2);
+            var parseForestRoot = parseEngine.GetParseForestRootNode();
+            var pasreForestNode = parseForestRoot;
+
+            var S_0_17 = CastAndCountChildren<ISymbolForestNode>(pasreForestNode, 2);
         }
 
         [TestMethod]
@@ -661,91 +679,191 @@ namespace Pliant.Tests.Unit.Runtime
                 .ToGrammar();
 
             var input = "aba";
+            var tokens = Tokenize(input, "[ab]");
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(tokens, grammar);
+        }
 
-            var leoEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
-            var leoInterface = new ParseRunner(leoEngine, input);
-            Assert.IsTrue(RunParse(leoInterface));
+        [TestMethod]
+        public void ParseEngineAmbiguousRootShouldCreateSameLeoAndClassicForest()
+        {
+            ProductionExpression
+                S = "S",
+                A = "A",
+                B = "B",
+                C = "C";
 
+            S.Rule = A | B;
+            A.Rule = 'a' + C;
+            B.Rule = 'a' + C;
+            C.Rule = 'c';
+
+            const string input = "ac";
+
+            var grammar = new GrammarExpression(S, new[] { S, A, B, C }).ToGrammar();
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
+        }
+
+        [TestMethod]
+        public void ParseEngineAmbiguousNestedChildrenShouldCreateSameLeoAndClassicForest()
+        {
+            ProductionExpression
+                Z = "Z",
+                S = "S",
+                A = "A",
+                B = "B",
+                C = "C",
+                D = "D",
+                E = "E",
+                F = "F";
+
+            Z.Rule = S;
+            S.Rule = A | B;
+            A.Rule = '0' + C;
+            B.Rule = '0' + C;
+            C.Rule = D | E;
+            D.Rule = '1' + F;
+            E.Rule = '1' + F;
+            F.Rule = '2';
+
+            const string input = "012";
+            
+            var grammar = new GrammarExpression(S, new[] { S, A, B, C, D, E, F }).ToGrammar();
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
+        }
+
+        [TestMethod]
+        public void ParseEngineDivergentAmbiguousGrammarShouldCreateSameLeoAndClassicParseForest()
+        {
+            ProductionExpression 
+                S = "S", 
+                A = "A", 
+                B = "B",
+                C = "C", 
+                X = "X",
+                Y = "Y", 
+                Z = "Z";
+            S.Rule = 
+                '0' + A 
+                | '0' + X;
+            A.Rule = '1' + B;
+            B.Rule = '2' + C;
+            C.Rule = '3';
+            X.Rule = '1' + Y;
+            Y.Rule = '2' + Z;
+            Z.Rule = '3';
+
+            const string input = "0123";
+
+            var grammar = new GrammarExpression(
+                S, 
+                new[] { S, A, B, C, X, Y, Z })
+                .ToGrammar();
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
+        }
+
+        [TestMethod]
+        public void ParseEngineShouldProduceSameLeoAndClassicParseForestWhenGivenLongAmbiguousProduction()
+        {
+            ProductionExpression
+                S = "S", 
+                A = "A", B = "B", C = "C", D= "D", 
+                W = "W", X = "X", Y = "Y", Z = "Z";
+            S.Rule = 
+                A + B + C + D
+                | W + X + Y + Z;
+            A.Rule = '0';
+            B.Rule = '1';
+            C.Rule = '2';
+            D.Rule = '3';
+            W.Rule = '0';
+            X.Rule = '1';
+            Y.Rule = '2';
+            Z.Rule = '3';
+
+            var grammar = new GrammarExpression(
+                S, 
+                new[] { S, A, B, C, D, W, X, Y, Z })
+                .ToGrammar();
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest("0123", grammar);
+        }
+
+        [TestMethod]
+        public void ParseEngineShouldProduceSameLeoAndClassicForestWhenGivenAmbiuousNonTerminal()
+        {
+            var digit = new DigitTerminal();
+            ProductionExpression E = "E";
+            E.Rule = E + '+' + E
+                | digit;
+            string input = "1+2+3";
+            var tokens = TokenizeNumericExpression(input);
+            var grammar = new GrammarExpression(E, new[] { E }).ToGrammar();
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(tokens, grammar);
+        }
+
+        [TestMethod]
+        public void ParseEngineShouldDisambiguateFollowingOperatorPresidence()
+        {
+            var digit = new DigitTerminal();
+            ProductionExpression E = "E";
+            E.Rule = 
+                E + '+' + E
+                | E + '*' + E
+                | digit;
+            string input = "2*3+5*7";
+            var parseTester = new ParseTester(new GrammarExpression(E));
+            parseTester.RunParse(input);
+            var forest = parseTester.ParseEngine.GetParseForestRootNode();
+            var tree = new InternalTreeNode(forest);
+            // ((2*3)+(5*7))
+            // (E, 0, 7) = (E, 0, 5) ('*', 5, 6) (E, 6, 7)
+            // (E, 0, 5) = (E, 0, 3) ('+', 3, 4) (E, 4, 5)
+            // (E, 0, 3) = (E, 0, 1) ('*', 1, 2) (E, 2, 3)
+            // (E, 0, 1) = ('2', 0, 1)
+            // (E, 2, 3) = ('3', 2, 3)
+            // (E, 4, 5) = ('5', 4, 5)
+            // (E, 6, 7) = ('7', 6, 7)
+            Assert.Inconclusive();
+        }
+
+        private static IEnumerable<IToken> TokenizeNumericExpression(string input)
+        {
+            return input
+                .Select((x, i) =>
+                    new Token(x.ToString(),
+                    i,
+                    new TokenType(char.IsDigit(x) ? "[0-9]" : x.ToString())));
+        }
+
+        private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(IEnumerable<IToken> tokens, IGrammar grammar)
+        {
+            var leoEngine = new ParseEngine(grammar);
             var classicEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
-            var classicInterface = new ParseRunner(classicEngine, input);
-            Assert.IsTrue(RunParse(classicInterface));
 
-            AssertForestsAreEqual(leoEngine.GetParseForestRoot(), classicEngine.GetParseForestRoot());
+            Assert.IsTrue(RunParse(leoEngine, tokens), "Leo Parse Failed");
+            Assert.IsTrue(RunParse(classicEngine, tokens), "Classic Parse Failed");
+
+            var nodeComparer = new StatefulForestNodeComparer();
+            var leoParseForestRoot = leoEngine.GetParseForestRootNode();
+            var classicParseForestRoot = classicEngine.GetParseForestRootNode();
+            Assert.IsTrue(nodeComparer.Equals(
+                classicParseForestRoot,
+                leoParseForestRoot),
+                "Leo and Classic Parse Forest mismatch");
         }
 
-        private static void AssertForestsAreEqual(IAndForestNode first, IAndForestNode second)
+        private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(string input, IGrammar grammar)
         {
-            Assert.AreEqual(first.Children.Count, second.Children.Count);
-            var firstChildrenEnumerator = first.Children.GetEnumerator();
-            var secondChildrenEnumerator = second.Children.GetEnumerator();
-
-            var firstChildEnumeratorMoveNext = false;
-            var secondChildEnumeratorMoveNext = false;
-
-            do
-            {
-                firstChildEnumeratorMoveNext = firstChildrenEnumerator.MoveNext();
-                secondChildEnumeratorMoveNext = secondChildrenEnumerator.MoveNext();
-                Assert.AreEqual(firstChildEnumeratorMoveNext, secondChildEnumeratorMoveNext);
-                if(firstChildEnumeratorMoveNext)
-                    AssertForestsAreEqual(firstChildrenEnumerator.Current, secondChildrenEnumerator.Current);
-            } while (firstChildEnumeratorMoveNext);
+            var tokens = Tokenize(input);
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(tokens, grammar);
         }
 
-        private static void AssertForestsAreEqual(IInternalForestNode first, IInternalForestNode second)
+        static void AssertForestsAreEqual(IForestNode expected, IForestNode actual)
         {
-            Assert.AreEqual(first.Children.Count, second.Children.Count);
-            var firstChildrenEnumerator = first.Children.GetEnumerator();
-            var secondChildrenEnumerator = second.Children.GetEnumerator();
-
-            var firstChildEnumeratorMoveNext = false;
-            var secondChildEnumeratorMoveNext = false;
-
-            do
-            {
-                firstChildEnumeratorMoveNext = firstChildrenEnumerator.MoveNext();
-                secondChildEnumeratorMoveNext = secondChildrenEnumerator.MoveNext();
-                Assert.AreEqual(firstChildEnumeratorMoveNext, secondChildEnumeratorMoveNext);
-                if(firstChildEnumeratorMoveNext)
-                    AssertForestsAreEqual(firstChildrenEnumerator.Current, secondChildrenEnumerator.Current);
-            } while (firstChildEnumeratorMoveNext);
-        }
-
-        private static void AssertForestsAreEqual(IForestNode first, IForestNode second)
-        {
-            Assert.AreEqual(first.NodeType, second.NodeType);
-            switch (first.NodeType)
-            {
-                case ForestNodeType.Intermediate:
-                    var firstIntermediate = first as IIntermediateForestNode;
-                    var secondIntermediate = second as IIntermediateForestNode;
-                    Assert.AreEqual(firstIntermediate.State, secondIntermediate.State);
-                    AssertForestsAreEqual(firstIntermediate, secondIntermediate);
-                    break;
-
-                case ForestNodeType.Symbol:
-                    var firstSymbol = first as ISymbolForestNode;
-                    var secondSymbol = second as ISymbolForestNode;
-                    Assert.AreEqual(firstSymbol.Symbol, secondSymbol.Symbol);
-                    AssertForestsAreEqual(firstSymbol, secondSymbol);
-                    break;
-
-                case ForestNodeType.Terminal:
-                    var firstTerminal = first as ITerminalForestNode;
-                    var secondTerminal = second as ITerminalForestNode;
-                    Assert.AreEqual(firstTerminal.Capture, secondTerminal.Capture);
-                    break;
-
-                case ForestNodeType.Token:
-                    var firstToken = first as ITokenForestNode;
-                    var secondToken = second as ITokenForestNode;
-                    Assert.AreEqual(firstToken.Token.TokenType.Id, secondToken.Token.TokenType.Id);
-                    Assert.AreEqual(firstToken.Token.Value, secondToken.Token.Value);
-                    break;
-            }
+            var comparer = new StatefulForestNodeComparer();
+            Assert.IsTrue(comparer.Equals(expected, actual));
         }
         
-        private static bool RunParse(ParseRunner lexer)
+        private static bool RunParse(IParseRunner lexer)
         {
             while (!lexer.EndOfStream())
             {
@@ -753,6 +871,16 @@ namespace Pliant.Tests.Unit.Runtime
                     return false;
             }
             return lexer.ParseEngine.IsAccepted();
+        }
+
+        private static bool RunParse(IParseEngine parseEngine, IEnumerable<IToken> tokens)
+        {
+            foreach (var token in tokens)
+            {
+                if (!parseEngine.Pulse(token))
+                    return false;
+            }
+            return parseEngine.IsAccepted();
         }
 
         private static IGrammar CreateRegularExpressionStubGrammar()
@@ -852,8 +980,13 @@ namespace Pliant.Tests.Unit.Runtime
 
         private static IEnumerable<IToken> Tokenize(string input, string tokenType)
         {
+            return Tokenize(input, new TokenType(tokenType));
+        }
+
+        private static IEnumerable<IToken> Tokenize(string input, TokenType tokenType)
+        {
             return input.Select((x, i) =>
-                new Token(x.ToString(), i, new TokenType(tokenType)));
+                new Token(x.ToString(), i, tokenType));
         }
 
         private static void ParseInput(IParseEngine parseEngine, IEnumerable<IToken> tokens)

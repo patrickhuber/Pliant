@@ -61,16 +61,16 @@ namespace Pliant.Tests.Unit.Tree
                 Assert.IsTrue(parseRunner.Read());
             }
             Assert.IsTrue(parseEngine.IsAccepted());
+            
+            var parseForest = parseEngine.GetParseForestRootNode();
 
-            var parseForest = parseEngine.GetParseForestRoot();
             Assert.IsTrue(parseForest is IInternalForestNode);
 
             var internalNode = parseForest as IInternalForestNode;
 
-            var stateManager = new MultiPassForestNodeVisitorStateManager();
-            var currentAndNode = stateManager.GetCurrentAndNode(internalNode);
-            var treeNode = new InternalTreeNode(internalNode, currentAndNode, stateManager);
-            return treeNode;
+            var disambiguationAlgorithm = new SelectFirstChildDisambiguationAlgorithm();
+            var treeNode = new InternalTreeNode(internalNode, disambiguationAlgorithm);
+            return treeNode;            
         }
     }
 }

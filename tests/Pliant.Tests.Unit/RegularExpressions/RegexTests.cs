@@ -110,7 +110,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
             var input = "[\\]]";
             ParseAndAcceptInput(input);
         }
-
+        
         private void ParseAndAcceptInput(string input)
         {
             ParseInput(input);

@@ -6,6 +6,6 @@ namespace Pliant.Tree
     public interface IInternalTreeNode : ITreeNode
     {
         INonTerminal Symbol { get; }
-        IEnumerable<ITreeNode> Children { get; }
+        IReadOnlyList<ITreeNode> Children { get; }
     }
 }

@@ -1,9 +1,7 @@
 ﻿namespace Pliant.Forest
 {
-    public interface IForestNodeVisitorStateManager
+    public interface IForestDisambiguationAlgorithm
     {
         IAndForestNode GetCurrentAndNode(IInternalForestNode internalNode);
-
-        void MarkAsTraversed(IInternalForestNode internalNode);
     }
 }

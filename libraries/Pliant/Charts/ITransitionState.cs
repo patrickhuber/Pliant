@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Forest;
+using Pliant.Grammars;
 
 namespace Pliant.Charts
 {
@@ -11,5 +12,7 @@ namespace Pliant.Charts
         ITransitionState NextTransition { get; set; }
 
         int Index { get; }
+
+        IState GetTargetState();
     }
 }

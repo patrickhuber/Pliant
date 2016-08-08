@@ -97,5 +97,22 @@ namespace Pliant.Tests.Unit.RegularExpressions
                                     character: new RegexCharacter('b')))))));
             Assert.AreEqual(expected, actual);
         }
+
+        [TestMethod]
+        public void RegexParserShouldParseEscape()
+        {
+            var regexParser = new RegexParser();
+            var actual = regexParser.Parse(@"\.");
+
+            var expected = new Regex(
+                false, 
+                new RegexExpressionTerm(
+                    new RegexTerm(
+                        new RegexFactor(
+                            new RegexAtomCharacter(
+                                new RegexCharacter('.'))))), 
+                false);
+            Assert.AreEqual(expected, actual);
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Pliant.Grammars
 {
-    public class NegationTerminal : BaseTerminal, ITerminal
+    public class NegationTerminal : BaseTerminal
     {
         private readonly ITerminal _innerTerminal;
 

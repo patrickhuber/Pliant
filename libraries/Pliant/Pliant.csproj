@@ -54,9 +54,18 @@
     <Compile Include="Builders\ReachibilityMatrix.cs" />
     <Compile Include="Builders\SymbolModel.cs" />
     <Compile Include="Builders\SymbolModelType.cs" />
+    <Compile Include="Charts\IParseNode.cs" />
+    <Compile Include="Forest\ForestNodeVisitorBase.cs" />
+    <Compile Include="Forest\IForestNodeReference.cs" />
+    <Compile Include="Forest\ForestNodeReference.cs" />
+    <Compile Include="Forest\SelectHigherPresedenceDisambiguationAlgorithm.cs" />
+    <Compile Include="Forest\VirtualForestNode.cs" />
+    <Compile Include="Forest\VirtualForestNodePath.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Grammars\GrammarWrapper.cs" />
+    <Compile Include="Tree\ParseTreeEnumerable.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />
-    <Compile Include="Forest\SinglePassForestNodeVisitorStateManager.cs" />
+    <Compile Include="Forest\SelectFirstChildDisambiguationAlgorithm.cs" />
     <Compile Include="Automata\INfaToDfa.cs" />
     <Compile Include="Automata\SubsetConstructionAlgorithm.cs" />
     <Compile Include="Collections\IQueue.cs" />
@@ -140,7 +149,7 @@
     <Compile Include="Grammars\INonTerminal.cs" />
     <Compile Include="Forest\IForestNodeVisitable.cs" />
     <Compile Include="Forest\IForestNodeVisitor.cs" />
-    <Compile Include="Forest\IForestNodeVisitorStateManager.cs" />
+    <Compile Include="Forest\IForestDisambiguationAlgorithm.cs" />
     <Compile Include="Forest\IntermediateForestNode.cs" />
     <Compile Include="Forest\IInternalForestNode.cs" />
     <Compile Include="Runtime\IParseEngine.cs" />
@@ -152,8 +161,7 @@
     <Compile Include="Grammars\ITerminal.cs" />
     <Compile Include="Forest\ITerminalForestNode.cs" />
     <Compile Include="Forest\ForestNodeBase.cs" />
-    <Compile Include="Forest\NodeVisitorBase.cs" />
-    <Compile Include="Forest\MultiPassForestNodeVisitorStateManager.cs" />
+    <Compile Include="Forest\DisambiguatingForestNodeVisitorBase.cs" />
     <Compile Include="Runtime\ParseEngineLexemeFactory.cs" />
     <Compile Include="Runtime\ParseEngineOptions.cs" />
     <Compile Include="RegularExpressions\IRegexToNfa.cs" />
@@ -210,7 +218,6 @@
     <Compile Include="Forest\TokenForestNode.cs" />
     <Compile Include="Tokens\TokenType.cs" />
     <Compile Include="Charts\TransitionState.cs" />
-    <Compile Include="Forest\VirtualForestNode.cs" />
     <Compile Include="Grammars\WhitespaceTerminal.cs" />
     <Compile Include="Tree\IInternalTreeNode.cs" />
     <Compile Include="Tree\InternalTreeNode.cs" />
