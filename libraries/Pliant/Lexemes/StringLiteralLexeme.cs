@@ -1,12 +1,14 @@
 ﻿using Pliant.Grammars;
 using Pliant.Tokens;
+using Pliant.Utilities;
 using System.Text;
 
 namespace Pliant.Lexemes
 {
     public class StringLiteralLexeme : ILexeme
     {
-        private readonly StringBuilder _capture;
+        private StringBuilder _stringBuilder;
+        private string _capture;
 
         private int _index = 0;
 
@@ -14,7 +16,30 @@ namespace Pliant.Lexemes
 
         public string Capture
         {
-            get { return _capture.ToString(); }
+            get
+            {
+                if (IsStringBuilderAllocated())
+                    DeallocateStringBuilderAndAssignCapture();
+                return _capture;
+            }
+        }
+
+        private bool IsStringBuilderAllocated()
+        {
+            return _stringBuilder != null;
+        }
+
+        private void DeallocateStringBuilderAndAssignCapture()
+        {
+            SharedPools.Default<StringBuilder>().Free(_stringBuilder);
+            _capture = _stringBuilder.ToString();
+            _stringBuilder = null;
+        }
+
+        private void ReallocateStringBuilderFromCapture()
+        {
+            _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
+            _stringBuilder.Append(_capture);
         }
 
         public TokenType TokenType { get; private set; }
@@ -23,7 +48,7 @@ namespace Pliant.Lexemes
         {
             Literal = literal;
             TokenType = tokenType;
-            _capture = new StringBuilder();
+            _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
         }
 
         public StringLiteralLexeme(IStringLiteralLexerRule lexerRule)
@@ -42,7 +67,9 @@ namespace Pliant.Lexemes
             if (Literal[_index] != c)
                 return false;
             _index++;
-            _capture.Append(c);
+            if (!IsStringBuilderAllocated())
+                ReallocateStringBuilderFromCapture();
+            _stringBuilder.Append(c);
             return true;
         }
     }

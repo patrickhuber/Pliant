@@ -1,10 +1,18 @@
 ﻿using Pliant.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Pliant.Utilities
 {
     public static class ObjectPoolExtensions
     {
+        internal static StringBuilder AllocateAndClear(this ObjectPool<StringBuilder> pool)
+        {
+            var builder = pool.Allocate();
+            builder.Clear();
+            return builder;
+        }
+
         internal static List<T> AllocateAndClear<T>(this ObjectPool<List<T>> pool)
         {
             var list = pool.Allocate();
@@ -34,6 +42,16 @@ namespace Pliant.Utilities
                 return;
             list.Clear();
             pool.Free(list);
-        } 
+        }
+
+        internal static void ClearAndFree(this ObjectPool<StringBuilder> pool, StringBuilder builder)
+        {
+            if (pool == null)
+                return;
+            if (builder == null)
+                return;
+            builder.Clear();
+            pool.Free(builder);
+        }
     }
 }
