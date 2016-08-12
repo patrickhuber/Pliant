@@ -1,47 +1,47 @@
 ﻿/* letters and digits */
-letter			= /[a-zA-Z]/;
-capitalLetter	= /[A-Z]/; 
-decimalDigit	= /[0-9/;
-octalDigit		= /[0-7]/;
-hexDigit		= /[a-fA-F0-9]/;
+letter			~ /[a-zA-Z]/;
+capitalLetter	~ /[A-Z]/; 
+decimalDigit	~ /[0-9/;
+octalDigit		~ /[0-7]/;
+hexDigit		~ /[a-fA-F0-9]/;
 
 /* identifiers */
-ident		= letter { letter | unicodeDigit | '_' };
-fullIndet	= ident { '.' ident } ;
-messageName	= ident ;
-enumName	= ident ;
-fieldName	= ident ;
-oneofName	= ident ;
-mapName		= ident ;
-serviceName	= ident ;
-rpcName		= ident ;
-messageType = ['.'] {ident '.'} messageName ;
-enumType	= ['.'] {ident '.'} enumName;
+ident		~ letter { letter | unicodeDigit | '_' };
+fullIndet	~ ident { '.' ident } ;
+messageName	~ ident ;
+enumName	~ ident ;
+fieldName	~ ident ;
+oneofName	~ ident ;
+mapName		~ ident ;
+serviceName	~ ident ;
+rpcName		~ ident ;
+messageType ~ ['.'] {ident '.'} messageName ;
+enumType	~ ['.'] {ident '.'} enumName;
 
 /* integer literals */
 intLit	= decimalLit | octalLit | hexLit ;
-decimalLit	= ( /[1..9]/ ) { decimalDigit } ;
-octalLit	= '0' { octalDigit };
-hexLit		= '0' ('x' | 'X' ) hexDigit { hexDigit } ;
+decimalLit	~ ( /[1..9]/ ) { decimalDigit } ;
+octalLit	~ '0' { octalDigit };
+hexLit		~ '0' ('x' | 'X' ) hexDigit { hexDigit } ;
 
 /* floating point literals */
-floatLit = decimals '.' [decimals] [exponent] | decimals exponent ;
-decimals = decimalDigit { decimalDigit } ;
-exponent = ( 'e' | 'E' ) [ '+' | '-' ] decimals ;
+floatLit ~ decimals '.' [decimals] [exponent] | decimals exponent ;
+decimals ~ decimalDigit { decimalDigit } ;
+exponent ~ ( 'e' | 'E' ) [ '+' | '-' ] decimals ;
 
 /* boolean literals */
-boolLit = "true" | "false" ;
+boolLit ~ "true" | "false" ;
 
 /* string literals */
-strLit = ("'" { charValue } "'" ) | ('"' { charValue } '"' );
-charValue = hexEscape | octEscape | charEscape | /[^\0\n\\]/ ;
-hexEscape = '\' ('x' | 'X') hexDigit hexDigit ;
-octEscape = '\' octalDigit octalDigit octalDigit ;
-charEscape = '\' /[abfnrtv\\'"]/; 
-quote = "'" | '"' ;
+strLit		~ ("'" { charValue } "'" ) | ('"' { charValue } '"' );
+charValue	~ hexEscape | octEscape | charEscape | /[^\0\n\\]/ ;
+hexEscape	~ '\' ('x' | 'X') hexDigit hexDigit ;
+octEscape	~ '\' octalDigit octalDigit octalDigit ;
+charEscape	~ '\' /[abfnrtv\\'"]/; 
+quote		~ "'" | '"' ;
 
 /* empty statement */
-emptyStatement = ';';
+emptyStatement ~ ';';
 
 /* syntax */
 syntax = "syntax" '=' quote "proto3" quote ';' ;

@@ -31,6 +31,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.Tests.Integration", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.Tests.Common", "tests\Pliant.Tests.Common\Pliant.Tests.Common.csproj", "{695B08BA-6B90-4B25-A99B-A09E4F84DFEE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.ProtocolBuffers.Tests.Unit", "tests\Pliant.ProtocolBuffers.Tests.Unit\Pliant.ProtocolBuffers.Tests.Unit.csproj", "{96D2A9B3-D85D-4F2E-88DE-E3C9F91CBF39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.Json", "libraries\Pliant.Json\Pliant.Json.csproj", "{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +73,14 @@ Global
 		{695B08BA-6B90-4B25-A99B-A09E4F84DFEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{695B08BA-6B90-4B25-A99B-A09E4F84DFEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{695B08BA-6B90-4B25-A99B-A09E4F84DFEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96D2A9B3-D85D-4F2E-88DE-E3C9F91CBF39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96D2A9B3-D85D-4F2E-88DE-E3C9F91CBF39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96D2A9B3-D85D-4F2E-88DE-E3C9F91CBF39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96D2A9B3-D85D-4F2E-88DE-E3C9F91CBF39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,5 +94,7 @@ Global
 		{F1E451B1-52B6-4C3E-B1E1-FF0DDA3F3A3B} = {E3C2A6DF-5436-4BC8-AAB1-C3B524B0FBAB}
 		{CF2238F2-D59F-46CA-9354-209C7D91F2E8} = {6A7B3028-8B58-4134-9809-9462EC68FBC6}
 		{695B08BA-6B90-4B25-A99B-A09E4F84DFEE} = {6A7B3028-8B58-4134-9809-9462EC68FBC6}
+		{96D2A9B3-D85D-4F2E-88DE-E3C9F91CBF39} = {6A7B3028-8B58-4134-9809-9462EC68FBC6}
+		{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10} = {6AF43B18-EF28-4486-8C5C-E4AFD659F8D8}
 	EndGlobalSection
 EndGlobal

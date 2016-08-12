@@ -2,18 +2,20 @@
 using Pliant.Automata;
 using Pliant.Builders.Expressions;
 using Pliant.Grammars;
+using Pliant.Json;
+using Pliant.LexerRules;
 using Pliant.RegularExpressions;
 using Pliant.Tests.Common;
 using System.IO;
 
-namespace Pliant.Tests.Unit.Runtime
+namespace Pliant.Tests.Integration.Runtime
 {
     [TestClass]
     public class LargeFileParseTests
     { 
         public TestContext TestContext { get; set; }
 
-        private static GrammarExpression _grammarExpression;
+        private static IGrammar _grammar;
 
         private ParseTester _parseTester;
 
@@ -22,59 +24,13 @@ namespace Pliant.Tests.Unit.Runtime
         public static void Initialize(TestContext testContext)
 #pragma warning restore CC0057 // Unused parameters
         {
-            ProductionExpression
-                Json = "Json",
-                Object = "Object",
-                Pair = "Pair",
-                PairRepeat = "PairRepeat",
-                Array = "Array",
-                Value = "Value",
-                ValueRepeat = "ValueRepeat";
-
-            var number = Number();
-            var @string = String();
-
-            Json.Rule = 
-                Value;
-
-            Object.Rule = 
-                '{' + PairRepeat + '}';
-
-            PairRepeat.Rule =
-                Pair
-                | Pair + ',' + PairRepeat
-                | (Expr)null;
-
-            Pair.Rule =
-                (Expr)@string + ':' + Value;
-                        
-            Array.Rule =
-                '[' + ValueRepeat + ']';
-
-            ValueRepeat.Rule = 
-                Value 
-                | Value + ',' + ValueRepeat
-                | (Expr)null;
-
-            Value.Rule = (Expr)
-                @string
-                | number
-                | Object
-                | Array
-                | "true"
-                | "false"
-                | "null";
-
-            _grammarExpression = new GrammarExpression(
-                Json, 
-                null, 
-                new[] { Whitespace() });
+            _grammar = new JsonGrammar();
         }
 
         [TestInitialize]
         public void InitializeTest()
         {
-            _parseTester = new ParseTester(_grammarExpression);
+            _parseTester = new ParseTester(_grammar);
         }
 
         [TestMethod]
@@ -100,8 +56,12 @@ namespace Pliant.Tests.Unit.Runtime
         [DeploymentItem(@"Runtime\10000.json", "Runtime")]
         public void TestCanParseLargeJsonFile()
         {
-            var json = File.ReadAllText(Path.Combine(TestContext.TestDeploymentDir, "Runtime", "10000.json"));
-            _parseTester.RunParse(json);
+            var path = Path.Combine(TestContext.TestDeploymentDir, "Runtime", "10000.json");
+            using (var stream = File.OpenRead(path))
+            using (var reader = new StreamReader(stream))
+            {
+                _parseTester.RunParse(reader);
+            }
         }
 
         private static ILexerRule Whitespace()
@@ -115,14 +75,7 @@ namespace Pliant.Tests.Unit.Runtime
             end.AddTransition(transition);
             return new DfaLexerRule(start, "\\w+");
         }
-
-        private static BaseLexerRule Number()
-        {
-            // [-+]?[0-9]*\.?[0-9]+
-            const string pattern = @"[-+]?[0-9]*[.]?[0-9]+";
-            return CreateRegexDfa(pattern);
-        }
-
+        
         private static BaseLexerRule String()
         {
             // ["][^"]+["]
@@ -134,9 +87,7 @@ namespace Pliant.Tests.Unit.Runtime
         {
             var regexParser = new RegexParser();
             var regex = regexParser.Parse(pattern);
-            var regexCompiler = new RegexCompiler(
-                new ThompsonConstructionAlgorithm(),
-                new SubsetConstructionAlgorithm());
+            var regexCompiler = new RegexCompiler();
             var dfa = regexCompiler.Compile(regex);
             return new DfaLexerRule(dfa, pattern);
         }

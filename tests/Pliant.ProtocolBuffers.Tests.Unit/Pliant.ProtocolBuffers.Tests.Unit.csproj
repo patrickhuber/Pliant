@@ -3,12 +3,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CF2238F2-D59F-46CA-9354-209C7D91F2E8}</ProjectGuid>
+    <ProjectGuid>{96D2A9B3-D85D-4F2E-88DE-E3C9F91CBF39}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Pliant.Tests.Integration</RootNamespace>
-    <AssemblyName>Pliant.Tests.Integration</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>Pliant.ProtocolBuffers.Tests.Unit</RootNamespace>
+    <AssemblyName>Pliant.ProtocolBuffers.Tests.Unit</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -16,7 +16,6 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -51,26 +50,17 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="LargeFileParseTests.cs" />
+    <Compile Include="ProtocolBuffersV3GrammarTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="10000.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\libraries\Pliant.Json\Pliant.Json.csproj">
-      <Project>{ddc33e1b-ca04-4c28-8f5b-a5f8f55dba10}</Project>
-      <Name>Pliant.Json</Name>
+    <ProjectReference Include="..\..\libraries\Pliant.ProtocolBuffers\Pliant.ProtocolBuffers.csproj">
+      <Project>{6fcb3236-9d19-4b61-9a54-246ee6ad686a}</Project>
+      <Name>Pliant.ProtocolBuffers</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj">
       <Project>{5c23805f-0ffc-4039-b853-e5acbe63a3c0}</Project>
       <Name>Pliant</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Pliant.Tests.Common\Pliant.Tests.Common.csproj">
-      <Project>{695B08BA-6B90-4B25-A99B-A09E4F84DFEE}</Project>
-      <Name>Pliant.Tests.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

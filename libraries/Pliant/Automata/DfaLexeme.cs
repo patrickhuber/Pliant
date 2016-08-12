@@ -1,24 +1,50 @@
 ﻿using Pliant.Lexemes;
 using Pliant.Tokens;
+using Pliant.Utilities;
 using System.Text;
 
 namespace Pliant.Automata
 {
     public class DfaLexeme : ILexeme
     {
-        private readonly StringBuilder _capture;
+        private StringBuilder _stringBuilder;
+        private string _capture;
+
         private IDfaState _currentState;
 
         public DfaLexeme(IDfaState dfaState, TokenType tokenType)
         {
-            _capture = new StringBuilder();
+            _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
             _currentState = dfaState;
             TokenType = tokenType;
         }
 
         public string Capture
         {
-            get { return _capture.ToString(); }
+            get
+            {
+                if (IsStringBuilderAllocated())
+                    DeallocateStringBuilderAndAssignCapture();
+                return _capture;
+            }
+        }
+
+        private bool IsStringBuilderAllocated()
+        {
+            return _stringBuilder != null;
+        }
+
+        private void DeallocateStringBuilderAndAssignCapture()
+        {
+            SharedPools.Default<StringBuilder>().Free(_stringBuilder);
+            _capture = _stringBuilder.ToString();
+            _stringBuilder = null;
+        }
+
+        private void ReallocateStringBuilderFromCapture()
+        {
+            _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
+            _stringBuilder.Append(_stringBuilder);
         }
 
         public TokenType TokenType { get; private set; }
@@ -35,8 +61,10 @@ namespace Pliant.Automata
                 var edge = _currentState.Transitions[e];
                 if (edge.Terminal.IsMatch(c))
                 {
+                    if (!IsStringBuilderAllocated())
+                        ReallocateStringBuilderFromCapture();
                     _currentState = edge.Target;
-                    _capture.Append(c);
+                    _stringBuilder.Append(c);
                     return true;
                 }
             }

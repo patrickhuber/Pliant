@@ -10,6 +10,7 @@ using Pliant.Runtime;
 using Pliant.Tree;
 using Pliant.Tests.Common.Forest;
 using Pliant.Tests.Common;
+using Pliant.Tests.Common.Expressions;
 
 namespace Pliant.Tests.Unit.Runtime
 {
@@ -790,27 +791,17 @@ namespace Pliant.Tests.Unit.Runtime
         [TestMethod]
         public void ParseEngineShouldProduceSameLeoAndClassicForestWhenGivenAmbiuousNonTerminal()
         {
-            var digit = new DigitTerminal();
-            ProductionExpression E = "E";
-            E.Rule = E + '+' + E
-                | digit;
-            string input = "1+2+3";
+            var input = "1+2+3";
             var tokens = TokenizeNumericExpression(input);
-            var grammar = new GrammarExpression(E, new[] { E }).ToGrammar();
+            var grammar = new SimpleExpressionGrammar();
             AssertLeoAndClassicParseAlgorithmsCreateSameForest(tokens, grammar);
         }
 
         [TestMethod]
         public void ParseEngineShouldDisambiguateFollowingOperatorPresidence()
         {
-            var digit = new DigitTerminal();
-            ProductionExpression E = "E";
-            E.Rule = 
-                E + '+' + E
-                | E + '*' + E
-                | digit;
-            string input = "2*3+5*7";
-            var parseTester = new ParseTester(new GrammarExpression(E));
+            var input = "2*3+5*7";
+            var parseTester = new ParseTester(new SimpleExpressionGrammar());
             parseTester.RunParse(input);
             var forest = parseTester.ParseEngine.GetParseForestRootNode();
             var tree = new InternalTreeNode(forest);

@@ -63,6 +63,8 @@
     <Compile Include="Forest\VirtualForestNodePath.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Grammars\GrammarWrapper.cs" />
+    <Compile Include="LexerRules\NumberLexerRule.cs" />
+    <Compile Include="LexerRules\WhitespaceLexerRule.cs" />
     <Compile Include="Tree\ParseTreeEnumerable.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />
     <Compile Include="Forest\SelectFirstChildDisambiguationAlgorithm.cs" />

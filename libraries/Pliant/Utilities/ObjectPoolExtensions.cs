@@ -1,10 +1,18 @@
 ﻿using Pliant.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Pliant.Utilities
 {
     public static class ObjectPoolExtensions
     {
+        internal static StringBuilder AllocateAndClear(this ObjectPool<StringBuilder> pool)
+        {
+            var builder = pool.Allocate();
+            builder.Clear();
+            return builder;
+        }
+
         internal static List<T> AllocateAndClear<T>(this ObjectPool<List<T>> pool)
         {
             var list = pool.Allocate();
@@ -26,6 +34,19 @@ namespace Pliant.Utilities
             return dictionary;
         }
 
+        internal static void ClearAndFree<TKey, TValue>(this ObjectPool<Dictionary<TKey, TValue>> pool, Dictionary<TKey, TValue> dictionary)
+        {
+            dictionary.Clear();
+            pool.Free(dictionary);
+        }
+
+        internal static HashSet<TValue> AllocateAndClear<TValue>(this ObjectPool<HashSet<TValue>> pool)
+        {
+            var hashSet = pool.Allocate();
+            hashSet.Clear();
+            return hashSet;
+        }
+
         internal static void ClearAndFree<T>(this ObjectPool<List<T>> pool, List<T> list)
         {
             if (list == null)
@@ -34,6 +55,16 @@ namespace Pliant.Utilities
                 return;
             list.Clear();
             pool.Free(list);
-        } 
+        }
+
+        internal static void ClearAndFree(this ObjectPool<StringBuilder> pool, StringBuilder builder)
+        {
+            if (pool == null)
+                return;
+            if (builder == null)
+                return;
+            builder.Clear();
+            pool.Free(builder);
+        }
     }
 }
