@@ -34,6 +34,19 @@ namespace Pliant.Utilities
             return dictionary;
         }
 
+        internal static void ClearAndFree<TKey, TValue>(this ObjectPool<Dictionary<TKey, TValue>> pool, Dictionary<TKey, TValue> dictionary)
+        {
+            dictionary.Clear();
+            pool.Free(dictionary);
+        }
+
+        internal static HashSet<TValue> AllocateAndClear<TValue>(this ObjectPool<HashSet<TValue>> pool)
+        {
+            var hashSet = pool.Allocate();
+            hashSet.Clear();
+            return hashSet;
+        }
+
         internal static void ClearAndFree<T>(this ObjectPool<List<T>> pool, List<T> list)
         {
             if (list == null)

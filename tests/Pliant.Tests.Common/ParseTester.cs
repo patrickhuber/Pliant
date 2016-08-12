@@ -4,6 +4,7 @@ using Pliant.Grammars;
 using Pliant.Runtime;
 using Pliant.Tokens;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Pliant.Tests.Common
 {
@@ -27,11 +28,22 @@ namespace Pliant.Tests.Common
         public void RunParse(string input)
         {
             ParseRunner = new ParseRunner(ParseEngine, input);
-            while (!ParseRunner.EndOfStream())
+            InternalRunParse(ParseRunner);
+        }
+
+        public void RunParse(TextReader reader)
+        {
+            ParseRunner = new ParseRunner(ParseEngine, reader);
+            InternalRunParse(ParseRunner);
+        }
+
+        private static void InternalRunParse(IParseRunner parseRunner)
+        {
+            while (!parseRunner.EndOfStream())
             {
-                Assert.IsTrue(ParseRunner.Read(), $"Parse Failed at Position {ParseRunner.Position}");
+                Assert.IsTrue(parseRunner.Read(), $"Parse Failed at Position {parseRunner.Position}");
             }
-            Assert.IsTrue(ParseRunner.ParseEngine.IsAccepted(), $"Parse was not accepted");
+            Assert.IsTrue(parseRunner.ParseEngine.IsAccepted(), $"Parse was not accepted");
         }
         
         public void Reset()

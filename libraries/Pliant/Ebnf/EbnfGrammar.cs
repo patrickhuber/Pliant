@@ -42,7 +42,8 @@ namespace Pliant.Ebnf
                     new NegationTerminal(new CharacterTerminal(']')), "[^\\]]"),
                 notMeta = CreateNotMetaLexerRule(),
                 escapeCharacter = CreateEscapeCharacterLexerRule(),
-                whitespace = CreateWhitespaceLexerRule();
+                whitespace = CreateWhitespaceLexerRule(),
+                multiLineComment = CreateMultiLineCommentLexerRule();
 
             ProductionExpression
                 definition = Definition,
@@ -149,7 +150,7 @@ namespace Pliant.Ebnf
                     lexerRuleTerm,
                     lexerRuleFactor
                 }, 
-                new[] { new LexerRuleModel(whitespace) });
+                new[] { new LexerRuleModel(whitespace), new LexerRuleModel(multiLineComment) });
             _ebnfGrammar = grammarExpression.ToGrammar();
         }
 
@@ -271,6 +272,36 @@ namespace Pliant.Ebnf
                     new NegationTerminal(
                         new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')),
                     "notMeta");
+        }
+
+        private static BaseLexerRule CreateMultiLineCommentLexerRule()
+        {
+            var pattern = @"\/[*]([*][^\/]|[^*])*[*][\/]";
+
+            var states = new DfaState[5];
+            for (int i = 0; i < states.Length; i++)
+                states[i] = new DfaState();
+
+            var slash = new CharacterTerminal('/');
+            var star = new CharacterTerminal('*');
+            var notStar = new NegationTerminal(star);
+            var notSlash = new NegationTerminal(slash);
+
+            var firstSlash = new DfaTransition(slash, states[1]);
+            var firstStar = new DfaTransition(star, states[2]);
+            var repeatNotStar = new DfaTransition(notStar, states[2]);
+            var lastStar = new DfaTransition(star, states[3]);
+            var goBackNotSlash = new DfaTransition(notSlash, states[2]);
+            var lastSlash = new DfaTransition(slash, states[4]);
+
+            states[0].AddTransition(firstSlash);
+            states[1].AddTransition(firstStar);
+            states[2].AddTransition(repeatNotStar);
+            states[2].AddTransition(lastStar);
+            states[3].AddTransition(goBackNotSlash);
+            states[3].AddTransition(lastSlash);
+            
+            return new DfaLexerRule(states[0], pattern);
         }
     }
 }

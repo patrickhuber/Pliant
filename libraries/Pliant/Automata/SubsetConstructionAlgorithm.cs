@@ -12,11 +12,12 @@ namespace Pliant.Automata
         {
             var processOnceQueue = new ProcessOnceQueue<NfaClosure>();
 
-            var set = new HashSet<INfaState>();
-            foreach(var state in nfa.Start.Closure())
+            var set = SharedPools.Default<HashSet<INfaState>>().AllocateAndClear();
+            foreach (var state in nfa.Start.Closure())
                 set.Add(state);
 
             var start = new NfaClosure(set, nfa.Start.Equals(nfa.End));
+
             processOnceQueue.Enqueue(start);
 
             while (processOnceQueue.Count > 0)
@@ -38,7 +39,7 @@ namespace Pliant.Automata
                                 var terminal = terminalTransition.Terminal;
 
                                 if (!transitions.ContainsKey(terminalTransition.Terminal))
-                                    transitions[terminal] = new HashSet<INfaState>();
+                                    transitions[terminal] = SharedPools.Default<HashSet<INfaState>>().AllocateAndClear();
                                 transitions[terminal].Add(transition.Target);
                                 break;
                         }
@@ -52,11 +53,14 @@ namespace Pliant.Automata
                     closure = processOnceQueue.EnqueueOrGetExisting(closure);
                     nfaClosure.State.AddTransition(
                         new DfaTransition(terminal, closure.State));
+                    SharedPools.Default<HashSet<INfaState>>().Free(targetStates);
                 }
-
+                SharedPools
+                    .Default<HashSet<INfaState>>()
+                    .Free(nfaClosure.Closure);
                 SharedPools
                     .Default<Dictionary<ITerminal, HashSet<INfaState>>>()
-                    .Free(transitions);
+                    .ClearAndFree(transitions);
             }
 
             return start.State;
@@ -64,7 +68,7 @@ namespace Pliant.Automata
 
         private static NfaClosure Closure(HashSet<INfaState> states, INfaState endState)
         {
-            var set = new HashSet<INfaState>();
+            var set = SharedPools.Default<HashSet<INfaState>>().AllocateAndClear();
             var isFinal = false;
             foreach (var state in states)
                 foreach (var item in state.Closure())
@@ -105,6 +109,6 @@ namespace Pliant.Automata
             {
                 return _hashCode;
             }
-        }
+        }        
     }     
 }

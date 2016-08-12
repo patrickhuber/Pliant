@@ -52,6 +52,9 @@ namespace Pliant.Runtime
 
             var character = ReadCharacter();
 
+            if (MatchesExistingIncompleteIgnoreLexemes(character))
+                return true;
+            
             if (MatchesExistingLexemes(character))
             {
                 if (!EndOfStream())
@@ -120,13 +123,34 @@ namespace Pliant.Runtime
 
         private bool MatchesExistingIgnoreLexemes(char character)
         {
-            if (_ignoreLexemes.Count == 0)
+            if (!AnyExistingIngoreLexemes())
                 return false;
 
             var anyMatchedIgnoreLexemes = false;
             foreach (var existingLexeme in _ignoreLexemes)
             {
                 if (existingLexeme.Scan(character))
+                {
+                    anyMatchedIgnoreLexemes = true;
+                }
+            }
+            return anyMatchedIgnoreLexemes;
+        }
+
+        private bool AnyExistingIngoreLexemes()
+        {
+            return _ignoreLexemes.Count != 0;
+        }
+
+        private bool MatchesExistingIncompleteIgnoreLexemes(char character)
+        {
+            if (!AnyExistingIngoreLexemes())
+                return false;
+
+            var anyMatchedIgnoreLexemes = false;
+            foreach (var existingLexeme in _ignoreLexemes)
+            {
+                if (!existingLexeme.IsAccepted() && existingLexeme.Scan(character))
                 {
                     anyMatchedIgnoreLexemes = true;
                 }
@@ -154,7 +178,7 @@ namespace Pliant.Runtime
             _existingLexemes = matchedLexemes;
             return true;
         }
-
+        
         private bool MatchesNewIgnoreLexemes(char character)
         {
             if (ParseEngine.Grammar.Ignores.Count == 0)
