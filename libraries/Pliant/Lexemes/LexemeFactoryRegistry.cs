@@ -1,59 +1,29 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Collections;
+using Pliant.Grammars;
 using System.Collections.Generic;
 
 namespace Pliant.Lexemes
 {
     public class LexemeFactoryRegistry : ILexemeFactoryRegistry
     {
-        private readonly Dictionary<LexerRuleType, ILexemeFactory> _registry;
-        private readonly List<ILexemeFactory> _smallNumberRegistry;
-        private int _itemCount;
-        private static readonly int Threshold = 4;
+        private readonly FastLookupDictionary<LexerRuleType, ILexemeFactory> _registry;        
 
         public LexemeFactoryRegistry()
         {
-            _registry = new Dictionary<LexerRuleType, ILexemeFactory>();
-            _smallNumberRegistry = new List<ILexemeFactory>();
-            _itemCount = 0;
+            _registry = new FastLookupDictionary<LexerRuleType, ILexemeFactory>();
         }
 
         public ILexemeFactory Get(LexerRuleType lexerRuleType)
         {
             ILexemeFactory lexemeFactory = null;
-            if (_itemCount > Threshold)
-            {
-                if (!_registry.TryGetValue(lexerRuleType, out lexemeFactory))
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                for (int i = 0; i < _smallNumberRegistry.Count; i++)
-                {
-                    var item = _smallNumberRegistry[i];
-                    if (item.LexerRuleType.Id.Equals(lexerRuleType.Id))
-                        return item;
-                }
-            }
+            if (!_registry.TryGetValue(lexerRuleType, out lexemeFactory))
+                return null;
             return lexemeFactory;
         }
 
         public void Register(ILexemeFactory factory)
         {
-            if (_itemCount > Threshold)
-                _registry[factory.LexerRuleType] = factory;
-            else
-            {
-                _smallNumberRegistry.Add(factory);
-            }
-            if (_itemCount == Threshold)
-                for (int i = 0; i < _smallNumberRegistry.Count; i++)
-                {
-                    var currentFactory = _smallNumberRegistry[i];
-                    _registry.Add(currentFactory.LexerRuleType, currentFactory);
-                }
-            _itemCount++;
+            _registry.Add(factory.LexerRuleType, factory);
         }
     }
 }

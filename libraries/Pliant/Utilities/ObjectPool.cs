@@ -43,7 +43,6 @@ namespace Pliant.Utilities
         internal void Free(T value)
         {
             _queue.Enqueue(value);
-        }
-        
+        }        
     }
 }

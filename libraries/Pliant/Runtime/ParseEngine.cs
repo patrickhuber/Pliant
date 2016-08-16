@@ -45,7 +45,7 @@ namespace Pliant.Runtime
             var scanStates = currentEarleySet.Scans;
 
             var returnList = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
-            var expectedRuleDictionary = SharedPools.Default<Dictionary<TokenType, ILexerRule>>().AllocateAndClear();
+            var expectedRuleDictionary = SharedPools.Default<FastLookupDictionary<TokenType, ILexerRule>>().AllocateAndClear();
 
             // PERF: Avoid Linq Select, Where due to lambda allocation
             // PERF: Avoid foreach enumeration due to IEnumerable boxing
@@ -65,7 +65,7 @@ namespace Pliant.Runtime
                 }
             }
             SharedPools
-                .Default<Dictionary<TokenType, ILexerRule>>()
+                .Default<FastLookupDictionary<TokenType, ILexerRule>>()
                 .Free(expectedRuleDictionary);
             return returnList;
         }

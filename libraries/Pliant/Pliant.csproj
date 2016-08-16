@@ -55,6 +55,7 @@
     <Compile Include="Builders\SymbolModel.cs" />
     <Compile Include="Builders\SymbolModelType.cs" />
     <Compile Include="Charts\IParseNode.cs" />
+    <Compile Include="Collections\FastLookupDictionary.cs" />
     <Compile Include="Forest\ForestNodeVisitorBase.cs" />
     <Compile Include="Forest\IForestNodeReference.cs" />
     <Compile Include="Forest\ForestNodeReference.cs" />
