@@ -19,5 +19,10 @@ namespace Pliant.Runtime
 
             return new ParseEngineLexeme(parseEngine, grammarLexerRule.TokenType);
         }
+
+        public void Free(ILexeme lexeme)
+        {
+
+        }
     }
 }

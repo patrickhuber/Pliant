@@ -1,0 +1,37 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="$(TargetDir)Pliant.dll"#>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Pliant"#>
+<#@ output extension=".cs" #>
+<# 
+	var currentDirectory = System.IO.Path.GetDirectoryName(this.Host.TemplateFile); 
+	var pliantFiles = new List<string>();
+	foreach(var file in System.IO.Directory.GetFiles(currentDirectory))
+	{
+		if(System.IO.Path.GetExtension(file).Equals(".pliant"))
+			pliantFiles.Add(file);
+	}
+#>
+
+<# 
+var grammar = new Pliant.Ebnf.EbnfGrammar();
+foreach(var file in pliantFiles)
+{
+	var parseEngine = new Pliant.Runtime.ParseEngine(grammar);
+    var parseRunner = new Pliant.Runtime.ParseRunner(parseEngine, System.IO.File.ReadAllText(file));
+	while(!parseRunner.EndOfStream())
+	{
+		if(!parseRunner.Read())
+			break;
+	}
+	if(parseRunner.ParseEngine.IsAccepted())
+	{
+	#>
+public class MyClass{}
+	<#
+	}
+}
+#>

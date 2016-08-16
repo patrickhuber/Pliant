@@ -2,6 +2,7 @@
 using Pliant.Tokens;
 using Pliant.Utilities;
 using System.Text;
+using System;
 
 namespace Pliant.Automata
 {
@@ -32,6 +33,14 @@ namespace Pliant.Automata
         private bool IsStringBuilderAllocated()
         {
             return _stringBuilder != null;
+        }
+
+        public void Reset(IDfaLexerRule dfaLexerRule)
+        {
+            _capture = null;
+            _stringBuilder.Clear();
+            _currentState = dfaLexerRule.Start;
+            TokenType = dfaLexerRule.TokenType;
         }
 
         private void DeallocateStringBuilderAndAssignCapture()

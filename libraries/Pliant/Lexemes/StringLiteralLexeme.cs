@@ -1,16 +1,12 @@
 ﻿using Pliant.Grammars;
 using Pliant.Tokens;
-using Pliant.Utilities;
-using System.Text;
 
 namespace Pliant.Lexemes
 {
     public class StringLiteralLexeme : ILexeme
     {
-        private StringBuilder _stringBuilder;
         private string _capture;
-
-        private int _index = 0;
+        private int _index;
 
         public string Literal { get; private set; }
 
@@ -18,42 +14,35 @@ namespace Pliant.Lexemes
         {
             get
             {
-                if (IsStringBuilderAllocated())
-                    DeallocateStringBuilderAndAssignCapture();
+                if (!IsSubStringAllocated())
+                    _capture = AllocateSubString();
                 return _capture;
             }
         }
 
-        private bool IsStringBuilderAllocated()
+        private bool IsSubStringAllocated()
         {
-            return _stringBuilder != null;
+            if (_capture == null)
+                return false;
+            return _index == _capture.Length;
         }
 
-        private void DeallocateStringBuilderAndAssignCapture()
+        private string AllocateSubString()
         {
-            SharedPools.Default<StringBuilder>().Free(_stringBuilder);
-            _capture = _stringBuilder.ToString();
-            _stringBuilder = null;
-        }
-
-        private void ReallocateStringBuilderFromCapture()
-        {
-            _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
-            _stringBuilder.Append(_capture);
+            return Literal.Substring(0, _index);
         }
 
         public TokenType TokenType { get; private set; }
 
         public StringLiteralLexeme(string literal, TokenType tokenType)
         {
-            Literal = literal;
-            TokenType = tokenType;
-            _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
+            Reset(literal, tokenType);
         }
 
         public StringLiteralLexeme(IStringLiteralLexerRule lexerRule)
-            : this(lexerRule.Literal, lexerRule.TokenType)
-        { }
+        {
+            Reset(lexerRule);
+        }
 
         public bool IsAccepted()
         {
@@ -67,10 +56,20 @@ namespace Pliant.Lexemes
             if (Literal[_index] != c)
                 return false;
             _index++;
-            if (!IsStringBuilderAllocated())
-                ReallocateStringBuilderFromCapture();
-            _stringBuilder.Append(c);
             return true;
+        }
+
+        public void Reset(IStringLiteralLexerRule newLiteral)
+        {
+            Reset(newLiteral.Literal, newLiteral.TokenType);
+        }
+
+        public void Reset(string literal, TokenType tokenType)
+        {
+            _index = 0;
+            _capture = null;
+            Literal = literal;
+            TokenType = tokenType;
         }
     }
 }

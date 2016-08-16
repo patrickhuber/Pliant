@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using System;
+using Pliant.Grammars;
 using Pliant.Tokens;
 
 namespace Pliant.Lexemes
@@ -32,11 +33,21 @@ namespace Pliant.Lexemes
         public TokenType TokenType { get; private set; }
 
         public TerminalLexeme(ITerminalLexerRule lexerRule)
-            : this(lexerRule.Terminal, lexerRule.TokenType)
         {
+            Reset(lexerRule);
         }
 
         public TerminalLexeme(ITerminal terminal, TokenType tokenType)
+        {
+            Reset(terminal, tokenType);
+        }
+
+        public void Reset(ITerminalLexerRule terminalLexerRule)
+        {
+            Reset(terminalLexerRule.Terminal, terminalLexerRule.TokenType);
+        }
+
+        public void Reset(ITerminal terminal, TokenType tokenType)
         {
             Terminal = terminal;
             TokenType = tokenType;

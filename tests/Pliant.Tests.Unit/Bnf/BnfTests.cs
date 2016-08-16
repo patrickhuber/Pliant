@@ -54,9 +54,9 @@ namespace Pliant.Tests.Unit.Bnf
                     var length = endIndex - startIndex;
                     var stringBuilder = new StringBuilder();
                     stringBuilder
-                        .AppendFormat("Error parsing input string at position {0}.", parseRunner.Position)
+                        .Append($"Error parsing input string at position {parseRunner.Position}.")
                         .AppendLine()
-                        .AppendFormat("start: {0}", startIndex)
+                        .Append($"start: {startIndex}")
                         .AppendLine()
                         .AppendLine(_bnfText.Substring(startIndex, length));
 

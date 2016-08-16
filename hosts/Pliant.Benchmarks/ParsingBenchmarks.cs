@@ -8,24 +8,24 @@ namespace Pliant.Benchmarks
 {
     public class ParsingBenchmarks
     {
-        IParseRunner parseRunner;
         string sampleBnf;
 
         [Setup]
         public void Setup()
         {
-            var grammar = new BnfGrammar();
-            var parseEngine = new ParseEngine(grammar);
             sampleBnf = File.ReadAllText(
                 Path.Combine(Environment.CurrentDirectory, "AnsiC.bnf"));
-
-            parseRunner = new ParseRunner(parseEngine, sampleBnf);
         }
 
         [Benchmark]
-        public void Parse()
+        public bool Parse()
         {
+            var grammar = new BnfGrammar();
+            var parseEngine = new ParseEngine(grammar);
+            var parseRunner = new ParseRunner(parseEngine, sampleBnf);
+            
             while (!parseRunner.EndOfStream() && parseRunner.Read()) { }
+            return parseRunner.ParseEngine.IsAccepted();
         }
     }
 }
