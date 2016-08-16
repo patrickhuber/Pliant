@@ -32,7 +32,7 @@ namespace Pliant.Lexemes
                 for (int i = 0; i < _smallNumberRegistry.Count; i++)
                 {
                     var item = _smallNumberRegistry[i];
-                    if (item.LexerRuleType.Equals(lexerRuleType))
+                    if (item.LexerRuleType.Id.Equals(lexerRuleType.Id))
                         return item;
                 }
             }
@@ -46,7 +46,6 @@ namespace Pliant.Lexemes
             else
             {
                 _smallNumberRegistry.Add(factory);
-                _itemCount++;
             }
             if (_itemCount == Threshold)
                 for (int i = 0; i < _smallNumberRegistry.Count; i++)
@@ -54,6 +53,7 @@ namespace Pliant.Lexemes
                     var currentFactory = _smallNumberRegistry[i];
                     _registry.Add(currentFactory.LexerRuleType, currentFactory);
                 }
+            _itemCount++;
         }
     }
 }

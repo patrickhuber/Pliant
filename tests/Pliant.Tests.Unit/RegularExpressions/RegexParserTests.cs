@@ -10,7 +10,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
     public class RegexParserTests
     {
         public TestContext TestContext { get; set; }
-
+        
         [TestMethod]
         public void RegexParserShouldParseSingleCharacter()
         {
