@@ -273,8 +273,9 @@ namespace Pliant.Runtime
             var topmostItem = new State(
                 transitionState.Production,
                 transitionState.Position,
-                transitionState.Origin,
-                virtualParseNode);
+                transitionState.Origin);
+
+            topmostItem.ParseNode = virtualParseNode;
 
             if (_chart.Enqueue(k, topmostItem))
                 Log("Complete", k, topmostItem);

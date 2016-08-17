@@ -23,10 +23,11 @@ namespace Pliant.Charts
             }
             else
             {
+                var hashCode = state.GetHashCode();
                 // search for duplicate
                 for (var i = 0; i < Count; i++)
                 {
-                    if (state.GetHashCode() == this[i].GetHashCode())
+                    if (hashCode == this[i].GetHashCode())
                         return false;
                 }
             }

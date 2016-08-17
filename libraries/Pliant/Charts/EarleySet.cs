@@ -11,7 +11,6 @@ namespace Pliant.Charts
         private StateQueue _scans;
         private StateQueue _completions;
         private StateQueue _transitions;
-        private StateQueue _extensions;
 
         public IReadOnlyList<IState> Predictions { get { return _predictions; } }
 
@@ -29,7 +28,6 @@ namespace Pliant.Charts
             _scans = new StateQueue();
             _completions = new StateQueue();
             _transitions = new StateQueue();
-            _extensions = new StateQueue();
             Location = location;
         }
 
@@ -47,8 +45,7 @@ namespace Pliant.Charts
 
             return _completions.Enqueue(state);
         }
-
-
+        
         public ITransitionState FindTransitionState(ISymbol searchSymbol)
         {
             for (int t = 0; t < Transitions.Count; t++)

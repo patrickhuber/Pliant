@@ -20,9 +20,9 @@ namespace Pliant.Runtime
         public IParseEngine ParseEngine { get; private set; }
 
         public int Position { get; private set; }
-
+        
         public ParseRunner(IParseEngine parseEngine, string input)
-                            : this(parseEngine, new StringReader(input))
+            : this(parseEngine, new StringReader(input))
         {
         }
 
@@ -232,6 +232,7 @@ namespace Pliant.Runtime
             _existingLexemes = newLexemes;
             return true;
         }
+
         private char ReadCharacter()
         {
             var character = (char)_textReader.Read();

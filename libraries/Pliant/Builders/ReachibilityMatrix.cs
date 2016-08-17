@@ -1,11 +1,12 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Collections;
+using Pliant.Grammars;
 using System.Collections.Generic;
 
 namespace Pliant.Builders
 {
     internal class ReachibilityMatrix 
     {
-        private Dictionary<ISymbol, ISet<NonTerminalModel>> _matrix;
+        private Dictionary<ISymbol, UniqueList<NonTerminalModel>> _matrix;
         private Dictionary<ISymbol, ProductionModel> _lookup;
 
         public ReachibilityMatrix(IEnumerable<ProductionModel> productions)
@@ -16,7 +17,7 @@ namespace Pliant.Builders
 
         public ReachibilityMatrix()
         {
-            _matrix = new Dictionary<ISymbol, ISet<NonTerminalModel>>();
+            _matrix = new Dictionary<ISymbol, UniqueList<NonTerminalModel>>();
             _lookup = new Dictionary<ISymbol, ProductionModel>();
         }
                 
@@ -31,7 +32,7 @@ namespace Pliant.Builders
         public void AddProduction(ProductionModel production)
         {
             if (!_matrix.ContainsKey(production.LeftHandSide.NonTerminal))
-                _matrix[production.LeftHandSide.NonTerminal] = new HashSet<NonTerminalModel>();
+                _matrix[production.LeftHandSide.NonTerminal] = new UniqueList<NonTerminalModel>();
 
             if (!_lookup.ContainsKey(production.LeftHandSide.NonTerminal))
                 _lookup[production.LeftHandSide.NonTerminal] = production;
@@ -51,10 +52,10 @@ namespace Pliant.Builders
 
         private void AddProductionToNewOrExistingSymbolSet(ProductionModel production, SymbolModel symbol)
         {
-            ISet<NonTerminalModel> set = null;
+            UniqueList<NonTerminalModel> set = null;
             if (!_matrix.TryGetValue(symbol.Symbol, out set))
             {
-                set = new HashSet<NonTerminalModel>();
+                set = new UniqueList<NonTerminalModel>();
                 _matrix[symbol.Symbol] = set;
             }
 

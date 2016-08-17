@@ -1,5 +1,6 @@
 ﻿using Pliant.Forest;
 using Pliant.Grammars;
+using System.Collections.Generic;
 
 namespace Pliant.Charts
 {
@@ -24,5 +25,7 @@ namespace Pliant.Charts
         IForestNode ParseNode { get; set; }
 
         bool IsSource(ISymbol searchSymbol);
+
+        IReadOnlyList<IState> Parents { get; }
     }
 }

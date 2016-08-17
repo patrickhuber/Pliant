@@ -56,6 +56,7 @@
     <Compile Include="Builders\SymbolModelType.cs" />
     <Compile Include="Charts\IParseNode.cs" />
     <Compile Include="Collections\FastLookupDictionary.cs" />
+    <Compile Include="Collections\UniqueList.cs" />
     <Compile Include="Forest\ForestNodeVisitorBase.cs" />
     <Compile Include="Forest\IForestNodeReference.cs" />
     <Compile Include="Forest\ForestNodeReference.cs" />
@@ -112,7 +113,6 @@
     <Compile Include="Automata\IDfaTransition.cs" />
     <Compile Include="Automata\IDfaLexerRule.cs" />
     <Compile Include="Automata\IDfaState.cs" />
-    <Compile Include="Automata\StringExtensions.cs" />
     <Compile Include="Ebnf\EbnfGrammar.cs" />
     <Compile Include="Ebnf\EbnfVisitor.cs" />
     <Compile Include="Grammars\BaseTerminal.cs" />

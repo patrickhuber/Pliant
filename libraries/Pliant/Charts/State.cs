@@ -1,8 +1,10 @@
-﻿using Pliant.Diagnostics;
+﻿using Pliant.Collections;
+using Pliant.Diagnostics;
 using Pliant.Forest;
 using Pliant.Grammars;
 using Pliant.Utilities;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Pliant.Charts
@@ -23,8 +25,11 @@ namespace Pliant.Charts
 
         public IForestNode ParseNode { get; set; }
 
-        private readonly int _hashCode;
+        public IReadOnlyList<IState> Parents { get { return _parents; } }
 
+        private readonly int _hashCode;
+        private UniqueList<IState> _parents;
+        
         public State(IProduction production, int position, int origin)
         {
             Assert.IsNotNull(production, nameof(production));
@@ -37,21 +42,16 @@ namespace Pliant.Charts
             PreDotSymbol = GetPreDotSymbol(position, production);
             _hashCode = ComputeHashCode();
         }
-
-        public State(IProduction production, int position, int origin, IForestNode parseNode)
-            : this(production, position, origin)
-        {
-            ParseNode = parseNode;
-        }
-
+        
         public IState NextState()
         {
             if (IsComplete)
                 return null;
-            return new State(
+            var state = new State(
                 Production,
                 Position + 1,
                 Origin);
+            return state;
         }
         
         public bool IsComplete
@@ -124,6 +124,16 @@ namespace Pliant.Charts
             if (position >= production.RightHandSide.Count)
                 return null;
             return production.RightHandSide[position];
+        }
+
+        public void Merge(IState state)
+        {
+            // the states must have the same hashcode
+            if (!_hashCode.Equals(state.GetHashCode()))
+                return;
+
+            for (int i = 0; i < state.Parents.Count; i++)
+                _parents.Add(state.Parents[i]);
         }
     }
 }
