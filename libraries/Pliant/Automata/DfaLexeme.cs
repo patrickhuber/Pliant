@@ -3,6 +3,7 @@ using Pliant.Tokens;
 using Pliant.Utilities;
 using System.Text;
 using System;
+using Pliant.Grammars;
 
 namespace Pliant.Automata
 {
@@ -13,12 +14,9 @@ namespace Pliant.Automata
 
         private IDfaState _currentState;
 
-        public DfaLexeme(IDfaState dfaState, TokenType tokenType)
-        {
-            _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
-            _currentState = dfaState;
-            TokenType = tokenType;
-        }
+        public TokenType TokenType { get { return LexerRule.TokenType; } }
+
+        public ILexerRule LexerRule { get; private set; }
 
         public string Capture
         {
@@ -29,6 +27,13 @@ namespace Pliant.Automata
                 return _capture;
             }
         }
+        
+        public DfaLexeme(IDfaLexerRule dfaLexerRule)
+        {
+            LexerRule = dfaLexerRule;
+            _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
+            _currentState = dfaLexerRule.Start;
+        }
 
         private bool IsStringBuilderAllocated()
         {
@@ -38,9 +43,10 @@ namespace Pliant.Automata
         public void Reset(IDfaLexerRule dfaLexerRule)
         {
             _capture = null;
-            _stringBuilder.Clear();
+            if(IsStringBuilderAllocated())
+                _stringBuilder.Clear();
             _currentState = dfaLexerRule.Start;
-            TokenType = dfaLexerRule.TokenType;
+            LexerRule = dfaLexerRule;
         }
 
         private void DeallocateStringBuilderAndAssignCapture()
@@ -55,8 +61,6 @@ namespace Pliant.Automata
             _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
             _stringBuilder.Append(_stringBuilder);
         }
-
-        public TokenType TokenType { get; private set; }
 
         public bool IsAccepted()
         {

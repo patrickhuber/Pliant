@@ -113,7 +113,7 @@ namespace Pliant.Runtime
             _chart = new Chart();
             foreach (var startProduction in Grammar.StartProductions())
             {
-                var startState = new State(startProduction, 0, 0);
+                var startState = new NormalState(startProduction, 0, 0);
                 if (_chart.Enqueue(0, startState))
                     Log("Start", 0, startState);
             }
@@ -146,7 +146,7 @@ namespace Pliant.Runtime
             }
         }
 
-        private void Scan(IState scan, int j, ITokenForestNode tokenNode)
+        private void Scan(INormalState scan, int j, ITokenForestNode tokenNode)
         {
             var i = scan.Origin;
             var currentSymbol = scan.PostDotSymbol;
@@ -197,7 +197,7 @@ namespace Pliant.Runtime
             }
         }
 
-        private void Predict(IState evidence, int j)
+        private void Predict(INormalState evidence, int j)
         {
             var nonTerminal = evidence.PostDotSymbol as INonTerminal;
             var rulesForNonTerminal = Grammar.RulesFor(nonTerminal);
@@ -210,10 +210,10 @@ namespace Pliant.Runtime
             }
         }
 
-        private void PredictProduction(IState evidence, int j, IProduction production)
+        private void PredictProduction(INormalState evidence, int j, IProduction production)
         {
             // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
-            var predictedState = new State(production, 0, j);
+            var predictedState = new NormalState(production, 0, j);
             if (_chart.Enqueue(j, predictedState))
                 Log("Predict", j, predictedState);
 
@@ -237,7 +237,7 @@ namespace Pliant.Runtime
             }
         }
 
-        private void Complete(IState completed, int k)
+        private void Complete(INormalState completed, int k)
         {
             if (completed.ParseNode == null)
                 completed.ParseNode = CreateNullParseNode(completed.Production.LeftHandSide, k);
@@ -270,7 +270,7 @@ namespace Pliant.Runtime
 
             var virtualParseNode = CreateVirtualParseNode(completed, k, rootTransitionState);
 
-            var topmostItem = new State(
+            var topmostItem = new NormalState(
                 transitionState.Production,
                 transitionState.Position,
                 transitionState.Origin);
@@ -281,18 +281,17 @@ namespace Pliant.Runtime
                 Log("Complete", k, topmostItem);
         }
         
-        private void EarleyComplete(IState completed, int k)
+        private void EarleyComplete(INormalState completed, int k)
         {
             var j = completed.Origin;
             var sourceEarleySet = _chart.EarleySets[j];
-                        
+            
             for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
             {
                 var prediction = sourceEarleySet.Predictions[p];
                 if (!prediction.IsSource(completed.Production.LeftHandSide))
                     continue;
-
-                var i = prediction.Origin;
+                                
                 var nextState = prediction.NextState();
 
                 var parseNode = CreateParseNode(

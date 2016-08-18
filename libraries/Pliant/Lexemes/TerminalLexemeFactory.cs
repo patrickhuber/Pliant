@@ -21,13 +21,12 @@ namespace Pliant.Lexemes
                     $"Unable to create TerminalLexeme from type {lexerRule.GetType().FullName}. Expected TerminalLexerRule");
             
             var terminalLexerRule = lexerRule as ITerminalLexerRule;
-            if (_queue.Count > 0)
-            {
-                var reusedLexeme = _queue.Dequeue();
-                reusedLexeme.Reset(terminalLexerRule);
-                return reusedLexeme;
-            }
-            return new TerminalLexeme(terminalLexerRule);
+            if (_queue.Count == 0)
+                return new TerminalLexeme(terminalLexerRule);
+            
+            var reusedLexeme = _queue.Dequeue();
+            reusedLexeme.Reset(terminalLexerRule);
+            return reusedLexeme;
         }
 
         public void Free(ILexeme lexeme)

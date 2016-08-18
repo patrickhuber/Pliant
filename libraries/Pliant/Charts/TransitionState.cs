@@ -1,15 +1,13 @@
-﻿using Pliant.Forest;
-using Pliant.Grammars;
+﻿using Pliant.Grammars;
 using Pliant.Utilities;
-using System;
 
 namespace Pliant.Charts
 {
-    public class TransitionState : State, ITransitionState
+    public class TransitionState : StateBase, ITransitionState
     {
         public ISymbol Recognized { get; private set; }
 
-        public IState Reduction { get; private set; }
+        public INormalState Reduction { get; private set; }
 
         public int Index { get; private set; }
 
@@ -18,7 +16,7 @@ namespace Pliant.Charts
         public TransitionState(
             ISymbol recognized,
             IState transition,
-            IState reduction,
+            INormalState reduction,
             int index)
             : base(transition.Production, transition.Position, transition.Origin)
         {
@@ -35,9 +33,10 @@ namespace Pliant.Charts
             var transitionState = obj as TransitionState;
             if (transitionState == null)
                 return false;
-            return base.Equals(obj as State) 
-                && this.Recognized.Equals(transitionState.Recognized)
-                && this.Index == transitionState.Index;
+
+            return GetHashCode() == transitionState.GetHashCode()
+                && Recognized.Equals(transitionState.Recognized)
+                && Index == transitionState.Index;
         }
         
         private readonly int _hashCode;

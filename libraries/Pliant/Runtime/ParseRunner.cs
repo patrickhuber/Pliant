@@ -149,11 +149,15 @@ namespace Pliant.Runtime
             var anyMatchedLexemes = false;
             foreach (var existingLexeme in _existingLexemes)
             {
-                if (existingLexeme.Scan(character))
+                if (!existingLexeme.Scan(character))
                 {
-                    matchedLexemes.Add(existingLexeme);
-                    anyMatchedLexemes = true;
+                    var factory = GetLexemeFactory(existingLexeme.LexerRule);
+                    factory.Free(existingLexeme);
+                    continue;
                 }
+                
+                matchedLexemes.Add(existingLexeme);
+                anyMatchedLexemes = true;                
             }
             if (!anyMatchedLexemes)
                 return false;

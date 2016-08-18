@@ -20,6 +20,15 @@ namespace Pliant.Lexemes
             }
         }
 
+        public TokenType TokenType { get { return LexerRule.TokenType; } }
+
+        public ILexerRule LexerRule { get; private set; }
+        
+        public StringLiteralLexeme(IStringLiteralLexerRule lexerRule)
+        {
+            Reset(lexerRule);
+        }
+
         private bool IsSubStringAllocated()
         {
             if (_capture == null)
@@ -30,18 +39,6 @@ namespace Pliant.Lexemes
         private string AllocateSubString()
         {
             return Literal.Substring(0, _index);
-        }
-
-        public TokenType TokenType { get; private set; }
-
-        public StringLiteralLexeme(string literal, TokenType tokenType)
-        {
-            Reset(literal, tokenType);
-        }
-
-        public StringLiteralLexeme(IStringLiteralLexerRule lexerRule)
-        {
-            Reset(lexerRule);
         }
 
         public bool IsAccepted()
@@ -61,15 +58,10 @@ namespace Pliant.Lexemes
 
         public void Reset(IStringLiteralLexerRule newLiteral)
         {
-            Reset(newLiteral.Literal, newLiteral.TokenType);
-        }
-
-        public void Reset(string literal, TokenType tokenType)
-        {
+            LexerRule = newLiteral;
             _index = 0;
             _capture = null;
-            Literal = literal;
-            TokenType = tokenType;
-        }
+            Literal = newLiteral.Literal;
+        }        
     }
 }

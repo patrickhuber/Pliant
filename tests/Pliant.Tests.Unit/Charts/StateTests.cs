@@ -10,7 +10,7 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void StateToStringShouldCreateCorrectFormat()
         {
-            var state = new State(
+            var state = new NormalState(
                 new Production(new NonTerminal("A"), new NonTerminal("B"), new NonTerminal("C")),
                 1, 0);
             Assert.AreEqual("A -> B\u25CFC\t\t(0)", state.ToString());

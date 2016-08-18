@@ -19,13 +19,7 @@ namespace Pliant.Charts
         int Position { get; }
 
         bool IsComplete { get; }
-
-        IState NextState();
-        
+                
         IForestNode ParseNode { get; set; }
-
-        bool IsSource(ISymbol searchSymbol);
-
-        IReadOnlyList<IState> Parents { get; }
     }
 }

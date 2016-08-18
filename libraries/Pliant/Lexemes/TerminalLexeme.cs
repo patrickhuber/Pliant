@@ -30,7 +30,9 @@ namespace Pliant.Lexemes
             }
         }
 
-        public TokenType TokenType { get; private set; }
+        public TokenType TokenType { get { return LexerRule.TokenType; } }
+
+        public ILexerRule LexerRule { get; private set; }
 
         public TerminalLexeme(ITerminalLexerRule lexerRule)
         {
@@ -38,23 +40,18 @@ namespace Pliant.Lexemes
         }
 
         public TerminalLexeme(ITerminal terminal, TokenType tokenType)
+            : this(new TerminalLexerRule(terminal, tokenType))
         {
-            Reset(terminal, tokenType);
         }
 
         public void Reset(ITerminalLexerRule terminalLexerRule)
         {
-            Reset(terminalLexerRule.Terminal, terminalLexerRule.TokenType);
-        }
-
-        public void Reset(ITerminal terminal, TokenType tokenType)
-        {
-            Terminal = terminal;
-            TokenType = tokenType;
+            LexerRule = terminalLexerRule;
+            Terminal = terminalLexerRule.Terminal;
             _captureRendered = false;
             _isAccepted = false;
         }
-
+        
         public bool IsAccepted()
         {
             return _isAccepted;

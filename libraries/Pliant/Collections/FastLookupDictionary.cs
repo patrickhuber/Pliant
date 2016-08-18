@@ -22,6 +22,11 @@ namespace Pliant.Collections
             _innerList = new List<KeyValuePair<TKey, TValue>>();
         }
 
+        public KeyValuePair<TKey, TValue> GetByIndex(int index)
+        {
+            return _innerList[index];
+        }
+
         private TValue Get(TKey key)
         {
             if (DictionaryIsMoreEfficient())
@@ -42,7 +47,7 @@ namespace Pliant.Collections
         private TValue GetValueFromDictionary(TKey key)
         {
             var value = default(TValue);
-            if (!_innerDictionary.TryGetValue(key, out value))
+            if (_innerDictionary.TryGetValue(key, out value))
                 return value;
             return default(TValue);
         }
@@ -50,10 +55,11 @@ namespace Pliant.Collections
         private bool TryGetValueFromList(TKey key, out TValue value)
         {
             value = default(TValue);
+            var hashCode = key.GetHashCode();
             for (int i = 0; i < _innerList.Count; i++)
             {
                 var keyValuePair = _innerList[i];
-                if (!keyValuePair.Key.Equals(key))
+                if (!hashCode.Equals(keyValuePair.Key.GetHashCode()))
                     continue;
                 value = keyValuePair.Value;
                 return true;
@@ -63,10 +69,11 @@ namespace Pliant.Collections
 
         private TValue GetValueFromList(TKey key)
         {
+            var keyHashCode = key.GetHashCode();
             for (int i = 0; i < _innerList.Count; i++)
             {
                 var keyValuePair = _innerList[i];
-                if (key.Equals(keyValuePair.Key))
+                if (keyHashCode == keyValuePair.Key.GetHashCode())
                     return keyValuePair.Value;
             }
             return default(TValue);
@@ -173,6 +180,7 @@ namespace Pliant.Collections
         {
             _innerDictionary.Clear();
             _innerList.Clear();
+            _count = 0;
         }
 
         public bool Contains(KeyValuePair<TKey, TValue> item)
@@ -184,8 +192,9 @@ namespace Pliant.Collections
         {
             if (DictionaryIsMoreEfficient())
                 return _innerDictionary.ContainsKey(key);
+            var hashCode = key.GetHashCode();
             for (int i = 0; i < _innerList.Count; i++)
-                if (_innerList[i].Key.Equals(key))
+                if (hashCode.Equals(_innerList[i].Key.GetHashCode()))
                     return true;
             return false;
         }

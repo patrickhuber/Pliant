@@ -25,13 +25,12 @@ namespace Pliant.Lexemes
                     $"Unable to create StringLiteralLexeme from type {lexerRule.GetType().FullName}. Expected StringLiteralLexerRule");
             var stringLiteralLexerRule = lexerRule as IStringLiteralLexerRule;
 
-            if (_queue.Count > 0)
-            {
-                var reusedLexeme = _queue.Dequeue();
-                reusedLexeme.Reset(stringLiteralLexerRule);
-                return reusedLexeme;
-            }
-            return new StringLiteralLexeme(stringLiteralLexerRule);
+            if (_queue.Count == 0)
+                return new StringLiteralLexeme(stringLiteralLexerRule);
+            
+            var reusedLexeme = _queue.Dequeue();
+            reusedLexeme.Reset(stringLiteralLexerRule);
+            return reusedLexeme;
         }
 
         public void Free(ILexeme lexeme)

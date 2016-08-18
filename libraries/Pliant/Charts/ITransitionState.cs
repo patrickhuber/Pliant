@@ -7,7 +7,7 @@ namespace Pliant.Charts
     {
         ISymbol Recognized { get; }
 
-        IState Reduction { get; }
+        INormalState Reduction { get; }
 
         ITransitionState NextTransition { get; set; }
 

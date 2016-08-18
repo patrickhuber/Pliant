@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Pliant.Utilities
 {
@@ -42,6 +43,8 @@ namespace Pliant.Utilities
 
         internal void Free(T value)
         {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
             _queue.Enqueue(value);
         }        
     }

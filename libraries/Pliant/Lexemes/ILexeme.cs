@@ -1,4 +1,5 @@
-﻿using Pliant.Tokens;
+﻿using Pliant.Grammars;
+using Pliant.Tokens;
 
 namespace Pliant.Lexemes
 {
@@ -11,5 +12,7 @@ namespace Pliant.Lexemes
         bool IsAccepted();
 
         TokenType TokenType { get; }
+
+        ILexerRule LexerRule { get; }
     }
 }

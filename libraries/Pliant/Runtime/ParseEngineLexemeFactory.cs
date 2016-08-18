@@ -1,12 +1,20 @@
 ﻿using Pliant.Grammars;
 using Pliant.Lexemes;
 using System;
+using System.Collections.Generic;
 
 namespace Pliant.Runtime
 {
     public class ParseEngineLexemeFactory : ILexemeFactory
     {
+        private Queue<ParseEngineLexeme> _queue;
+
         public LexerRuleType LexerRuleType { get { return GrammarLexerRule.GrammarLexerRuleType; } }
+
+        public ParseEngineLexemeFactory()
+        {
+            _queue = new Queue<ParseEngineLexeme>();
+        }
 
         public ILexeme Create(ILexerRule lexerRule)
         {
@@ -15,14 +23,21 @@ namespace Pliant.Runtime
                     $"Unable to create ParseEngineLexeme from type {lexerRule.GetType().FullName}. Expected TerminalLexerRule");
 
             var grammarLexerRule = lexerRule as IGrammarLexerRule;
-            var parseEngine = new ParseEngine(grammarLexerRule.Grammar);
 
-            return new ParseEngineLexeme(parseEngine, grammarLexerRule.TokenType);
+            if (_queue.Count == 0)
+                return new ParseEngineLexeme(grammarLexerRule);
+            
+            var reusedLexeme = _queue.Dequeue();
+            reusedLexeme.Reset(grammarLexerRule);
+            return reusedLexeme;
         }
 
         public void Free(ILexeme lexeme)
         {
-
+            var parseEngineLexeme = lexeme as ParseEngineLexeme;
+            if(parseEngineLexeme == null)
+                throw new Exception($"Unable to free lexeme of type {lexeme.GetType()} from ParseEngineLexeme.");
+            _queue.Enqueue(parseEngineLexeme);
         }
     }
 }

@@ -1,51 +1,60 @@
 ﻿using Pliant.Grammars;
 using System.Collections.Generic;
-using System;
-using Pliant.Forest;
 
 namespace Pliant.Charts
 {
     public class EarleySet : IEarleySet
     {
-        private StateQueue _predictions;
-        private StateQueue _scans;
-        private StateQueue _completions;
-        private StateQueue _transitions;
+        private StateQueue<INormalState> _predictions;
+        private StateQueue<INormalState> _scans;
+        private StateQueue<INormalState> _completions;
+        private StateQueue<ITransitionState> _transitions;
 
-        public IReadOnlyList<IState> Predictions { get { return _predictions; } }
+        public IReadOnlyList<INormalState> Predictions { get { return _predictions; } }
 
-        public IReadOnlyList<IState> Scans { get { return _scans; } }
+        public IReadOnlyList<INormalState> Scans { get { return _scans; } }
 
-        public IReadOnlyList<IState> Completions { get { return _completions; } }
+        public IReadOnlyList<INormalState> Completions { get { return _completions; } }
 
-        public IReadOnlyList<IState> Transitions { get { return _transitions; } }
+        public IReadOnlyList<ITransitionState> Transitions { get { return _transitions; } }
 
         public int Location { get; private set; }
 
         public EarleySet(int location)
         {
-            _predictions = new StateQueue();
-            _scans = new StateQueue();
-            _completions = new StateQueue();
-            _transitions = new StateQueue();
+            _predictions = new StateQueue<INormalState>();
+            _scans = new StateQueue<INormalState>();
+            _completions = new StateQueue<INormalState>();
+            _transitions = new StateQueue<ITransitionState>();
             Location = location;
         }
 
         public bool Enqueue(IState state)
         {
+            if (state.StateType == StateType.Transitive)
+                return EnqueueTransition(state as ITransitionState);
+            
+            return EnqueueNormal(state, state as INormalState);
+        }
+
+        private bool EnqueueNormal(IState state, INormalState normalState)
+        {
             if (!state.IsComplete)
             {
                 var currentSymbol = state.PostDotSymbol;
                 if (currentSymbol.SymbolType == SymbolType.NonTerminal)
-                    return _predictions.Enqueue(state);
-                return _scans.Enqueue(state);
+                    return _predictions.Enqueue(normalState);
+                return _scans.Enqueue(normalState);
             }
-            if (state.StateType == StateType.Transitive)
-                return _transitions.Enqueue(state);
 
-            return _completions.Enqueue(state);
+            return _completions.Enqueue(normalState);
         }
-        
+
+        private bool EnqueueTransition(ITransitionState transitionState)
+        {
+            return _transitions.Enqueue(transitionState);
+        }
+
         public ITransitionState FindTransitionState(ISymbol searchSymbol)
         {
             for (int t = 0; t < Transitions.Count; t++)
@@ -57,11 +66,11 @@ namespace Pliant.Charts
             return null;
         }
 
-        public IState FindSourceState(ISymbol searchSymbol)
+        public INormalState FindSourceState(ISymbol searchSymbol)
         {
             // TODO: speed up by using a index lookup
             var sourceItemCount = 0;
-            IState sourceItem = null;
+            INormalState sourceItem = null;
 
             for (int s = 0; s < Predictions.Count; s++)
             {
