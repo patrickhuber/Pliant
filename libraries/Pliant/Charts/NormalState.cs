@@ -1,63 +1,32 @@
-﻿using Pliant.Diagnostics;
-using Pliant.Forest;
+﻿using Pliant.Collections;
 using Pliant.Grammars;
 using Pliant.Utilities;
-using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Pliant.Charts
 {
-    public class State : IState
-    {
-        public IProduction Production { get; private set; }
-
-        public int Origin { get; private set; }
-
-        public ISymbol PreDotSymbol { get; private set; }
-
-        public ISymbol PostDotSymbol { get; private set; }
-
-        public int Position { get; private set; }
-
-        public virtual StateType StateType { get { return StateType.Normal; } }
-
-        public IForestNode ParseNode { get; set; }
-
+    public class NormalState : StateBase, INormalState
+    {        
         private readonly int _hashCode;
-
-        public State(IProduction production, int position, int origin)
+        public NormalState(IProduction production, int position, int origin)
+            : base(production, position, origin)
         {
-            Assert.IsNotNull(production, nameof(production));
-            Assert.IsGreaterThanEqualToZero(position, nameof(position));
-            Assert.IsGreaterThanEqualToZero(origin, nameof(origin));
-            Production = production;
-            Origin = origin;
-            Position = position;
-            PostDotSymbol = GetPostDotSymbol(position, production);
-            PreDotSymbol = GetPreDotSymbol(position, production);
             _hashCode = ComputeHashCode();
         }
-
-        public State(IProduction production, int position, int origin, IForestNode parseNode)
-            : this(production, position, origin)
-        {
-            ParseNode = parseNode;
-        }
-
+        
         public IState NextState()
         {
             if (IsComplete)
                 return null;
-            return new State(
+            var state = new NormalState(
                 Production,
                 Position + 1,
                 Origin);
+            return state;
         }
         
-        public bool IsComplete
-        {
-            get { return Position == Production.RightHandSide.Count; }
-        }
+        public override StateType StateType { get { return StateType.Normal; } }
 
         public bool IsSource(ISymbol searchSymbol)
         {
@@ -70,13 +39,12 @@ namespace Pliant.Charts
         {
             if (obj == null)
                 return false;
-            var state = obj as State;
+            var state = obj as NormalState;
             if (state == null)
                 return false;
             // PERF: Hash Codes are Cached, so equality performance is cached as well
             return GetHashCode() == state.GetHashCode();
         }
-
 
         private int ComputeHashCode()
         {
@@ -110,20 +78,6 @@ namespace Pliant.Charts
 
             stringBuilder.Append($"\t\t({Origin})");
             return stringBuilder.ToString();
-        }
-
-        private static ISymbol GetPreDotSymbol(int position, IProduction production)
-        {
-            if (position == 0 || production.IsEmpty)
-                return null;
-            return production.RightHandSide[position - 1];
-        }
-
-        private static ISymbol GetPostDotSymbol(int position, IProduction production)
-        {
-            if (position >= production.RightHandSide.Count)
-                return null;
-            return production.RightHandSide[position];
-        }
+        }        
     }
 }

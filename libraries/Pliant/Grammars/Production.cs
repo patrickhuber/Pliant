@@ -17,7 +17,7 @@ namespace Pliant.Grammars
 
         public bool IsEmpty { get { return _rightHandSide.Count == 0; } }
         
-        public Production(INonTerminal leftHandSide, IEnumerable<ISymbol> rightHandSide)
+        public Production(INonTerminal leftHandSide, List<ISymbol> rightHandSide)
         {
             Assert.IsNotNull(leftHandSide, nameof(leftHandSide));
             Assert.IsNotNull(rightHandSide, nameof(rightHandSide));

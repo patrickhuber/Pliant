@@ -45,7 +45,7 @@ namespace Pliant.Runtime
             var scanStates = currentEarleySet.Scans;
 
             var returnList = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
-            var expectedRuleDictionary = SharedPools.Default<Dictionary<TokenType, ILexerRule>>().AllocateAndClear();
+            var expectedRules = SharedPools.Default<UniqueList<TokenType>>().AllocateAndClear();
 
             // PERF: Avoid Linq Select, Where due to lambda allocation
             // PERF: Avoid foreach enumeration due to IEnumerable boxing
@@ -57,16 +57,15 @@ namespace Pliant.Runtime
                     && postDotSymbol.SymbolType == SymbolType.LexerRule)
                 {
                     var lexerRule = postDotSymbol as ILexerRule;
-                    if (!expectedRuleDictionary.ContainsKey(lexerRule.TokenType))
+                    if (expectedRules.AddUnique(lexerRule.TokenType))
                     {
-                        expectedRuleDictionary.Add(lexerRule.TokenType, lexerRule);
                         returnList.Add(lexerRule);
                     }
                 }
             }
             SharedPools
-                .Default<Dictionary<TokenType, ILexerRule>>()
-                .Free(expectedRuleDictionary);
+                .Default<UniqueList<TokenType>>()
+                .Free(expectedRules);
             return returnList;
         }
         
@@ -113,7 +112,7 @@ namespace Pliant.Runtime
             _chart = new Chart();
             foreach (var startProduction in Grammar.StartProductions())
             {
-                var startState = new State(startProduction, 0, 0);
+                var startState = new NormalState(startProduction, 0, 0);
                 if (_chart.Enqueue(0, startState))
                     Log("Start", 0, startState);
             }
@@ -122,7 +121,6 @@ namespace Pliant.Runtime
 
         public bool Pulse(IToken token)
         {
-            _nodeSet.Clear();
             ScanPass(Location, token);
 
             var tokenRecognized = _chart.EarleySets.Count > Location + 1;
@@ -132,29 +130,29 @@ namespace Pliant.Runtime
             Location++;
             ReductionPass(Location);
 
+            _nodeSet.Clear();
             return true;
         }
 
         private void ScanPass(int location, IToken token)
         {
             var earleySet = _chart.EarleySets[location];
-            var tokenNode = new TokenForestNode(token, location, location + 1);
             for (int s = 0; s < earleySet.Scans.Count; s++)
             {
                 var scanState = earleySet.Scans[s];
-                Scan(scanState, location, tokenNode);
+                Scan(scanState, location, token);
             }
         }
 
-        private void Scan(IState scan, int j, ITokenForestNode tokenNode)
+        private void Scan(INormalState scan, int j, IToken token)
         {
             var i = scan.Origin;
             var currentSymbol = scan.PostDotSymbol;
             var lexerRule = currentSymbol as ILexerRule;
-
-            var token = tokenNode.Token;
+            
             if (token.TokenType == lexerRule.TokenType)
             {
+                var tokenNode = _nodeSet.AddOrGetExistingTokenNode(token);
                 var nextState = scan.NextState();
                 var parseNode = CreateParseNode(
                     nextState,
@@ -197,7 +195,7 @@ namespace Pliant.Runtime
             }
         }
 
-        private void Predict(IState evidence, int j)
+        private void Predict(INormalState evidence, int j)
         {
             var nonTerminal = evidence.PostDotSymbol as INonTerminal;
             var rulesForNonTerminal = Grammar.RulesFor(nonTerminal);
@@ -210,10 +208,10 @@ namespace Pliant.Runtime
             }
         }
 
-        private void PredictProduction(IState evidence, int j, IProduction production)
+        private void PredictProduction(INormalState evidence, int j, IProduction production)
         {
             // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
-            var predictedState = new State(production, 0, j);
+            var predictedState = new NormalState(production, 0, j);
             if (_chart.Enqueue(j, predictedState))
                 Log("Predict", j, predictedState);
 
@@ -237,7 +235,7 @@ namespace Pliant.Runtime
             }
         }
 
-        private void Complete(IState completed, int k)
+        private void Complete(INormalState completed, int k)
         {
             if (completed.ParseNode == null)
                 completed.ParseNode = CreateNullParseNode(completed.Production.LeftHandSide, k);
@@ -270,28 +268,28 @@ namespace Pliant.Runtime
 
             var virtualParseNode = CreateVirtualParseNode(completed, k, rootTransitionState);
 
-            var topmostItem = new State(
+            var topmostItem = new NormalState(
                 transitionState.Production,
                 transitionState.Position,
-                transitionState.Origin,
-                virtualParseNode);
+                transitionState.Origin);
+
+            topmostItem.ParseNode = virtualParseNode;
 
             if (_chart.Enqueue(k, topmostItem))
                 Log("Complete", k, topmostItem);
         }
         
-        private void EarleyComplete(IState completed, int k)
+        private void EarleyComplete(INormalState completed, int k)
         {
             var j = completed.Origin;
             var sourceEarleySet = _chart.EarleySets[j];
-                        
+            
             for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
             {
                 var prediction = sourceEarleySet.Predictions[p];
                 if (!prediction.IsSource(completed.Production.LeftHandSide))
                     continue;
-
-                var i = prediction.Origin;
+                                
                 var nextState = prediction.NextState();
 
                 var parseNode = CreateParseNode(

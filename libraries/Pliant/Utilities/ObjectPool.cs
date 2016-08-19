@@ -1,22 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Pliant.Utilities
 {
-    internal class ObjectPool<T> where T : class, new()
+    internal class ObjectPool<T> where T : class
     {
         private readonly Queue<T> _queue;
         private readonly ObjectPoolFactory _factory;
 
         internal delegate T ObjectPoolFactory();
-
-        internal ObjectPool()
-            : this(()=>new T())
-        { }
-
-        internal ObjectPool(int size)
-            : this(size, ()=>new T())
-        { }
-
+        
         internal ObjectPool(int size, ObjectPoolFactory factory)
         {
             _factory = factory;
@@ -42,8 +35,9 @@ namespace Pliant.Utilities
 
         internal void Free(T value)
         {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
             _queue.Enqueue(value);
-        }
-        
+        }        
     }
 }

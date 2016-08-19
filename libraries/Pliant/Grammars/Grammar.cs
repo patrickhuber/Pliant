@@ -11,8 +11,8 @@ namespace Pliant.Grammars
         protected ReadWriteList<IProduction> _productions;
         private Dictionary<INonTerminal, ReadWriteList<IProduction>> _productionIndex;
         private Dictionary<int, ReadWriteList<ILexerRule>> _ignoreIndex;
-        private ISet<INonTerminal> _nullable;
-        private Dictionary<INonTerminal, HashSet<IProduction>> _reverseLookup;
+        private UniqueList<INonTerminal> _nullable;
+        private Dictionary<INonTerminal, UniqueList<IProduction>> _reverseLookup;
 
         private static readonly IProduction[] EmptyProductionArray = { };
         private static readonly ILexerRule[] EmptyLexerRuleArray = { };
@@ -23,8 +23,8 @@ namespace Pliant.Grammars
             _ignores = new ReadWriteList<ILexerRule>();
             _productionIndex = new Dictionary<INonTerminal, ReadWriteList<IProduction>>();
             _ignoreIndex = new Dictionary<int, ReadWriteList<ILexerRule>>();
-            _nullable = new HashSet<INonTerminal>();
-            _reverseLookup = new Dictionary<INonTerminal, HashSet<IProduction>>();
+            _nullable = new UniqueList<INonTerminal>();
+            _reverseLookup = new Dictionary<INonTerminal, UniqueList<IProduction>>();
         }
 
         public Grammar(
@@ -89,10 +89,10 @@ namespace Pliant.Grammars
                 if (symbol.SymbolType != SymbolType.NonTerminal)
                     continue;
                 var nonTerminal = symbol as INonTerminal;
-                HashSet<IProduction> hashSet = null;
+                UniqueList<IProduction> hashSet = null;
                 if (!_reverseLookup.TryGetValue(nonTerminal, out hashSet))
                 {
-                    hashSet = new HashSet<IProduction>();
+                    hashSet = new UniqueList<IProduction>();
                     _reverseLookup.Add(nonTerminal, hashSet);
                 }
                 hashSet.Add(production);
@@ -108,11 +108,12 @@ namespace Pliant.Grammars
             while (nullableQueue.Count > 0)
             {
                 var nonTerminal = nullableQueue.Dequeue();
-                HashSet<IProduction> productionsContainingNonTerminal = null;
+                UniqueList<IProduction> productionsContainingNonTerminal = null;
                 if (_reverseLookup.TryGetValue(nonTerminal, out productionsContainingNonTerminal))
                 {
-                    foreach (var production in productionsContainingNonTerminal)
+                    for (int p = 0; p < productionsContainingNonTerminal.Count; p++)
                     {
+                        var production = productionsContainingNonTerminal[p];
                         var size = 0;
                         if (!productionSizes.TryGetValue(production, out size))
                         {
@@ -126,7 +127,7 @@ namespace Pliant.Grammars
                                 && nonTerminal.Equals(symbol))
                                 size--;
                         }
-                        if (size == 0 && _nullable.Add(production.LeftHandSide))
+                        if (size == 0 && _nullable.AddUnique(production.LeftHandSide))
                             nullableQueue.Enqueue(production.LeftHandSide);
                         productionSizes[production] = size;
                     }

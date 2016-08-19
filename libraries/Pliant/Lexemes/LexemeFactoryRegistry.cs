@@ -1,15 +1,16 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Collections;
+using Pliant.Grammars;
 using System.Collections.Generic;
 
 namespace Pliant.Lexemes
 {
     public class LexemeFactoryRegistry : ILexemeFactoryRegistry
     {
-        private readonly Dictionary<LexerRuleType, ILexemeFactory> _registry;
+        private readonly FastLookupDictionary<LexerRuleType, ILexemeFactory> _registry;        
 
         public LexemeFactoryRegistry()
         {
-            _registry = new Dictionary<LexerRuleType, ILexemeFactory>();
+            _registry = new FastLookupDictionary<LexerRuleType, ILexemeFactory>();
         }
 
         public ILexemeFactory Get(LexerRuleType lexerRuleType)
@@ -22,7 +23,7 @@ namespace Pliant.Lexemes
 
         public void Register(ILexemeFactory factory)
         {
-            _registry[factory.LexerRuleType] = factory;
+            _registry.Add(factory.LexerRuleType, factory);
         }
     }
 }

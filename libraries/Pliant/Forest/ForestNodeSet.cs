@@ -1,5 +1,6 @@
 ﻿using Pliant.Charts;
 using Pliant.Grammars;
+using Pliant.Tokens;
 using Pliant.Utilities;
 using System.Collections.Generic;
 
@@ -10,12 +11,14 @@ namespace Pliant.Forest
         private readonly Dictionary<int, ISymbolForestNode> _symbolNodes;
         private readonly Dictionary<int, IIntermediateForestNode> _intermediateNodes;
         private readonly Dictionary<int, VirtualForestNode> _virtualNodes;
+        private readonly Dictionary<IToken, ITokenForestNode> _tokenNodes;
 
         public ForestNodeSet()
         {
             _symbolNodes = new Dictionary<int, ISymbolForestNode>();
             _intermediateNodes = new Dictionary<int, IIntermediateForestNode>();
             _virtualNodes = new Dictionary<int, VirtualForestNode>();
+            _tokenNodes = new Dictionary<IToken, ITokenForestNode>();
         }
 
         public ISymbolForestNode AddOrGetExistingSymbolNode(ISymbol symbol, int origin, int location)
@@ -50,6 +53,16 @@ namespace Pliant.Forest
             return intermediateNode;
         }
 
+        public ITokenForestNode AddOrGetExistingTokenNode(IToken token)
+        {
+            ITokenForestNode tokenNode = null;
+            if (_tokenNodes.TryGetValue(token, out tokenNode))
+                return tokenNode;
+            tokenNode = new TokenForestNode(token, token.Origin, token.Value.Length);
+            _tokenNodes.Add(token, tokenNode);
+            return tokenNode;
+        }
+
         public void AddNewVirtualNode(
             VirtualForestNode virtualNode)
         {
@@ -75,6 +88,7 @@ namespace Pliant.Forest
             _symbolNodes.Clear();
             _intermediateNodes.Clear();
             _virtualNodes.Clear();
+            _tokenNodes.Clear();
         }
     }
 }

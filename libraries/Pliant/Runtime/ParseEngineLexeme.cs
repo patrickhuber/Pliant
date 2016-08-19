@@ -4,6 +4,7 @@ using Pliant.Tokens;
 using Pliant.Utilities;
 using System.Collections.Generic;
 using System.Text;
+using System;
 
 namespace Pliant.Runtime
 {
@@ -11,16 +12,18 @@ namespace Pliant.Runtime
     {
         public string Capture { get { return _capture.ToString(); } }
 
-        public TokenType TokenType { get; private set; }
+        public TokenType TokenType { get { return LexerRule.TokenType; } }
+
+        public ILexerRule LexerRule { get; private set; }
 
         private StringBuilder _capture;
-        private readonly IParseEngine _parseEngine;
+        private IParseEngine _parseEngine;
 
-        public ParseEngineLexeme(IParseEngine parseEngine, TokenType tokenType)
+        public ParseEngineLexeme(IGrammarLexerRule lexerRule)
         {
-            TokenType = tokenType;
             _capture = new StringBuilder();
-            _parseEngine = parseEngine;
+            _parseEngine = new ParseEngine(lexerRule.Grammar);
+            LexerRule = lexerRule;
         }
 
         public bool Scan(char c)
@@ -28,7 +31,9 @@ namespace Pliant.Runtime
             // get expected lexems
             // PERF: Avoid Linq where, let and select expressions due to lambda allocation
             var expectedLexemes = SharedPools.Default<List<TerminalLexeme>>().AllocateAndClear();
-            foreach (var rule in _parseEngine.GetExpectedLexerRules())
+            var expectedLexerRules = _parseEngine.GetExpectedLexerRules();
+
+            foreach (var rule in expectedLexerRules)
                 if (rule.LexerRuleType == TerminalLexerRule.TerminalLexerRuleType)
                     expectedLexemes.Add(new TerminalLexeme(rule as ITerminalLexerRule));
 
@@ -58,6 +63,14 @@ namespace Pliant.Runtime
         public bool IsAccepted()
         {
             return _parseEngine.IsAccepted();
+        }
+
+        public void Reset(IGrammarLexerRule newGrammarRule)
+        {
+            LexerRule = newGrammarRule;
+            _capture.Clear();
+
+            _parseEngine = new ParseEngine(newGrammarRule.Grammar);
         }
     }
 }

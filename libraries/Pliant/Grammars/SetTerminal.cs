@@ -4,16 +4,28 @@ namespace Pliant.Grammars
 {
     public class SetTerminal : BaseTerminal
     {
-        private readonly ISet<char> _characterSet;
+        private readonly HashSet<char> _characterSet;
 
         public SetTerminal(params char[] characters)
             : this(new HashSet<char>(characters))
         {
         }
 
+        public SetTerminal(char first)
+        {
+            _characterSet = new HashSet<char>();
+            _characterSet.Add(first);
+        }
+
+        public SetTerminal(char first, char second)
+            : this(first)
+        {
+            _characterSet.Add(second);
+        }
+
         public SetTerminal(ISet<char> characterSet)
         {
-            _characterSet = characterSet;
+            _characterSet = new HashSet<char>(characterSet);
         }
 
         public override bool IsMatch(char character)

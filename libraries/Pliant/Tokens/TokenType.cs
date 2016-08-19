@@ -1,12 +1,21 @@
-﻿namespace Pliant.Tokens
+﻿using Pliant.Utilities;
+using System;
+
+namespace Pliant.Tokens
 {
     public class TokenType
     {
         public string Id { get; private set; }
-
+        private readonly int _hashCode;
         public TokenType(string id)
         {
             Id = id;
+            _hashCode = ComputeHashCode(Id);
+        }
+
+        private static int ComputeHashCode(string id)
+        {
+            return id.GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -21,7 +30,7 @@
 
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            return _hashCode;
         }
 
         public override string ToString()

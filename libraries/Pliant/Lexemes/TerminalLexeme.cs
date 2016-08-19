@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using System;
+using Pliant.Grammars;
 using Pliant.Tokens;
 
 namespace Pliant.Lexemes
@@ -29,21 +30,28 @@ namespace Pliant.Lexemes
             }
         }
 
-        public TokenType TokenType { get; private set; }
+        public TokenType TokenType { get { return LexerRule.TokenType; } }
+
+        public ILexerRule LexerRule { get; private set; }
 
         public TerminalLexeme(ITerminalLexerRule lexerRule)
-            : this(lexerRule.Terminal, lexerRule.TokenType)
         {
+            Reset(lexerRule);
         }
 
         public TerminalLexeme(ITerminal terminal, TokenType tokenType)
+            : this(new TerminalLexerRule(terminal, tokenType))
         {
-            Terminal = terminal;
-            TokenType = tokenType;
+        }
+
+        public void Reset(ITerminalLexerRule terminalLexerRule)
+        {
+            LexerRule = terminalLexerRule;
+            Terminal = terminalLexerRule.Terminal;
             _captureRendered = false;
             _isAccepted = false;
         }
-
+        
         public bool IsAccepted()
         {
             return _isAccepted;

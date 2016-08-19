@@ -20,9 +20,9 @@ namespace Pliant.Runtime
         public IParseEngine ParseEngine { get; private set; }
 
         public int Position { get; private set; }
-
+        
         public ParseRunner(IParseEngine parseEngine, string input)
-                            : this(parseEngine, new StringReader(input))
+            : this(parseEngine, new StringReader(input))
         {
         }
 
@@ -78,10 +78,7 @@ namespace Pliant.Runtime
 
             ClearExistingIngoreLexemes();
 
-            if (MatchesNewIgnoreLexemes(character))
-                return true;
-
-            return false;
+            return MatchesNewIgnoreLexemes(character);
         }
 
         private static void RegisterDefaultLexemeFactories(ILexemeFactoryRegistry lexemeFactoryRegistry)
@@ -100,25 +97,11 @@ namespace Pliant.Runtime
         {
             _ignoreLexemes.Clear();
         }
-
-        private void ClearExistingLexemes()
-        {
-            _existingLexemes.Clear();
-        }
-
-        private ILexeme CreateLexemeForLexerRule(ILexerRule lexerRule)
+        
+        private ILexemeFactory GetLexemeFactory(ILexerRule lexerRule)
         {
             return _lexemeFactoryRegistry
-                .Get(lexerRule.LexerRuleType)
-                .Create(lexerRule);
-        }
-
-        private IToken CreateTokenFromLexeme(ILexeme lexeme)
-        {
-            return new Token(
-                lexeme.Capture,
-                Position - lexeme.Capture.Length - 1,
-                lexeme.TokenType);
+                .Get(lexerRule.LexerRuleType);
         }
 
         private bool MatchesExistingIgnoreLexemes(char character)
@@ -166,14 +149,21 @@ namespace Pliant.Runtime
             var anyMatchedLexemes = false;
             foreach (var existingLexeme in _existingLexemes)
             {
-                if (existingLexeme.Scan(character))
+                if (!existingLexeme.Scan(character))
                 {
-                    matchedLexemes.Add(existingLexeme);
-                    anyMatchedLexemes = true;
+                    var factory = GetLexemeFactory(existingLexeme.LexerRule);
+                    factory.Free(existingLexeme);
+                    continue;
                 }
+                
+                matchedLexemes.Add(existingLexeme);
+                anyMatchedLexemes = true;                
             }
             if (!anyMatchedLexemes)
+            {
+                SharedPools.Default<List<ILexeme>>().Free(matchedLexemes);
                 return false;
+            }
             SharedPools.Default<List<ILexeme>>().Free(_existingLexemes);
             _existingLexemes = matchedLexemes;
             return true;
@@ -197,12 +187,15 @@ namespace Pliant.Runtime
             var anyMatchingIgnoreLexemes = false;
             foreach (var ignoreLexerRule in ignoreLexerRules)
             {
-                var lexeme = CreateLexemeForLexerRule(ignoreLexerRule);
-                if (lexeme.Scan(character))
+                var lexemeFactory = GetLexemeFactory(ignoreLexerRule);
+                var lexeme = lexemeFactory.Create(ignoreLexerRule);
+                if (!lexeme.Scan(character))
                 {
-                    matchingIgnoreLexemes.Add(lexeme);
-                    anyMatchingIgnoreLexemes = true;
+                    lexemeFactory.Free(lexeme);
+                    continue;
                 }
+                matchingIgnoreLexemes.Add(lexeme);
+                anyMatchingIgnoreLexemes = true;                
             }
             SharedPools.Default<List<ILexerRule>>().Free(ignoreLexerRules);
 
@@ -212,6 +205,8 @@ namespace Pliant.Runtime
                 _ignoreLexemes = matchingIgnoreLexemes;
                 return true;
             }
+
+            SharedPools.Default<List<ILexeme>>().Free(matchingIgnoreLexemes);
             return false;
         }
 
@@ -226,23 +221,32 @@ namespace Pliant.Runtime
             for (var l = 0; l< expectedLexerRules.Count; l++)
             {
                 var lexerRule = expectedLexerRules[l];
-                var lexeme = CreateLexemeForLexerRule(lexerRule);
-                if (lexeme.Scan(character))
+                var lexemeFactory = GetLexemeFactory(lexerRule);
+                var lexeme = lexemeFactory.Create(lexerRule);
+                if (!lexeme.Scan(character))
                 {
-                    anyLexemeScanned = true;
-                    newLexemes.Add(lexeme);
+                    lexemeFactory.Free(lexeme);
+                    continue;
                 }
+                anyLexemeScanned = true;
+                newLexemes.Add(lexeme);                
             }
 
             SharedPools.Default<List<ILexerRule>>().Free(expectedLexerRules);
             expectedLexerRules = null;
 
             if (!anyLexemeScanned)
+            {
+                SharedPools.Default<List<ILexeme>>().Free(newLexemes);
                 return false;
+            }
+
             SharedPools.Default<List<ILexeme>>().Free(_existingLexemes);
             _existingLexemes = newLexemes;
+
             return true;
         }
+
         private char ReadCharacter()
         {
             var character = (char)_textReader.Read();
@@ -273,6 +277,20 @@ namespace Pliant.Runtime
 
             ClearExistingLexemes();
             return true;
+        }
+        
+        private IToken CreateTokenFromLexeme(ILexeme lexeme)
+        {
+            var capture = lexeme.Capture;
+            return new Token(
+                capture,
+                Position - capture.Length - 1,
+                lexeme.TokenType);
+        }
+        
+        private void ClearExistingLexemes()
+        {
+            _existingLexemes.Clear();
         }
     }
 }

@@ -54,7 +54,11 @@
     <Compile Include="Builders\ReachibilityMatrix.cs" />
     <Compile Include="Builders\SymbolModel.cs" />
     <Compile Include="Builders\SymbolModelType.cs" />
+    <Compile Include="Charts\INormalState.cs" />
     <Compile Include="Charts\IParseNode.cs" />
+    <Compile Include="Charts\StateBase.cs" />
+    <Compile Include="Collections\FastLookupDictionary.cs" />
+    <Compile Include="Collections\UniqueList.cs" />
     <Compile Include="Forest\ForestNodeVisitorBase.cs" />
     <Compile Include="Forest\IForestNodeReference.cs" />
     <Compile Include="Forest\ForestNodeReference.cs" />
@@ -111,7 +115,6 @@
     <Compile Include="Automata\IDfaTransition.cs" />
     <Compile Include="Automata\IDfaLexerRule.cs" />
     <Compile Include="Automata\IDfaState.cs" />
-    <Compile Include="Automata\StringExtensions.cs" />
     <Compile Include="Ebnf\EbnfGrammar.cs" />
     <Compile Include="Ebnf\EbnfVisitor.cs" />
     <Compile Include="Grammars\BaseTerminal.cs" />
@@ -206,7 +209,7 @@
     <Compile Include="Grammars\RangeTerminal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Collections\ReadOnlyList.cs" />
-    <Compile Include="Charts\State.cs" />
+    <Compile Include="Charts\NormalState.cs" />
     <Compile Include="Charts\StateQueue.cs" />
     <Compile Include="Charts\StateType.cs" />
     <Compile Include="Forest\SymbolForestNode.cs" />

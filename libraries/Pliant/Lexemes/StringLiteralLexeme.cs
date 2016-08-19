@@ -1,16 +1,12 @@
 ﻿using Pliant.Grammars;
 using Pliant.Tokens;
-using Pliant.Utilities;
-using System.Text;
 
 namespace Pliant.Lexemes
 {
     public class StringLiteralLexeme : ILexeme
     {
-        private StringBuilder _stringBuilder;
         private string _capture;
-
-        private int _index = 0;
+        private int _index;
 
         public string Literal { get; private set; }
 
@@ -18,42 +14,32 @@ namespace Pliant.Lexemes
         {
             get
             {
-                if (IsStringBuilderAllocated())
-                    DeallocateStringBuilderAndAssignCapture();
+                if (!IsSubStringAllocated())
+                    _capture = AllocateSubString();
                 return _capture;
             }
         }
 
-        private bool IsStringBuilderAllocated()
-        {
-            return _stringBuilder != null;
-        }
+        public TokenType TokenType { get { return LexerRule.TokenType; } }
 
-        private void DeallocateStringBuilderAndAssignCapture()
-        {
-            SharedPools.Default<StringBuilder>().Free(_stringBuilder);
-            _capture = _stringBuilder.ToString();
-            _stringBuilder = null;
-        }
-
-        private void ReallocateStringBuilderFromCapture()
-        {
-            _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
-            _stringBuilder.Append(_capture);
-        }
-
-        public TokenType TokenType { get; private set; }
-
-        public StringLiteralLexeme(string literal, TokenType tokenType)
-        {
-            Literal = literal;
-            TokenType = tokenType;
-            _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
-        }
-
+        public ILexerRule LexerRule { get; private set; }
+        
         public StringLiteralLexeme(IStringLiteralLexerRule lexerRule)
-            : this(lexerRule.Literal, lexerRule.TokenType)
-        { }
+        {
+            Reset(lexerRule);
+        }
+
+        private bool IsSubStringAllocated()
+        {
+            if (_capture == null)
+                return false;
+            return _index == _capture.Length;
+        }
+
+        private string AllocateSubString()
+        {
+            return Literal.Substring(0, _index);
+        }
 
         public bool IsAccepted()
         {
@@ -67,10 +53,15 @@ namespace Pliant.Lexemes
             if (Literal[_index] != c)
                 return false;
             _index++;
-            if (!IsStringBuilderAllocated())
-                ReallocateStringBuilderFromCapture();
-            _stringBuilder.Append(c);
             return true;
         }
+
+        public void Reset(IStringLiteralLexerRule newLiteral)
+        {
+            LexerRule = newLiteral;
+            _index = 0;
+            _capture = null;
+            Literal = newLiteral.Literal;
+        }        
     }
 }

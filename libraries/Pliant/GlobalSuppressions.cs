@@ -10,3 +10,5 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CC0006:Use foreach", Justification = "Suppressing foreach due to performance of generic IEnumerable<T> vs for.", Scope = "member", Target = "~M:Pliant.Runtime.ParseEngine.Predict(Pliant.Charts.IState,System.Int32)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CC0006:Use foreach", Justification = "Suppressing foreach due to performance of generic IEnumerable<T> vs for.", Scope = "member", Target = "~M:Pliant.Runtime.ParseRunner.MatchesNewLexemes(System.Char)~System.Boolean")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CC0006:Use foreach", Justification = "Suppressing foreach due to performance of generic IEnumerable<T> vs for.", Scope = "member", Target = "~M:Pliant.Forest.VirtualForestNode.IsUniquePath(Pliant.Forest.VirtualForestNodePath)~System.Boolean")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "CC0008:Use object initializer", Justification = "<Pending>", Scope = "member", Target = "~M:Pliant.Runtime.ParseEngine.LeoComplete(Pliant.Charts.ITransitionState,Pliant.Charts.IState,System.Int32)")]
+

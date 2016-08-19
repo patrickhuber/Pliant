@@ -6,26 +6,40 @@ namespace Pliant.Utilities
 {
     public static class ObjectPoolExtensions
     {
-        internal static StringBuilder AllocateAndClear(this ObjectPool<StringBuilder> pool)
-        {
-            var builder = pool.Allocate();
-            builder.Clear();
-            return builder;
-        }
+        #region UniqueList<T>
 
-        internal static List<T> AllocateAndClear<T>(this ObjectPool<List<T>> pool)
+        internal static UniqueList<T> AllocateAndClear<T>(this ObjectPool<UniqueList<T>> pool)
         {
             var list = pool.Allocate();
             list.Clear();
             return list;
         }
 
-        internal static ReadWriteList<T> AllocateAndClear<T>(this ObjectPool<ReadWriteList<T>> pool)
+        #endregion UniqueList<T>
+
+        #region FastLookupDictionary<TKey, TValue>
+
+        internal static FastLookupDictionary<TKey, TValue> AllocateAndClear<TKey, TValue>(this ObjectPool<FastLookupDictionary<TKey, TValue>> pool)
         {
-            var list = pool.Allocate();
-            list.Clear();
-            return list;
+            var dictionary = pool.Allocate();
+            dictionary.Clear();
+            return dictionary;
         }
+
+        #endregion FastLookupDictionary<TKey, TValue>
+
+        #region HashSet<T>
+
+        internal static HashSet<TValue> AllocateAndClear<TValue>(this ObjectPool<HashSet<TValue>> pool)
+        {
+            var hashSet = pool.Allocate();
+            hashSet.Clear();
+            return hashSet;
+        }
+
+        #endregion HashSet<T>
+
+        #region Dictionary<TKey, TValue>
 
         internal static Dictionary<TKey, TValue> AllocateAndClear<TKey, TValue>(this ObjectPool<Dictionary<TKey, TValue>> pool)
         {
@@ -40,11 +54,15 @@ namespace Pliant.Utilities
             pool.Free(dictionary);
         }
 
-        internal static HashSet<TValue> AllocateAndClear<TValue>(this ObjectPool<HashSet<TValue>> pool)
+        #endregion Dictionary<TKey, TValue>
+
+        #region List<T>
+
+        internal static List<T> AllocateAndClear<T>(this ObjectPool<List<T>> pool)
         {
-            var hashSet = pool.Allocate();
-            hashSet.Clear();
-            return hashSet;
+            var list = pool.Allocate();
+            list.Clear();
+            return list;
         }
 
         internal static void ClearAndFree<T>(this ObjectPool<List<T>> pool, List<T> list)
@@ -57,6 +75,17 @@ namespace Pliant.Utilities
             pool.Free(list);
         }
 
+        #endregion List<T>
+
+        #region StringBuilder
+
+        internal static StringBuilder AllocateAndClear(this ObjectPool<StringBuilder> pool)
+        {
+            var builder = pool.Allocate();
+            builder.Clear();
+            return builder;
+        }
+
         internal static void ClearAndFree(this ObjectPool<StringBuilder> pool, StringBuilder builder)
         {
             if (pool == null)
@@ -66,5 +95,7 @@ namespace Pliant.Utilities
             builder.Clear();
             pool.Free(builder);
         }
+
+        #endregion StringBuilder
     }
 }

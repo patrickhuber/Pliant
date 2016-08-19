@@ -7,5 +7,7 @@ namespace Pliant.Lexemes
         LexerRuleType LexerRuleType { get; }
 
         ILexeme Create(ILexerRule lexerRule);
+
+        void Free(ILexeme lexeme);
     }
 }
