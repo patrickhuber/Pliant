@@ -45,7 +45,7 @@ namespace Pliant.Runtime
             var scanStates = currentEarleySet.Scans;
 
             var returnList = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
-            var expectedRuleDictionary = SharedPools.Default<FastLookupDictionary<TokenType, ILexerRule>>().AllocateAndClear();
+            var expectedRules = SharedPools.Default<UniqueList<TokenType>>().AllocateAndClear();
 
             // PERF: Avoid Linq Select, Where due to lambda allocation
             // PERF: Avoid foreach enumeration due to IEnumerable boxing
@@ -57,16 +57,15 @@ namespace Pliant.Runtime
                     && postDotSymbol.SymbolType == SymbolType.LexerRule)
                 {
                     var lexerRule = postDotSymbol as ILexerRule;
-                    if (!expectedRuleDictionary.ContainsKey(lexerRule.TokenType))
+                    if (expectedRules.AddUnique(lexerRule.TokenType))
                     {
-                        expectedRuleDictionary.Add(lexerRule.TokenType, lexerRule);
                         returnList.Add(lexerRule);
                     }
                 }
             }
             SharedPools
-                .Default<FastLookupDictionary<TokenType, ILexerRule>>()
-                .Free(expectedRuleDictionary);
+                .Default<UniqueList<TokenType>>()
+                .Free(expectedRules);
             return returnList;
         }
         
@@ -122,7 +121,6 @@ namespace Pliant.Runtime
 
         public bool Pulse(IToken token)
         {
-            _nodeSet.Clear();
             ScanPass(Location, token);
 
             var tokenRecognized = _chart.EarleySets.Count > Location + 1;
@@ -132,29 +130,29 @@ namespace Pliant.Runtime
             Location++;
             ReductionPass(Location);
 
+            _nodeSet.Clear();
             return true;
         }
 
         private void ScanPass(int location, IToken token)
         {
             var earleySet = _chart.EarleySets[location];
-            var tokenNode = new TokenForestNode(token, location, location + 1);
             for (int s = 0; s < earleySet.Scans.Count; s++)
             {
                 var scanState = earleySet.Scans[s];
-                Scan(scanState, location, tokenNode);
+                Scan(scanState, location, token);
             }
         }
 
-        private void Scan(INormalState scan, int j, ITokenForestNode tokenNode)
+        private void Scan(INormalState scan, int j, IToken token)
         {
             var i = scan.Origin;
             var currentSymbol = scan.PostDotSymbol;
             var lexerRule = currentSymbol as ILexerRule;
-
-            var token = tokenNode.Token;
+            
             if (token.TokenType == lexerRule.TokenType)
             {
+                var tokenNode = _nodeSet.AddOrGetExistingTokenNode(token);
                 var nextState = scan.NextState();
                 var parseNode = CreateParseNode(
                     nextState,

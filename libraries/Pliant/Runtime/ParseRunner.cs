@@ -160,7 +160,10 @@ namespace Pliant.Runtime
                 anyMatchedLexemes = true;                
             }
             if (!anyMatchedLexemes)
+            {
+                SharedPools.Default<List<ILexeme>>().Free(matchedLexemes);
                 return false;
+            }
             SharedPools.Default<List<ILexeme>>().Free(_existingLexemes);
             _existingLexemes = matchedLexemes;
             return true;
@@ -202,6 +205,8 @@ namespace Pliant.Runtime
                 _ignoreLexemes = matchingIgnoreLexemes;
                 return true;
             }
+
+            SharedPools.Default<List<ILexeme>>().Free(matchingIgnoreLexemes);
             return false;
         }
 
@@ -231,9 +236,14 @@ namespace Pliant.Runtime
             expectedLexerRules = null;
 
             if (!anyLexemeScanned)
+            {
+                SharedPools.Default<List<ILexeme>>().Free(newLexemes);
                 return false;
+            }
+
             SharedPools.Default<List<ILexeme>>().Free(_existingLexemes);
             _existingLexemes = newLexemes;
+
             return true;
         }
 

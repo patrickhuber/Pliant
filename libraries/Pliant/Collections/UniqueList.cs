@@ -147,7 +147,8 @@ namespace Pliant.Collections
         public void Clear()
         {
             _innerList.Clear();
-            _set.Clear();
+            if(_set != null)
+                _set.Clear();
         }
 
         public bool Contains(T item)
