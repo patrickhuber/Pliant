@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Pliant.Charts
 {
-    public class StateQueue<TState> : ReadWriteList<TState>
+    public class StateQueue<TState> : List<TState>
         where TState : IState
     {
         private readonly HashSet<TState> _set;

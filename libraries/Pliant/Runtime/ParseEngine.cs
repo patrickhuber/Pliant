@@ -65,7 +65,7 @@ namespace Pliant.Runtime
             }
             SharedPools
                 .Default<UniqueList<TokenType>>()
-                .Free(expectedRules);
+                .ClearAndFree(expectedRules);
             return returnList;
         }
         

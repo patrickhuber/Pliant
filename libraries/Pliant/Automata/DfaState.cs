@@ -7,7 +7,7 @@ namespace Pliant.Automata
     {
         public bool IsFinal { get; private set; }
 
-        private readonly ReadWriteList<IDfaTransition> _transitions;
+        private readonly List<IDfaTransition> _transitions;
 
         public IReadOnlyList<IDfaTransition> Transitions { get { return _transitions; } }
         
@@ -19,7 +19,7 @@ namespace Pliant.Automata
         public DfaState(bool isFinal)
         {
             IsFinal = isFinal;
-            _transitions = new ReadWriteList<IDfaTransition>();
+            _transitions = new List<IDfaTransition>();
         }
 
         public void AddTransition(IDfaTransition edge)

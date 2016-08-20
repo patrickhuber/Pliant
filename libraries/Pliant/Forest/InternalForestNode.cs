@@ -5,13 +5,13 @@ namespace Pliant.Forest
 {
     public abstract class InternalForestNode : ForestNodeBase, IInternalForestNode
     {
-        protected readonly ReadWriteList<IAndForestNode> _children;
+        protected readonly List<IAndForestNode> _children;
         public virtual IReadOnlyList<IAndForestNode> Children { get { return _children; } }
 
         protected InternalForestNode(int origin, int location)
             : base(origin, location)
         {
-            _children = new ReadWriteList<IAndForestNode>();
+            _children = new List<IAndForestNode>();
         }
 
         public void AddUniqueFamily(IForestNode trigger)

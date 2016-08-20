@@ -57,7 +57,7 @@ namespace Pliant.Automata
                 }
                 SharedPools
                     .Default<HashSet<INfaState>>()
-                    .Free(nfaClosure.Closure);
+                    .ClearAndFree(nfaClosure.Closure);
                 SharedPools
                     .Default<Dictionary<ITerminal, HashSet<INfaState>>>()
                     .ClearAndFree(transitions);

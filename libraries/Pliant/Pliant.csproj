@@ -197,7 +197,6 @@
     <Compile Include="Charts\Optimizer.cs" />
     <Compile Include="Runtime\ParseEngine.cs" />
     <Compile Include="Runtime\ParseRunner.cs" />
-    <Compile Include="Collections\ReadWriteList.cs" />
     <Compile Include="RegularExpressions\RegexGrammar.cs" />
     <Compile Include="RegularExpressions\RegexParser.cs" />
     <Compile Include="Grammars\SetTerminal.cs" />

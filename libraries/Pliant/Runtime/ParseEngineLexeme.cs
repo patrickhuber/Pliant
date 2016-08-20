@@ -46,7 +46,8 @@ namespace Pliant.Runtime
                     firstPassingRule = lexeme;
                     break;
                 }
-            SharedPools.Default<List<TerminalLexeme>>().Free(expectedLexemes);
+            SharedPools.Default<List<TerminalLexeme>>()
+                .ClearAndFree(expectedLexemes);
 
             if (firstPassingRule == null)
                 return false;

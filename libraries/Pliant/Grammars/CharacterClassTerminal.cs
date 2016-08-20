@@ -14,9 +14,12 @@ namespace Pliant.Grammars
         public override bool IsMatch(char character)
         {
             // PERF: Avoid LINQ Any due to Lambda allocation
-            foreach (var terminal in _terminals)
+            for (int t = 0; t < _terminals.Count; t++)
+            {
+                var terminal = _terminals[t];
                 if (terminal.IsMatch(character))
                     return true;
+            }
             return false;
         }
     }

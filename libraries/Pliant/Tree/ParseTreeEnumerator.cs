@@ -236,7 +236,7 @@ namespace Pliant.Tree
 
         private class InternalTreeNodeImpl : TreeNodeImpl, IInternalTreeNode
         {
-            public ReadWriteList<ITreeNode> ReadWriteChildren { get; private set; }
+            public List<ITreeNode> ReadWriteChildren { get; private set; }
 
             public IReadOnlyList<ITreeNode> Children
             {
@@ -249,7 +249,7 @@ namespace Pliant.Tree
                 : base(origin, location, TreeNodeType.Internal)
             {
                 Symbol = symbol;
-                ReadWriteChildren = new ReadWriteList<ITreeNode>();
+                ReadWriteChildren = new List<ITreeNode>();
             }
 
             public override void Accept(ITreeNodeVisitor visitor)

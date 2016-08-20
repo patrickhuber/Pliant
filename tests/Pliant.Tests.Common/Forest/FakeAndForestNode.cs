@@ -6,11 +6,11 @@ namespace Pliant.Tests.Common.Forest
 {
     public class FakeAndForestNode : IAndForestNode
     {
-        private ReadWriteList<IForestNode> _children;
+        private List<IForestNode> _children;
 
         public FakeAndForestNode(params IForestNode[] children)
         {
-            _children = new ReadWriteList<IForestNode>(children);
+            _children = new List<IForestNode>(children);
         }
 
         public IReadOnlyList<IForestNode> Children

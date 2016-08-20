@@ -51,8 +51,8 @@ namespace Pliant.Automata
 
         private void DeallocateStringBuilderAndAssignCapture()
         {
-            SharedPools.Default<StringBuilder>().Free(_stringBuilder);
             _capture = _stringBuilder.ToString();
+            SharedPools.Default<StringBuilder>().ClearAndFree(_stringBuilder);
             _stringBuilder = null;
         }
 

@@ -10,7 +10,7 @@ namespace Pliant.Tree
     {
         private IForestDisambiguationAlgorithm _disambiguationAlgorithm;
         private IInternalForestNode _internalNode;
-        private ReadWriteList<ITreeNode> _children;
+        private List<ITreeNode> _children;
 
         public int Origin { get { return _internalNode.Origin; } }
 
@@ -24,7 +24,7 @@ namespace Pliant.Tree
         {
             _disambiguationAlgorithm = stateManager;
             _internalNode = internalNode;
-            _children = new ReadWriteList<ITreeNode>();
+            _children = new List<ITreeNode>();
             SetSymbol(_internalNode);
         }
 

@@ -5,13 +5,13 @@ namespace Pliant.Charts
 {
     public class Chart : IChart
     {
-        private ReadWriteList<IEarleySet> _earleySets;
+        private List<IEarleySet> _earleySets;
 
         public IReadOnlyList<IEarleySet> EarleySets { get { return _earleySets; } }
 
         public Chart()
         {
-            _earleySets = new ReadWriteList<IEarleySet>();
+            _earleySets = new List<IEarleySet>();
         }
 
         public bool Enqueue(int index, IState state)

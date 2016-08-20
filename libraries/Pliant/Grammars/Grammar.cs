@@ -7,10 +7,10 @@ namespace Pliant.Grammars
 {
     public class Grammar : IGrammar
     {
-        protected ReadWriteList<ILexerRule> _ignores;
-        protected ReadWriteList<IProduction> _productions;
-        private Dictionary<INonTerminal, ReadWriteList<IProduction>> _productionIndex;
-        private Dictionary<int, ReadWriteList<ILexerRule>> _ignoreIndex;
+        protected List<ILexerRule> _ignores;
+        protected List<IProduction> _productions;
+        private Dictionary<INonTerminal, List<IProduction>> _productionIndex;
+        private Dictionary<int, List<ILexerRule>> _ignoreIndex;
         private UniqueList<INonTerminal> _nullable;
         private Dictionary<INonTerminal, UniqueList<IProduction>> _reverseLookup;
 
@@ -19,10 +19,10 @@ namespace Pliant.Grammars
 
         public Grammar()
         {
-            _productions = new ReadWriteList<IProduction>();
-            _ignores = new ReadWriteList<ILexerRule>();
-            _productionIndex = new Dictionary<INonTerminal, ReadWriteList<IProduction>>();
-            _ignoreIndex = new Dictionary<int, ReadWriteList<ILexerRule>>();
+            _productions = new List<IProduction>();
+            _ignores = new List<ILexerRule>();
+            _productionIndex = new Dictionary<INonTerminal, List<IProduction>>();
+            _ignoreIndex = new Dictionary<int, List<ILexerRule>>();
             _nullable = new UniqueList<INonTerminal>();
             _reverseLookup = new Dictionary<INonTerminal, UniqueList<IProduction>>();
         }
@@ -73,7 +73,7 @@ namespace Pliant.Grammars
             var leftHandSide = production.LeftHandSide;
             if (!_productionIndex.ContainsKey(leftHandSide))
             {
-                _productionIndex.Add(leftHandSide, new ReadWriteList<IProduction>());
+                _productionIndex.Add(leftHandSide, new List<IProduction>());
             }
             _productionIndex[leftHandSide].Add(production);
         }
@@ -147,7 +147,7 @@ namespace Pliant.Grammars
                 lexerRule.SymbolType.GetHashCode(),
                 lexerRule.TokenType.Id.GetHashCode());
             if (!_ignoreIndex.ContainsKey(key))
-                _ignoreIndex.Add(key, new ReadWriteList<ILexerRule>());
+                _ignoreIndex.Add(key, new List<ILexerRule>());
             _ignoreIndex[key].Add(lexerRule);
         }
 
@@ -155,7 +155,7 @@ namespace Pliant.Grammars
 
         public IReadOnlyList<IProduction> RulesFor(INonTerminal symbol)
         {
-            ReadWriteList<IProduction> list;
+            List<IProduction> list;
             if (!_productionIndex.TryGetValue(symbol, out list))
                 return EmptyProductionArray;
             return list;

@@ -203,7 +203,7 @@ var parseTree = new InternalTreeNode(
 * [marpa parser](http://jeffreykegler.github.io/Ocean-of-Awareness-blog/)
 * [joop leo - optimizing right recursions](http://www.sciencedirect.com/science/article/pii/030439759190180A)
 * [parsing techniques - a practical guide](http://amzn.com/B0017AMLL8)
-* [practical earley parsing](http://webhome.cs.uvic.ca/~nigelh/Publications/PracticalEarleyParsing.pdf)
+* [practical earley parsing](http://www.cs.uvic.ca/~nigelh/Publications/PracticalEarleyParsing.pdf)
 * [detailed description of leo optimizations and internals of marpa](https://github.com/jeffreykegler/kollos/blob/master/notes/misc/leo2.md)
 * [theory of Marpa Algorithm](https://docs.google.com/file/d/0B9_mR_M2zOc4Ni1zSW5IYzk3TGc/edit)
 * [parse tree forest creation](http://www.sciencedirect.com/science/article/pii/S1571066108001497)

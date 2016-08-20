@@ -5,11 +5,11 @@ namespace Pliant.Automata
 {
     public class NfaState : INfaState
     {
-        private ReadWriteList<INfaTransition> _transitions;
+        private List<INfaTransition> _transitions;
 
         public NfaState()
         {
-            _transitions = new ReadWriteList<INfaTransition>();
+            _transitions = new List<INfaTransition>();
         }
 
         public IReadOnlyList<INfaTransition> Transitions

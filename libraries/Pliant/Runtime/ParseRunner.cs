@@ -145,10 +145,12 @@ namespace Pliant.Runtime
         {
             if (!AnyExistingLexemes())
                 return false;
-            var matchedLexemes = SharedPools.Default<List<ILexeme>>().AllocateAndClear();
-            var anyMatchedLexemes = false;
-            foreach (var existingLexeme in _existingLexemes)
+
+            List<ILexeme> matchedLexemes = null;
+
+            for (int i=0;i<_existingLexemes.Count;i++)
             {
+                var existingLexeme = _existingLexemes[i];
                 if (!existingLexeme.Scan(character))
                 {
                     var factory = GetLexemeFactory(existingLexeme.LexerRule);
@@ -156,15 +158,22 @@ namespace Pliant.Runtime
                     continue;
                 }
                 
-                matchedLexemes.Add(existingLexeme);
-                anyMatchedLexemes = true;                
+                if(matchedLexemes == null)
+                    matchedLexemes = SharedPools.Default<List<ILexeme>>().AllocateAndClear();
+
+                matchedLexemes.Add(existingLexeme);      
             }
-            if (!anyMatchedLexemes)
+
+            if (matchedLexemes == null)
+                return false;
+
+            if (matchedLexemes.Count == 0)
             {
                 SharedPools.Default<List<ILexeme>>().Free(matchedLexemes);
                 return false;
             }
-            SharedPools.Default<List<ILexeme>>().Free(_existingLexemes);
+
+            SharedPools.Default<List<ILexeme>>().ClearAndFree(_existingLexemes);
             _existingLexemes = matchedLexemes;
             return true;
         }
@@ -174,19 +183,11 @@ namespace Pliant.Runtime
             if (ParseEngine.Grammar.Ignores.Count == 0)
                 return false;
 
-            var ignoreLexerRules = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
-            // PERF: Avoid IEnumerable<T> boxing by calling AddRange
-            // PERF: Avoid foreach loop due to non struct boxing
+            List<ILexeme> matchingIgnoreLexemes = null;
+            
             for (int i = 0; i < ParseEngine.Grammar.Ignores.Count; i++)
             {
-                var ignore = ParseEngine.Grammar.Ignores[i];
-                ignoreLexerRules.Add(ignore);
-            }
-
-            var matchingIgnoreLexemes = SharedPools.Default<List<ILexeme>>().AllocateAndClear();
-            var anyMatchingIgnoreLexemes = false;
-            foreach (var ignoreLexerRule in ignoreLexerRules)
-            {
+                var ignoreLexerRule = ParseEngine.Grammar.Ignores[i];
                 var lexemeFactory = GetLexemeFactory(ignoreLexerRule);
                 var lexeme = lexemeFactory.Create(ignoreLexerRule);
                 if (!lexeme.Scan(character))
@@ -194,26 +195,28 @@ namespace Pliant.Runtime
                     lexemeFactory.Free(lexeme);
                     continue;
                 }
+                if(matchingIgnoreLexemes == null)
+                    matchingIgnoreLexemes = SharedPools.Default<List<ILexeme>>().AllocateAndClear();
                 matchingIgnoreLexemes.Add(lexeme);
-                anyMatchingIgnoreLexemes = true;                
             }
-            SharedPools.Default<List<ILexerRule>>().Free(ignoreLexerRules);
 
-            if (anyMatchingIgnoreLexemes)
+            if (matchingIgnoreLexemes == null)
+                return false;
+
+            if (matchingIgnoreLexemes.Count == 0)
             {
-                SharedPools.Default<List<ILexeme>>().Free(_ignoreLexemes);
-                _ignoreLexemes = matchingIgnoreLexemes;
-                return true;
+                SharedPools.Default<List<ILexeme>>().Free(matchingIgnoreLexemes);
+                return false;
             }
 
-            SharedPools.Default<List<ILexeme>>().Free(matchingIgnoreLexemes);
-            return false;
+            SharedPools.Default<List<ILexeme>>().ClearAndFree(_ignoreLexemes);
+            _ignoreLexemes = matchingIgnoreLexemes;
+            return true;
         }
 
         private bool MatchesNewLexemes(char character)
         {
-            var newLexemes = SharedPools.Default<List<ILexeme>>().AllocateAndClear();
-            var anyLexemeScanned = false;
+            List<ILexeme> newLexemes = null; 
             
             var expectedLexerRules = ParseEngine.GetExpectedLexerRules();
             // PERF: Avoid foreach due to boxing IEnumerable<T>
@@ -228,20 +231,24 @@ namespace Pliant.Runtime
                     lexemeFactory.Free(lexeme);
                     continue;
                 }
-                anyLexemeScanned = true;
+                if(newLexemes == null)
+                    newLexemes = SharedPools.Default<List<ILexeme>>().AllocateAndClear();
                 newLexemes.Add(lexeme);                
             }
 
-            SharedPools.Default<List<ILexerRule>>().Free(expectedLexerRules);
+            SharedPools.Default<List<ILexerRule>>().ClearAndFree(expectedLexerRules);
             expectedLexerRules = null;
 
-            if (!anyLexemeScanned)
+            if (newLexemes == null)
+                return false;
+
+            if (newLexemes.Count == 0)
             {
                 SharedPools.Default<List<ILexeme>>().Free(newLexemes);
                 return false;
             }
 
-            SharedPools.Default<List<ILexeme>>().Free(_existingLexemes);
+            SharedPools.Default<List<ILexeme>>().ClearAndFree(_existingLexemes);
             _existingLexemes = newLexemes;
 
             return true;
@@ -258,12 +265,15 @@ namespace Pliant.Runtime
         {
             // PERF: Avoid Linq FirstOrDefault due to lambda allocation
             ILexeme longestAcceptedMatch = null;
-            foreach (var lexeme in _existingLexemes)
+            for (int i = 0; i < _existingLexemes.Count; i++)
+            {
+                var lexeme = _existingLexemes[i];
                 if (lexeme.IsAccepted())
                 {
                     longestAcceptedMatch = lexeme;
                     break;
                 }
+            }
 
             if (longestAcceptedMatch == null)
                 return false;

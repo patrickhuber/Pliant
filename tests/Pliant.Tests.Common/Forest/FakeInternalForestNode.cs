@@ -7,13 +7,13 @@ namespace Pliant.Tests.Common.Forest
 {
     public abstract class FakeInternalForestNode : IInternalForestNode
     {
-        private ReadWriteList<IAndForestNode> _children;
+        private List<IAndForestNode> _children;
 
         protected FakeInternalForestNode(int origin, int location, params IAndForestNode[] children)
         {
             Origin = origin;
             Location = location;
-            _children = new ReadWriteList<IAndForestNode>(children);
+            _children = new List<IAndForestNode>(children);
         }
 
         public IReadOnlyList<IAndForestNode> Children

@@ -15,6 +15,12 @@ namespace Pliant.Utilities
             return list;
         }
 
+        internal static void ClearAndFree<T>(this ObjectPool<UniqueList<T>> pool, UniqueList<T> list)
+        {
+            list.Clear();
+            pool.Free(list);
+        }
+
         #endregion UniqueList<T>
 
         #region FastLookupDictionary<TKey, TValue>
@@ -35,6 +41,12 @@ namespace Pliant.Utilities
             var hashSet = pool.Allocate();
             hashSet.Clear();
             return hashSet;
+        }
+
+        internal static void ClearAndFree<TValue>(this ObjectPool<HashSet<TValue>> pool, HashSet<TValue> hashSet)
+        {
+            hashSet.Clear();
+            pool.Free(hashSet);
         }
 
         #endregion HashSet<T>
