@@ -6,6 +6,23 @@ namespace Pliant.Utilities
 {
     public static class ObjectPoolExtensions
     {
+        #region Queue<T>
+        
+        internal static Queue<T> AllocateAndClear<T>(this ObjectPool<Queue<T>> pool)
+        {
+            var queue = pool.Allocate();
+            queue.Clear();
+            return queue;
+        }
+
+        internal static void ClearAndFree<T>(this ObjectPool<Queue<T>> pool, Queue<T> queue)
+        {
+            queue.Clear();
+            pool.Free(queue);
+        }
+
+        #endregion Queue<T>
+
         #region UniqueList<T>
 
         internal static UniqueList<T> AllocateAndClear<T>(this ObjectPool<UniqueList<T>> pool)

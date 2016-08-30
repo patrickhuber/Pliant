@@ -67,7 +67,7 @@ namespace Pliant.Utilities
             }
         }
 
-        public static int ComputeHash(int first, int second, int third, int fourth, int fifth, int sixth)
+        public static int Compute(int first, int second, int third, int fourth, int fifth, int sixth)
         {
             unchecked
             {
@@ -82,7 +82,7 @@ namespace Pliant.Utilities
             }
         }
 
-        public static int ComputeHash(IEnumerable<object> items)
+        public static int Compute(IEnumerable<object> items)
         {
             unchecked
             {

@@ -212,3 +212,4 @@ var parseTree = new InternalTreeNode(
 * [incremental reparsing](http://www.aclweb.org/anthology/E89-1033.pdf)
 * [An extension of Earley's Algorithm for extended grammars](http://link.springer.com/chapter/10.1007%2F978-1-4020-3953-9_22)
 * [Finding nullable productions in a grammar](http://cstheory.stackexchange.com/a/2493/32787)
+* [Directly-Executable Earley Parsing (Aycock and Horspool, 2001)](http://link.springer.com/chapter/10.1007%2F3-540-45306-7_16#)

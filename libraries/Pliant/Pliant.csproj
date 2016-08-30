@@ -57,6 +57,8 @@
     <Compile Include="Charts\INormalState.cs" />
     <Compile Include="Charts\IParseNode.cs" />
     <Compile Include="Charts\StateBase.cs" />
+    <Compile Include="Collections\BitMatrix.cs" />
+    <Compile Include="Collections\DictionaryExtensions.cs" />
     <Compile Include="Collections\FastLookupDictionary.cs" />
     <Compile Include="Collections\UniqueList.cs" />
     <Compile Include="Forest\ForestNodeVisitorBase.cs" />
@@ -69,6 +71,8 @@
     <Compile Include="Grammars\GrammarWrapper.cs" />
     <Compile Include="LexerRules\NumberLexerRule.cs" />
     <Compile Include="LexerRules\WhitespaceLexerRule.cs" />
+    <Compile Include="Runtime\Deep.cs" />
+    <Compile Include="Runtime\PreComputedState.cs" />
     <Compile Include="Tree\ParseTreeEnumerable.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />
     <Compile Include="Forest\SelectFirstChildDisambiguationAlgorithm.cs" />

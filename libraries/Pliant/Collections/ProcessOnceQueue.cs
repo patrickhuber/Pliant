@@ -15,6 +15,13 @@ namespace Pliant.Collections
             _visited = new Dictionary<T, T>();
         }
 
+        public ProcessOnceQueue(IEnumerable<T> items)
+            : this()
+        {
+            foreach (var item in items)
+                Enqueue(item);
+        }
+
         public void Clear()
         {
             _queue.Clear();

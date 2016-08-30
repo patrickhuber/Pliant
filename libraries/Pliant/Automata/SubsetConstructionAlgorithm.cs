@@ -34,7 +34,7 @@ namespace Pliant.Automata
                         var transition = state.Transitions[t];
                         switch (transition.TransitionType)
                         {
-                            case NfaTransitionType.Terminal:
+                            case NfaTransitionType.Edge:
                                 var terminalTransition = transition as TerminalNfaTransition;
                                 var terminal = terminalTransition.Terminal;
 
@@ -45,7 +45,7 @@ namespace Pliant.Automata
                         }
                     }
                 }
-
+                
                 foreach (var terminal in transitions.Keys)
                 {
                     var targetStates = transitions[terminal];
@@ -53,7 +53,7 @@ namespace Pliant.Automata
                     closure = processOnceQueue.EnqueueOrGetExisting(closure);
                     nfaClosure.State.AddTransition(
                         new DfaTransition(terminal, closure.State));
-                    SharedPools.Default<HashSet<INfaState>>().Free(targetStates);
+                    SharedPools.Default<HashSet<INfaState>>().ClearAndFree(targetStates);
                 }
                 SharedPools
                     .Default<HashSet<INfaState>>()
@@ -87,7 +87,7 @@ namespace Pliant.Automata
             public NfaClosure(HashSet<INfaState> closure, bool isFinal)
             {
                 Closure = closure;
-                _hashCode = HashCode.ComputeHash(closure);
+                _hashCode = HashCode.Compute(closure);
                 State = new DfaState(isFinal);
             }
 

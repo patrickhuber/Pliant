@@ -36,7 +36,7 @@ namespace Pliant.Grammars
             Start = start;
             AddProductions(productions ?? EmptyProductionArray);
             AddIgnoreRules(ignoreRules ?? EmptyLexerRuleArray);
-            FindNullableSymbols();
+            FindNullableSymbols(_reverseLookup, _nullable);
         }
 
         private void AddIgnoreRules(IEnumerable<ILexerRule> ignoreRules)
@@ -89,27 +89,24 @@ namespace Pliant.Grammars
                 if (symbol.SymbolType != SymbolType.NonTerminal)
                     continue;
                 var nonTerminal = symbol as INonTerminal;
-                UniqueList<IProduction> hashSet = null;
-                if (!_reverseLookup.TryGetValue(nonTerminal, out hashSet))
-                {
-                    hashSet = new UniqueList<IProduction>();
-                    _reverseLookup.Add(nonTerminal, hashSet);
-                }
+                var hashSet = _reverseLookup.AddOrGetExisting(nonTerminal);
                 hashSet.Add(production);
             }
         }
         
-        private void FindNullableSymbols()
+        private static void FindNullableSymbols(
+            Dictionary<INonTerminal, UniqueList<IProduction>> reverseLookup, 
+            UniqueList<INonTerminal> nullable)
         {
             // trace nullability through productions: http://cstheory.stackexchange.com/questions/2479/quickly-finding-empty-string-producing-nonterminals-in-a-cfg
-            var nullableQueue = new Queue<INonTerminal>(_nullable);
+            var nullableQueue = new Queue<INonTerminal>(nullable);
             var productionSizes = new Dictionary<IProduction, int>();
             // foreach nullable symbol discovered in forming the reverse lookup
             while (nullableQueue.Count > 0)
             {
                 var nonTerminal = nullableQueue.Dequeue();
                 UniqueList<IProduction> productionsContainingNonTerminal = null;
-                if (_reverseLookup.TryGetValue(nonTerminal, out productionsContainingNonTerminal))
+                if (reverseLookup.TryGetValue(nonTerminal, out productionsContainingNonTerminal))
                 {
                     for (int p = 0; p < productionsContainingNonTerminal.Count; p++)
                     {
@@ -127,14 +124,14 @@ namespace Pliant.Grammars
                                 && nonTerminal.Equals(symbol))
                                 size--;
                         }
-                        if (size == 0 && _nullable.AddUnique(production.LeftHandSide))
+                        if (size == 0 && nullable.AddUnique(production.LeftHandSide))
                             nullableQueue.Enqueue(production.LeftHandSide);
                         productionSizes[production] = size;
                     }
                 }
             }
         }
-
+        
         private void AddIgnoreRule(ILexerRule lexerRule)
         {
             _ignores.Add(lexerRule);
@@ -161,7 +158,15 @@ namespace Pliant.Grammars
             return list;
         }
 
-        public IEnumerable<IProduction> StartProductions()
+        public IReadOnlyList<IProduction> RulesContainingSymbol(INonTerminal symbol)
+        {
+            UniqueList<IProduction> list;
+            if (!_reverseLookup.TryGetValue(symbol, out list))
+                return EmptyProductionArray;
+            return list;
+        }
+
+        public IReadOnlyList<IProduction> StartProductions()
         {
             return RulesFor(Start);
         }
@@ -169,6 +174,11 @@ namespace Pliant.Grammars
         public bool IsNullable(INonTerminal nonTerminal)
         {
             return _nullable.Contains(nonTerminal);
-        }        
+        }
+
+        public IReadOnlyList<INonTerminal> Nullable()
+        {
+            return _nullable;
+        }    
     }
 }

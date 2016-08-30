@@ -160,7 +160,7 @@ namespace Pliant.Collections
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            _innerList.CopyTo(array, arrayIndex);
         }
 
         public bool Remove(T item)
@@ -185,6 +185,21 @@ namespace Pliant.Collections
         private bool HashSetIsMoreEfficient()
         {
             return _innerList.Count >= Threshold;
+        }
+
+        public override int GetHashCode()
+        {
+            return _innerList.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (((object)obj) == null)
+                return false;
+            var uniqueList = obj as UniqueList<T>;
+            if (((object)uniqueList) == null)
+                return false;
+            return _innerList.Equals(uniqueList._innerList);
         }
     }
 }

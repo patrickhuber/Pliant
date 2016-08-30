@@ -110,8 +110,10 @@ namespace Pliant.Runtime
         {
             Location = 0;
             _chart = new Chart();
-            foreach (var startProduction in Grammar.StartProductions())
+            var startProductions = Grammar.StartProductions();
+            for (var s = 0; s< startProductions.Count; s++)
             {
+                var startProduction = startProductions[s];
                 var startState = new NormalState(startProduction, 0, 0);
                 if (_chart.Enqueue(0, startState))
                     Log("Start", 0, startState);

@@ -43,7 +43,7 @@ namespace Pliant.Charts
 
         private int ComputeHashCode()
         {
-            return HashCode.ComputeHash(
+            return HashCode.Compute(
                 Position.GetHashCode(),
                 Origin.GetHashCode(),
                 Production.GetHashCode(),

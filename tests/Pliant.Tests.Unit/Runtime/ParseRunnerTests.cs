@@ -9,12 +9,12 @@ using System;
 namespace Pliant.Tests.Unit.Runtime
 {
     [TestClass]
-    public class LexerTests
+    public class ParseRunnerTests
     {
         private GrammarLexerRule _whitespaceRule;
         private GrammarLexerRule _wordRule;
 
-        public LexerTests()
+        public ParseRunnerTests()
         {
             _whitespaceRule = CreateWhitespaceRule();
             _wordRule = CreateWordRule();

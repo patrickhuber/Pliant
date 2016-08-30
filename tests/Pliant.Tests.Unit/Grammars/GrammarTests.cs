@@ -50,5 +50,35 @@ namespace Pliant.Tests.Unit
             foreach (var productionBuilder in expectedNotEmpty)
                 Assert.IsFalse(grammar.IsNullable(productionBuilder.ProductionModel.LeftHandSide.NonTerminal));
         }
+
+        [TestMethod]
+        public void GrammarRulesConainingSymbolShouldReturnAllRulesContainingSymbol()
+        {
+            ProductionExpression
+                S = nameof(S),
+                A = nameof(A),
+                B = nameof(B),
+                C = nameof(C);
+
+            S.Rule = A | B;
+            A.Rule = A | C | 'a';
+            B.Rule = 'b' | B;
+            C.Rule = 'c';
+
+            var grammarExpression = new GrammarExpression(S);
+            var grammar = grammarExpression.ToGrammar();
+
+            var rulesContainingA = grammar.RulesContainingSymbol(A.ProductionModel.LeftHandSide.NonTerminal);
+            Assert.AreEqual(2, rulesContainingA.Count);
+
+            var rulesContainingB = grammar.RulesContainingSymbol(B.ProductionModel.LeftHandSide.NonTerminal);
+            Assert.AreEqual(2, rulesContainingB.Count);
+
+            var rulesContainingC = grammar.RulesContainingSymbol(C.ProductionModel.LeftHandSide.NonTerminal);
+            Assert.AreEqual(1, rulesContainingC.Count);
+
+            var rulesContainingS = grammar.RulesContainingSymbol(S.ProductionModel.LeftHandSide.NonTerminal);
+            Assert.AreEqual(0, rulesContainingS.Count);
+        }
     }
 }

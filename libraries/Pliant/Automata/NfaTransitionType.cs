@@ -3,6 +3,6 @@
     public enum NfaTransitionType
     {
         Null,
-        Terminal
+        Edge
     }
 }
