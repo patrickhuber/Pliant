@@ -18,7 +18,7 @@ namespace Pliant.Tests.Unit.Runtime
         {
             var regexGrammar = new RegexGrammar();
             var preComputedRegexGrammar = new PreComputedGrammar(regexGrammar);
-            var compressedParseEngine = new CompressedParseEngine(preComputedRegexGrammar);
+            var parseEngine = new CompressedParseEngine(preComputedRegexGrammar);
             
             var pattern = "[a-z][0-9]abc123";
 
@@ -53,9 +53,10 @@ namespace Pliant.Tests.Unit.Runtime
                         break;
                 }
                 var token = new Token(pattern[i].ToString(), i, tokenType);
-                var result = compressedParseEngine.Pulse(token);
+                var result = parseEngine.Pulse(token);
                 Assert.IsTrue(result, $"Error at position {i}");
             }
+            Assert.IsTrue(parseEngine.IsAccepted(), "Parse was not accepted");
         }
 
         [TestMethod]

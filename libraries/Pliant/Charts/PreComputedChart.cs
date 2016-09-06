@@ -32,5 +32,10 @@ namespace Pliant.Charts
 
             return preComputedSet.Enqueue(frame);
         }
+
+        public void Clear()
+        {
+            _preComputedSets.Clear();
+        }
     }
 }

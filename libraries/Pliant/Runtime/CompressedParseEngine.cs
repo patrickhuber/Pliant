@@ -2,15 +2,25 @@
 using Pliant.Tokens;
 using Pliant.Charts;
 using Pliant.Grammars;
+using Pliant.Forest;
+using System.Collections.Generic;
 
 namespace Pliant.Runtime
 {
-    public class CompressedParseEngine
+    public class CompressedParseEngine : IParseEngine
     {
         PreComputedGrammar _precomputedGrammar;
         PreComputedChart _chart;
 
         public int Location { get; private set; }
+
+        public IGrammar Grammar
+        {
+            get
+            {
+                return _precomputedGrammar.Grammar;
+            }
+        }
 
         public CompressedParseEngine(PreComputedGrammar preComputedGrammar)
         {
@@ -24,6 +34,7 @@ namespace Pliant.Runtime
             _chart = new PreComputedChart();
             var kernelFrame = _precomputedGrammar.Start;
             Enqueue(Location, new StateFrame(kernelFrame, 0));
+            Reduce(Location);
         }
 
         private bool Enqueue(int location, StateFrame stateFrame)
@@ -41,45 +52,112 @@ namespace Pliant.Runtime
             return _chart.Enqueue(location, nullTransitionFrame);
         }
 
-        public bool PulseBreakout(Token token)
-        {
-            ScanPass(Location, token);
-            
-            var tokenRecognized = _chart.FrameSets.Count > Location + 1;
-            if (!tokenRecognized)
-                return false;
-
-            Location++;
-            ReductionPass(Location);
-
-            return true;
-        }
-
-        public bool Pulse(Token token)
+        public bool Pulse(IToken token)
         {            
-            Process(Location, token);
+            Scan(Location, token);
             var tokenRecognized = _chart.FrameSets.Count > Location + 1;
             if (!tokenRecognized)
                 return false;
             Location++;
+            Reduce(Location);
             return true;
+        }      
+
+        public bool IsAccepted()
+        {
+            if (_chart.FrameSets.Count == 0)
+                return false;
+
+            var lastFrameSetIndex = _chart.FrameSets.Count - 1;
+            var lastFrameSet = _chart.FrameSets[lastFrameSetIndex];
+            
+            var start = Grammar.Start;
+
+            for (var i = 0; i < lastFrameSet.Frames.Count; i++)
+            {
+                var stateFrame = lastFrameSet.Frames[i];
+                if (stateFrame.Origin != 0)
+                    continue;
+
+                foreach (var preComputedState in stateFrame.Frame.Data)
+                {
+                    var isCompleted = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
+                    if (!isCompleted)
+                        continue;
+
+                    var isStartState = preComputedState.Production.LeftHandSide.Equals(start);
+                    if (!isStartState)
+                        continue;
+
+                    return true;
+                }
+            }
+
+            return false;
         }
         
-        private void ScanPass(int location, Token token)
+        private void Reduce(int i)
         {
-            var frameSet = _chart.FrameSets[Location];
-            for (int i = 0; i < frameSet.Frames.Count; i++)
+            var set = _chart.FrameSets[i];
+            for (int f = 0; f < set.Frames.Count; f++)
             {
-                var frame = frameSet.Frames[i];
-                Scan(token, location, frame);
+                var state = set.Frames[f];
+                var parent = state.Origin;
+                var frame = state.Frame;
+
+                if (parent == i)
+                    continue;
+
+                ReduceFrame(i, parent, frame);
             }
         }
 
-        private void Scan(Token token, int location, StateFrame stateFrame)
+        private void ReduceFrame(int i, int parent, Frame frame)
         {
-            var frame = stateFrame.Frame;
-            var origin = stateFrame.Origin;
+            foreach (var preComputedState in frame.Data)
+            {
+                var isComplete = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
+                if (!isComplete)
+                    continue;
 
+                var leftHandSide = preComputedState.Production.LeftHandSide;
+                var parentSet = _chart.FrameSets[parent];
+
+                for (int p = 0; p < parentSet.Frames.Count; p++)
+                {
+                    var pState = parentSet.Frames[p];
+                    var pParent = pState.Origin;
+
+                    Frame target = null;
+                    if (!pState.Frame.Transitions.TryGetValue(leftHandSide, out target))
+                        continue;
+
+                    if (!_chart.Enqueue(i, new StateFrame(target, pParent)))
+                        continue;
+
+                    if (target.NullTransition == null)
+                        continue;
+
+                    _chart.Enqueue(i, new StateFrame(target.NullTransition, i));
+                }
+            }
+        }
+
+        private void Scan(int i, IToken token)
+        {
+            var set = _chart.FrameSets[i];
+            for (int f = 0; f < set.Frames.Count; f++)
+            {
+                var state = set.Frames[f];
+                var parent = state.Origin;
+                var frame = state.Frame;
+
+                ScanFrame(i, token, parent, frame);
+            }
+        }
+
+        private void ScanFrame(int i, IToken token, int parent, Frame frame)
+        {
             foreach (var symbol in frame.Transitions.Keys)
             {
                 if (symbol.SymbolType != SymbolType.LexerRule)
@@ -90,127 +168,30 @@ namespace Pliant.Runtime
                     continue;
 
                 var target = frame.Transitions[symbol];
-                if (_chart.Enqueue(location + 1, new StateFrame(target, origin)))
-                {
-                    if (target.NullTransition != null)
-                    {
-                        _chart.Enqueue(location + 1, new StateFrame(target.NullTransition, location + 1));
-                    }
-                }
-                // Enqueue(location + 1, new StateFrame(target, origin));
-            }
-        }
 
-        private void ReductionPass(int location)
-        {
-            var frameSet = _chart.FrameSets[location];
-                               
-            for (int i = 0; i < frameSet.Frames.Count; i++)
-            {
-                var stateFrame = frameSet.Frames[i];
-                var frame = stateFrame.Frame;
-                var origin = stateFrame.Origin;
-
-                if (origin == location)
-                    continue;
-                
-                foreach (var preComputedState in frame.Data)
-                {
-                    var isComplete = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
-                    if (!isComplete)
-                        continue;
-
-                    var leftHandSide = preComputedState.Production.LeftHandSide;
-                    var originFrame = _chart.FrameSets[origin];
-                    
-                    for (int j = 0; j < originFrame.Frames.Count; j++)
-                    {
-                        var searchStateFrame = originFrame.Frames[j];
-
-                        Frame targetFrame = null;
-                        if (!searchStateFrame.Frame.Transitions.TryGetValue(leftHandSide, out targetFrame))
-                            continue;
-
-                        if (_chart.Enqueue(location, new StateFrame(targetFrame, origin)))
-                        {
-                            if (targetFrame.NullTransition != null)
-                            {
-                                _chart.Enqueue(location, new StateFrame(targetFrame.NullTransition, location));
-                            }
-                        }
-                        // Enqueue(location, new StateFrame(targetFrame, origin));
-                    }
-                }
-            }
-        }
-
-        public bool IsAccepted()
-        {
-            // TODO: scan for a completed start production in the last frame set
-            return true;
-        }
-
-        private void Process(int i, Token token)
-        {
-            var set = _chart.FrameSets[i];
-
-            for (int f = 0; f < set.Frames.Count; f++)
-            {
-                var state = set.Frames[f];
-                var parent = state.Origin;
-                var frame = state.Frame;
-
-                foreach (var symbol in frame.Transitions.Keys)
-                {
-                    if (symbol.SymbolType != SymbolType.LexerRule)
-                        continue;
-
-                    var lexerRule = symbol as ILexerRule;
-                    if (lexerRule.TokenType != token.TokenType)
-                        continue;
-
-                    var target = frame.Transitions[symbol];
-
-                    if (!_chart.Enqueue(i + 1, new StateFrame(target, parent)))
-                        continue;
-
-                    if (target.NullTransition == null)
-                        continue;
-
-                    _chart.Enqueue(i + 1, new StateFrame(target.NullTransition, i + 1));                    
-                }
-
-                if (parent == i)
+                if (!_chart.Enqueue(i + 1, new StateFrame(target, parent)))
                     continue;
 
-                foreach (var preComputedState in frame.Data)
-                {
-                    var isComplete = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
-                    if (!isComplete)
-                        continue;
+                if (target.NullTransition == null)
+                    continue;
 
-                    var leftHandSide = preComputedState.Production.LeftHandSide;
-                    var parentSet = _chart.FrameSets[parent];
-
-                    for (int p = 0; p < parentSet.Frames.Count; p++)
-                    {
-                        var pState = parentSet.Frames[p];
-                        var pParent = pState.Origin;
-
-                        Frame target = null;
-                        if (!pState.Frame.Transitions.TryGetValue(leftHandSide, out target))
-                            continue;
-
-                        if (!_chart.Enqueue(i, new StateFrame(target, pParent)))
-                            continue;
-
-                        if (target.NullTransition == null)
-                            continue;
-
-                        _chart.Enqueue(i, new StateFrame(target.NullTransition, i));
-                    }
-                }
+                _chart.Enqueue(i + 1, new StateFrame(target.NullTransition, i + 1));
             }
+        }
+
+        public void Reset()
+        {
+            _chart.Clear();
+        }
+
+        public IInternalForestNode GetParseForestRootNode()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<ILexerRule> GetExpectedLexerRules()
+        {
+            throw new NotImplementedException();
         }
     }
 }

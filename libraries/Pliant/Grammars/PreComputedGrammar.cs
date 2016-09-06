@@ -7,20 +7,21 @@ namespace Pliant.Runtime
 {
     public class PreComputedGrammar
     {
-        private IGrammar _grammar;
         private Dictionary<Frame, Frame> _frames;
         private Queue<Frame> _frameQueue;
 
         internal Frame Start { get; private set; }
 
+        public IGrammar Grammar { get; private set; }
+
         public PreComputedGrammar(IGrammar grammar)
         {
-            _grammar = grammar;
+            Grammar = grammar;
             _frames = new Dictionary<Frame, Frame>();
             _frameQueue = new Queue<Frame>(0);
 
             var startStates = new SortedSet<PreComputedState>();
-            var startProductions = _grammar.StartProductions();
+            var startProductions = Grammar.StartProductions();
             for (int p = 0; p < startProductions.Count; p++)
             {
                 var production = startProductions[p];
@@ -68,7 +69,7 @@ namespace Pliant.Runtime
                     if (postDotSymbol.SymbolType != SymbolType.NonTerminal)
                         break;
                     var nonTerminalPostDotSymbol = postDotSymbol as INonTerminal;
-                    if (!_grammar.IsNullable(nonTerminalPostDotSymbol))
+                    if (!Grammar.IsNullable(nonTerminalPostDotSymbol))
                         break;
                     nonLambdaKernelStates.Add(
                         new PreComputedState(production, s + 1));
@@ -100,7 +101,7 @@ namespace Pliant.Runtime
 
                 var nonTerminalPostDotSymbol = postDotSymbol as INonTerminal;
 
-                if (_grammar.IsNullable(nonTerminalPostDotSymbol))
+                if (Grammar.IsNullable(nonTerminalPostDotSymbol))
                 {
                     var aycockHorspoolState = new PreComputedState(state.Production, state.Position + 1);
                     if (!nonLambdaKernelStates.Contains(aycockHorspoolState))
@@ -108,7 +109,7 @@ namespace Pliant.Runtime
                             queue.Enqueue(aycockHorspoolState);
                 }
 
-                var predictedProductions = _grammar.RulesFor(nonTerminalPostDotSymbol);
+                var predictedProductions = Grammar.RulesFor(nonTerminalPostDotSymbol);
 
                 for (int p = 0; p < predictedProductions.Count; p++)
                 {

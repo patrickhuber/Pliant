@@ -63,7 +63,6 @@ namespace Pliant.Tests.Integration.Runtime
             {
                 _parseTester.RunParse(reader);
             }
-            Console.WriteLine($"# Earley Sets {_parseTester.ParseEngine.Chart.Count}");
         }
 
         private static ILexerRule Whitespace()
