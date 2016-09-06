@@ -66,7 +66,8 @@
     <Compile Include="Bnf\BnfTests.cs" />
     <Compile Include="Charts\ChartTests.cs" />
     <Compile Include="Grammars\DigitTerminalTests.cs" />
-    <Compile Include="Runtime\DeepTests.cs" />
+    <Compile Include="Grammars\PreComputedGrammarTests.cs" />
+    <Compile Include="Runtime\CompressedParseEngineTests.cs" />
     <Compile Include="Runtime\LoggingNodeVisitor.cs" />
     <Compile Include="Forest\ForestNodeVisitorTests.cs" />
     <Compile Include="Collections\ProcessOnceQueueTests.cs" />

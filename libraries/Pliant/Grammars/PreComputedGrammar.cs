@@ -5,13 +5,15 @@ using Pliant.Collections;
 
 namespace Pliant.Runtime
 {
-    public class Deep
+    public class PreComputedGrammar
     {
         private IGrammar _grammar;
         private Dictionary<Frame, Frame> _frames;
         private Queue<Frame> _frameQueue;
 
-        public Deep(IGrammar grammar)
+        internal Frame Start { get; private set; }
+
+        public PreComputedGrammar(IGrammar grammar)
         {
             _grammar = grammar;
             _frames = new Dictionary<Frame, Frame>();
@@ -25,21 +27,22 @@ namespace Pliant.Runtime
                 var state = new PreComputedState(production, 0);
                 startStates.Add(state);
             }
-
-            var startFrame = new Frame(startStates);
-            _frameQueue.Enqueue(startFrame);
+            
+            // split will enqueue additional states
+            // it returns the non lambda kernel state and the lambda kernel state
+            // through the NullTransition property
+            Start = Split(
+                new Frame(startStates));
 
             while(_frameQueue.Count > 0)
-                ProcessFrame(_frameQueue.Dequeue());
+                Split(_frameQueue.Dequeue());
         }
 
-        private void ProcessFrame(Frame frame)
+        private Frame Split(Frame frame)
         {
-            SortedSet<PreComputedState> nonLambdaKernelStates = null;
-            SortedSet<PreComputedState> lambdaKernelStates = null;
-
-            Split(frame, out nonLambdaKernelStates, out lambdaKernelStates);
-
+            var nonLambdaKernelStates = GetNonLambdaKernelStates(frame);
+            var lambdaKernelStates = GetLambdaKernelStates(nonLambdaKernelStates);
+            
             var nonLambdaKernelFrame = AddNewFrameOrGetExistingFrame(nonLambdaKernelStates);
             ProcessSymbolTransitions(nonLambdaKernelFrame);
             if (lambdaKernelStates.Count > 0)
@@ -48,16 +51,8 @@ namespace Pliant.Runtime
                 nonLambdaKernelFrame.NullTransition = lambdaKernelFrame;
                 ProcessSymbolTransitions(lambdaKernelFrame);
             }
-        }
-
-        private void Split(
-            Frame frame, 
-            out SortedSet<PreComputedState> nonLambdaKernelStates, 
-            out SortedSet<PreComputedState> lambdaKernelStates)
-        {
-            nonLambdaKernelStates = GetNonLambdaKernelStates(frame);
-            lambdaKernelStates = GetLambdaKernelStates(nonLambdaKernelStates);
-        }
+            return nonLambdaKernelFrame;
+        }        
 
         private SortedSet<PreComputedState> GetNonLambdaKernelStates(Frame frame)
         {
@@ -179,54 +174,7 @@ namespace Pliant.Runtime
             pool.ClearAndFree(transitions);
         }
 
-        private class Frame
-        {
-            public SortedSet<PreComputedState> Data { get; private set; }
-            public Dictionary<ISymbol, Frame> Transitions { get; private set; }
-            public Frame NullTransition { get; set; }
-
-            public Frame(SortedSet<PreComputedState> data)
-            {
-                Data = data;
-                Transitions = new Dictionary<ISymbol, Frame>();
-                _hashCode = ComputeHashCode(data);
-            }
-
-            private readonly int _hashCode;
-
-            public void AddTransistion(ISymbol symbol, Frame target)
-            {
-                Frame value = null;
-                if (!Transitions.TryGetValue(symbol, out value))
-                    Transitions.Add(symbol, target);
-            }
-
-            static int ComputeHashCode(SortedSet<PreComputedState> data)
-            {
-                return HashCode.Compute(data);
-            }
-
-            public override int GetHashCode()
-            {
-                return _hashCode;
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (((object)obj) == null)
-                    return false;
-
-                var frame = obj as Frame;
-                if (((object)frame) == null)
-                    return false;
-
-                foreach (var item in Data)
-                    if (!frame.Data.Contains(item))
-                        return false;
-
-                return true;
-            }
-        }
+        
     }    
 
     

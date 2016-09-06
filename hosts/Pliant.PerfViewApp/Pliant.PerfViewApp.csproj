@@ -47,12 +47,19 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="10000.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="AnsiC.bnf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\libraries\Pliant.Json\Pliant.Json.csproj">
+      <Project>{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10}</Project>
+      <Name>Pliant.Json</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj">
       <Project>{5c23805f-0ffc-4039-b853-e5acbe63a3c0}</Project>
       <Name>Pliant</Name>

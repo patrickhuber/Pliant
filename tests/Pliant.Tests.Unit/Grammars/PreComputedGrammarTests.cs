@@ -1,13 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders.Expressions;
 using Pliant.Grammars;
-using Pliant.LexerRules;
 using Pliant.Runtime;
 
-namespace Pliant.Tests.Unit.Runtime
+namespace Pliant.Tests.Unit.Grammars
 {
     [TestClass]
-    public class DeepTests
+    public class PreComputedGrammarTests
     {
         private static IGrammar _expressionGrammar;
         private static IGrammar _nullableGrammar;
@@ -20,15 +19,27 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void DeepTest()
+        public void PreComputedGrammarTest()
         {
-            var deep = new Deep(_expressionGrammar);
+            var preComputedGrammar = new PreComputedGrammar(_expressionGrammar);
         }
 
         [TestMethod]
-        public void DeepTestWithNullableGrammar()
+        public void PreComputedGrammarTestWithNullableGrammar()
         {
-            var deep = new Deep(_nullableGrammar);
+            var preComputedGrammar = new PreComputedGrammar(_nullableGrammar);
+        }
+
+        [TestMethod]
+        public void PreComputedGrammarBitsTestWithNullableGrammar()
+        {
+            var preComputedGrammar = new PreComputedGrammarBits(_nullableGrammar);
+        }
+
+        [TestMethod]
+        public void PreComputedGrammarBitsTestWithExpressionGrammar()
+        {
+            var preComputedGrammar = new PreComputedGrammarBits(_expressionGrammar);
         }
         
         private static IGrammar GetExpressionGrammar()

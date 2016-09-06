@@ -30,13 +30,13 @@ namespace Pliant.Collections
 
         public void Enqueue(T item)
         {
-            if (!_visited.ContainsKey(item))
-            {
-                _visited[item] = item;
-                _queue.Enqueue(item);
-            }
-        }
+            if (_visited.ContainsKey(item))
+                return;
 
+            _visited[item] = item;
+            _queue.Enqueue(item);            
+        }
+        
         public T EnqueueOrGetExisting(T item)
         {
             if (!_visited.ContainsKey(item))

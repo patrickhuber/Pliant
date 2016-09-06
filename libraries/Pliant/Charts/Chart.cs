@@ -1,5 +1,4 @@
-﻿using Pliant.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Pliant.Charts
 {
@@ -16,10 +15,17 @@ namespace Pliant.Charts
 
         public bool Enqueue(int index, IState state)
         {
+            IEarleySet earleySet = null;
             if (_earleySets.Count <= index)
-                _earleySets.Add(new EarleySet(index));
+            {
+                earleySet = new EarleySet(index);
+                _earleySets.Add(earleySet);
+            }
+            else
+            {
+                earleySet = _earleySets[index];
+            }
 
-            var earleySet = _earleySets[index];
             return earleySet.Enqueue(state);
         }
 

@@ -56,7 +56,10 @@
     <Compile Include="Builders\SymbolModelType.cs" />
     <Compile Include="Charts\INormalState.cs" />
     <Compile Include="Charts\IParseNode.cs" />
+    <Compile Include="Charts\PreComputedChart.cs" />
+    <Compile Include="Charts\PreComputedSet.cs" />
     <Compile Include="Charts\StateBase.cs" />
+    <Compile Include="Charts\StateFrame.cs" />
     <Compile Include="Collections\BitMatrix.cs" />
     <Compile Include="Collections\DictionaryExtensions.cs" />
     <Compile Include="Collections\FastLookupDictionary.cs" />
@@ -68,11 +71,14 @@
     <Compile Include="Forest\VirtualForestNode.cs" />
     <Compile Include="Forest\VirtualForestNodePath.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Grammars\Frame.cs" />
     <Compile Include="Grammars\GrammarWrapper.cs" />
     <Compile Include="LexerRules\NumberLexerRule.cs" />
     <Compile Include="LexerRules\WhitespaceLexerRule.cs" />
-    <Compile Include="Runtime\Deep.cs" />
-    <Compile Include="Runtime\PreComputedState.cs" />
+    <Compile Include="Grammars\PreComputedGrammar.cs" />
+    <Compile Include="Grammars\PreComputedGrammarBits.cs" />
+    <Compile Include="Grammars\PreComputedState.cs" />
+    <Compile Include="Runtime\CompressedParseEngine.cs" />
     <Compile Include="Tree\ParseTreeEnumerable.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />
     <Compile Include="Forest\SelectFirstChildDisambiguationAlgorithm.cs" />
@@ -211,9 +217,7 @@
     <Compile Include="Grammars\Production.cs" />
     <Compile Include="Grammars\RangeTerminal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Collections\ReadOnlyList.cs" />
     <Compile Include="Charts\NormalState.cs" />
-    <Compile Include="Charts\StateQueue.cs" />
     <Compile Include="Charts\StateType.cs" />
     <Compile Include="Forest\SymbolForestNode.cs" />
     <Compile Include="Grammars\SymbolType.cs" />
