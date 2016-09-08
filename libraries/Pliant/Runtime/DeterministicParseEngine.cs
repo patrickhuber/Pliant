@@ -41,20 +41,20 @@ namespace Pliant.Runtime
         private bool Enqueue(int location, StateFrame stateFrame)
         {
             if (!_chart.Enqueue(location, stateFrame))
-                return false;            
+                return false;
 
             if (stateFrame.Frame.NullTransition == null)
                 return true;
 
             var nullTransitionFrame = new StateFrame(
-                stateFrame.Frame.NullTransition, 
+                stateFrame.Frame.NullTransition,
                 location);
 
             return _chart.Enqueue(location, nullTransitionFrame);
         }
 
         public bool Pulse(IToken token)
-        {            
+        {
             Scan(Location, token);
             var tokenRecognized = _chart.FrameSets.Count > Location + 1;
             if (!tokenRecognized)
@@ -62,7 +62,7 @@ namespace Pliant.Runtime
             Location++;
             Reduce(Location);
             return true;
-        }      
+        }
 
         public bool IsAccepted()
         {
@@ -71,7 +71,7 @@ namespace Pliant.Runtime
 
             var lastFrameSetIndex = _chart.FrameSets.Count - 1;
             var lastFrameSet = _chart.FrameSets[lastFrameSetIndex];
-            
+
             var start = Grammar.Start;
 
             for (var i = 0; i < lastFrameSet.Frames.Count; i++)
@@ -96,52 +96,102 @@ namespace Pliant.Runtime
 
             return false;
         }
-        
+
         private void Reduce(int i)
         {
             var set = _chart.FrameSets[i];
-            for (int f = 0; f < set.Frames.Count; f++)
-            {
-                var state = set.Frames[f];
-                var parent = state.Origin;
-                var frame = state.Frame;
+            var setFrames = set.Frames;
+            var framesCount = setFrames.Count;
 
-                if (parent == i)
+            //PERF: not sure if it helps moving decl outside of loop
+            int parentOrigin;
+            Frame frame;
+            StateFrame stateFrame;
+            bool hasChanged;
+            var f = 0;
+
+            for (; f < framesCount; f++)
+            {
+                stateFrame = setFrames[f];
+                parentOrigin = stateFrame.Origin;
+                frame = stateFrame.Frame;
+
+                if (parentOrigin == i)
                     continue;
 
-                ReduceFrame(i, parent, frame);
+                hasChanged = ReduceFrame(i, parentOrigin, frame);
+                if (hasChanged)
+                {
+                    setFrames = set.Frames;
+                    framesCount = setFrames.Count;
+                }
             }
         }
 
-        private void ReduceFrame(int i, int parent, Frame frame)
+        private bool ReduceFrame(int i, int parent, Frame frame)
         {
-            foreach (var preComputedState in frame.Data)
+            var hasChanged = false;
+            
+            var frameData = frame.DataPerf;
+            var frameDataCount = frameData.Length;
+
+            var parentSet = _chart.FrameSets[parent];
+            var parentSetFrames = parentSet.FramesPerf;
+            var parentSetFramesCount = parentSetFrames.Length;
+            StateFrame pState;
+            int pParent;
+            Frame target;
+            Frame nullTransition;
+
+            PreComputedState preComputedState;
+            IProduction preComputedStateProduction;
+            INonTerminal leftHandSide;
+            IReadOnlyList<ISymbol> productionRhs;
+            StateFrame newStateFrame;
+
+            int d = 0;
+            int p = 0;
+
+            for (; d < frameDataCount; ++d)
             {
-                var isComplete = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
+                preComputedState = frameData[d];
+                preComputedStateProduction = preComputedState.Production;
+                productionRhs = preComputedStateProduction.RightHandSide;
+
+                var isComplete = preComputedState.Position == productionRhs.Count;
                 if (!isComplete)
                     continue;
 
-                var leftHandSide = preComputedState.Production.LeftHandSide;
-                var parentSet = _chart.FrameSets[parent];
+                leftHandSide = preComputedStateProduction.LeftHandSide;
 
-                for (int p = 0; p < parentSet.Frames.Count; p++)
+                p = 0;
+                for (; p < parentSetFramesCount; p++)
                 {
-                    var pState = parentSet.Frames[p];
-                    var pParent = pState.Origin;
+                    pState = parentSetFrames[p];
+                    pParent = pState.Origin;
 
-                    Frame target = null;
                     if (!pState.Frame.Transitions.TryGetValue(leftHandSide, out target))
                         continue;
 
-                    if (!_chart.Enqueue(i, new StateFrame(target, pParent)))
+                    newStateFrame = new StateFrame(target, pParent);
+
+                    if (!_chart.Enqueue(i, newStateFrame))
                         continue;
 
-                    if (target.NullTransition == null)
+                    hasChanged = true;
+
+                    nullTransition = target.NullTransition;
+
+                    if (nullTransition == null)
                         continue;
 
-                    _chart.Enqueue(i, new StateFrame(target.NullTransition, i));
+                    newStateFrame = new StateFrame(nullTransition, i);
+
+                    _chart.Enqueue(i, newStateFrame);
                 }
             }
+
+            return hasChanged;
         }
 
         private void Scan(int i, IToken token)
@@ -179,7 +229,7 @@ namespace Pliant.Runtime
             if (target.NullTransition == null)
                 return;
 
-            _chart.Enqueue(i + 1, new StateFrame(target.NullTransition, i + 1));            
+            _chart.Enqueue(i + 1, new StateFrame(target.NullTransition, i + 1));
         }
 
         public void Reset()
@@ -195,7 +245,7 @@ namespace Pliant.Runtime
         public List<ILexerRule> GetExpectedLexerRules()
         {
             var list = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
-            
+
             if (_chart.FrameSets.Count == 0)
                 return list;
 

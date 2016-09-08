@@ -16,8 +16,8 @@ namespace Pliant.JsonPerformanceTest
     {
         static void Main(string[] args)
         {
-            RunSingle();
-            //RunTests();
+            //RunSingle();
+            RunTests();
         }
 
         private static void RunSingle()
