@@ -147,13 +147,21 @@ namespace Pliant.Runtime
         private void Scan(int i, IToken token)
         {
             var set = _chart.FrameSets[i];
-            for (int f = 0; f < set.Frames.Count; f++)
-            {
-                var stateFrame = set.Frames[f];
-                var parent = stateFrame.Origin;
-                var frame = stateFrame.Frame;
+            var frames = set.FramesPerf;
+            var framesCount = frames.Length;
 
-                ScanFrame(i, token, parent, frame);
+            //PERF: not sure if it helps moving decl outside of loop
+            int parentOrigin;
+            Frame frame;
+            StateFrame stateFrame;
+            var f = 0;
+            for (; f < framesCount; f++)
+            {
+                stateFrame = frames[f];
+                parentOrigin = stateFrame.Origin;
+                frame = stateFrame.Frame;
+
+                ScanFrame(i, token, parentOrigin, frame);
             }
         }
 
@@ -161,6 +169,7 @@ namespace Pliant.Runtime
         {
             Frame target;
 
+            //PERF: This could perhaps be improved with an int array and direct index lookup based on "token.TokenType.Id"?...
             if (!frame.TokenTransitions.TryGetValue(token.TokenType, out target))
                 return;
 
