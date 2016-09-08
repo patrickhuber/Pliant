@@ -11,14 +11,14 @@ namespace Pliant.Tests.Integration.Runtime
 {
     [TestClass]
     public class LargeFileParseTests
-    { 
+    {
         public TestContext TestContext { get; set; }
 
         private static IGrammar _grammar;
 
         private ParseTester _parseTester;
         private ParseTester _compressedParseTester;
-        
+
         [ClassInitialize]
 #pragma warning disable CC0057 // Unused parameters
         public static void Initialize(TestContext testContext)
@@ -31,9 +31,7 @@ namespace Pliant.Tests.Integration.Runtime
         public void InitializeTest()
         {
             _parseTester = new ParseTester(_grammar);
-            _compressedParseTester = new ParseTester(
-                new DeterministicParseEngine(
-                    new PreComputedGrammar(_grammar)));
+            _compressedParseTester = new ParseTester(new DeterministicParseEngine(new PreComputedGrammar(_grammar)));
         }
 
         [TestMethod]
@@ -78,7 +76,7 @@ namespace Pliant.Tests.Integration.Runtime
                 _compressedParseTester.RunParse(reader);
             }
         }
-        
+
         [TestMethod]
         public void TestCanParseJsonArrayWithCompression()
         {
@@ -109,7 +107,7 @@ namespace Pliant.Tests.Integration.Runtime
             end.AddTransition(transition);
             return new DfaLexerRule(start, "\\w+");
         }
-        
+
         private static BaseLexerRule String()
         {
             // ["][^"]+["]
