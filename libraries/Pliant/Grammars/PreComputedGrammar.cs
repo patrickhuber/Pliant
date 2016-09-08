@@ -1,133 +1,158 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Collections;
 using System.Collections.Generic;
+using System;
 using Pliant.Utilities;
-using Pliant.Collections;
 
-namespace Pliant.Runtime
+namespace Pliant.Grammars
 {
     public class PreComputedGrammar
     {
-        private Dictionary<Frame, Frame> _frames;
-        private Queue<Frame> _frameQueue;
+        public IGrammar Grammar { get; private set; }
 
         internal Frame Start { get; private set; }
 
-        public IGrammar Grammar { get; private set; }
+        private ProcessOnceQueue<Frame> _frameQueue;
+
+        private Dictionary<Frame, Frame> _frames;
 
         public PreComputedGrammar(IGrammar grammar)
         {
-            Grammar = grammar;
+            _frameQueue = new ProcessOnceQueue<Frame>();
             _frames = new Dictionary<Frame, Frame>();
-            _frameQueue = new Queue<Frame>(0);
 
+            Grammar = grammar;
+            var startStates = Initialize(Grammar);
+            Start = AddNewFrameOrGetExistingFrame(startStates);
+
+            while (_frameQueue.Count > 0)
+            {
+                // assume the closure has already been captured
+                var frame = _frameQueue.Dequeue();
+                ProcessSymbolTransitions(frame);
+
+                // capture the predictions for the frame
+                var nonLambdaKernelStates = GetLambdaKernelStates(frame.Data);
+
+                // if no predictions, continue
+                if (nonLambdaKernelStates.Count == 0)
+                    continue;
+
+                // assign the null transition
+                // only process symbols on the null frame if it is new
+                Frame nullFrame;
+                if (!TryGetExistingFrameOrCreateNew(nonLambdaKernelStates, out nullFrame))
+                    ProcessSymbolTransitions(nullFrame);
+
+                frame.NullTransition = nullFrame;
+            }
+        }
+
+        private SortedSet<PreComputedState> Initialize(IGrammar grammar)
+        {
+            // allocate start states
             var startStates = new SortedSet<PreComputedState>();
-            var startProductions = Grammar.StartProductions();
+            var startProductions = grammar.StartProductions();
+
             for (int p = 0; p < startProductions.Count; p++)
             {
                 var production = startProductions[p];
                 var state = new PreComputedState(production, 0);
                 startStates.Add(state);
             }
-            
-            // split will enqueue additional states
-            // it returns the non lambda kernel state and the lambda kernel state
-            // through the NullTransition property
-            Start = Split(
-                new Frame(startStates));
 
-            while(_frameQueue.Count > 0)
-                Split(_frameQueue.Dequeue());
+            var closure = GetNonLambdaKernelStates(startStates);
+
+            // free start states
+            return closure;
         }
 
-        private Frame Split(Frame frame)
+        private SortedSet<PreComputedState> GetNonLambdaKernelStates(SortedSet<PreComputedState> states)
         {
-            var nonLambdaKernelStates = GetNonLambdaKernelStates(frame);
-            var lambdaKernelStates = GetLambdaKernelStates(nonLambdaKernelStates);
-            
-            var nonLambdaKernelFrame = AddNewFrameOrGetExistingFrame(nonLambdaKernelStates);
-            ProcessSymbolTransitions(nonLambdaKernelFrame);
-            if (lambdaKernelStates.Count > 0)
-            {
-                var lambdaKernelFrame = AddNewFrameOrGetExistingFrame(lambdaKernelStates);
-                nonLambdaKernelFrame.NullTransition = lambdaKernelFrame;
-                ProcessSymbolTransitions(lambdaKernelFrame);
-            }
-            return nonLambdaKernelFrame;
-        }        
+            var queue = new Queue<PreComputedState>();
+            var closure = new SortedSet<PreComputedState>();
 
-        private SortedSet<PreComputedState> GetNonLambdaKernelStates(Frame frame)
-        {
-            var nonLambdaKernelStates = new SortedSet<PreComputedState>();
+            foreach (var state in states)
+                if (closure.Add(state))
+                    queue.Enqueue(state);
 
-            foreach (var state in frame.Data)
+            while (queue.Count > 0)
             {
-                nonLambdaKernelStates.Add(state);
+                var state = queue.Dequeue();
+                if (IsComplete(state))
+                    continue;
+
                 var production = state.Production;
                 for (int s = state.Position; s < state.Production.RightHandSide.Count; s++)
                 {
                     var postDotSymbol = production.RightHandSide[s];
                     if (postDotSymbol.SymbolType != SymbolType.NonTerminal)
                         break;
+
                     var nonTerminalPostDotSymbol = postDotSymbol as INonTerminal;
                     if (!Grammar.IsNullable(nonTerminalPostDotSymbol))
                         break;
-                    nonLambdaKernelStates.Add(
-                        new PreComputedState(production, s + 1));
+
+                    var preComputedState = new PreComputedState(production, s + 1);
+                    if (closure.Add(preComputedState))
+                        queue.Enqueue(preComputedState);
                 }
             }
-
-            return nonLambdaKernelStates;
+            return closure;
         }
 
-        private SortedSet<PreComputedState> GetLambdaKernelStates(SortedSet<PreComputedState> nonLambdaKernelStates)
+        private SortedSet<PreComputedState> GetLambdaKernelStates(SortedSet<PreComputedState> states)
         {
-            var kernelStates = new SortedSet<PreComputedState>();
-            var queuePool = SharedPools.Default<Queue<PreComputedState>>();
-            var queue = queuePool.AllocateAndClear();
+            var queue = new Queue<PreComputedState>();
+            var closure = new SortedSet<PreComputedState>();
 
-            foreach (var nonKernelState in nonLambdaKernelStates)
-                queue.Enqueue(nonKernelState);
+            foreach (var state in states)
+                if (!IsComplete(state))
+                    queue.Enqueue(state);
 
             while (queue.Count > 0)
             {
                 var state = queue.Dequeue();
-                var isComplete = state.Position == state.Production.RightHandSide.Count;
-                if (isComplete)
+                if (IsComplete(state))
                     continue;
 
-                var postDotSymbol = state.Production.RightHandSide[state.Position];
+                var production = state.Production;
+
+                var postDotSymbol = production.RightHandSide[state.Position];
                 if (postDotSymbol.SymbolType != SymbolType.NonTerminal)
                     continue;
 
                 var nonTerminalPostDotSymbol = postDotSymbol as INonTerminal;
-
                 if (Grammar.IsNullable(nonTerminalPostDotSymbol))
                 {
-                    var aycockHorspoolState = new PreComputedState(state.Production, state.Position + 1);
-                    if (!nonLambdaKernelStates.Contains(aycockHorspoolState))
-                        if (kernelStates.Add(aycockHorspoolState))
-                            queue.Enqueue(aycockHorspoolState);
+                    var preComputedState = new PreComputedState(production, state.Position + 1);
+                    if (!states.Contains(preComputedState))
+                        if (closure.Add(preComputedState))
+                            if (!IsComplete(preComputedState))
+                                queue.Enqueue(preComputedState);
                 }
 
-                var predictedProductions = Grammar.RulesFor(nonTerminalPostDotSymbol);
-
-                for (int p = 0; p < predictedProductions.Count; p++)
+                var predictions = Grammar.RulesFor(nonTerminalPostDotSymbol);
+                for (var p = 0; p < predictions.Count; p++)
                 {
-                    var production = predictedProductions[p];
-                    var predictedState = new PreComputedState(production, 0);
-                    if (!nonLambdaKernelStates.Contains(predictedState))
-                        if (kernelStates.Add(predictedState))
-                            queue.Enqueue(predictedState);
+                    var prediction = predictions[p];
+                    var preComputedState = new PreComputedState(prediction, 0);
+                    if (!states.Contains(preComputedState))
+                        if (closure.Add(preComputedState))
+                            if (!IsComplete(preComputedState))
+                                queue.Enqueue(preComputedState);
                 }
             }
 
-            queuePool.ClearAndFree(queue);
-
-            return kernelStates;
+            return closure;
         }
-        
+
+        private static bool IsComplete(PreComputedState state)
+        {
+            return state.Position == state.Production.RightHandSide.Count;
+        }
+
         private Frame AddNewFrameOrGetExistingFrame(SortedSet<PreComputedState> states)
-        {            
+        {
             var frame = new Frame(states);
             Frame outFrame = null;
             if (!_frames.TryGetValue(frame, out outFrame))
@@ -139,11 +164,22 @@ namespace Pliant.Runtime
             return outFrame;
         }
 
+        private bool TryGetExistingFrameOrCreateNew(SortedSet<PreComputedState> states, out Frame outFrame)
+        {
+            var newFrame = new Frame(states);
+            if (_frames.TryGetValue(newFrame, out outFrame))
+                return true;
+            outFrame = newFrame;
+            _frames[newFrame] = outFrame;
+            _frameQueue.Enqueue(outFrame);
+            return false;
+        }
+
         private void ProcessSymbolTransitions(Frame frame)
         {
             var pool = SharedPools.Default<Dictionary<ISymbol, SortedSet<PreComputedState>>>();
             var transitions = pool.AllocateAndClear();
-            
+
             foreach (var nfaState in frame.Data)
             {
                 var isCompleted = nfaState.Position == nfaState.Production.RightHandSide.Count;
@@ -156,27 +192,17 @@ namespace Pliant.Runtime
                 var targetStates = transitions.AddOrGetExisting(postDotSymbol);
 
                 var nextRule = new PreComputedState(production, nfaState.Position + 1);
-                targetStates.Add(nextRule);                
+                targetStates.Add(nextRule);
             }
 
             foreach (var symbol in transitions.Keys)
             {
-                var keyFrame = new Frame(transitions[symbol]);
-                Frame valueFrame = null;
-                if (!_frames.TryGetValue(keyFrame, out valueFrame))
-                {
-                    valueFrame = keyFrame;
-                    _frames[keyFrame] = valueFrame;
-                    _frameQueue.Enqueue(valueFrame);
-                }
+                var closure = GetNonLambdaKernelStates(transitions[symbol]);
+                var valueFrame = AddNewFrameOrGetExistingFrame(closure);
                 frame.AddTransistion(symbol, valueFrame);
             }
 
             pool.ClearAndFree(transitions);
         }
-
-        
-    }    
-
-    
+    }
 }

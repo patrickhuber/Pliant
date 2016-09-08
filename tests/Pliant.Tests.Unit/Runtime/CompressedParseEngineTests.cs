@@ -77,6 +77,28 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsTrue(parseEngine.IsAccepted(), "Parse was not accepted");
         }
 
+        [TestMethod]
+        public void CompressedParseEngineShouldReturnExpectedLexerRulesGivenNullableGrammar()
+        {
+            AssertExpectedLexerRulesReturnedFromInitializedParseEngine(NullableGrammar, 1);
+        }
+
+        [TestMethod]
+        public void CompressedParseEngineShouldReturnExpectedLexerRulesGivenExpressionGrammar()
+        {
+            AssertExpectedLexerRulesReturnedFromInitializedParseEngine(ExpressionGrammar, 4);
+        }
+
+        private static void AssertExpectedLexerRulesReturnedFromInitializedParseEngine(IGrammar grammar, int expectedCount)
+        {
+            var preComputedGrammar = new PreComputedGrammar(grammar);
+            var parseEngine = new CompressedParseEngine(preComputedGrammar);
+
+            var lexerRules = parseEngine.GetExpectedLexerRules();
+            Assert.AreEqual(
+                expectedCount,
+                lexerRules.Count, $"Expected {expectedCount} lexerRule, Found {lexerRules.Count}");
+        }
 
         private static IGrammar GetExpressionGrammar()
         {

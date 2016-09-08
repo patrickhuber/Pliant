@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Pliant.Automata;
 using Pliant.Builders.Expressions;
 using Pliant.Grammars;
-using Pliant.Runtime;
+using Pliant.LexerRules;
+using Pliant.RegularExpressions;
 
 namespace Pliant.Tests.Unit.Grammars
 {
@@ -10,12 +12,14 @@ namespace Pliant.Tests.Unit.Grammars
     {
         private static IGrammar _expressionGrammar;
         private static IGrammar _nullableGrammar;
+        private static IGrammar _jsonGrammar;
 
         [ClassInitialize]
         public static void InitializeClass(TestContext testContext)
         {
             _expressionGrammar = GetExpressionGrammar();
             _nullableGrammar = GetNullableGrammar();
+            _jsonGrammar = GetJsonGrammar();
         }
 
         [TestMethod]
@@ -28,20 +32,14 @@ namespace Pliant.Tests.Unit.Grammars
         public void PreComputedGrammarTestWithNullableGrammar()
         {
             var preComputedGrammar = new PreComputedGrammar(_nullableGrammar);
-        }
+        }        
 
         [TestMethod]
-        public void PreComputedGrammarBitsTestWithNullableGrammar()
+        public void PreComputedGrammarTestWithJsonGrammar()
         {
-            var preComputedGrammar = new PreComputedGrammarBits(_nullableGrammar);
-        }
+            var preComputedGrammar = new PreComputedGrammar(_jsonGrammar);
+        }        
 
-        [TestMethod]
-        public void PreComputedGrammarBitsTestWithExpressionGrammar()
-        {
-            var preComputedGrammar = new PreComputedGrammarBits(_expressionGrammar);
-        }
-        
         private static IGrammar GetExpressionGrammar()
         {
             ProductionExpression
@@ -82,5 +80,74 @@ namespace Pliant.Tests.Unit.Grammars
             var grammar = new GrammarExpression(SP).ToGrammar();
             return grammar;
         }
+
+        private static IGrammar GetJsonGrammar()
+        {
+            ProductionExpression
+                Json = "Json",
+                Object = "Object",
+                Pair = "Pair",
+                PairRepeat = "PairRepeat",
+                Array = "Array",
+                Value = "Value",
+                ValueRepeat = "ValueRepeat";
+
+            var number = new NumberLexerRule();
+            var @string = String();
+
+            Json.Rule =
+                Value;
+
+            Object.Rule =
+                '{' + PairRepeat + '}';
+
+            PairRepeat.Rule =
+                Pair
+                | Pair + ',' + PairRepeat
+                | (Expr)null;
+
+            Pair.Rule =
+                (Expr)@string + ':' + Value;
+
+            Array.Rule =
+                '[' + ValueRepeat + ']';
+
+            ValueRepeat.Rule =
+                Value
+                | Value + ',' + ValueRepeat
+                | (Expr)null;
+
+            Value.Rule = (Expr)
+                @string
+                | number
+                | Object
+                | Array
+                | "true"
+                | "false"
+                | "null";
+
+            return new GrammarExpression(
+                Json,
+                null,
+                new[] { new WhitespaceLexerRule() }).ToGrammar();
+        }
+
+        private static BaseLexerRule String()
+        {
+            // ["][^"]+["]
+            const string pattern = "[\"][^\"]+[\"]";
+            return CreateRegexDfa(pattern);
+        }
+
+
+        private static BaseLexerRule CreateRegexDfa(string pattern)
+        {
+            var regexParser = new RegexParser();
+            var regex = regexParser.Parse(pattern);
+            var regexCompiler = new RegexCompiler();
+            var dfa = regexCompiler.Compile(regex);
+            return new DfaLexerRule(dfa, pattern);
+        }
+
     }
 }

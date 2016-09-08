@@ -191,7 +191,19 @@ namespace Pliant.Runtime
 
         public List<ILexerRule> GetExpectedLexerRules()
         {
-            throw new NotImplementedException();
+            var list = new List<ILexerRule>();
+            if (_chart.FrameSets.Count == 0)
+                return list;
+
+            var frameSet = _chart.FrameSets[_chart.FrameSets.Count - 1];
+            for (int i = 0; i < frameSet.Frames.Count; i++)
+            {
+                var frame = frameSet.Frames[i];
+                foreach (var symbol in frame.Frame.Transitions.Keys)
+                    if (symbol.SymbolType == SymbolType.LexerRule)
+                        list.Add(symbol as ILexerRule);
+            }
+            return list;
         }
     }
 }

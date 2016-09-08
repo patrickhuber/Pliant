@@ -5,6 +5,7 @@ using Pliant.Grammars;
 using Pliant.Json;
 using Pliant.LexerRules;
 using Pliant.RegularExpressions;
+using Pliant.Runtime;
 using Pliant.Tests.Common;
 using System;
 using System.IO;
@@ -19,7 +20,8 @@ namespace Pliant.Tests.Integration.Runtime
         private static IGrammar _grammar;
 
         private ParseTester _parseTester;
-
+        private ParseTester _compressedParseTester;
+        
         [ClassInitialize]
 #pragma warning disable CC0057 // Unused parameters
         public static void Initialize(TestContext testContext)
@@ -32,6 +34,9 @@ namespace Pliant.Tests.Integration.Runtime
         public void InitializeTest()
         {
             _parseTester = new ParseTester(_grammar);
+            _compressedParseTester = new ParseTester(
+                new CompressedParseEngine(
+                    new PreComputedGrammar(_grammar)));
         }
 
         [TestMethod]
@@ -63,6 +68,37 @@ namespace Pliant.Tests.Integration.Runtime
             {
                 _parseTester.RunParse(reader);
             }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"Runtime\10000.json", "Runtime")]
+        public void TestCanParseLargeJsonFileWithCompression()
+        {
+            var path = Path.Combine(TestContext.TestDeploymentDir, "Runtime", "10000.json");
+            using (var stream = File.OpenRead(path))
+            using (var reader = new StreamReader(stream))
+            {
+                _compressedParseTester.RunParse(reader);
+            }
+        }
+        
+        [TestMethod]
+        public void TestCanParseJsonArrayWithCompression()
+        {
+            var json = @"[""one"", ""two""]";
+            _compressedParseTester.RunParse(json);
+        }
+
+        [TestMethod]
+        public void TestCanParseJsonObjectWithCompression()
+        {
+            var json = @"
+            {
+                ""firstName"":""Patrick"", 
+                ""lastName"": ""Huber"",
+                ""id"": 12345
+            }";
+            _compressedParseTester.RunParse(json);
         }
 
         private static ILexerRule Whitespace()

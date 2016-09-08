@@ -76,7 +76,6 @@
     <Compile Include="LexerRules\NumberLexerRule.cs" />
     <Compile Include="LexerRules\WhitespaceLexerRule.cs" />
     <Compile Include="Grammars\PreComputedGrammar.cs" />
-    <Compile Include="Grammars\PreComputedGrammarBits.cs" />
     <Compile Include="Grammars\PreComputedState.cs" />
     <Compile Include="Runtime\CompressedParseEngine.cs" />
     <Compile Include="Tree\ParseTreeEnumerable.cs" />

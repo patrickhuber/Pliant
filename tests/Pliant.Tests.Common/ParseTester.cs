@@ -25,6 +25,12 @@ namespace Pliant.Tests.Common
             ParseEngine = new ParseEngine(Grammar);
         }
 
+        public ParseTester(IParseEngine parseEngine)
+        {
+            Grammar = parseEngine.Grammar;
+            ParseEngine = parseEngine;
+        }
+
         public void RunParse(string input)
         {
             ParseRunner = new ParseRunner(ParseEngine, input);
@@ -44,11 +50,6 @@ namespace Pliant.Tests.Common
                 Assert.IsTrue(parseRunner.Read(), $"Parse Failed at Position {parseRunner.Position}");
             }
             Assert.IsTrue(parseRunner.ParseEngine.IsAccepted(), $"Parse was not accepted");
-        }
-        
-        public void Reset()
-        {
-            ParseEngine = new ParseEngine(Grammar);            
         }
     }
 }
