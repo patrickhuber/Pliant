@@ -1,4 +1,5 @@
-﻿using Pliant.Utilities;
+﻿using Pliant.Tokens;
+using Pliant.Utilities;
 using System.Collections.Generic;
 
 namespace Pliant.Grammars
@@ -7,12 +8,15 @@ namespace Pliant.Grammars
     {
         public SortedSet<PreComputedState> Data { get; private set; }
         public Dictionary<ISymbol, Frame> Transitions { get; private set; }
+        public Dictionary<TokenType, Frame> Scans { get; private set; }
+
         public Frame NullTransition { get; set; }
 
         public Frame(SortedSet<PreComputedState> data)
         {
             Data = data;
             Transitions = new Dictionary<ISymbol, Frame>();
+            Scans = new Dictionary<TokenType, Frame>();
             _hashCode = ComputeHashCode(data);
         }
 
@@ -22,7 +26,14 @@ namespace Pliant.Grammars
         {
             Frame value = null;
             if (!Transitions.TryGetValue(symbol, out value))
+            {
                 Transitions.Add(symbol, target);
+                if (symbol.SymbolType == SymbolType.LexerRule)
+                {
+                    var lexerRule = symbol as ILexerRule;
+                    Scans.Add(lexerRule.TokenType, target);
+                }
+            }
         }
 
         static int ComputeHashCode(SortedSet<PreComputedState> data)

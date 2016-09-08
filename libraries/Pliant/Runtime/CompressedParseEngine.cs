@@ -159,25 +159,18 @@ namespace Pliant.Runtime
 
         private void ScanFrame(int i, IToken token, int parent, Frame frame)
         {
-            foreach (var symbol in frame.Transitions.Keys)
-            {
-                if (symbol.SymbolType != SymbolType.LexerRule)
-                    continue;
+            Frame target;
 
-                var lexerRule = symbol as ILexerRule;
-                if (lexerRule.TokenType != token.TokenType)
-                    continue;
+            if (!frame.Scans.TryGetValue(token.TokenType, out target))
+                return;
 
-                var target = frame.Transitions[symbol];
+            if (!_chart.Enqueue(i + 1, new StateFrame(target, parent)))
+                return;
 
-                if (!_chart.Enqueue(i + 1, new StateFrame(target, parent)))
-                    continue;
+            if (target.NullTransition == null)
+                return;
 
-                if (target.NullTransition == null)
-                    continue;
-
-                _chart.Enqueue(i + 1, new StateFrame(target.NullTransition, i + 1));
-            }
+            _chart.Enqueue(i + 1, new StateFrame(target.NullTransition, i + 1));            
         }
 
         public void Reset()
