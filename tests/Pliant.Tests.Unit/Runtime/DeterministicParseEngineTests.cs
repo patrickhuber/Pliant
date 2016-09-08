@@ -8,17 +8,17 @@ using Pliant.Tokens;
 namespace Pliant.Tests.Unit.Runtime
 {
     [TestClass]
-    public class CompressedParseEngineTests
+    public class DeterministicParseEngineTests
     {
         private static readonly IGrammar ExpressionGrammar = GetExpressionGrammar();
         private static readonly IGrammar NullableGrammar = GetNullableGrammar();
 
         [TestMethod]
-        public void CompressedParseEngineCanParseRegex()
+        public void DeterministicParseEngineCanParseRegex()
         {
             var regexGrammar = new RegexGrammar();
             var preComputedRegexGrammar = new PreComputedGrammar(regexGrammar);
-            var parseEngine = new CompressedParseEngine(preComputedRegexGrammar);
+            var parseEngine = new DeterministicParseEngine(preComputedRegexGrammar);
             
             var pattern = "[a-z][0-9]abc123";
 
@@ -60,10 +60,10 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void CompressedParseEngineCanParseNullableGrammar()
+        public void DeterministicParseEngineCanParseNullableGrammar()
         {
             var preComputedGrammar = new PreComputedGrammar(NullableGrammar);
-            var parseEngine = new CompressedParseEngine(preComputedGrammar);
+            var parseEngine = new DeterministicParseEngine(preComputedGrammar);
 
             var input = "aaaa";
             var tokenType = new TokenType("a");
@@ -78,13 +78,13 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void CompressedParseEngineShouldReturnExpectedLexerRulesGivenNullableGrammar()
+        public void DeterministicParseEngineShouldReturnExpectedLexerRulesGivenNullableGrammar()
         {
             AssertExpectedLexerRulesReturnedFromInitializedParseEngine(NullableGrammar, 1);
         }
 
         [TestMethod]
-        public void CompressedParseEngineShouldReturnExpectedLexerRulesGivenExpressionGrammar()
+        public void DeterministicParseEngineShouldReturnExpectedLexerRulesGivenExpressionGrammar()
         {
             AssertExpectedLexerRulesReturnedFromInitializedParseEngine(ExpressionGrammar, 4);
         }
@@ -92,7 +92,7 @@ namespace Pliant.Tests.Unit.Runtime
         private static void AssertExpectedLexerRulesReturnedFromInitializedParseEngine(IGrammar grammar, int expectedCount)
         {
             var preComputedGrammar = new PreComputedGrammar(grammar);
-            var parseEngine = new CompressedParseEngine(preComputedGrammar);
+            var parseEngine = new DeterministicParseEngine(preComputedGrammar);
 
             var lexerRules = parseEngine.GetExpectedLexerRules();
             Assert.AreEqual(

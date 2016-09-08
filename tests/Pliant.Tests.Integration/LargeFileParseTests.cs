@@ -1,13 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Automata;
-using Pliant.Builders.Expressions;
 using Pliant.Grammars;
 using Pliant.Json;
-using Pliant.LexerRules;
 using Pliant.RegularExpressions;
 using Pliant.Runtime;
 using Pliant.Tests.Common;
-using System;
 using System.IO;
 
 namespace Pliant.Tests.Integration.Runtime
@@ -35,7 +32,7 @@ namespace Pliant.Tests.Integration.Runtime
         {
             _parseTester = new ParseTester(_grammar);
             _compressedParseTester = new ParseTester(
-                new CompressedParseEngine(
+                new DeterministicParseEngine(
                     new PreComputedGrammar(_grammar)));
         }
 

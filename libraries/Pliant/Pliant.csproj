@@ -77,7 +77,7 @@
     <Compile Include="LexerRules\WhitespaceLexerRule.cs" />
     <Compile Include="Grammars\PreComputedGrammar.cs" />
     <Compile Include="Grammars\PreComputedState.cs" />
-    <Compile Include="Runtime\CompressedParseEngine.cs" />
+    <Compile Include="Runtime\DeterministicParseEngine.cs" />
     <Compile Include="Tree\ParseTreeEnumerable.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />
     <Compile Include="Forest\SelectFirstChildDisambiguationAlgorithm.cs" />

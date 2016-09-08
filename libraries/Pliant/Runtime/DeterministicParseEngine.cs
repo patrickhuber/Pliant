@@ -8,7 +8,7 @@ using Pliant.Utilities;
 
 namespace Pliant.Runtime
 {
-    public class CompressedParseEngine : IParseEngine
+    public class DeterministicParseEngine : IParseEngine
     {
         PreComputedGrammar _precomputedGrammar;
         PreComputedChart _chart;
@@ -23,7 +23,7 @@ namespace Pliant.Runtime
             }
         }
 
-        public CompressedParseEngine(PreComputedGrammar preComputedGrammar)
+        public DeterministicParseEngine(PreComputedGrammar preComputedGrammar)
         {
             _precomputedGrammar = preComputedGrammar;
             Initialize();
@@ -149,9 +149,9 @@ namespace Pliant.Runtime
             var set = _chart.FrameSets[i];
             for (int f = 0; f < set.Frames.Count; f++)
             {
-                var state = set.Frames[f];
-                var parent = state.Origin;
-                var frame = state.Frame;
+                var stateFrame = set.Frames[f];
+                var parent = stateFrame.Origin;
+                var frame = stateFrame.Frame;
 
                 ScanFrame(i, token, parent, frame);
             }
@@ -193,8 +193,8 @@ namespace Pliant.Runtime
             var frameSet = _chart.FrameSets[_chart.FrameSets.Count - 1];
             for (int i = 0; i < frameSet.Frames.Count; i++)
             {
-                var frame = frameSet.Frames[i];
-                foreach (var lexerRule in frame.Frame.Scans.Keys)
+                var stateFrame = frameSet.Frames[i];
+                foreach (var lexerRule in stateFrame.Frame.Scans.Keys)
                     list.Add(lexerRule);
             }
             return list;
