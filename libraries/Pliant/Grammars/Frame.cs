@@ -8,7 +8,8 @@ namespace Pliant.Grammars
     {
         public SortedSet<PreComputedState> Data { get; private set; }
         public Dictionary<ISymbol, Frame> Transitions { get; private set; }
-        public Dictionary<TokenType, Frame> Scans { get; private set; }
+        public Dictionary<TokenType, Frame> TokenTransitions { get; private set; }
+        public Dictionary<ILexerRule, Frame> Scans { get; private set; }
 
         public Frame NullTransition { get; set; }
 
@@ -16,7 +17,8 @@ namespace Pliant.Grammars
         {
             Data = data;
             Transitions = new Dictionary<ISymbol, Frame>();
-            Scans = new Dictionary<TokenType, Frame>();
+            TokenTransitions = new Dictionary<TokenType, Frame>();
+            Scans = new Dictionary<ILexerRule, Frame>();
             _hashCode = ComputeHashCode(data);
         }
 
@@ -31,7 +33,8 @@ namespace Pliant.Grammars
                 if (symbol.SymbolType == SymbolType.LexerRule)
                 {
                     var lexerRule = symbol as ILexerRule;
-                    Scans.Add(lexerRule.TokenType, target);
+                    TokenTransitions.Add(lexerRule.TokenType, target);
+                    Scans.Add(lexerRule, target);
                 }
             }
         }

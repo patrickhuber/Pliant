@@ -161,7 +161,7 @@ namespace Pliant.Runtime
         {
             Frame target;
 
-            if (!frame.Scans.TryGetValue(token.TokenType, out target))
+            if (!frame.TokenTransitions.TryGetValue(token.TokenType, out target))
                 return;
 
             if (!_chart.Enqueue(i + 1, new StateFrame(target, parent)))
@@ -194,9 +194,8 @@ namespace Pliant.Runtime
             for (int i = 0; i < frameSet.Frames.Count; i++)
             {
                 var frame = frameSet.Frames[i];
-                foreach (var symbol in frame.Frame.Transitions.Keys)
-                    if (symbol.SymbolType == SymbolType.LexerRule)
-                        list.Add(symbol as ILexerRule);
+                foreach (var lexerRule in frame.Frame.Scans.Keys)
+                    list.Add(lexerRule);
             }
             return list;
         }
