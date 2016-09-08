@@ -68,6 +68,24 @@ namespace Pliant.Utilities
 
         #endregion HashSet<T>
 
+
+        #region SortedSet<T>
+
+        internal static SortedSet<TValue> AllocateAndClear<TValue>(this ObjectPool<SortedSet<TValue>> pool)
+        {
+            var hashSet = pool.Allocate();
+            hashSet.Clear();
+            return hashSet;
+        }
+
+        internal static void ClearAndFree<TValue>(this ObjectPool<SortedSet<TValue>> pool, SortedSet<TValue> hashSet)
+        {
+            hashSet.Clear();
+            pool.Free(hashSet);
+        }
+
+        #endregion SortedSet<T>
+
         #region Dictionary<TKey, TValue>
 
         internal static Dictionary<TKey, TValue> AllocateAndClear<TKey, TValue>(this ObjectPool<Dictionary<TKey, TValue>> pool)

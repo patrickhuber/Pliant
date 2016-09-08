@@ -49,8 +49,9 @@ namespace Pliant.Grammars
 
         private SortedSet<PreComputedState> Initialize(IGrammar grammar)
         {
-            // allocate start states
-            var startStates = new SortedSet<PreComputedState>();
+            var pool = SharedPools.Default<SortedSet<PreComputedState>>();
+            
+            var startStates = pool.AllocateAndClear();
             var startProductions = grammar.StartProductions();
 
             for (int p = 0; p < startProductions.Count; p++)
@@ -62,13 +63,15 @@ namespace Pliant.Grammars
 
             var closure = GetNonLambdaKernelStates(startStates);
 
-            // free start states
+            pool.ClearAndFree(startStates);
             return closure;
         }
 
         private SortedSet<PreComputedState> GetNonLambdaKernelStates(SortedSet<PreComputedState> states)
         {
-            var queue = new Queue<PreComputedState>();
+            var pool = SharedPools.Default<Queue<PreComputedState>>();
+
+            var queue = pool.AllocateAndClear();
             var closure = new SortedSet<PreComputedState>();
 
             foreach (var state in states)
@@ -97,12 +100,15 @@ namespace Pliant.Grammars
                         queue.Enqueue(preComputedState);
                 }
             }
+            pool.ClearAndFree(queue);
             return closure;
         }
 
         private SortedSet<PreComputedState> GetLambdaKernelStates(SortedSet<PreComputedState> states)
         {
-            var queue = new Queue<PreComputedState>();
+            var pool = SharedPools.Default<Queue<PreComputedState>>();
+
+            var queue = pool.AllocateAndClear();
             var closure = new SortedSet<PreComputedState>();
 
             foreach (var state in states)
@@ -143,6 +149,7 @@ namespace Pliant.Grammars
                 }
             }
 
+            pool.ClearAndFree(queue);
             return closure;
         }
 

@@ -4,6 +4,7 @@ using Pliant.Charts;
 using Pliant.Grammars;
 using Pliant.Forest;
 using System.Collections.Generic;
+using Pliant.Utilities;
 
 namespace Pliant.Runtime
 {
@@ -191,7 +192,8 @@ namespace Pliant.Runtime
 
         public List<ILexerRule> GetExpectedLexerRules()
         {
-            var list = new List<ILexerRule>();
+            var list = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
+            
             if (_chart.FrameSets.Count == 0)
                 return list;
 
