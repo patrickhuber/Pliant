@@ -100,98 +100,55 @@ namespace Pliant.Runtime
         private void Reduce(int i)
         {
             var set = _chart.FrameSets[i];
-            var setFrames = set.Frames;
-            var framesCount = setFrames.Count;
-
-            //PERF: not sure if it helps moving decl outside of loop
-            int parentOrigin;
-            Frame frame;
-            StateFrame stateFrame;
-            bool hasChanged;
-            var f = 0;
-
-            for (; f < framesCount; f++)
+            for (int f = 0; f < set.Frames.Count; f++)
             {
-                stateFrame = setFrames[f];
-                parentOrigin = stateFrame.Origin;
-                frame = stateFrame.Frame;
+                var state = set.Frames[f];
+                var parent = state.Origin;
+                var frame = state.Frame;
 
-                if (parentOrigin == i)
+                if (parent == i)
                     continue;
 
-                hasChanged = ReduceFrame(i, parentOrigin, frame);
-                if (hasChanged)
-                {
-                    setFrames = set.Frames;
-                    framesCount = setFrames.Count;
-                }
+                ReduceFrame(i, parent, frame);
             }
         }
 
-        private bool ReduceFrame(int i, int parent, Frame frame)
+        private void ReduceFrame(int i, int parent, Frame frame)
         {
-            var hasChanged = false;
-            
-            var frameData = frame.DataPerf;
-            var frameDataCount = frameData.Length;
-
             var parentSet = _chart.FrameSets[parent];
             var parentSetFrames = parentSet.FramesPerf;
             var parentSetFramesCount = parentSetFrames.Length;
-            StateFrame pState;
-            int pParent;
-            Frame target;
-            Frame nullTransition;
 
-            PreComputedState preComputedState;
-            IProduction preComputedStateProduction;
-            INonTerminal leftHandSide;
-            IReadOnlyList<ISymbol> productionRhs;
-            StateFrame newStateFrame;
-
-            int d = 0;
-            int p = 0;
-
-            for (; d < frameDataCount; ++d)
+            for (int d = 0; d < frame.DataPerf.Length; ++d)
             {
-                preComputedState = frameData[d];
-                preComputedStateProduction = preComputedState.Production;
-                productionRhs = preComputedStateProduction.RightHandSide;
+                var preComputedState = frame.DataPerf[d];
 
-                var isComplete = preComputedState.Position == productionRhs.Count;
+                var production = preComputedState.Production;
+
+                var isComplete = preComputedState.Position == production.RightHandSide.Count;
                 if (!isComplete)
                     continue;
 
-                leftHandSide = preComputedStateProduction.LeftHandSide;
+                var leftHandSide = production.LeftHandSide;
 
-                p = 0;
-                for (; p < parentSetFramesCount; p++)
+                for (int p = 0; p < parentSetFramesCount; p++)
                 {
-                    pState = parentSetFrames[p];
-                    pParent = pState.Origin;
+                    var pState = parentSetFrames[p];
+                    var pParent = pState.Origin;
 
+                    Frame target = null;
                     if (!pState.Frame.Transitions.TryGetValue(leftHandSide, out target))
                         continue;
 
-                    newStateFrame = new StateFrame(target, pParent);
-
-                    if (!_chart.Enqueue(i, newStateFrame))
+                    if (!_chart.Enqueue(i, new StateFrame(target, pParent)))
                         continue;
 
-                    hasChanged = true;
-
-                    nullTransition = target.NullTransition;
-
-                    if (nullTransition == null)
+                    if (target.NullTransition == null)
                         continue;
 
-                    newStateFrame = new StateFrame(nullTransition, i);
-
-                    _chart.Enqueue(i, newStateFrame);
+                    _chart.Enqueue(i, new StateFrame(target.NullTransition, i));
                 }
             }
-
-            return hasChanged;
         }
 
         private void Scan(int i, IToken token)
@@ -199,17 +156,12 @@ namespace Pliant.Runtime
             var set = _chart.FrameSets[i];
             var frames = set.FramesPerf;
             var framesCount = frames.Length;
-
-            //PERF: not sure if it helps moving decl outside of loop
-            int parentOrigin;
-            Frame frame;
-            StateFrame stateFrame;
-            var f = 0;
-            for (; f < framesCount; f++)
+            
+            for (var f = 0; f < framesCount; f++)
             {
-                stateFrame = frames[f];
-                parentOrigin = stateFrame.Origin;
-                frame = stateFrame.Frame;
+                var stateFrame = frames[f];
+                var parentOrigin = stateFrame.Origin;
+                var frame = stateFrame.Frame;
 
                 ScanFrame(i, token, parentOrigin, frame);
             }
