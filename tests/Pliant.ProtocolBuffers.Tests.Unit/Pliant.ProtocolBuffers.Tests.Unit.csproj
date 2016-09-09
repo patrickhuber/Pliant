@@ -63,6 +63,12 @@
       <Name>Pliant</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="addressbook.proto">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="ProtocolBufferesV3.pliant" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

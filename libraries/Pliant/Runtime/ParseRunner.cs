@@ -54,7 +54,7 @@ namespace Pliant.Runtime
 
             if (MatchesExistingIncompleteIgnoreLexemes(character))
                 return true;
-            
+
             if (MatchesExistingLexemes(character))
             {
                 if (!EndOfStream())
@@ -88,6 +88,7 @@ namespace Pliant.Runtime
             lexemeFactoryRegistry.Register(new StringLiteralLexemeFactory());
             lexemeFactoryRegistry.Register(new DfaLexemeFactory());
         }
+
         private bool AnyExistingLexemes()
         {
             return _existingLexemes.Count > 0;

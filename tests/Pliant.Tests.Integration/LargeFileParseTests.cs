@@ -56,7 +56,7 @@ namespace Pliant.Tests.Integration.Runtime
         }
 
         [TestMethod]
-        [DeploymentItem(@"Runtime\10000.json", "Runtime")]
+        [DeploymentItem(@"10000.json", "Runtime")]
         public void TestCanParseLargeJsonFile()
         {
             var path = Path.Combine(TestContext.TestDeploymentDir, "Runtime", "10000.json");
@@ -68,7 +68,7 @@ namespace Pliant.Tests.Integration.Runtime
         }
 
         [TestMethod]
-        [DeploymentItem(@"Runtime\10000.json", "Runtime")]
+        [DeploymentItem(@"10000.json", "Runtime")]
         public void TestCanParseLargeJsonFileWithCompression()
         {
             var path = Path.Combine(TestContext.TestDeploymentDir, "Runtime", "10000.json");

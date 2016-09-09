@@ -6,11 +6,11 @@ namespace Pliant.Lexemes
 {
     public class LexemeFactoryRegistry : ILexemeFactoryRegistry
     {
-        private readonly FastLookupDictionary<LexerRuleType, ILexemeFactory> _registry;        
+        private readonly Dictionary<LexerRuleType, ILexemeFactory> _registry;        
 
         public LexemeFactoryRegistry()
         {
-            _registry = new FastLookupDictionary<LexerRuleType, ILexemeFactory>();
+            _registry = new Dictionary<LexerRuleType, ILexemeFactory>();
         }
 
         public ILexemeFactory Get(LexerRuleType lexerRuleType)
