@@ -8,7 +8,10 @@ namespace Pliant.Benchmarks
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<ParsingBenchmarks>();
+            //var summary = BenchmarkRunner.Run<ParsingBenchmarks>();
+            var summary = BenchmarkRunner.Run<LargeJsonFileBenchmarkDeterministic>();
+
+            Console.Read();
         }
     }
 }

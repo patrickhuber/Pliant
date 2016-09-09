@@ -3,7 +3,7 @@ using Pliant.Utilities;
 using System.Text;
 using System;
 
-namespace Pliant.Runtime
+namespace Pliant.Grammars
 {
     public class PreComputedState : IComparable<PreComputedState>
     {
@@ -19,7 +19,7 @@ namespace Pliant.Runtime
             Position = position;
             _hashCode = ComputeHashCode(Production, Position);
         }
-
+        
         private static int ComputeHashCode(IProduction production, int position)
         {
             return HashCode.Compute(production.GetHashCode(), position.GetHashCode());

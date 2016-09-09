@@ -71,11 +71,8 @@ namespace Pliant.Grammars
         private void AddProductionToIndex(IProduction production)
         {
             var leftHandSide = production.LeftHandSide;
-            if (!_productionIndex.ContainsKey(leftHandSide))
-            {
-                _productionIndex.Add(leftHandSide, new List<IProduction>());
-            }
-            _productionIndex[leftHandSide].Add(production);
+            var indexedProductions = _productionIndex.AddOrGetExisting(leftHandSide);
+            indexedProductions.Add(production);
         }
 
         private void AddProductionToReverseLookup(IProduction production)
@@ -99,6 +96,7 @@ namespace Pliant.Grammars
             UniqueList<INonTerminal> nullable)
         {
             // trace nullability through productions: http://cstheory.stackexchange.com/questions/2479/quickly-finding-empty-string-producing-nonterminals-in-a-cfg
+            // I think this is Dijkstra's algorithm
             var nullableQueue = new Queue<INonTerminal>(nullable);
             var productionSizes = new Dictionary<IProduction, int>();
             // foreach nullable symbol discovered in forming the reverse lookup

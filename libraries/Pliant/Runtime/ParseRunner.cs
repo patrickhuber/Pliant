@@ -110,8 +110,9 @@ namespace Pliant.Runtime
                 return false;
 
             var anyMatchedIgnoreLexemes = false;
-            foreach (var existingLexeme in _ignoreLexemes)
+            for(int i=0;i<_ignoreLexemes.Count;i++)
             {
+                var existingLexeme = _ignoreLexemes[i];
                 if (existingLexeme.Scan(character))
                 {
                     anyMatchedIgnoreLexemes = true;
@@ -131,12 +132,11 @@ namespace Pliant.Runtime
                 return false;
 
             var anyMatchedIgnoreLexemes = false;
-            foreach (var existingLexeme in _ignoreLexemes)
+            for (int i = 0; i < _ignoreLexemes.Count; i++)
             {
+                var existingLexeme = _ignoreLexemes[i];
                 if (!existingLexeme.IsAccepted() && existingLexeme.Scan(character))
-                {
                     anyMatchedIgnoreLexemes = true;
-                }
             }
             return anyMatchedIgnoreLexemes;
         }

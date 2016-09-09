@@ -1,12 +1,10 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders.Expressions;
 using Pliant.Grammars;
 using Pliant.Runtime;
-using Pliant.Tokens;
-using System.Collections.Generic;
-using System.IO;
 
-namespace Pliant.Tests.Common
+namespace Pliant.JsonPerformanceTest
 {
     public class ParseTester
     {
@@ -47,17 +45,9 @@ namespace Pliant.Tests.Common
         {
             while (!parseRunner.EndOfStream())
             {
-                var hasRead = parseRunner.Read();
-                if (!hasRead)
-                {
-                    Assert.IsTrue(false, $"Parse Failed at Position {parseRunner.Position}");
-                }
+                Assert.IsTrue(parseRunner.Read(), $"Parse Failed at Position {parseRunner.Position}");
             }
-            var isAccepted = parseRunner.ParseEngine.IsAccepted();
-            if (!isAccepted)
-            {
-                Assert.IsTrue(false, $"Parse was not accepted");
-            }
+            Assert.IsTrue(parseRunner.ParseEngine.IsAccepted(), $"Parse was not accepted");
         }
     }
 }

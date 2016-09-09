@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.ProtocolBuffers.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.Json", "libraries\Pliant.Json\Pliant.Json.csproj", "{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.JsonPerformanceTest", "Pliant.JsonPerformanceTest\Pliant.JsonPerformanceTest.csproj", "{1484ADA2-DC6B-49DE-B784-90D433F72895}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1484ADA2-DC6B-49DE-B784-90D433F72895}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1484ADA2-DC6B-49DE-B784-90D433F72895}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1484ADA2-DC6B-49DE-B784-90D433F72895}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1484ADA2-DC6B-49DE-B784-90D433F72895}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
