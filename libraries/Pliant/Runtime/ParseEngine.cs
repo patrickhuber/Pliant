@@ -419,10 +419,12 @@ namespace Pliant.Runtime
             return true;
         }
 
+        private static readonly TokenType EmptyTokenType = new TokenType(string.Empty);
+
         private IForestNode CreateNullParseNode(ISymbol symbol, int location)
         {
             var symbolNode = _nodeSet.AddOrGetExistingSymbolNode(symbol, location, location);
-            var token = new Token(string.Empty, location, new TokenType(string.Empty));
+            var token = new Token(string.Empty, location, EmptyTokenType);
             var nullNode = new TokenForestNode(token, location, location);
             symbolNode.AddUniqueFamily(nullNode);
             return symbolNode;
