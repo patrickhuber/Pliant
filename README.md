@@ -1,6 +1,3 @@
-# RapidPliant
-This is a fork of the Pliant repository - with the purpose of refactoring and any other changes that I would personally like to have while working on other projects - this way making it easier to pull changes back to Pliant if anyone would want to.
-
 # Pliant
 Implementation of a modified Earley parser in C# inspired by the Marpa Parser project.
 
