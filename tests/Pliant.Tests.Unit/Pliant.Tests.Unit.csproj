@@ -58,6 +58,7 @@
     <Compile Include="Builders\Expressions\ProductionExpressionTests.cs" />
     <Compile Include="Builders\GrammarModelTests.cs" />
     <Compile Include="Builders\ProductionModelTests.cs" />
+    <Compile Include="Collections\BitMatrixTests.cs" />
     <Compile Include="Collections\FastLookupDictionaryTests.cs" />
     <Compile Include="Ebnf\EbnfGrammarGeneratorTests.cs" />
     <Compile Include="Ebnf\EbnfParserTests.cs" />

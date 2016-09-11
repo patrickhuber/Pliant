@@ -116,12 +116,12 @@ namespace Pliant.Runtime
         private void ReduceFrame(int i, int parent, Frame frame)
         {
             var parentSet = _chart.FrameSets[parent];
-            var parentSetFrames = parentSet.FramesPerf;
-            var parentSetFramesCount = parentSetFrames.Length;
+            var parentSetFrames = parentSet.Frames;
+            var parentSetFramesCount = parentSetFrames.Count;
 
-            for (int d = 0; d < frame.DataPerf.Length; ++d)
+            for (int d = 0; d < frame.Data.Length; ++d)
             {
-                var preComputedState = frame.DataPerf[d];
+                var preComputedState = frame.Data[d];
 
                 var production = preComputedState.Production;
 
@@ -154,8 +154,8 @@ namespace Pliant.Runtime
         private void Scan(int i, IToken token)
         {
             var set = _chart.FrameSets[i];
-            var frames = set.FramesPerf;
-            var framesCount = frames.Length;
+            var frames = set.Frames;
+            var framesCount = frames.Count;
             
             for (var f = 0; f < framesCount; f++)
             {

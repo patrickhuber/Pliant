@@ -1,8 +1,9 @@
 ﻿using System.Collections;
+using System.Text;
 
 namespace Pliant.Collections
 {
-    internal class BitMatrix
+    public class BitMatrix
     {
         private BitArray[] _matrix;
 
@@ -49,6 +50,26 @@ namespace Pliant.Collections
                 bitMatrix._matrix[i] = _matrix[i].Clone() as BitArray;
             }
             return bitMatrix;
+        }
+
+        public override string ToString()
+        {
+            const string space = " ";
+            const string zero = "0";
+            const string one = "1";
+            var stringBuilder = new StringBuilder();
+            for (int i = 0; i < Length; i++)
+            {
+                if (i > 0)
+                    stringBuilder.AppendLine();
+                for (int j = 0; j < Length; j++)
+                {
+                    if (j > 0)
+                        stringBuilder.Append(space);
+                    stringBuilder.Append(this[i][j] ? one : zero);
+                }
+            }
+            return stringBuilder.ToString();
         }
     }
 }

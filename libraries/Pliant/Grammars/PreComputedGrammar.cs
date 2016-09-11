@@ -31,7 +31,7 @@ namespace Pliant.Grammars
                 ProcessSymbolTransitions(frame);
 
                 // capture the predictions for the frame
-                var nonLambdaKernelStates = GetLambdaKernelStates(frame.Data);
+                var nonLambdaKernelStates = GetLambdaKernelStates(frame);
 
                 // if no predictions, continue
                 if (nonLambdaKernelStates.Count == 0)
@@ -104,14 +104,14 @@ namespace Pliant.Grammars
             return closure;
         }
 
-        private SortedSet<PreComputedState> GetLambdaKernelStates(SortedSet<PreComputedState> states)
+        private SortedSet<PreComputedState> GetLambdaKernelStates(Frame frame)
         {
             var pool = SharedPools.Default<Queue<PreComputedState>>();
 
             var queue = pool.AllocateAndClear();
             var closure = new SortedSet<PreComputedState>();
-
-            foreach (var state in states)
+            
+            foreach (var state in frame.Data)
                 if (!IsComplete(state))
                     queue.Enqueue(state);
 
@@ -131,7 +131,7 @@ namespace Pliant.Grammars
                 if (Grammar.IsNullable(nonTerminalPostDotSymbol))
                 {
                     var preComputedState = new PreComputedState(production, state.Position + 1);
-                    if (!states.Contains(preComputedState))
+                    if (!frame.Contains(preComputedState))
                         if (closure.Add(preComputedState))
                             if (!IsComplete(preComputedState))
                                 queue.Enqueue(preComputedState);
@@ -142,7 +142,7 @@ namespace Pliant.Grammars
                 {
                     var prediction = predictions[p];
                     var preComputedState = new PreComputedState(prediction, 0);
-                    if (!states.Contains(preComputedState))
+                    if (!frame.Contains(preComputedState))
                         if (closure.Add(preComputedState))
                             if (!IsComplete(preComputedState))
                                 queue.Enqueue(preComputedState);

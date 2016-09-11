@@ -7,34 +7,25 @@ namespace Pliant.Grammars
 {
     internal class Frame
     {
-        private PreComputedState[] _cachedData;
-        public PreComputedState[] DataPerf
-        {
-            get
-            {
-                if (_cachedData == null)
-                {
-                    _cachedData = Data.ToArray();
-                }
-                
-                return _cachedData;
-            }
-        }
+        private PreComputedState[] _cachedData;        
+        private SortedSet<PreComputedState> _set;
 
-        public SortedSet<PreComputedState> Data { get; private set; }
+        public PreComputedState[] Data { get { return _cachedData; } }
+                
         public Dictionary<ISymbol, Frame> Transitions { get; private set; }
         public Dictionary<TokenType, Frame> TokenTransitions { get; private set; }
         public Dictionary<ILexerRule, Frame> Scans { get; private set; }
 
         public Frame NullTransition { get; set; }
 
-        public Frame(SortedSet<PreComputedState> data)
+        public Frame(SortedSet<PreComputedState> set)
         {
-            Data = data;
+            _set = set;
+            _cachedData = _set.ToArray();
             Transitions = new Dictionary<ISymbol, Frame>();
             TokenTransitions = new Dictionary<TokenType, Frame>();
             Scans = new Dictionary<ILexerRule, Frame>();
-            _hashCode = ComputeHashCode(data);
+            _hashCode = ComputeHashCode(set);
         }
 
         private readonly int _hashCode;
@@ -52,6 +43,11 @@ namespace Pliant.Grammars
                     Scans.Add(lexerRule, target);
                 }
             }
+        }
+
+        public bool Contains(PreComputedState state)
+        {
+            return _set.Contains(state);
         }
 
         static int ComputeHashCode(SortedSet<PreComputedState> data)
@@ -73,8 +69,8 @@ namespace Pliant.Grammars
             if (((object)frame) == null)
                 return false;
 
-            foreach (var item in Data)
-                if (!frame.Data.Contains(item))
+            foreach (var item in _cachedData)
+                if (!frame.Contains(item))
                     return false;
 
             return true;

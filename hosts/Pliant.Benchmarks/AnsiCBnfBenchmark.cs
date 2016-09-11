@@ -6,7 +6,7 @@ using System.IO;
 
 namespace Pliant.Benchmarks
 {
-    public class ParsingBenchmarks
+    public class AnsiCBnfBenchmark
     {
         string sampleBnf;
 

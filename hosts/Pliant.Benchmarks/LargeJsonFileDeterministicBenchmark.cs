@@ -3,10 +3,12 @@ using Pliant.Json;
 using Pliant.Runtime;
 using System;
 using System.IO;
+using Pliant.Grammars;
 
 namespace Pliant.Benchmarks
 {
-    public class LargeJsonFileBenchmark
+
+    public class LargeJsonFileDeterministicBenchmark
     {
         string json;
 
@@ -21,7 +23,7 @@ namespace Pliant.Benchmarks
         public bool Parse()
         {
             var grammar = new JsonGrammar();
-            var parseEngine = new ParseEngine(grammar);
+            var parseEngine = new DeterministicParseEngine(new PreComputedGrammar(grammar));
             var parseRunner = new ParseRunner(parseEngine, json);
 
             while (!parseRunner.EndOfStream() && parseRunner.Read()) { }
