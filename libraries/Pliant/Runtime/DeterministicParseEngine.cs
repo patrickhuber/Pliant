@@ -41,20 +41,20 @@ namespace Pliant.Runtime
         private bool Enqueue(int location, StateFrame stateFrame)
         {
             if (!_chart.Enqueue(location, stateFrame))
-                return false;            
+                return false;
 
             if (stateFrame.Frame.NullTransition == null)
                 return true;
 
             var nullTransitionFrame = new StateFrame(
-                stateFrame.Frame.NullTransition, 
+                stateFrame.Frame.NullTransition,
                 location);
 
             return _chart.Enqueue(location, nullTransitionFrame);
         }
 
         public bool Pulse(IToken token)
-        {            
+        {
             Scan(Location, token);
             var tokenRecognized = _chart.FrameSets.Count > Location + 1;
             if (!tokenRecognized)
@@ -62,7 +62,7 @@ namespace Pliant.Runtime
             Location++;
             Reduce(Location);
             return true;
-        }      
+        }
 
         public bool IsAccepted()
         {
@@ -71,7 +71,7 @@ namespace Pliant.Runtime
 
             var lastFrameSetIndex = _chart.FrameSets.Count - 1;
             var lastFrameSet = _chart.FrameSets[lastFrameSetIndex];
-            
+
             var start = Grammar.Start;
 
             for (var i = 0; i < lastFrameSet.Frames.Count; i++)
@@ -96,7 +96,7 @@ namespace Pliant.Runtime
 
             return false;
         }
-        
+
         private void Reduce(int i)
         {
             var set = _chart.FrameSets[i];
@@ -115,18 +115,25 @@ namespace Pliant.Runtime
 
         private void ReduceFrame(int i, int parent, Frame frame)
         {
-            foreach (var preComputedState in frame.Data)
+            var parentSet = _chart.FrameSets[parent];
+            var parentSetFrames = parentSet.FramesPerf;
+            var parentSetFramesCount = parentSetFrames.Length;
+
+            for (int d = 0; d < frame.DataPerf.Length; ++d)
             {
-                var isComplete = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
+                var preComputedState = frame.DataPerf[d];
+
+                var production = preComputedState.Production;
+
+                var isComplete = preComputedState.Position == production.RightHandSide.Count;
                 if (!isComplete)
                     continue;
 
-                var leftHandSide = preComputedState.Production.LeftHandSide;
-                var parentSet = _chart.FrameSets[parent];
+                var leftHandSide = production.LeftHandSide;
 
-                for (int p = 0; p < parentSet.Frames.Count; p++)
+                for (int p = 0; p < parentSetFramesCount; p++)
                 {
-                    var pState = parentSet.Frames[p];
+                    var pState = parentSetFrames[p];
                     var pParent = pState.Origin;
 
                     Frame target = null;
@@ -147,13 +154,16 @@ namespace Pliant.Runtime
         private void Scan(int i, IToken token)
         {
             var set = _chart.FrameSets[i];
-            for (int f = 0; f < set.Frames.Count; f++)
+            var frames = set.FramesPerf;
+            var framesCount = frames.Length;
+            
+            for (var f = 0; f < framesCount; f++)
             {
-                var stateFrame = set.Frames[f];
-                var parent = stateFrame.Origin;
+                var stateFrame = frames[f];
+                var parentOrigin = stateFrame.Origin;
                 var frame = stateFrame.Frame;
 
-                ScanFrame(i, token, parent, frame);
+                ScanFrame(i, token, parentOrigin, frame);
             }
         }
 
@@ -161,6 +171,7 @@ namespace Pliant.Runtime
         {
             Frame target;
 
+            //PERF: This could perhaps be improved with an int array and direct index lookup based on "token.TokenType.Id"?...
             if (!frame.TokenTransitions.TryGetValue(token.TokenType, out target))
                 return;
 
@@ -170,7 +181,7 @@ namespace Pliant.Runtime
             if (target.NullTransition == null)
                 return;
 
-            _chart.Enqueue(i + 1, new StateFrame(target.NullTransition, i + 1));            
+            _chart.Enqueue(i + 1, new StateFrame(target.NullTransition, i + 1));
         }
 
         public void Reset()
@@ -186,7 +197,7 @@ namespace Pliant.Runtime
         public List<ILexerRule> GetExpectedLexerRules()
         {
             var list = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
-            
+
             if (_chart.FrameSets.Count == 0)
                 return list;
 

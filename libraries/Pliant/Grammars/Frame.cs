@@ -1,11 +1,26 @@
 ﻿using Pliant.Tokens;
 using Pliant.Utilities;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Pliant.Grammars
 {
     internal class Frame
     {
+        private PreComputedState[] _cachedData;
+        public PreComputedState[] DataPerf
+        {
+            get
+            {
+                if (_cachedData == null)
+                {
+                    _cachedData = Data.ToArray();
+                }
+                
+                return _cachedData;
+            }
+        }
+
         public SortedSet<PreComputedState> Data { get; private set; }
         public Dictionary<ISymbol, Frame> Transitions { get; private set; }
         public Dictionary<TokenType, Frame> TokenTransitions { get; private set; }

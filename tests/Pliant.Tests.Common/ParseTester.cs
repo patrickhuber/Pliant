@@ -47,9 +47,17 @@ namespace Pliant.Tests.Common
         {
             while (!parseRunner.EndOfStream())
             {
-                Assert.IsTrue(parseRunner.Read(), $"Parse Failed at Position {parseRunner.Position}");
+                var hasRead = parseRunner.Read();
+                if (!hasRead)
+                {
+                    Assert.IsTrue(false, $"Parse Failed at Position {parseRunner.Position}");
+                }
             }
-            Assert.IsTrue(parseRunner.ParseEngine.IsAccepted(), $"Parse was not accepted");
+            var isAccepted = parseRunner.ParseEngine.IsAccepted();
+            if (!isAccepted)
+            {
+                Assert.IsTrue(false, $"Parse was not accepted");
+            }
         }
     }
 }
