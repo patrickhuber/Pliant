@@ -3,7 +3,9 @@ using Pliant.Builders.Expressions;
 using Pliant.Grammars;
 using Pliant.RegularExpressions;
 using Pliant.Runtime;
+using Pliant.Tests.Common;
 using Pliant.Tokens;
+using System.Linq;
 
 namespace Pliant.Tests.Unit.Runtime
 {
@@ -87,6 +89,27 @@ namespace Pliant.Tests.Unit.Runtime
         public void DeterministicParseEngineShouldReturnExpectedLexerRulesGivenExpressionGrammar()
         {
             AssertExpectedLexerRulesReturnedFromInitializedParseEngine(ExpressionGrammar, 4);
+        }
+
+        [TestMethod]
+        public void DeterministicParseEngineShouldParseInSubCubicTimeGivenRightRecursiveGrammar()
+        {
+            var a = new TerminalLexerRule(
+                new CharacterTerminal('a'),
+                new TokenType("a"));
+            ProductionExpression A = "A";
+            A.Rule =
+                'a' + A
+                | (Expr)null;
+
+            var grammarExpression = new GrammarExpression(A, new[] { A });
+            
+            var parseTester = new ParseTester(
+                new DeterministicParseEngine(
+                    new PreComputedGrammar(grammarExpression.ToGrammar())));
+            
+            const string input = "aaaaa";
+            parseTester.RunParse(input);
         }
 
         private static void AssertExpectedLexerRulesReturnedFromInitializedParseEngine(IGrammar grammar, int expectedCount)
