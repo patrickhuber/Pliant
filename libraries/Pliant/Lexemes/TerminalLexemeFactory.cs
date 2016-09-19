@@ -16,7 +16,7 @@ namespace Pliant.Lexemes
 
         public ILexeme Create(ILexerRule lexerRule)
         {
-            if (lexerRule.LexerRuleType != LexerRuleType)
+            if (!LexerRuleType.Equals(lexerRule.LexerRuleType))
                 throw new Exception(
                     $"Unable to create TerminalLexeme from type {lexerRule.GetType().FullName}. Expected TerminalLexerRule");
             
@@ -34,7 +34,7 @@ namespace Pliant.Lexemes
             var terminalLexeme = lexeme as TerminalLexeme;
             if (terminalLexeme == null)
                 throw new Exception($"Unable to free lexeme of type {lexeme.GetType()} from TerminalLexemeFactory");
-
+            
             _queue.Enqueue(terminalLexeme);
         }
     }

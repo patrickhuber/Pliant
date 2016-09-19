@@ -20,11 +20,14 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            var other = obj as LexerRuleType;
-            // order is important here, null must preceed obj
-            // to make sure the == operator is not called
-            if (null == obj)
+            if (((object)obj) == null)
                 return false;
+
+            var other = obj as LexerRuleType;
+
+            if (((object)other) == null)
+                return false;
+
             return other.Id == Id;
         }
 
