@@ -1,16 +1,18 @@
 ﻿using Pliant.Grammars;
 using Pliant.Tokens;
 
-namespace Pliant.Lexemes
+namespace Pliant.Tokens
 {
     public class StringLiteralLexeme : ILexeme
     {
         private string _capture;
         private int _index;
 
+        public int Position { get; private set; }
+
         public string Literal { get; private set; }
 
-        public string Capture
+        public string Value
         {
             get
             {
@@ -24,9 +26,9 @@ namespace Pliant.Lexemes
 
         public ILexerRule LexerRule { get; private set; }
         
-        public StringLiteralLexeme(IStringLiteralLexerRule lexerRule)
+        public StringLiteralLexeme(IStringLiteralLexerRule lexerRule, int position)
         {
-            Reset(lexerRule);
+            Reset(lexerRule, position);
         }
 
         private bool IsSubStringAllocated()
@@ -56,11 +58,12 @@ namespace Pliant.Lexemes
             return true;
         }
 
-        public void Reset(IStringLiteralLexerRule newLiteral)
+        public void Reset(IStringLiteralLexerRule newLiteral, int position)
         {
             LexerRule = newLiteral;
             _index = 0;
             _capture = null;
+            Position = position;
             Literal = newLiteral.Literal;
         }        
     }

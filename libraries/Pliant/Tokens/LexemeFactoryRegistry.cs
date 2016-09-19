@@ -2,7 +2,7 @@
 using Pliant.Grammars;
 using System.Collections.Generic;
 
-namespace Pliant.Lexemes
+namespace Pliant.Tokens
 {
     public class LexemeFactoryRegistry : ILexemeFactoryRegistry
     {

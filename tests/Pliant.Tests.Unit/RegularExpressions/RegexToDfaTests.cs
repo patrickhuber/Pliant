@@ -2,7 +2,7 @@
 using Pliant.RegularExpressions;
 using Pliant.Automata;
 using Pliant.Grammars;
-using Pliant.Lexemes;
+
 
 namespace Pliant.Tests.Unit.RegularExpressions
 {
@@ -22,7 +22,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
             Assert.IsNotNull(dfa);
 
             var lexerRule = new DfaLexerRule(dfa, "a");
-            var lexeme = new DfaLexemeFactory().Create(lexerRule);
+            var lexeme = new DfaLexemeFactory().Create(lexerRule, 0);
             Assert.IsTrue(lexeme.Scan('a'));
         }
 
@@ -45,7 +45,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
          
         private static void AssertLexerRuleMatches(IDfaLexerRule lexerRule, string input)
         {
-            var lexeme = _factory.Create(lexerRule);
+            var lexeme = _factory.Create(lexerRule, 0);
             for (int i = 0; i < input.Length; i++)
                 Assert.IsTrue(lexeme.Scan(input[i]), $"character '{input[i]}' not recognized at position {i}.");
             Assert.IsTrue(lexeme.IsAccepted(), $"input {input} not accepted.");

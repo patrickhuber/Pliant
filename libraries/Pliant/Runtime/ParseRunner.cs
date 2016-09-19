@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using Pliant.Runtime;
-using Pliant.Lexemes;
+
 using Pliant.Automata;
 using System.Collections.Generic;
 using Pliant.Utilities;
@@ -159,11 +159,13 @@ public class ParseRunner : IParseRunner
     {
         // PERF: Avoid Linq FirstOrDefault due to lambda allocation
         ILexeme longestAcceptedMatch = null;
+        int doNotFreeLexemeIndex = -1;
         for (int i = 0; i < _existingLexemes.Count; i++)
         {
             var lexeme = _existingLexemes[i];
             if (lexeme.IsAccepted())
             {
+                doNotFreeLexemeIndex = i;
                 longestAcceptedMatch = lexeme;
                 break;
             }
@@ -172,31 +174,29 @@ public class ParseRunner : IParseRunner
         if (longestAcceptedMatch == null)
             return false;
 
-        var token = CreateTokenFromLexeme(longestAcceptedMatch);
-        if (token == null)
+        //var token = CreateTokenFromLexeme(longestAcceptedMatch);
+        //if (token == null)
+        //    return false;
+        if (!ParseEngine.Pulse(longestAcceptedMatch))
             return false;
 
-        if (!ParseEngine.Pulse(token))
-            return false;
-
-        ClearExistingLexemes();
-
+        ClearExistingLexemes(doNotFreeLexemeIndex);
 
         return true;
     }
 
     private IToken CreateTokenFromLexeme(ILexeme lexeme)
     {
-        var capture = lexeme.Capture;
+        var capture = lexeme.Value;
         return new Token(
             capture,
             Position - capture.Length - 1,
             lexeme.TokenType);
     }
 
-    private void ClearExistingLexemes()
+    private void ClearExistingLexemes(int doNotFreeLexemeIndex)
     {
-        ClearLexemes(_existingLexemes);
+        ClearLexemes(_existingLexemes, doNotFreeLexemeIndex);
     }
 
     private bool MatchesNewLexemes(char character)
@@ -207,7 +207,7 @@ public class ParseRunner : IParseRunner
         {
             var lexerRule = newLexerRules[i];
             var factory = _lexemeFactoryRegistry.Get(lexerRule.LexerRuleType);
-            var lexeme = factory.Create(lexerRule);
+            var lexeme = factory.Create(lexerRule, Position);
             if (!lexeme.Scan(character))
             {
                 factory.Free(lexeme);
@@ -270,7 +270,7 @@ public class ParseRunner : IParseRunner
         {
             var lexerRule = lexerRules[i];
             var factory = _lexemeFactoryRegistry.Get(lexerRule.LexerRuleType);
-            var lexeme = factory.Create(lexerRule);
+            var lexeme = factory.Create(lexerRule, Position);
 
             if (!lexeme.Scan(character))
             {
@@ -299,10 +299,11 @@ public class ParseRunner : IParseRunner
         return true;
     }
 
-    private void ClearLexemes(List<ILexeme> lexemes)
+    private void ClearLexemes(List<ILexeme> lexemes, int doNotFreeLexemeIndex = -1)
     {
         for (var i = 0; i < lexemes.Count; i++)
-            FreeLexeme(lexemes[i]);
+            if(i != doNotFreeLexemeIndex)
+                FreeLexeme(lexemes[i]);
         lexemes.Clear();
     }
 

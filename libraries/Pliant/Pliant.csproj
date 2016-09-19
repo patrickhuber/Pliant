@@ -141,12 +141,12 @@
     <Compile Include="Grammars\Repetition.cs" />
     <Compile Include="Grammars\StringLiteralLexerRule.cs" />
     <Compile Include="Utilities\HashCode.cs" />
-    <Compile Include="Lexemes\ILexemeFactory.cs" />
-    <Compile Include="Lexemes\ILexemeFactoryRegistry.cs" />
-    <Compile Include="Lexemes\LexemeFactoryRegistry.cs" />
-    <Compile Include="Lexemes\StringLiteralLexeme.cs" />
-    <Compile Include="Lexemes\StringLiteralLexemeFactory.cs" />
-    <Compile Include="Lexemes\TerminalLexemeFactory.cs" />
+    <Compile Include="Tokens\ILexemeFactory.cs" />
+    <Compile Include="Tokens\ILexemeFactoryRegistry.cs" />
+    <Compile Include="Tokens\LexemeFactoryRegistry.cs" />
+    <Compile Include="Tokens\StringLiteralLexeme.cs" />
+    <Compile Include="Tokens\StringLiteralLexemeFactory.cs" />
+    <Compile Include="Tokens\TerminalLexemeFactory.cs" />
     <Compile Include="Forest\AndForestNode.cs" />
     <Compile Include="Grammars\AnyTerminal.cs" />
     <Compile Include="Diagnostics\Assert.cs" />
@@ -159,7 +159,7 @@
     <Compile Include="Charts\IEarleySet.cs" />
     <Compile Include="Grammars\IGrammar.cs" />
     <Compile Include="Forest\IIntermediateForestNode.cs" />
-    <Compile Include="Lexemes\ILexeme.cs" />
+    <Compile Include="Tokens\ILexeme.cs" />
     <Compile Include="Grammars\ILexerRule.cs" />
     <Compile Include="Forest\IForestNode.cs" />
     <Compile Include="Grammars\INonTerminal.cs" />
@@ -224,7 +224,7 @@
     <Compile Include="Grammars\SymbolType.cs" />
     <Compile Include="Grammars\Symbol.cs" />
     <Compile Include="Grammars\CharacterTerminal.cs" />
-    <Compile Include="Lexemes\TerminalLexeme.cs" />
+    <Compile Include="Tokens\TerminalLexeme.cs" />
     <Compile Include="Grammars\TerminalLexerRule.cs" />
     <Compile Include="Forest\TerminalForestNode.cs" />
     <Compile Include="Tokens\Token.cs" />

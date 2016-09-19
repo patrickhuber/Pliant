@@ -2,7 +2,7 @@
 using Pliant.Grammars;
 using Pliant.Tokens;
 
-namespace Pliant.Lexemes
+namespace Pliant.Tokens
 {
     public class TerminalLexeme : ILexeme
     {
@@ -13,7 +13,9 @@ namespace Pliant.Lexemes
         bool _captureRendered;
         bool _isAccepted;
 
-        public string Capture
+        public int Position { get; private set; }
+
+        public string Value
         {
             get
             {
@@ -34,22 +36,23 @@ namespace Pliant.Lexemes
 
         public ILexerRule LexerRule { get; private set; }
 
-        public TerminalLexeme(ITerminalLexerRule lexerRule)
+        public TerminalLexeme(ITerminalLexerRule lexerRule, int position)
         {
-            Reset(lexerRule);
+            Reset(lexerRule, position);
         }
 
-        public TerminalLexeme(ITerminal terminal, TokenType tokenType)
-            : this(new TerminalLexerRule(terminal, tokenType))
+        public TerminalLexeme(ITerminal terminal, TokenType tokenType, int position)
+            : this(new TerminalLexerRule(terminal, tokenType), position)
         {
         }
 
-        public void Reset(ITerminalLexerRule terminalLexerRule)
+        public void Reset(ITerminalLexerRule terminalLexerRule, int position)
         {
             LexerRule = terminalLexerRule;
             Terminal = terminalLexerRule.Terminal;
             _captureRendered = false;
             _isAccepted = false;
+            Position = position;
         }
         
         public bool IsAccepted()

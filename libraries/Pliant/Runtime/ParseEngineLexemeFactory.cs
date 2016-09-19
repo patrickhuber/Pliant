@@ -1,5 +1,5 @@
 ﻿using Pliant.Grammars;
-using Pliant.Lexemes;
+using Pliant.Tokens;
 using System;
 using System.Collections.Generic;
 
@@ -16,7 +16,7 @@ namespace Pliant.Runtime
             _queue = new Queue<ParseEngineLexeme>();
         }
 
-        public ILexeme Create(ILexerRule lexerRule)
+        public ILexeme Create(ILexerRule lexerRule, int position)
         {
             if (lexerRule.LexerRuleType != LexerRuleType)
                 throw new Exception(
