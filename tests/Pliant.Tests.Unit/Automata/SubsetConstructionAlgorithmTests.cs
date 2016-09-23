@@ -8,7 +8,7 @@ namespace Pliant.Tests.Unit.Automata
     public class SubsetConstructionAlgorithmTests
     {
         [TestMethod]
-        public void ShouldConvertSingleCharacterNfaToEquivalentDfa()
+        public void SubsetConstructionAlgorithmShouldConvertSingleCharacterNfaToEquivalentDfa()
         {
             var a = new CharacterTerminal('a');
             var states = CreateStates(2);
@@ -22,7 +22,7 @@ namespace Pliant.Tests.Unit.Automata
         }
 
         [TestMethod]
-        public void ShouldConvertComplexNfaToDfa()
+        public void SubsetConstructionAlgorithmShouldConvertComplexNfaToDfa()
         {
             var a = new CharacterTerminal('a');
             var b = new CharacterTerminal('b');

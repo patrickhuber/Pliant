@@ -82,6 +82,7 @@
     <Compile Include="Grammars\GrammarTests.cs" />
     <Compile Include="Runtime\AycockHorspoolAlgorithmTests.cs" />
     <Compile Include="Grammars\RangeTerminalTests.cs" />
+    <Compile Include="Runtime\NullableGrammar.cs" />
     <Compile Include="Runtime\ParseEngineTests.cs" />
     <Compile Include="Lexemes\ParseEngineLexemeTests.cs" />
     <Compile Include="Runtime\ParseRunnerTests.cs" />

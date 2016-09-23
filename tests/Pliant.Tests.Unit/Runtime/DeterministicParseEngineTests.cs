@@ -5,7 +5,6 @@ using Pliant.RegularExpressions;
 using Pliant.Runtime;
 using Pliant.Tests.Common;
 using Pliant.Tokens;
-using System.Linq;
 
 namespace Pliant.Tests.Unit.Runtime
 {
@@ -13,7 +12,7 @@ namespace Pliant.Tests.Unit.Runtime
     public class DeterministicParseEngineTests
     {
         private static readonly IGrammar ExpressionGrammar = GetExpressionGrammar();
-        private static readonly IGrammar NullableGrammar = GetNullableGrammar();
+        private static readonly IGrammar NullableGrammar = new NullableGrammar();
 
         [TestMethod]
         public void DeterministicParseEngineCanParseRegex()
@@ -144,23 +143,6 @@ namespace Pliant.Tests.Unit.Runtime
                 | '(' + E + ')';
 
             var grammar = new GrammarExpression(S).ToGrammar();
-            return grammar;
-        }
-
-        private static IGrammar GetNullableGrammar()
-        {
-            ProductionExpression
-                SP = nameof(SP),
-                S = nameof(S),
-                A = nameof(A),
-                E = nameof(E);
-
-            SP.Rule = S;
-            S.Rule = A + A + A + A;
-            A.Rule = 'a' | E;
-            E.Rule = null;
-
-            var grammar = new GrammarExpression(SP).ToGrammar();
             return grammar;
         }
     }

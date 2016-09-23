@@ -168,6 +168,17 @@ namespace Pliant.Runtime
             }
         }
 
+        private struct Range
+        {
+            public readonly int Min;
+            public readonly int Max;
+            public Range(int min, int max)
+            {
+                Min = min;
+                Max = max;
+            }
+        }
+
         private void ReductionPass(int location)
         {
             var earleySet = _chart.EarleySets[location];
@@ -176,6 +187,10 @@ namespace Pliant.Runtime
             var p = 0;
             var c = 0;
 
+            // jumps hold the offset to jump to when the prediction pointer p is
+            // in the jump range. We do this to avoid reprocessing states that are
+            // generated during precomputation
+            var jumps = SharedPools.Default<List<Range>>().AllocateAndClear();
             while (resume)
             {
                 // is there a new completion?
@@ -188,16 +203,48 @@ namespace Pliant.Runtime
                 // is there a new prediction?
                 else if (p < earleySet.Predictions.Count)
                 {
-                    var evidence = earleySet.Predictions[p];
+                    var predictions = earleySet.Predictions;
+                    var currentPredictionCount = predictions.Count;
+                    
+                    var evidence = predictions[p];
                     Predict(evidence, location);
+                    var newPredictionCount = predictions.Count;
+                    if (currentPredictionCount < newPredictionCount)
+                        jumps.Add(new Range(currentPredictionCount, newPredictionCount));
+
                     p++;
+                    if (jumps.Count > 0)
+                    {
+                        var jump = jumps[0];
+                        if (jump.Min <= p)
+                        {
+                            p = jump.Max;
+                            jumps.RemoveAt(0);
+                        }
+                    }
                 }
                 else
                     resume = false;
             }
+            SharedPools.Default<List<Range>>().ClearAndFree(jumps);
         }
 
         private void Predict(INormalState evidence, int j)
+        {
+            var nonTerminal = evidence.PostDotSymbol as INonTerminal;
+            var predictions = Grammar.PredictionsFor(nonTerminal);
+            for (var p = 0; p < predictions.Count; p++)
+            {
+                var prediction = predictions[p];
+                var state = new NormalState(
+                    prediction.Production,
+                    prediction.Position,
+                    j);
+                _chart.Enqueue(j, state);
+            }
+        }
+
+        private void PredictSlow(INormalState evidence, int j)
         {
             var nonTerminal = evidence.PostDotSymbol as INonTerminal;
             var rulesForNonTerminal = Grammar.RulesFor(nonTerminal);

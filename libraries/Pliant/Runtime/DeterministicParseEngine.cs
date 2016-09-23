@@ -66,7 +66,8 @@ namespace Pliant.Runtime
 
         public bool IsAccepted()
         {
-            if (_chart.FrameSets.Count == 0)
+            var anyEarleySets = _chart.FrameSets.Count > 0;
+            if (!anyEarleySets)
                 return false;
 
             var lastFrameSetIndex = _chart.FrameSets.Count - 1;
@@ -77,7 +78,8 @@ namespace Pliant.Runtime
             for (var i = 0; i < lastFrameSet.Frames.Count; i++)
             {
                 var stateFrame = lastFrameSet.Frames[i];
-                if (stateFrame.Origin != 0)
+                var originIsFirstEarleySet = stateFrame.Origin == 0;
+                if (!originIsFirstEarleySet)
                     continue;
 
                 foreach (var preComputedState in stateFrame.Frame.Data)

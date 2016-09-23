@@ -789,7 +789,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void ParseEngineShouldProduceSameLeoAndClassicForestWhenGivenAmbiuousNonTerminal()
+        public void ParseEngineShouldProduceSameLeoAndClassicForestWhenGivenAmbiguousNonTerminal()
         {
             var input = "1+2+3";
             var tokens = TokenizeNumericExpression(input);
@@ -814,6 +814,23 @@ namespace Pliant.Tests.Unit.Runtime
             // (E, 4, 5) = ('5', 4, 5)
             // (E, 6, 7) = ('7', 6, 7)
             Assert.Inconclusive();
+        }
+
+        [TestMethod]
+        public void ParseEngineCanParseNullableGrammar()
+        {
+            var parseEngine = new ParseEngine(new NullableGrammar());
+
+            var input = "aaaa";
+            var tokenType = new TokenType("a");
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                var result = parseEngine.Pulse(new Token("a", i, tokenType));
+                Assert.IsTrue(result, $"Error at position {i}");
+            }
+
+            Assert.IsTrue(parseEngine.IsAccepted(), "Parse was not accepted");
         }
 
         private static IEnumerable<IToken> TokenizeNumericExpression(string input)
