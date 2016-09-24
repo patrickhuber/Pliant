@@ -17,7 +17,5 @@ namespace Pliant.Grammars
         IReadOnlyList<IProduction> StartProductions();
 
         bool IsNullable(INonTerminal nonTerminal);
-
-        IReadOnlyList<PreComputedState> PredictionsFor(INonTerminal symbol);
     }
 }

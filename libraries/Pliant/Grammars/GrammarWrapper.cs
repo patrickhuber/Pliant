@@ -45,9 +45,5 @@ namespace Pliant.Grammars
         {
             return _innerGrammar.RulesContainingSymbol(nonTerminal);
         }
-        public IReadOnlyList<PreComputedState> PredictionsFor(INonTerminal symbol)
-        {
-            return _innerGrammar.PredictionsFor(symbol);
-        }
     }
 }

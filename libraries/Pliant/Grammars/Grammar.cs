@@ -13,7 +13,6 @@ namespace Pliant.Grammars
         private Dictionary<int, List<ILexerRule>> _ignoreIndex;
         private UniqueList<INonTerminal> _nullable;
         private Dictionary<INonTerminal, UniqueList<IProduction>> _reverseLookup;
-        private Dictionary<INonTerminal, UniqueList<PreComputedState>> _predictions;
 
         private static readonly IProduction[] EmptyProductionArray = { };
         private static readonly ILexerRule[] EmptyLexerRuleArray = { };
@@ -35,8 +34,6 @@ namespace Pliant.Grammars
             AddProductions(productions ?? EmptyProductionArray);
             AddIgnoreRules(ignoreRules ?? EmptyLexerRuleArray);
             FindNullableSymbols(_reverseLookup, _nullable);
-
-            _predictions = FindPredictions(_productionIndex, _nullable);
         }
 
         private void AddIgnoreRules(IEnumerable<ILexerRule> ignoreRules)
@@ -129,82 +126,7 @@ namespace Pliant.Grammars
                 }
             }
         }
-
-        private static Dictionary<INonTerminal, UniqueList<PreComputedState>> FindPredictions(
-            Dictionary<INonTerminal, List<IProduction>> productionIndex,
-            UniqueList<INonTerminal> nullable)
-        {
-            var predictions = new Dictionary<INonTerminal, UniqueList<PreComputedState>>();
-            var queue = new Queue<PreComputedState>();
-
-            // the production index contains all productions indexed by their left hand side 
-            // symbol
-            foreach (var symbolProductionList in productionIndex)
-            {
-                var symbol = symbolProductionList.Key;
-                var productions = symbolProductionList.Value;
-                var symbolPredictions = predictions.AddOrGetExisting(symbol);
-
-                // initialize the predictions listed in the production index
-                // these all start at position 0
-                for (var p = 0; p < productions.Count; p++)
-                {
-                    var production = productions[p];
-                    var state = new PreComputedState(production, 0);
-                    if (symbolPredictions.AddUnique(state))
-                        queue.Enqueue(state);
-                }
-
-                // compute the null closure over those productions above to get
-                // all possible predicted states for symbol
-                while (queue.Count > 0)
-                {
-                    var state = queue.Dequeue();
-
-                    var isComplete = state.Position == state.Production.RightHandSide.Count;
-                    if (isComplete)
-                        continue;
-
-                    var postDotSymbol = state.Production.RightHandSide[state.Position];
-                    var isNonTerminal = postDotSymbol.SymbolType == SymbolType.NonTerminal;
-
-                    if (!isNonTerminal)
-                        continue;
-
-                    var nonTerminalPostDotSymbol = postDotSymbol as INonTerminal;
-
-                    List<IProduction> predictedProductions;
-                    if (productionIndex.TryGetValue(nonTerminalPostDotSymbol, out predictedProductions))
-                    {
-                        for (var p = 0; p < predictedProductions.Count; p++)
-                        {
-                            var production = predictedProductions[p];
-                            var prediction = new PreComputedState(production, 0);
-
-                            if (symbolPredictions.AddUnique(prediction))
-                                queue.Enqueue(prediction);
-                        }
-                    }
-
-                    for (var s = state.Position; s < state.Production.RightHandSide.Count; s++)
-                    {
-                        var nullCheckSymbol = state.Production.RightHandSide[s];
-                        if (nullCheckSymbol.SymbolType != SymbolType.NonTerminal)
-                            break;
-                        var nonTerminalNullCheckSymbol = nullCheckSymbol as INonTerminal;
-                        if (!nullable.Contains(nonTerminalNullCheckSymbol))
-                            break;
-
-                        var aycockHorspoolState = new PreComputedState(state.Production, s + 1);
-                        if (symbolPredictions.AddUnique(aycockHorspoolState))
-                            queue.Enqueue(aycockHorspoolState);                            
-                    }
-                } 
-                // queue is clear                
-            }
-            return predictions;
-        }
-        
+                
         private void AddIgnoreRule(ILexerRule lexerRule)
         {
             _ignores.Add(lexerRule);
@@ -238,15 +160,7 @@ namespace Pliant.Grammars
                 return EmptyProductionArray;
             return list;
         }
-
-        public IReadOnlyList<PreComputedState> PredictionsFor(INonTerminal symbol)
-        {
-            UniqueList<PreComputedState> list;
-            if (!_predictions.TryGetValue(symbol, out list))
-                return EmptyPredictionArray;
-            return list;
-        }
-
+        
         public IReadOnlyList<IProduction> StartProductions()
         {
             return RulesFor(Start);

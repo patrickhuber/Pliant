@@ -204,91 +204,67 @@ namespace Pliant.Runtime
                 else if (p < earleySet.Predictions.Count)
                 {
                     var predictions = earleySet.Predictions;
-                    var currentPredictionCount = predictions.Count;
                     
                     var evidence = predictions[p];
                     Predict(evidence, location);
-                    var newPredictionCount = predictions.Count;
-                    if (currentPredictionCount < newPredictionCount)
-                        jumps.Add(new Range(currentPredictionCount, newPredictionCount));
-
+                    
                     p++;
-                    if (jumps.Count > 0)
-                    {
-                        var jump = jumps[0];
-                        if (jump.Min <= p)
-                        {
-                            p = jump.Max;
-                            jumps.RemoveAt(0);
-                        }
-                    }
                 }
                 else
                     resume = false;
             }
             SharedPools.Default<List<Range>>().ClearAndFree(jumps);
         }
-
+        
         private void Predict(INormalState evidence, int j)
         {
             var nonTerminal = evidence.PostDotSymbol as INonTerminal;
-            var predictions = Grammar.PredictionsFor(nonTerminal);
-            for (var p = 0; p < predictions.Count; p++)
-            {
-                var prediction = predictions[p];
-                var state = new NormalState(
-                    prediction.Production,
-                    prediction.Position,
-                    j);
-                _chart.Enqueue(j, state);
-            }
-        }
-
-        private void PredictSlow(INormalState evidence, int j)
-        {
-            var nonTerminal = evidence.PostDotSymbol as INonTerminal;
             var rulesForNonTerminal = Grammar.RulesFor(nonTerminal);
+            
             // PERF: Avoid boxing enumerable
-
             for (int p = 0; p < rulesForNonTerminal.Count; p++)
             {
                 var production = rulesForNonTerminal[p];
-                PredictProduction(evidence, j, production);
+                PredictProduction(j, production);
             }
+
+            var isNullable = Grammar.IsNullable(evidence.PostDotSymbol as INonTerminal);
+            if (isNullable)            
+                PredictAycockHorspool(evidence, j);            
         }
 
-        private void PredictProduction(INormalState evidence, int j, IProduction production)
+        private void PredictProduction(int j, IProduction production)
         {
             // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
             var predictedState = new NormalState(production, 0, j);
             if (_chart.Enqueue(j, predictedState))
                 Log("Predict", j, predictedState);
-
-            var isNullable = Grammar.IsNullable(evidence.PostDotSymbol as INonTerminal);
-            if (isNullable)
-            {
-                var nullParseNode = CreateNullParseNode(evidence.PostDotSymbol, j);
-                var aycockHorspoolState = evidence.NextState();
-                var evidenceParseNode = evidence.ParseNode as IInternalForestNode;
-                if (evidenceParseNode == null)
-                    aycockHorspoolState.ParseNode = CreateParseNode(aycockHorspoolState, null, nullParseNode, j);
-                else if (evidenceParseNode.Children.Count > 0 
-                    && evidenceParseNode.Children[0].Children.Count > 0)
-                {
-                    var firstChildNode = evidenceParseNode;
-                    var parseNode = CreateParseNode(aycockHorspoolState, firstChildNode, nullParseNode, j);
-                    aycockHorspoolState.ParseNode = parseNode;
-                }
-                if (_chart.Enqueue(j, aycockHorspoolState))
-                    Log("Predict", j, aycockHorspoolState);
-            }
         }
+
+        private void PredictAycockHorspool(INormalState evidence, int j)
+        {
+            var nullParseNode = CreateNullParseNode(evidence.PostDotSymbol, j);
+            var aycockHorspoolState = evidence.NextState();
+            var evidenceParseNode = evidence.ParseNode as IInternalForestNode;
+            if (evidenceParseNode == null)
+                aycockHorspoolState.ParseNode = CreateParseNode(aycockHorspoolState, null, nullParseNode, j);
+            else if (evidenceParseNode.Children.Count > 0
+                && evidenceParseNode.Children[0].Children.Count > 0)
+            {
+                var firstChildNode = evidenceParseNode;
+                var parseNode = CreateParseNode(aycockHorspoolState, firstChildNode, nullParseNode, j);
+                aycockHorspoolState.ParseNode = parseNode;
+            }
+            if (_chart.Enqueue(j, aycockHorspoolState))
+                Log("Predict", j, aycockHorspoolState);
+        }
+
 
         private void Complete(INormalState completed, int k)
         {
             if (completed.ParseNode == null)
                 completed.ParseNode = CreateNullParseNode(completed.Production.LeftHandSide, k);
-            
+                        
             var earleySet = _chart.EarleySets[completed.Origin];
             var searchSymbol = completed.Production.LeftHandSide;
 
