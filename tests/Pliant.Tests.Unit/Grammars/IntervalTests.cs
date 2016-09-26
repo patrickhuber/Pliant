@@ -126,8 +126,8 @@ namespace Pliant.Tests.Unit.Grammars
 
             Assert.AreEqual(2, joins.Count);
 
-            Assert.AreSame(first, joins[0]);
-            Assert.AreSame(second, joins[1]);
+            Assert.AreEqual(first, joins[0]);
+            Assert.AreEqual(second, joins[1]);
         }
 
         [TestMethod]
@@ -201,6 +201,34 @@ namespace Pliant.Tests.Unit.Grammars
             Assert.AreEqual('4', splits[0].Max);
             Assert.AreEqual('5', splits[1].Min);
             Assert.AreEqual('9', splits[1].Max);
+        }
+
+        [TestMethod]
+        public void IntervalShouldTouchWhereMinIsOneLessThanMaxOfOther()
+        {
+            var first = new Interval('a', 'a');
+            var second = new Interval('b', 'b');
+
+            Assert.IsTrue(first.Touches(second));
+        }
+
+        [TestMethod]
+        public void IntervalShouldTouchIntervalWhereMaxIsOneMoreThanMinOfOther()
+        {
+            var first = new Interval('b', 'b');
+            var second = new Interval('a', 'a');
+
+            Assert.IsTrue(first.Touches(second));
+        }
+
+        [TestMethod]
+        public void IntervalShouldNotTouchWhenIntervalsAreNotCloseToEachother()
+        {
+            var first = new Interval('a', 'b');
+            var second = new Interval('e', 'z');
+
+            Assert.IsFalse(first.Touches(second));
+            Assert.IsFalse(second.Touches(first));
         }
     }
 }

@@ -7,5 +7,7 @@
         }
 
         public abstract bool IsMatch(char character);
+
+        public abstract Interval[] GetIntervals();
     }
 }

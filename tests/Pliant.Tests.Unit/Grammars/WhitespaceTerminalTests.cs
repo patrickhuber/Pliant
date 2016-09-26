@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Grammars;
+using System;
 
 namespace Pliant.Tests.Unit
 {
@@ -35,5 +36,14 @@ namespace Pliant.Tests.Unit
             var whitespaceTerminal = new WhitespaceTerminal();
             Assert.IsTrue(whitespaceTerminal.IsMatch(' '));
         }
+
+        [TestMethod]
+        public void WhitespaceTerminalGetIntervalsShouldReturnAllWhitespaceRanges()
+        {
+            var whitespaceTerminal = new WhitespaceTerminal();
+            var intervals = whitespaceTerminal.GetIntervals();
+            Assert.AreEqual(9, intervals.Length);
+        }
+        
     }
 }

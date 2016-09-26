@@ -1,7 +1,11 @@
-﻿namespace Pliant.Grammars
+﻿using System;
+
+namespace Pliant.Grammars
 {
     public class DigitTerminal : BaseTerminal
     {
+        private static readonly Interval[] Intervals = { new Interval('0', '9') };
+
         public override bool IsMatch(char character)
         {
             return char.IsDigit(character);
@@ -24,6 +28,11 @@
         public override int GetHashCode()
         {
             return ToStringValue.GetHashCode();
+        }
+
+        public override Interval[] GetIntervals()
+        {
+            return Intervals;
         }
     }
 }

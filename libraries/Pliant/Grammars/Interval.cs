@@ -5,19 +5,18 @@ namespace Pliant.Grammars
 {
     /// <summary>
     /// Defines an interval with a inclusive min and max. Does not represent empty sets. Represents single value sets with Min == Max
-    /// </summary>
-    /// <typeparam name="T">A value that implements IComparable&lt;T&gt;</typeparam>    
-    public class Interval : IComparable<Interval>
+    /// </summary> 
+    public struct Interval : IComparable<Interval>
     {
         /// <summary>
         /// Gets the min value of the interval
         /// </summary>
-        public char Min { get; private set; }
+        public readonly char Min;
 
         /// <summary>
         /// Gets the max value of the interval
         /// </summary>
-        public char Max { get; private set; }
+        public readonly char Max;
         
         /// <summary>
         /// Constructs a new interval with the give min and max values
@@ -57,6 +56,27 @@ namespace Pliant.Grammars
         }
 
         /// <summary>
+        /// Determines when two intervals touch. Touch is when one Min differes from a Max by at most one.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Touches(Interval other)
+        {
+            // if intervals overlap they touch
+            if (Overlaps(other))
+                return true;
+
+            // char.CompareTo returns the difference between integers
+            if (Min - other.Max == 1)
+                return true;
+
+            if (other.Min - Max == 1)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
         /// Joins two intervals together if they overlap.
         /// </summary>
         /// <param name="first">the first interval</param>
@@ -66,12 +86,12 @@ namespace Pliant.Grammars
         /// if intervals are equal returns a single interval.
         /// if intervals do not overlap reutrns both interval.
         /// </returns>
-        public static List<Interval> Join(Interval first, Interval second)
+        public static IReadOnlyList<Interval> Join(Interval first, Interval second)
         {
             var list = new List<Interval>();
 
-            var overlaps = first.Overlaps(second);
-            if (!overlaps)
+            var touches = first.Touches(second);
+            if (!touches)
             {
                 list.Add(first);
                 list.Add(second);
@@ -96,7 +116,7 @@ namespace Pliant.Grammars
         /// <param name="first"></param>
         /// <param name="second"></param>
         /// <returns>The disjoint set of intervals</returns>
-        public static List<Interval> Split(Interval first, Interval second)
+        public static IReadOnlyList<Interval> Split(Interval first, Interval second)
         {
             var list = new List<Interval>();
 

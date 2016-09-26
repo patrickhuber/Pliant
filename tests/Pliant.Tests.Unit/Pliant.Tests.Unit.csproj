@@ -71,6 +71,7 @@
     <Compile Include="Charts\ChartTests.cs" />
     <Compile Include="Grammars\DigitTerminalTests.cs" />
     <Compile Include="Grammars\PreComputedGrammarTests.cs" />
+    <Compile Include="Grammars\SetTerminalTests.cs" />
     <Compile Include="Runtime\DeterministicParseEngineTests.cs" />
     <Compile Include="Runtime\LoggingNodeVisitor.cs" />
     <Compile Include="Forest\ForestNodeVisitorTests.cs" />

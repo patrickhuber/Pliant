@@ -1,7 +1,11 @@
-﻿namespace Pliant.Grammars
+﻿using System;
+
+namespace Pliant.Grammars
 {
     public class AnyTerminal : BaseTerminal
     {
+        private static readonly Interval[] Interval = { new Interval(char.MinValue, char.MaxValue) };
+
         public override bool IsMatch(char character)
         {
             return true;
@@ -23,6 +27,11 @@
         public override string ToString()
         {
             return ".";
+        }
+
+        public override Interval[] GetIntervals()
+        {
+            return Interval;
         }
     }
 }

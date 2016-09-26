@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Pliant.Grammars
 {
@@ -21,6 +22,11 @@ namespace Pliant.Grammars
                     return true;
             }
             return false;
+        }
+
+        public override Interval[] GetIntervals()
+        {
+            throw new NotImplementedException();
         }
     }
 }

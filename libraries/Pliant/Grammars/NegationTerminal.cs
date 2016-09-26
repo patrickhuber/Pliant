@@ -1,4 +1,6 @@
-﻿namespace Pliant.Grammars
+﻿using System;
+
+namespace Pliant.Grammars
 {
     public class NegationTerminal : BaseTerminal
     {
@@ -12,6 +14,10 @@
         public override bool IsMatch(char character)
         {
             return !_innerTerminal.IsMatch(character);
+        }
+        public override Interval[] GetIntervals()
+        {
+            throw new NotImplementedException();
         }
     }
 }
