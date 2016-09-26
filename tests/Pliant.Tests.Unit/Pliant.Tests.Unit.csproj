@@ -53,12 +53,14 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Automata\DfaLexemeTests.cs" />
+    <Compile Include="Grammars\IntervalTests.cs" />
     <Compile Include="Automata\SubsetConstructionAlgorithmTests.cs" />
     <Compile Include="Automata\TableFiniteAutomataTests.cs" />
     <Compile Include="Builders\Expressions\NamespaceExpressionTests.cs" />
     <Compile Include="Builders\Expressions\ProductionExpressionTests.cs" />
     <Compile Include="Builders\GrammarModelTests.cs" />
     <Compile Include="Builders\ProductionModelTests.cs" />
+    <Compile Include="Collections\AvlTreeTests.cs" />
     <Compile Include="Collections\BitMatrixTests.cs" />
     <Compile Include="Collections\FastLookupDictionaryTests.cs" />
     <Compile Include="Ebnf\EbnfGrammarGeneratorTests.cs" />
@@ -109,7 +111,9 @@
       <Name>Pliant.Tests.Common</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Categories\" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

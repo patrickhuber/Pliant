@@ -62,6 +62,7 @@
     <Compile Include="Charts\PreComputedSet.cs" />
     <Compile Include="Charts\StateBase.cs" />
     <Compile Include="Charts\StateFrame.cs" />
+    <Compile Include="Collections\AvlTree.cs" />
     <Compile Include="Collections\BitMatrix.cs" />
     <Compile Include="Collections\DictionaryExtensions.cs" />
     <Compile Include="Collections\FastLookupDictionary.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Grammars\Frame.cs" />
     <Compile Include="Grammars\GrammarWrapper.cs" />
+    <Compile Include="Grammars\Interval.cs" />
     <Compile Include="LexerRules\NumberLexerRule.cs" />
     <Compile Include="LexerRules\WhitespaceLexerRule.cs" />
     <Compile Include="Grammars\PreComputedGrammar.cs" />
