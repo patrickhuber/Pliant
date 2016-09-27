@@ -4,17 +4,18 @@ namespace Pliant.Grammars
 {
     public class NegationTerminal : BaseTerminal
     {
-        private readonly ITerminal _innerTerminal;
+        public ITerminal InnerTerminal { get; private set; }
 
         public NegationTerminal(ITerminal innerTerminal)
         {
-            _innerTerminal = innerTerminal;
+            InnerTerminal = innerTerminal;
         }
 
         public override bool IsMatch(char character)
         {
-            return !_innerTerminal.IsMatch(character);
+            return !InnerTerminal.IsMatch(character);
         }
+
         public override Interval[] GetIntervals()
         {
             throw new NotImplementedException();

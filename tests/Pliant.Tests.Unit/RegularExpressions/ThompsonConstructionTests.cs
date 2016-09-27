@@ -99,6 +99,126 @@ namespace Pliant.Tests.Unit.RegularExpressions
             Assert.AreEqual(q2Transition.Target, q3Transition.Target);
         }
 
+        [TestMethod]
+        public void ThompsonConstructionShouldRecognizeWhitespaceShortHandCharacterClass()
+        {
+            var input = @"[\s]";
+            var nfa = CreateNfa(input);
+            VerifyNfaIsNotNullAndHasValidStartAndEndStates(nfa);
+
+            // start -  whitespace - end
+
+            var start = nfa.Start;
+            Assert.AreEqual(1, nfa.Start.Transitions.Count);
+
+            var transition = nfa.Start.Transitions[0];
+            var terminalTransition = transition as TerminalNfaTransition;
+            Assert.IsNotNull(terminalTransition);
+
+            var whitespaceTerminal = terminalTransition.Terminal as WhitespaceTerminal;
+            Assert.IsNotNull(whitespaceTerminal);            
+        }
+
+        [TestMethod]
+        public void ThompsonConstructionShouldRecognizeNonWhitespaceShortHandCharacterClass()
+        {
+            var input = @"[\S]";
+            var nfa = CreateNfa(input);
+            VerifyNfaIsNotNullAndHasValidStartAndEndStates(nfa);
+
+            var start = nfa.Start;
+            Assert.AreEqual(1, nfa.Start.Transitions.Count);
+
+            var transition = nfa.Start.Transitions[0];
+            var terminalTransition = transition as TerminalNfaTransition;
+            Assert.IsNotNull(terminalTransition);
+
+            var negationTerminal = terminalTransition.Terminal as NegationTerminal;
+            Assert.IsNotNull(negationTerminal);
+
+            var whitespaceTerminal = negationTerminal.InnerTerminal as WhitespaceTerminal;
+            Assert.IsNotNull(whitespaceTerminal);
+        }
+
+        [TestMethod]
+        public void ThompsonConstructionShouldRecognizeWordShortHandCharacterClass()
+        {
+            var input = @"[\w]";
+            var nfa = CreateNfa(input);
+            VerifyNfaIsNotNullAndHasValidStartAndEndStates(nfa);
+
+            var start = nfa.Start;
+            Assert.AreEqual(1, nfa.Start.Transitions.Count);
+
+            var transition = nfa.Start.Transitions[0];
+            var terminalTransition = transition as TerminalNfaTransition;
+            Assert.IsNotNull(terminalTransition);
+
+            var wordTerminal = terminalTransition.Terminal as WordTerminal;
+            Assert.IsNotNull(wordTerminal);
+        }
+
+        [TestMethod]
+        public void ThompsonConstructionShouldRecognizeNonWordShortHandCharacterClass()
+        {
+            var input = @"[\W]";
+            var nfa = CreateNfa(input);
+            VerifyNfaIsNotNullAndHasValidStartAndEndStates(nfa);
+
+            var start = nfa.Start;
+            Assert.AreEqual(1, nfa.Start.Transitions.Count);
+
+            var transition = nfa.Start.Transitions[0];
+            var terminalTransition = transition as TerminalNfaTransition;
+            Assert.IsNotNull(terminalTransition);
+
+            var negationTerminal = terminalTransition.Terminal as NegationTerminal;
+            Assert.IsNotNull(negationTerminal);
+
+            var wordTerminal = negationTerminal.InnerTerminal as WordTerminal;
+            Assert.IsNotNull(wordTerminal);
+        }
+
+        [TestMethod]
+        public void ThompsonConstructionShouldRecognizeDigitShortHandCharacterClass()
+        {
+            var input = @"[\d]";
+            var nfa = CreateNfa(input);
+            VerifyNfaIsNotNullAndHasValidStartAndEndStates(nfa);
+
+            var start = nfa.Start;
+            Assert.AreEqual(1, nfa.Start.Transitions.Count);
+
+            var transition = nfa.Start.Transitions[0];
+            var terminalTransition = transition as TerminalNfaTransition;
+            Assert.IsNotNull(terminalTransition);
+
+            var digitTerminal = terminalTransition.Terminal as DigitTerminal;
+            Assert.IsNotNull(digitTerminal);
+        }
+
+        [TestMethod]
+        public void ThompsonConstructionShouldRecognizeNonDigitShortHandCharacterClass()
+        {
+
+            var input = @"[\D]";
+            var nfa = CreateNfa(input);
+            VerifyNfaIsNotNullAndHasValidStartAndEndStates(nfa);
+
+            var start = nfa.Start;
+            Assert.AreEqual(1, nfa.Start.Transitions.Count);
+
+            var transition = nfa.Start.Transitions[0];
+            var terminalTransition = transition as TerminalNfaTransition;
+            Assert.IsNotNull(terminalTransition);
+
+            var negationTerminal = terminalTransition.Terminal as NegationTerminal;
+            Assert.IsNotNull(negationTerminal);
+
+            var digitTerminal = negationTerminal.InnerTerminal as DigitTerminal;
+            Assert.IsNotNull(digitTerminal);
+        }
+
         private static void VerifyNfaIsNotNullAndHasValidStartAndEndStates(INfa nfa)
         {
             Assert.IsNotNull(nfa);
