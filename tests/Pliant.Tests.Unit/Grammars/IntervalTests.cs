@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Grammars;
+using System.Collections.Generic;
 
 namespace Pliant.Tests.Unit.Grammars
 {
@@ -274,6 +275,37 @@ namespace Pliant.Tests.Unit.Grammars
 
             Assert.AreEqual('z', inverses[1].Min);
             Assert.AreEqual(inverses[1].Max, char.MaxValue);             
+        }
+
+        [TestMethod]
+        public void IntervalGroupShouldCombineTouchingAndOverlappingIntervals()
+        {
+            var intervalList = new List<Interval>();
+            intervalList.Add(new Interval('a', 'a'));
+            intervalList.Add(new Interval('b', 'c'));
+            intervalList.Add(new Interval('e', 'e'));
+            intervalList.Add(new Interval('f', 'm'));
+            intervalList.Add(new Interval('0', '9'));
+
+            var groupedList = Interval.Group(intervalList);
+
+            Assert.AreEqual(3, groupedList.Count);
+        }
+
+        [TestMethod]
+        public void IntervalGroupShouldSortIntervalsAndCombine()
+        {
+
+            var intervalList = new List<Interval>();
+            intervalList.Add(new Interval('0', '9'));
+            intervalList.Add(new Interval('e', 'e'));            
+            intervalList.Add(new Interval('b', 'c'));
+            intervalList.Add(new Interval('f', 'm'));
+            intervalList.Add(new Interval('a', 'a'));
+
+            var groupedList = Interval.Group(intervalList);
+
+            Assert.AreEqual(3, groupedList.Count);
         }
     }
 }
