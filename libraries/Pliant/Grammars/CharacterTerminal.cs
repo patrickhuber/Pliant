@@ -8,12 +8,11 @@ namespace Pliant.Grammars
     {
         public char Character { get; private set; }
 
-        private readonly Interval[] _intervals;
+        private Interval[] _intervals;
 
         public CharacterTerminal(char character)
         {
-            Character = character;
-            _intervals = new[] { new Interval(character, character) };
+            Character = character;            
         }
 
         public override int GetHashCode()
@@ -44,6 +43,8 @@ namespace Pliant.Grammars
 
         public override IReadOnlyList<Interval> GetIntervals()
         {
+            if(_intervals == null)
+                _intervals = new[] { new Interval(Character, Character) };
             return _intervals;
         }
     }

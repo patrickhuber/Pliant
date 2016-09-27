@@ -7,7 +7,7 @@ namespace Pliant.Grammars
     public class SetTerminal : BaseTerminal
     {
         private readonly HashSet<char> _characterSet;
-        private readonly IReadOnlyList<Interval> _intervals;
+        private IReadOnlyList<Interval> _intervals;
 
         public SetTerminal(params char[] characters)
             : this(new HashSet<char>(characters))
@@ -18,7 +18,6 @@ namespace Pliant.Grammars
         {
             _characterSet = new HashSet<char>();
             _characterSet.Add(first);
-            _intervals = CreateIntervals(_characterSet);
         }
 
         public SetTerminal(char first, char second)
@@ -61,6 +60,8 @@ namespace Pliant.Grammars
 
         public override IReadOnlyList<Interval> GetIntervals()
         {
+            if(_intervals == null)
+                _intervals = CreateIntervals(_characterSet); 
             return _intervals;
         }
     }

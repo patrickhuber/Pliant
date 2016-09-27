@@ -10,13 +10,12 @@ namespace Pliant.Grammars
 
         public char End { get; private set; }
 
-        private readonly Interval[] _intervals;
+        private Interval[] _intervals;
 
         public RangeTerminal(char start, char end)
         {
             Start = start;
             End = end;
-            _intervals = new[] { new Interval(start,end) };
         }
 
         public override bool IsMatch(char character)
@@ -47,6 +46,8 @@ namespace Pliant.Grammars
 
         public override IReadOnlyList<Interval> GetIntervals()
         {
+            if(_intervals == null)
+                _intervals = new[] { new Interval(Start, End) };
             return _intervals;
         }
     }

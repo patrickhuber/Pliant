@@ -6,15 +6,14 @@ namespace Pliant.Grammars
     public class CharacterClassTerminal : BaseTerminal
     {
         private readonly List<ITerminal> _terminals;
-        private readonly IReadOnlyList<Interval> _intervals;
+        private IReadOnlyList<Interval> _intervals;
 
         public CharacterClassTerminal(params ITerminal[] terminals)
         {
             _terminals = new List<ITerminal>(terminals);
-            _intervals = CreateIntervals(_terminals);
         }
 
-        private IReadOnlyList<Interval> CreateIntervals(IReadOnlyList<ITerminal> terminals)
+        private static IReadOnlyList<Interval> CreateIntervals(IReadOnlyList<ITerminal> terminals)
         {
             var intervalList = new List<Interval>();
             for (var i = 0; i < terminals.Count; i++)
@@ -39,6 +38,8 @@ namespace Pliant.Grammars
 
         public override IReadOnlyList<Interval> GetIntervals()
         {
+            if(_intervals == null)
+                _intervals = CreateIntervals(_terminals);
             return _intervals;
         }
     }
