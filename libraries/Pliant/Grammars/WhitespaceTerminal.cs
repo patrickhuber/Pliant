@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Pliant.Grammars
 {
@@ -41,7 +42,7 @@ namespace Pliant.Grammars
             return ToStringValue.GetHashCode();
         }
 
-        public override Interval[] GetIntervals()
+        public override IReadOnlyList<Interval> GetIntervals()
         {
             return Intervals;
         }

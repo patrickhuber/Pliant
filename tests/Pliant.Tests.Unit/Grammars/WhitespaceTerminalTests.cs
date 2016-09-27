@@ -42,7 +42,7 @@ namespace Pliant.Tests.Unit
         {
             var whitespaceTerminal = new WhitespaceTerminal();
             var intervals = whitespaceTerminal.GetIntervals();
-            Assert.AreEqual(9, intervals.Length);
+            Assert.AreEqual(9, intervals.Count);
         }
         
     }

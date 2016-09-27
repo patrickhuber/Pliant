@@ -230,5 +230,50 @@ namespace Pliant.Tests.Unit.Grammars
             Assert.IsFalse(first.Touches(second));
             Assert.IsFalse(second.Touches(first));
         }
+
+        [TestMethod]
+        public void IntervalShouldNotCreateInverseWhenMinAndMaxAreAtBounds()
+        {
+            var interval = new Interval(char.MinValue, char.MaxValue);
+            var inverses = Interval.Inverse(interval);
+            Assert.AreEqual(0, inverses.Count);
+        }
+
+        [TestMethod]
+        public void IntervalShouldCreateOneIntervalWhenMinAtBoundMaxLessThanBound()
+        {
+            var interval = new Interval(char.MinValue, 'y');
+            var inverses = Interval.Inverse(interval);
+            Assert.AreEqual(1, inverses.Count);
+
+            Assert.AreEqual('z', inverses[0].Min);
+            Assert.AreEqual(char.MaxValue, inverses[0].Max);
+        }
+
+        [TestMethod]
+        public void IntervalShouldCreateOneIntervalWhenMaxAtBoundMinMoreThanBound()
+        {
+            var interval = new Interval('b', char.MaxValue);
+
+            var inverses = Interval.Inverse(interval);
+            Assert.AreEqual(1, inverses.Count);
+
+            Assert.AreEqual(char.MinValue, inverses[0].Min);
+            Assert.AreEqual('a', inverses[0].Max);            
+        }
+
+        [TestMethod]
+        public void IntervalShouldCreateTwoInversesWhenMaxAndMinWithinBounds()
+        {
+            var interval = new Interval('b', 'y');
+            var inverses = Interval.Inverse(interval);
+            Assert.AreEqual(2, inverses.Count);
+
+            Assert.AreEqual(char.MinValue, inverses[0].Min);
+            Assert.AreEqual('a', inverses[0].Max);
+
+            Assert.AreEqual('z', inverses[1].Min);
+            Assert.AreEqual(inverses[1].Max, char.MaxValue);             
+        }
     }
 }

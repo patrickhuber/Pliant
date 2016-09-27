@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pliant.Utilities;
+using System;
 using System.Collections.Generic;
 
 namespace Pliant.Grammars
@@ -152,6 +153,63 @@ namespace Pliant.Grammars
             }
             
             return list;
+        }
+
+        private static Interval[] EmptyList = { };
+
+        public static IReadOnlyList<Interval> Inverse(Interval interval)
+        {
+            if (interval.Min == char.MinValue && interval.Max == char.MaxValue)
+                return EmptyList;
+            
+            var list = new List<Interval>();
+            if (interval.Min != char.MinValue)
+                list.Add(new Interval(char.MinValue, (char)(interval.Min - 1)));
+            if (interval.Max != char.MaxValue)
+                list.Add(new Interval((char)(interval.Max + 1), char.MaxValue));
+
+            return list;
+        }
+
+        public static IReadOnlyList<Interval> Group(IReadOnlyList<Interval> input)
+        {
+            var intervalPool = SharedPools.Default<List<Interval>>();
+            var sortedIntervals = intervalPool.AllocateAndClear();
+            sortedIntervals.AddRange(input);
+            sortedIntervals.Sort();
+
+            var intervalList = intervalPool.AllocateAndClear();
+
+            Interval? accumulator = null;
+            for (var i = 0; i < sortedIntervals.Count; i++)
+            {
+                var interval = sortedIntervals[i];
+                if (accumulator == null)
+                {
+                    accumulator = interval;
+                    continue;
+                }
+
+                var joins = Join(accumulator.Value, interval);
+
+                switch (joins.Count)
+                {
+                    case 2:
+                        intervalList.Add(joins[0]);
+                        accumulator = joins[1];
+                        break;
+                    case 1:
+                        accumulator = joins[0];
+                        break;
+                }
+            }
+
+            if (accumulator != null)
+                intervalList.Add(accumulator.Value);
+
+            intervalPool.ClearAndFree(sortedIntervals);
+
+            return intervalList;
         }
 
         public override string ToString()

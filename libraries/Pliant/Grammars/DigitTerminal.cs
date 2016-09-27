@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Pliant.Grammars
 {
     public class DigitTerminal : BaseTerminal
     {
-        private static readonly Interval[] Intervals = { new Interval('0', '9') };
+        private static readonly Interval[] _intervals = { new Interval('0', '9') };
 
         public override bool IsMatch(char character)
         {
@@ -30,9 +31,9 @@ namespace Pliant.Grammars
             return ToStringValue.GetHashCode();
         }
 
-        public override Interval[] GetIntervals()
+        public override IReadOnlyList<Interval> GetIntervals()
         {
-            return Intervals;
+            return _intervals;
         }
     }
 }

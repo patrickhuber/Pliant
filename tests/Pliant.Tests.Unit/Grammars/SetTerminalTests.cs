@@ -26,7 +26,7 @@ namespace Pliant.Tests.Unit.Grammars
         {
             var setTerminal = new SetTerminal('a', 'b', 'c', 'd', 'e', 'z');
             var intervals = setTerminal.GetIntervals();
-            Assert.AreEqual(2, intervals.Length);
+            Assert.AreEqual(2, intervals.Count);
             Assert.AreEqual('a', intervals[0].Min);
             Assert.AreEqual('e', intervals[0].Max);
             Assert.AreEqual('z', intervals[1].Min);

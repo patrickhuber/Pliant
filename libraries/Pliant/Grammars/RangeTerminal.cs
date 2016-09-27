@@ -1,5 +1,6 @@
 ﻿using System;
 using Pliant.Utilities;
+using System.Collections.Generic;
 
 namespace Pliant.Grammars
 {
@@ -44,7 +45,7 @@ namespace Pliant.Grammars
                 && rangeTerminal.Start == Start;
         }
 
-        public override Interval[] GetIntervals()
+        public override IReadOnlyList<Interval> GetIntervals()
         {
             return _intervals;
         }

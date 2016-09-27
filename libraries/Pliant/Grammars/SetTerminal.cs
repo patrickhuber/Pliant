@@ -7,7 +7,7 @@ namespace Pliant.Grammars
     public class SetTerminal : BaseTerminal
     {
         private readonly HashSet<char> _characterSet;
-        private readonly Interval[] _intervals;
+        private readonly IReadOnlyList<Interval> _intervals;
 
         public SetTerminal(params char[] characters)
             : this(new HashSet<char>(characters))
@@ -18,6 +18,7 @@ namespace Pliant.Grammars
         {
             _characterSet = new HashSet<char>();
             _characterSet.Add(first);
+            _intervals = CreateIntervals(_characterSet);
         }
 
         public SetTerminal(char first, char second)
@@ -29,54 +30,23 @@ namespace Pliant.Grammars
         public SetTerminal(ISet<char> characterSet)
         {
             _characterSet = new HashSet<char>(characterSet);
-            _intervals = CreateIntervals(characterSet);            
+            _intervals = CreateIntervals(_characterSet);            
         }
+                
 
-        private static Interval[] CreateIntervals(ISet<char> characterSet)
+        private static IReadOnlyList<Interval> CreateIntervals(HashSet<char> characterSet)
         {
-            var sortedListPool = SharedPools.Default<List<char>>();
-            var sortedArray = sortedListPool.AllocateAndClear();
-            sortedArray.AddRange(characterSet);
-            sortedArray.Sort();
-
             var intervalListPool = SharedPools.Default<List<Interval>>();
             var intervalList = intervalListPool.AllocateAndClear();
-            Interval? accumulator = null;
 
-            for (var i = 0; i < sortedArray.Count; i++)
-            {
-                var interval = new Interval(sortedArray[i], sortedArray[i]);
-                if (accumulator == null)
-                {
-                    accumulator = interval;
-                    continue;
-                }
+            // create a initial set of intervals
+            foreach (var character in characterSet)            
+                intervalList.Add(new Interval(character, character));
 
-                var joins = Interval.Join(accumulator.Value, interval);
-
-                // two items mean that the intervals do not intersect
-                // add the first interval to the list 
-                // and set the accumulator to the second interval
-                if (joins.Count == 2)
-                {
-                    intervalList.Add(joins[0]);
-                    accumulator = joins[1];
-                }
-                else if (joins.Count == 1)
-                {
-                    accumulator = joins[0];
-                }
-            }
-
-            sortedListPool.ClearAndFree(sortedArray);
-
-            if (accumulator != null)
-                intervalList.Add(accumulator.Value);
-
-            var array = intervalList.ToArray();
+            var groupedIntervals = Interval.Group(intervalList);
             intervalListPool.ClearAndFree(intervalList);
 
-            return array;
+            return groupedIntervals;
         }
 
         public override bool IsMatch(char character)
@@ -89,7 +59,7 @@ namespace Pliant.Grammars
             return $"[{string.Join(string.Empty, _characterSet)}]";
         }
 
-        public override Interval[] GetIntervals()
+        public override IReadOnlyList<Interval> GetIntervals()
         {
             return _intervals;
         }

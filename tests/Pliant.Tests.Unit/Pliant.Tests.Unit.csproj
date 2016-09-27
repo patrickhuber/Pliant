@@ -71,6 +71,7 @@
     <Compile Include="Bnf\BnfTests.cs" />
     <Compile Include="Charts\ChartTests.cs" />
     <Compile Include="Grammars\DigitTerminalTests.cs" />
+    <Compile Include="Grammars\NegationTerminalTests.cs" />
     <Compile Include="Grammars\PreComputedGrammarTests.cs" />
     <Compile Include="Grammars\SetTerminalTests.cs" />
     <Compile Include="Grammars\WordTerminalTests.cs" />

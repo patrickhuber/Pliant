@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Pliant.Grammars
 {
@@ -6,9 +7,20 @@ namespace Pliant.Grammars
     {
         public ITerminal InnerTerminal { get; private set; }
 
+        private readonly IReadOnlyList<Interval> _intervals;
+
         public NegationTerminal(ITerminal innerTerminal)
         {
             InnerTerminal = innerTerminal;
+            var inverseIntervalList = new List<Interval>();
+            var intervals = innerTerminal.GetIntervals();
+            for (var i = 0; i < intervals.Count; i++)
+            {
+                var inverseIntervals = Interval.Inverse(intervals[i]);
+                inverseIntervalList.AddRange(inverseIntervals);
+            }
+            
+            _intervals = Interval.Group(inverseIntervalList);
         }
 
         public override bool IsMatch(char character)
@@ -16,9 +28,9 @@ namespace Pliant.Grammars
             return !InnerTerminal.IsMatch(character);
         }
 
-        public override Interval[] GetIntervals()
+        public override IReadOnlyList<Interval> GetIntervals()
         {
-            throw new NotImplementedException();
+            return _intervals;
         }
     }
 }

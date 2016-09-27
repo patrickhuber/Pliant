@@ -6,10 +6,23 @@ namespace Pliant.Grammars
     public class CharacterClassTerminal : BaseTerminal
     {
         private readonly List<ITerminal> _terminals;
-        
+        private readonly IReadOnlyList<Interval> _intervals;
+
         public CharacterClassTerminal(params ITerminal[] terminals)
         {
             _terminals = new List<ITerminal>(terminals);
+            _intervals = CreateIntervals(_terminals);
+        }
+
+        private IReadOnlyList<Interval> CreateIntervals(IReadOnlyList<ITerminal> terminals)
+        {
+            var intervalList = new List<Interval>();
+            for (var i = 0; i < terminals.Count; i++)
+            {
+                var intervals = terminals[i].GetIntervals();
+                intervalList.AddRange(intervals);
+            }
+            return Interval.Group(intervalList);
         }
 
         public override bool IsMatch(char character)
@@ -24,9 +37,9 @@ namespace Pliant.Grammars
             return false;
         }
 
-        public override Interval[] GetIntervals()
+        public override IReadOnlyList<Interval> GetIntervals()
         {
-            throw new NotImplementedException();
+            return _intervals;
         }
     }
 }

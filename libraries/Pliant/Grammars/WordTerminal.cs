@@ -16,7 +16,7 @@ namespace Pliant.Grammars
             new Interval('_', '_')
         };
         
-        public override Interval[] GetIntervals()
+        public override IReadOnlyList<Interval> GetIntervals()
         {
             return _intervals;
         }

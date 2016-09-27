@@ -25,7 +25,7 @@ namespace Pliant.Tests.Unit
         {
             var digitTerminal = new DigitTerminal();
             var intervals = digitTerminal.GetIntervals();
-            Assert.AreEqual(1, intervals.Length);
+            Assert.AreEqual(1, intervals.Count);
             Assert.AreEqual('0', intervals[0].Min);
             Assert.AreEqual('9', intervals[0].Max);
         }

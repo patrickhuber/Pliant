@@ -32,7 +32,7 @@ namespace Pliant.Tests.Unit
         {
             var rangeTerminal = new RangeTerminal('a', 'z');
             var intervals = rangeTerminal.GetIntervals();
-            Assert.AreEqual(1, intervals.Length);
+            Assert.AreEqual(1, intervals.Count);
             Assert.AreEqual('a', intervals[0].Min);
             Assert.AreEqual('z', intervals[0].Max);
         }
