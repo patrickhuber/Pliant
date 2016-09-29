@@ -167,18 +167,7 @@ namespace Pliant.Runtime
                     LogScan(j + 1, nextState, token);
             }
         }
-
-        private struct Range
-        {
-            public readonly int Min;
-            public readonly int Max;
-            public Range(int min, int max)
-            {
-                Min = min;
-                Max = max;
-            }
-        }
-
+        
         private void ReductionPass(int location)
         {
             var earleySet = _chart.EarleySets[location];
@@ -186,11 +175,7 @@ namespace Pliant.Runtime
 
             var p = 0;
             var c = 0;
-
-            // jumps hold the offset to jump to when the prediction pointer p is
-            // in the jump range. We do this to avoid reprocessing states that are
-            // generated during precomputation
-            var jumps = SharedPools.Default<List<Range>>().AllocateAndClear();
+            
             while (resume)
             {
                 // is there a new completion?
@@ -213,7 +198,6 @@ namespace Pliant.Runtime
                 else
                     resume = false;
             }
-            SharedPools.Default<List<Range>>().ClearAndFree(jumps);
         }
         
         private void Predict(INormalState evidence, int j)
