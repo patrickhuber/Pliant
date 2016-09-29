@@ -9,7 +9,7 @@ namespace Pliant.Collections
         private HashSet<T> _set;
         private readonly List<T> _innerList;
 
-        private const int Threshold = 20;
+        private const int Threshold = 10;
 
         public int Count { get { return _innerList.Count; } }
 
@@ -58,6 +58,7 @@ namespace Pliant.Collections
 
         private bool InsertUniqueUsingHashSet(int index, T item)
         {
+            AllocateAndPopulateHashSet();
             if (!_set.Add(item))
                 return false;
 
@@ -110,6 +111,7 @@ namespace Pliant.Collections
 
         private bool AddUniqueUsingHashSet(T item)
         {
+            AllocateAndPopulateHashSet();
             if (!_set.Add(item))
                 return false;
             _innerList.Add(item);
@@ -138,8 +140,9 @@ namespace Pliant.Collections
 
         private void AllocateAndPopulateHashSet()
         {
-            if(_set == null)
-                _set = new HashSet<T>();
+            if (_set != null)
+                return;
+            _set = new HashSet<T>();
             for (int i = 0; i < _innerList.Count; i++)
                 _set.Add(_innerList[i]);
         }
@@ -153,6 +156,7 @@ namespace Pliant.Collections
 
         public bool Contains(T item)
         {
+            AllocateAndPopulateHashSet();
             if (HashSetIsMoreEfficient())
                 return _set.Contains(item);
             return _innerList.Contains(item);
@@ -165,6 +169,7 @@ namespace Pliant.Collections
 
         public bool Remove(T item)
         {
+            AllocateAndPopulateHashSet();
             if (HashSetIsMoreEfficient())
             {
                 _set.Remove(item);

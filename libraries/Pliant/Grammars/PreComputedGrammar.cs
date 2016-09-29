@@ -45,6 +45,8 @@ namespace Pliant.Grammars
 
                 frame.NullTransition = nullFrame;
             }
+
+            _frameQueue.Clear();
         }
 
         private SortedSet<PreComputedState> Initialize(IGrammar grammar)

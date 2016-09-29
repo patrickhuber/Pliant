@@ -328,19 +328,23 @@ namespace Pliant.Runtime
                     Log("Complete", k, nextState);
             }
         }
-
+        
         private void OptimizeReductionPath(ISymbol searchSymbol, int k)
         {
             IState t_rule = null;
             ITransitionState previousTransitionState = null;
-            OptimizeReductionPathRecursive(searchSymbol, k, ref t_rule, ref previousTransitionState);
+
+            var visited = SharedPools.Default<HashSet<IState>>().AllocateAndClear();
+            OptimizeReductionPathRecursive(searchSymbol, k, ref t_rule, ref previousTransitionState, visited);
+            SharedPools.Default<HashSet<IState>>().ClearAndFree(visited);
         }
 
         private void OptimizeReductionPathRecursive(
             ISymbol searchSymbol,
             int k,
             ref IState t_rule,
-            ref ITransitionState previousTransitionState)
+            ref ITransitionState previousTransitionState,
+            HashSet<IState> visited)
         {
             var earleySet = _chart.EarleySets[k];
 
@@ -359,19 +363,26 @@ namespace Pliant.Runtime
             if (sourceState == null)
                 return;
 
+            if (!visited.Add(sourceState))
+                return;
+
             // and [B-> aA.b, k] is quasi complete (is b null)
             if (!IsNextStateQuasiComplete(sourceState))
                 return;
 
             // then t_rule := [B->aAb.]; t_pos=k;
             t_rule = sourceState.NextState();
+            
+            if (sourceState.Origin != k)
+                visited.Clear();
 
             // T_Update(I0...Ik, B);
             OptimizeReductionPathRecursive(
                 sourceState.Production.LeftHandSide,
                 sourceState.Origin,
                 ref t_rule,
-                ref previousTransitionState);
+                ref previousTransitionState,
+                visited);
 
             if (t_rule == null)
                 return;

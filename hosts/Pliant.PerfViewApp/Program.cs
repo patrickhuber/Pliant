@@ -15,9 +15,11 @@ namespace Pliant.PerfViewApp
                 Path.Combine(Environment.CurrentDirectory, "10000.json"));
 
             var grammar = new JsonGrammar();
-            
-            for (long i = 0; i < 100; i++)
+
+            var loopCount = 100;
+            for (long i = 0; i < loopCount; i++)
             {
+                Console.WriteLine($"Iteration {i} of {loopCount}");
                 var parseEngine = new ParseEngine(grammar);
                 var parseRunner = new ParseRunner(parseEngine, sampleBnf);
 

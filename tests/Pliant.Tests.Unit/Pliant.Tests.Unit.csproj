@@ -76,6 +76,7 @@
     <Compile Include="Grammars\SetTerminalTests.cs" />
     <Compile Include="Grammars\WordTerminalTests.cs" />
     <Compile Include="Runtime\DeterministicParseEngineTests.cs" />
+    <Compile Include="Runtime\ExpressionGrammar.cs" />
     <Compile Include="Runtime\LoggingNodeVisitor.cs" />
     <Compile Include="Forest\ForestNodeVisitorTests.cs" />
     <Compile Include="Collections\ProcessOnceQueueTests.cs" />

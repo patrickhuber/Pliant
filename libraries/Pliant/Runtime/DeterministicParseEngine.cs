@@ -10,8 +10,8 @@ namespace Pliant.Runtime
 {
     public class DeterministicParseEngine : IParseEngine
     {
-        PreComputedGrammar _precomputedGrammar;
-        PreComputedChart _chart;
+        readonly PreComputedGrammar _precomputedGrammar;
+        private PreComputedChart _chart;
 
         public int Location { get; private set; }
 
@@ -28,7 +28,7 @@ namespace Pliant.Runtime
             _precomputedGrammar = preComputedGrammar;
             Initialize();
         }
-
+        
         private void Initialize()
         {
             Location = 0;
@@ -121,7 +121,7 @@ namespace Pliant.Runtime
             var parentSetFrames = parentSet.Frames;
             var parentSetFramesCount = parentSetFrames.Count;
 
-            for (int d = 0; d < frame.Data.Length; ++d)
+            for (var d = 0; d < frame.Data.Length; ++d)
             {
                 var preComputedState = frame.Data[d];
 
@@ -133,7 +133,7 @@ namespace Pliant.Runtime
 
                 var leftHandSide = production.LeftHandSide;
 
-                for (int p = 0; p < parentSetFramesCount; p++)
+                for (var p = 0; p < parentSetFramesCount; p++)
                 {
                     var pState = parentSetFrames[p];
                     var pParent = pState.Origin;
@@ -204,7 +204,7 @@ namespace Pliant.Runtime
                 return list;
 
             var frameSet = _chart.FrameSets[_chart.FrameSets.Count - 1];
-            for (int i = 0; i < frameSet.Frames.Count; i++)
+            for (var i = 0; i < frameSet.Frames.Count; i++)
             {
                 var stateFrame = frameSet.Frames[i];
                 foreach (var lexerRule in stateFrame.Frame.Scans.Keys)

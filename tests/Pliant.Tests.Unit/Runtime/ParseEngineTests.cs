@@ -521,7 +521,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var grammar = new GrammarExpression(A, new[] { A })
                 .ToGrammar();
-
+            
             var input = Tokenize("aaaaa");
             var recognizer = new ParseEngine(grammar);
             ParseInput(recognizer, input);
@@ -545,6 +545,50 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.AreEqual(1, lastEarleySet.Transitions.Count);
             Assert.AreEqual(1, lastEarleySet.Predictions.Count);
             Assert.AreEqual(1, lastEarleySet.Scans.Count);
+        }
+
+
+        [TestMethod]
+        public void ParseEngineShouldHandleCyclesInGrammar()
+        {
+            ProductionExpression 
+                A = nameof(A), 
+                B = nameof(B), 
+                C = nameof(C);
+
+            A.Rule = B | 'a';
+            B.Rule = C | 'b';
+            C.Rule = A | 'c';
+
+            var grammar = new GrammarExpression(A, new [] {A, B, C})
+                .ToGrammar();
+
+            const string input = "a";
+            var tokens = Tokenize(input);
+            var recognizer = new ParseEngine(grammar);
+            ParseInput(recognizer, tokens);
+        }
+
+        [TestMethod]
+        public void ParseEngineShouldHandleHiddenRightRecursionsInSubCubicTime()
+        {
+
+            ProductionExpression
+                A = nameof(A),
+                B = nameof(B),
+                C = nameof(C);
+
+            A.Rule = 'a' + B | 'a';
+            B.Rule = 'b' + C | 'b';
+            C.Rule = 'c' + A | 'c';
+
+            var grammar = new GrammarExpression(A, new[] { A, B, C })
+                .ToGrammar();
+
+            const string input = "abcabcabcabcabcabca";
+            var tokens = Tokenize(input);
+            var recognizer = new ParseEngine(grammar);
+            ParseInput(recognizer, tokens);
         }
 
         [TestMethod]

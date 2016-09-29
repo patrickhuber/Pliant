@@ -1,17 +1,19 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Collections;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders.Expressions;
 using Pliant.Grammars;
 using Pliant.RegularExpressions;
 using Pliant.Runtime;
 using Pliant.Tests.Common;
 using Pliant.Tokens;
+using System.Collections.Generic;
 
 namespace Pliant.Tests.Unit.Runtime
 {
     [TestClass]
     public class DeterministicParseEngineTests
     {
-        private static readonly IGrammar ExpressionGrammar = GetExpressionGrammar();
+        private static readonly IGrammar ExpressionGrammar = new ExpressionGrammar();
         private static readonly IGrammar NullableGrammar = new NullableGrammar();
 
         [TestMethod]
@@ -111,6 +113,29 @@ namespace Pliant.Tests.Unit.Runtime
             parseTester.RunParse(input);
         }
 
+        [TestMethod]
+        public void DeterministicParseEngineShouldParseGrammarWithCycles()
+        {
+            ProductionExpression
+                A = nameof(A),
+                B = nameof(B),
+                C = nameof(C);
+
+            A.Rule = B | 'a';
+            B.Rule = C | 'b';
+            C.Rule = A | 'c';
+
+            var grammar = new GrammarExpression(A, new[] { A, B, C })
+                .ToGrammar();
+            
+            var parseTester = new ParseTester(
+                new DeterministicParseEngine(
+                    new PreComputedGrammar(grammar)));
+
+            const string input = "a";
+            parseTester.RunParse(input);
+        }
+        
         private static void AssertExpectedLexerRulesReturnedFromInitializedParseEngine(IGrammar grammar, int expectedCount)
         {
             var preComputedGrammar = new PreComputedGrammar(grammar);
@@ -120,30 +145,6 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.AreEqual(
                 expectedCount,
                 lexerRules.Count, $"Expected {expectedCount} lexerRule, Found {lexerRules.Count}");
-        }
-
-        private static IGrammar GetExpressionGrammar()
-        {
-            ProductionExpression
-                S = nameof(S),
-                E = nameof(E),
-                T = nameof(T),
-                F = nameof(F);
-
-            S.Rule = E;
-            E.Rule = E + '+' + T
-                | E + '-' + T
-                | T;
-            T.Rule = T + '*' + F
-                | T + '|' + F
-                | F;
-            F.Rule = '+' + F
-                | '-' + F
-                | 'n'
-                | '(' + E + ')';
-
-            var grammar = new GrammarExpression(S).ToGrammar();
-            return grammar;
-        }
+        }        
     }
 }
