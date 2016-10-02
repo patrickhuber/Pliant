@@ -20,8 +20,8 @@ namespace Pliant.Grammars
         
         public Grammar(
             INonTerminal start,
-            IEnumerable<IProduction> productions,
-            IEnumerable<ILexerRule> ignoreRules)
+            IReadOnlyList<IProduction> productions,
+            IReadOnlyList<ILexerRule> ignoreRules)
         {
             _productions = new List<IProduction>();
             _ignores = new List<ILexerRule>();
@@ -36,16 +36,22 @@ namespace Pliant.Grammars
             FindNullableSymbols(_reverseLookup, _nullable);
         }
 
-        private void AddIgnoreRules(IEnumerable<ILexerRule> ignoreRules)
+        private void AddIgnoreRules(IReadOnlyList<ILexerRule> ignoreRules)
         {
-            foreach (var ignoreRule in ignoreRules)
+            for (int i = 0; i < ignoreRules.Count; i++)
+            {
+                var ignoreRule = ignoreRules[i];
                 AddIgnoreRule(ignoreRule);
+            }
         }
 
-        private void AddProductions(IEnumerable<IProduction> productions)
+        private void AddProductions(IReadOnlyList<IProduction> productions)
         {
-            foreach (var production in productions)
+            for (int i = 0; i < productions.Count; i++)
+            {
+                var production = productions[i];
                 AddProduction(production);
+            }
         }
 
         public IReadOnlyList<ILexerRule> Ignores
@@ -112,10 +118,10 @@ namespace Pliant.Grammars
                             size = production.RightHandSide.Count;
                             productionSizes[production] = size;
                         }
-                        for (var s=0; s< production.RightHandSide.Count; s++)
+                        for (var s = 0; s < production.RightHandSide.Count; s++)
                         {
                             var symbol = production.RightHandSide[s];
-                            if (symbol.SymbolType == SymbolType.NonTerminal 
+                            if (symbol.SymbolType == SymbolType.NonTerminal
                                 && nonTerminal.Equals(symbol))
                                 size--;
                         }
