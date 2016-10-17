@@ -11,7 +11,7 @@ namespace Pliant.Runtime
 {
     public class DeterministicParseEngine : IParseEngine
     {
-        readonly PreComputedGrammar _precomputedGrammar;
+        private readonly PreComputedGrammar _precomputedGrammar;
         private StateFrameChart _chart;
 
         public int Location { get; private set; }
@@ -73,8 +73,7 @@ namespace Pliant.Runtime
 
             var lastFrameSetIndex = _chart.FrameSets.Count - 1;
             var lastFrameSet = _chart.FrameSets[lastFrameSetIndex];
-
-            var start = Grammar.Start;
+            
             return AnyStateFrameAccepted(lastFrameSet);
         }
 
@@ -100,7 +99,6 @@ namespace Pliant.Runtime
             for (var j = 0; j < states.Count; j++)
             {
                 var preComputedState = states[j];
-                var isCompleted = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
                 if (!IsComplete(preComputedState))
                     continue;
 

@@ -4,6 +4,8 @@ using Pliant.Collections;
 using System.Collections.Generic;
 using Pliant.Utilities;
 using Pliant.Tokens;
+using System;
+using System.Runtime.CompilerServices;
 
 namespace Pliant.Runtime
 {
@@ -41,6 +43,52 @@ namespace Pliant.Runtime
             Location++;
             ReductionPass(Location);
             return true;
+        }
+
+        public bool IsAccepted()
+        {
+            var anyEarleySets = Chart.FrameSets.Count > 0;
+            if (!anyEarleySets)
+                return false;
+
+            var lastFrameSetIndex = Chart.FrameSets.Count - 1;
+            var lastFrameSet = Chart.FrameSets[lastFrameSetIndex];
+
+            return AnyStateFrameAccepted(lastFrameSet);
+        }
+
+        private bool AnyStateFrameAccepted(StateFrameSet lastFrameSet)
+        {
+            var lastFrameSetFramesCount = lastFrameSet.Frames.Count;
+            for (var i = 0; i < lastFrameSetFramesCount; i++)
+            {
+                var stateFrame = lastFrameSet.Frames[i];
+                var originIsFirstEarleySet = stateFrame.Origin == 0;
+                if (!originIsFirstEarleySet)
+                    continue;
+
+                if (AnyPreComputedStateAccepted(stateFrame.Frame.Data))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private bool AnyPreComputedStateAccepted(IReadOnlyList<PreComputedState> states)
+        {
+            for (var j = 0; j < states.Count; j++)
+            {
+                var preComputedState = states[j];
+                var isCompleted = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
+                if (!IsComplete(preComputedState))
+                    continue;
+
+                if (!IsStartState(preComputedState))
+                    continue;
+
+                return true;
+            }
+            return false;
         }
 
         private void ScanPasss(int iLoc, IToken token)
@@ -238,5 +286,19 @@ namespace Pliant.Runtime
         {
             return fromAH.TokenTransitions.GetOrReturnNull(token.TokenType);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool IsStartState(PreComputedState state)
+        {
+            var start = _preComputedGrammar.Grammar.Start;
+            return state.Production.LeftHandSide.Equals(start);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsComplete(PreComputedState preComputedState)
+        {
+            return preComputedState.Position == preComputedState.Production.RightHandSide.Count;
+        }
+
     }
 }

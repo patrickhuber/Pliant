@@ -28,7 +28,10 @@ namespace Pliant.Tests.Unit.Runtime
                 if (!result)
                     Assert.Fail($"Error parsing at token position {t}");
             }
-            
+            var accepted = parseEngine.IsAccepted();
+            if (!accepted)
+                Assert.Fail($"Parse is not accepted. ");
+
             var stateFrameChart = parseEngine.Chart;
             var lastFrameSet = stateFrameChart.FrameSets[stateFrameChart.FrameSets.Count - 1];
             Assert.AreEqual(4, lastFrameSet.Frames.Count);
