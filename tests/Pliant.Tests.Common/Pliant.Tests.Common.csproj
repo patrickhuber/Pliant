@@ -42,7 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Expressions\SimpleExpressionGrammar.cs" />
+    <Compile Include="Grammars\CycleGrammar.cs" />
+    <Compile Include="Grammars\ExpressionGrammar.cs" />
+    <Compile Include="Grammars\HiddenRightRecursionGrammar.cs" />
+    <Compile Include="Grammars\NullableGrammar.cs" />
+    <Compile Include="Grammars\RightRecursionGrammar.cs" />
+    <Compile Include="Grammars\SimpleExpressionGrammar.cs" />
     <Compile Include="Forest\FakeAndForestNode.cs" />
     <Compile Include="Forest\FakeIntermediateForestNode.cs" />
     <Compile Include="Forest\FakeInternalForestNode.cs" />
@@ -58,9 +63,7 @@
       <Name>Pliant</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tree\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

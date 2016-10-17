@@ -58,14 +58,16 @@
     <Compile Include="Builders\SymbolModelType.cs" />
     <Compile Include="Charts\INormalState.cs" />
     <Compile Include="Charts\IParseNode.cs" />
-    <Compile Include="Charts\PreComputedChart.cs" />
-    <Compile Include="Charts\PreComputedSet.cs" />
+    <Compile Include="Charts\StateFrameChart.cs" />
+    <Compile Include="Charts\StateFrameSet.cs" />
     <Compile Include="Charts\StateBase.cs" />
     <Compile Include="Charts\StateFrame.cs" />
+    <Compile Include="Charts\CachedStateFrameTransition.cs" />
     <Compile Include="Collections\AvlTree.cs" />
     <Compile Include="Collections\BitMatrix.cs" />
     <Compile Include="Collections\DictionaryExtensions.cs" />
     <Compile Include="Collections\FastLookupDictionary.cs" />
+    <Compile Include="Collections\IndexedList.cs" />
     <Compile Include="Collections\UniqueList.cs" />
     <Compile Include="Forest\ForestNodeVisitorBase.cs" />
     <Compile Include="Forest\IForestNodeReference.cs" />
@@ -83,6 +85,7 @@
     <Compile Include="Grammars\PreComputedGrammar.cs" />
     <Compile Include="Grammars\PreComputedState.cs" />
     <Compile Include="Runtime\DeterministicParseEngine.cs" />
+    <Compile Include="Runtime\MarpaParseEngine.cs" />
     <Compile Include="Tree\ParseTreeEnumerable.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />
     <Compile Include="Forest\SelectFirstChildDisambiguationAlgorithm.cs" />
@@ -208,7 +211,6 @@
     <Compile Include="Forest\InternalForestNode.cs" />
     <Compile Include="Forest\ForestNodeSet.cs" />
     <Compile Include="Forest\ForestNodeType.cs" />
-    <Compile Include="Charts\Optimizer.cs" />
     <Compile Include="Runtime\ParseEngine.cs" />
     <Compile Include="Runtime\ParseRunner.cs" />
     <Compile Include="RegularExpressions\RegexGrammar.cs" />

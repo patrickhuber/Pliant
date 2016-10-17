@@ -1,9 +1,9 @@
 ﻿using Pliant.Builders.Expressions;
 using Pliant.Grammars;
 
-namespace Pliant.Tests.Unit.Runtime
+namespace Pliant.Tests.Common.Grammars
 {
-    internal class NullableGrammar : GrammarWrapper
+    public class NullableGrammar : GrammarWrapper
     {
         private static readonly IGrammar _grammar;
 

@@ -3,7 +3,7 @@ using Pliant.Utilities;
 
 namespace Pliant.Charts
 {
-    internal class StateFrame
+    public class StateFrame
     {
         public Frame Frame { get; private set; }
 
@@ -11,7 +11,7 @@ namespace Pliant.Charts
 
         private readonly int _hashCode;
                 
-        internal StateFrame(Frame frame, int origin)
+        public StateFrame(Frame frame, int origin)
         {
             Frame = frame;
             Origin = origin;

@@ -5,6 +5,7 @@ using Pliant.Runtime;
 using Pliant.Tokens;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 namespace Pliant.Tests.Common
 {
@@ -45,19 +46,22 @@ namespace Pliant.Tests.Common
 
         private static void InternalRunParse(IParseRunner parseRunner)
         {
-            while (!parseRunner.EndOfStream())
-            {
-                var hasRead = parseRunner.Read();
-                if (!hasRead)
-                {
-                    Assert.IsTrue(false, $"Parse Failed at Position {parseRunner.Position}");
-                }
-            }
-            var isAccepted = parseRunner.ParseEngine.IsAccepted();
-            if (!isAccepted)
-            {
-                Assert.IsTrue(false, $"Parse was not accepted");
-            }
+            while (!parseRunner.EndOfStream())            
+                if (!parseRunner.Read())
+                    Assert.Fail($"Parse Failed at Position {parseRunner.Position}");
+            
+            if (!parseRunner.ParseEngine.IsAccepted())            
+                Assert.Fail($"Parse was not accepted");            
+        }
+
+        public void RunParse(IReadOnlyList<IToken> tokens)
+        {
+            for (int i = 0; i < tokens.Count; i++)
+                if (!ParseEngine.Pulse(tokens[i]))
+                    Assert.Fail($"Parse Failed at Position {ParseEngine.Location}");
+
+            if (!ParseEngine.IsAccepted())
+                Assert.Fail($"Parse was not accepted");
         }
     }
 }

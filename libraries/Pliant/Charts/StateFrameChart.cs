@@ -5,24 +5,24 @@ using Pliant.Collections;
 
 namespace Pliant.Charts
 {
-    internal class PreComputedChart
+    public class StateFrameChart
     {
-        private List<PreComputedSet> _preComputedSets;
+        private List<StateFrameSet> _preComputedSets;
 
-        internal IReadOnlyList<PreComputedSet> FrameSets { get { return _preComputedSets; } }
+        public IReadOnlyList<StateFrameSet> FrameSets { get { return _preComputedSets; } }
 
 
-        public PreComputedChart()
+        public StateFrameChart()
         {
-            _preComputedSets = new List<PreComputedSet>();
+            _preComputedSets = new List<StateFrameSet>();
         }
 
-        internal bool Enqueue(int index, StateFrame frame)
+        public bool Enqueue(int index, StateFrame frame)
         {
-            PreComputedSet preComputedSet = null;
+            StateFrameSet preComputedSet = null;
             if (_preComputedSets.Count <= index)
             {
-                preComputedSet = new PreComputedSet(index);
+                preComputedSet = new StateFrameSet(index);
                 _preComputedSets.Add(preComputedSet);
             }
             else

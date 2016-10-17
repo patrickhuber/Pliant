@@ -10,7 +10,7 @@ using Pliant.Runtime;
 using Pliant.Tree;
 using Pliant.Tests.Common.Forest;
 using Pliant.Tests.Common;
-using Pliant.Tests.Common.Expressions;
+using Pliant.Tests.Common.Grammars;
 
 namespace Pliant.Tests.Unit.Runtime
 {
@@ -551,43 +551,18 @@ namespace Pliant.Tests.Unit.Runtime
         [TestMethod]
         public void ParseEngineShouldHandleCyclesInGrammar()
         {
-            ProductionExpression 
-                A = nameof(A), 
-                B = nameof(B), 
-                C = nameof(C);
-
-            A.Rule = B | 'a';
-            B.Rule = C | 'b';
-            C.Rule = A | 'c';
-
-            var grammar = new GrammarExpression(A, new [] {A, B, C})
-                .ToGrammar();
-
             const string input = "a";
             var tokens = Tokenize(input);
-            var recognizer = new ParseEngine(grammar);
+            var recognizer = new ParseEngine(new CycleGrammar());
             ParseInput(recognizer, tokens);
         }
 
         [TestMethod]
         public void ParseEngineShouldHandleHiddenRightRecursionsInSubCubicTime()
         {
-
-            ProductionExpression
-                A = nameof(A),
-                B = nameof(B),
-                C = nameof(C);
-
-            A.Rule = 'a' + B | 'a';
-            B.Rule = 'b' + C | 'b';
-            C.Rule = 'c' + A | 'c';
-
-            var grammar = new GrammarExpression(A, new[] { A, B, C })
-                .ToGrammar();
-
             const string input = "abcabcabcabcabcabca";
             var tokens = Tokenize(input);
-            var recognizer = new ParseEngine(grammar);
+            var recognizer = new ParseEngine(new HiddenRightRecursionGrammar());
             ParseInput(recognizer, tokens);
         }
 
@@ -1024,28 +999,29 @@ namespace Pliant.Tests.Unit.Runtime
             return new Token(character.ToString(), position, new TokenType(character.ToString()));
         }
 
-        private static IEnumerable<IToken> Tokenize(string input)
+        private static IReadOnlyList<IToken> Tokenize(string input)
         {
             return input.Select((x, i) =>
-                new Token(x.ToString(), i, new TokenType(x.ToString())));
+                new Token(x.ToString(), i, new TokenType(x.ToString())))
+                .ToArray();
         }
 
-        private static IEnumerable<IToken> Tokenize(string input, string tokenType)
+        private static IReadOnlyList<IToken> Tokenize(string input, string tokenType)
         {
             return Tokenize(input, new TokenType(tokenType));
         }
 
-        private static IEnumerable<IToken> Tokenize(string input, TokenType tokenType)
+        private static IReadOnlyList<IToken> Tokenize(string input, TokenType tokenType)
         {
             return input.Select((x, i) =>
-                new Token(x.ToString(), i, tokenType));
+                new Token(x.ToString(), i, tokenType))
+                .ToArray();
         }
 
-        private static void ParseInput(IParseEngine parseEngine, IEnumerable<IToken> tokens)
+        private static void ParseInput(IParseEngine parseEngine, IReadOnlyList<IToken> tokens)
         {
-            foreach (var token in tokens)
-                Assert.IsTrue(parseEngine.Pulse(token));
-            Assert.IsTrue(parseEngine.IsAccepted());
+            var parseTester = new ParseTester(parseEngine);
+            parseTester.RunParse(tokens);
         }
     }
 }

@@ -69,7 +69,6 @@ namespace Pliant.Charts
 
         public INormalState FindSourceState(ISymbol searchSymbol)
         {
-            // TODO: speed up by using a index lookup
             var sourceItemCount = 0;
             INormalState sourceItem = null;
 

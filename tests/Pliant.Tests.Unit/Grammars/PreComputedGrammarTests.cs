@@ -1,86 +1,99 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Automata;
 using Pliant.Builders.Expressions;
+using Pliant.Collections;
 using Pliant.Grammars;
 using Pliant.LexerRules;
 using Pliant.RegularExpressions;
+using Pliant.Tests.Common.Grammars;
+using Pliant.Tokens;
 
 namespace Pliant.Tests.Unit.Grammars
 {
     [TestClass]
     public class PreComputedGrammarTests
     {
-        private static IGrammar _expressionGrammar;
-        private static IGrammar _nullableGrammar;
         private static IGrammar _jsonGrammar;
 
         [ClassInitialize]
         public static void InitializeClass(TestContext testContext)
         {
-            _expressionGrammar = GetExpressionGrammar();
-            _nullableGrammar = GetNullableGrammar();
             _jsonGrammar = GetJsonGrammar();
         }
 
         [TestMethod]
-        public void PreComputedGrammarTest()
+        public void PreComputedGrammarShouldLoadExpressionGrammar()
         {
-            var preComputedGrammar = new PreComputedGrammar(_expressionGrammar);
+            var preComputedGrammar = new PreComputedGrammar(new ExpressionGrammar());
+            
         }
 
         [TestMethod]
-        public void PreComputedGrammarTestWithNullableGrammar()
+        public void PreComputedGrammarShouldLoadNullableGrammar()
         {
-            var preComputedGrammar = new PreComputedGrammar(_nullableGrammar);
+            var preComputedGrammar = new PreComputedGrammar(new NullableGrammar());
         }        
 
         [TestMethod]
-        public void PreComputedGrammarTestWithJsonGrammar()
+        public void PreComputedGrammarShouldLoadJsonGrammar()
         {
             var preComputedGrammar = new PreComputedGrammar(_jsonGrammar);
-        }        
-
-        private static IGrammar GetExpressionGrammar()
-        {
-            ProductionExpression
-                S = nameof(S), 
-                E = nameof(E), 
-                T = nameof(T), 
-                F = nameof(F);
-
-            S.Rule = E;
-            E.Rule = E + '+' + T
-                | E + '-' + T
-                | T;
-            T.Rule = T + '*' + F
-                | T + '|' + F
-                | F;
-            F.Rule = '+' + F
-                | '-' + F
-                | 'n'
-                | '(' + E + ')';
-
-            var grammar = new GrammarExpression(S).ToGrammar();
-            return grammar;
         }
 
-        private static IGrammar GetNullableGrammar()
+        [TestMethod]
+        public void PreComputedGrammarIsRightRecursiveShouldFindSimpleRecursion()
         {
-            ProductionExpression
-                SP = nameof(SP),
-                S = nameof(S),
-                A = nameof(A),
-                E = nameof(E);
-
-            SP.Rule = S;
-            S.Rule = A + A + A + A;
-            A.Rule = 'a' | E;
-            E.Rule = null;
-
-            var grammar = new GrammarExpression(SP).ToGrammar();
-            return grammar;
+            var preComputedGrammar = new PreComputedGrammar(new RightRecursionGrammar());
         }
 
+        [TestMethod]
+        public void PreComputedGrammarIsRightRecursiveShouldFindCyclicRecursion()
+        {
+            var grammar = new HiddenRightRecursionGrammar();
+            var preComputedGrammar = new PreComputedGrammar(grammar);
+
+            var leftHandSides = new UniqueList<INonTerminal>();
+            for (var p = 0; p < grammar.Productions.Count; p++)
+            {
+                var production = grammar.Productions[p];
+                Assert.IsTrue(preComputedGrammar.IsRightRecursive(production.LeftHandSide));
+            }
+        }
+
+        [TestMethod]
+        public void PreComputedGrammarIsRightRecursiveShouldNotContainSymbolsWithoutCycles()
+        {
+            ProductionExpression
+                A = "A",
+                B = "B",
+                C = "C",
+                D = "D",
+                E = "E";
+            A.Rule = B + C;
+            B.Rule = 'b';
+            C.Rule = A | D;
+            D.Rule = E + D | 'd';
+            E.Rule = 'e';
+
+            var grammar = new GrammarExpression(A).ToGrammar();
+            var preComputedGrammar = new PreComputedGrammar(grammar);
+
+            var rightRecursiveRules = new[] { A, C, D };
+            var notRightRecursiveRules = new[] { B, E };
+
+            foreach(var rightRecursiveRule in rightRecursiveRules)
+            {
+                var leftHandSide = rightRecursiveRule.ProductionModel.LeftHandSide.NonTerminal;
+                Assert.IsTrue(preComputedGrammar.IsRightRecursive(leftHandSide));
+            }
+
+            foreach (var notRightRecursiveRule in notRightRecursiveRules)
+            {
+                var leftHandSide = notRightRecursiveRule.ProductionModel.LeftHandSide.NonTerminal;
+                Assert.IsFalse(preComputedGrammar.IsRightRecursive(leftHandSide));
+            }
+        }
+        
         private static IGrammar GetJsonGrammar()
         {
             ProductionExpression

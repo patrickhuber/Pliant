@@ -6,9 +6,9 @@ namespace Pliant.Grammars
     {
         private List<ISymbol> _items;
 
-        public IReadOnlyCollection<ISymbol> Items { get { return _items; } }
+        public IReadOnlyList<ISymbol> Items { get { return _items; } }
 
-        public Grouping(IEnumerable<ISymbol> items)
+        public Grouping(IReadOnlyList<ISymbol> items)
         {
             _items = new List<ISymbol>(items);
         }

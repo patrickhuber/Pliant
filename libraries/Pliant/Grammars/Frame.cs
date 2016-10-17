@@ -5,16 +5,24 @@ using System.Linq;
 
 namespace Pliant.Grammars
 {
-    internal class Frame
+    public class Frame
     {
         private PreComputedState[] _cachedData;        
         private SortedSet<PreComputedState> _set;
+        private Dictionary<ISymbol, Frame> _reductions;
+        private Dictionary<TokenType, Frame> _tokenTransitions;
+        private Dictionary<ILexerRule, Frame> _scans;
+        private List<ILexerRule> _scanKeys;
 
-        public PreComputedState[] Data { get { return _cachedData; } }
+        public IReadOnlyList<PreComputedState> Data { get { return _cachedData; } }
                 
-        public Dictionary<ISymbol, Frame> Transitions { get; private set; }
-        public Dictionary<TokenType, Frame> TokenTransitions { get; private set; }
-        public Dictionary<ILexerRule, Frame> Scans { get; private set; }
+        public IReadOnlyDictionary<ISymbol, Frame> Reductions { get { return _reductions; } }
+
+        public IReadOnlyDictionary<TokenType, Frame> TokenTransitions { get { return _tokenTransitions; } }
+
+        public IReadOnlyDictionary<ILexerRule, Frame> Scans { get { return _scans; } }
+
+        public IReadOnlyList<ILexerRule> ScanKeys { get { return _scanKeys; } }
 
         public Frame NullTransition { get; set; }
 
@@ -22,9 +30,11 @@ namespace Pliant.Grammars
         {
             _set = set;
             _cachedData = _set.ToArray();
-            Transitions = new Dictionary<ISymbol, Frame>();
-            TokenTransitions = new Dictionary<TokenType, Frame>();
-            Scans = new Dictionary<ILexerRule, Frame>();
+            _reductions = new Dictionary<ISymbol, Frame>();
+            _tokenTransitions = new Dictionary<TokenType, Frame>();
+            _scans = new Dictionary<ILexerRule, Frame>();
+            _scanKeys = new List<ILexerRule>();
+
             _hashCode = ComputeHashCode(set);
         }
 
@@ -32,15 +42,19 @@ namespace Pliant.Grammars
 
         public void AddTransistion(ISymbol symbol, Frame target)
         {
-            Frame value = null;
-            if (!Transitions.TryGetValue(symbol, out value))
+            if (symbol.SymbolType == SymbolType.NonTerminal)
             {
-                Transitions.Add(symbol, target);
-                if (symbol.SymbolType == SymbolType.LexerRule)
+                if (!Reductions.ContainsKey(symbol))
+                    _reductions.Add(symbol, target);
+            }
+            else if(symbol.SymbolType == SymbolType.LexerRule)
+            {
+                var lexerRule = symbol as ILexerRule;
+                if (!Scans.ContainsKey(lexerRule))
                 {
-                    var lexerRule = symbol as ILexerRule;
-                    TokenTransitions.Add(lexerRule.TokenType, target);
-                    Scans.Add(lexerRule, target);
+                    _tokenTransitions.Add(lexerRule.TokenType, target);
+                    _scans.Add(lexerRule, target);
+                    _scanKeys.Add(lexerRule);
                 }
             }
         }

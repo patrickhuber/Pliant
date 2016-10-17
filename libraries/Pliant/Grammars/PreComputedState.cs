@@ -47,7 +47,7 @@ namespace Pliant.Grammars
                 .AppendFormat("{0} ->", Production.LeftHandSide.Value);
             const string Dot = "\u25CF";
 
-            for (int p = 0; p < Production.RightHandSide.Count; p++)
+            for (var p = 0; p < Production.RightHandSide.Count; p++)
             {
                 stringBuilder.AppendFormat(
                     "{0}{1}",

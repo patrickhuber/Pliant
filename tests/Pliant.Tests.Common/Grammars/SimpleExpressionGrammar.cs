@@ -1,7 +1,7 @@
 ﻿using Pliant.Builders.Expressions;
 using Pliant.Grammars;
 
-namespace Pliant.Tests.Common.Expressions
+namespace Pliant.Tests.Common.Grammars
 {
     public class SimpleExpressionGrammar : GrammarWrapper
     {

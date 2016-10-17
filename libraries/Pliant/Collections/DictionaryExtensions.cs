@@ -37,5 +37,13 @@ namespace Pliant.Collections
 
             return value;
         }
+        
+        public static TValue GetOrReturnNull<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key)
+        {
+            var value = default(TValue);
+            if (dictionary.TryGetValue(key, out value))
+                return value;
+            return default(TValue);
+        }
     }
 }

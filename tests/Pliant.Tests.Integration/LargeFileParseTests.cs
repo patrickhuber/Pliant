@@ -21,7 +21,9 @@ namespace Pliant.Tests.Integration.Runtime
 
         [ClassInitialize]
 #pragma warning disable CC0057 // Unused parameters
+#pragma warning disable RECS0154 // Parameter is never used
         public static void Initialize(TestContext testContext)
+#pragma warning restore RECS0154 // Parameter is never used
 #pragma warning restore CC0057 // Unused parameters
         {
             _grammar = new JsonGrammar();

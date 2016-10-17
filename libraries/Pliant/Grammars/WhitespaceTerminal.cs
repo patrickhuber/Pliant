@@ -15,7 +15,7 @@ namespace Pliant.Grammars
             new Interval((char)0x2028, (char)0x2029),
             new Interval((char)0x202f, (char)0x202f),
             new Interval((char)0x205f, (char)0x205f),
-            new Interval((char)0x3000, (char)0x3000),
+            new Interval((char)0x3000, (char)0x3000)
         };
 
         public override bool IsMatch(char character)

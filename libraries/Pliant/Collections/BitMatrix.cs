@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Pliant.Utilities;
+using System.Collections;
 using System.Text;
 
 namespace Pliant.Collections
@@ -27,19 +28,21 @@ namespace Pliant.Collections
                 _matrix[i].SetAll(false);
         }
 
-        public void TransitiveClosure()
+        public BitMatrix TransitiveClosure()
         {
-            for (int k = 0; k < _matrix.Length; k++)
+            var transitiveClosure = Clone();
+            for (int k = 0; k < transitiveClosure.Length; k++)
             {
-                for (int i = 0; i < _matrix.Length; i++)
+                for (int i = 0; i < transitiveClosure.Length; i++)
                 {
-                    for (int j = 0; j < _matrix.Length; j++)
+                    for (int j = 0; j < transitiveClosure.Length; j++)
                     {
-                        _matrix[i][j] = _matrix[i][j]
-                            || (_matrix[i][k] && _matrix[k][j]);
+                        transitiveClosure[i][j] = transitiveClosure[i][j]
+                            || (transitiveClosure[i][k] && transitiveClosure[k][j]);
                     }
                 }
             }
+            return transitiveClosure;
         }
 
         public BitMatrix Clone()
@@ -70,6 +73,29 @@ namespace Pliant.Collections
                 }
             }
             return stringBuilder.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (((object)obj) == null)
+                return false;
+            var bitMatrix = obj as BitMatrix;
+            if (((object)bitMatrix) == null)
+                return false;
+            if (bitMatrix.Length != Length)
+                return false;
+            for (var i = 0; i < bitMatrix.Length; i++)
+                if (!bitMatrix[i].Equals(this[i]))
+                    return false;
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = 0;
+            for (var i = 0; i < Length; i++)
+                hashCode = HashCode.ComputeIncrementalHash(this[i].GetHashCode(), hashCode, i == 0);            
+            return hashCode;
         }
     }
 }

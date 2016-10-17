@@ -5,13 +5,14 @@ using Pliant.Grammars;
 using Pliant.Forest;
 using System.Collections.Generic;
 using Pliant.Utilities;
+using System.Runtime.CompilerServices;
 
 namespace Pliant.Runtime
 {
     public class DeterministicParseEngine : IParseEngine
     {
         readonly PreComputedGrammar _precomputedGrammar;
-        private PreComputedChart _chart;
+        private StateFrameChart _chart;
 
         public int Location { get; private set; }
 
@@ -32,7 +33,7 @@ namespace Pliant.Runtime
         private void Initialize()
         {
             Location = 0;
-            _chart = new PreComputedChart();
+            _chart = new StateFrameChart();
             var kernelFrame = _precomputedGrammar.Start;
             Enqueue(Location, new StateFrame(kernelFrame, 0));
             Reduce(Location);
@@ -74,28 +75,40 @@ namespace Pliant.Runtime
             var lastFrameSet = _chart.FrameSets[lastFrameSetIndex];
 
             var start = Grammar.Start;
+            return AnyStateFrameAccepted(lastFrameSet);
+        }
 
-            for (var i = 0; i < lastFrameSet.Frames.Count; i++)
+        private bool AnyStateFrameAccepted(StateFrameSet lastFrameSet)
+        {
+            var lastFrameSetFramesCount = lastFrameSet.Frames.Count;
+            for (var i = 0; i < lastFrameSetFramesCount; i++)
             {
                 var stateFrame = lastFrameSet.Frames[i];
                 var originIsFirstEarleySet = stateFrame.Origin == 0;
                 if (!originIsFirstEarleySet)
                     continue;
 
-                foreach (var preComputedState in stateFrame.Frame.Data)
-                {
-                    var isCompleted = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
-                    if (!isCompleted)
-                        continue;
-
-                    var isStartState = preComputedState.Production.LeftHandSide.Equals(start);
-                    if (!isStartState)
-                        continue;
-
+                if (AnyPreComputedStateAccepted(stateFrame.Frame.Data))
                     return true;
-                }
             }
 
+            return false;
+        }
+
+        private bool AnyPreComputedStateAccepted(IReadOnlyList<PreComputedState> states)
+        {
+            for (var j = 0; j < states.Count; j++)
+            {
+                var preComputedState = states[j];
+                var isCompleted = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
+                if (!IsComplete(preComputedState))
+                    continue;
+
+                if (!IsStartState(preComputedState))
+                    continue;
+
+                return true;
+            }
             return false;
         }
 
@@ -121,7 +134,7 @@ namespace Pliant.Runtime
             var parentSetFrames = parentSet.Frames;
             var parentSetFramesCount = parentSetFrames.Count;
 
-            for (var d = 0; d < frame.Data.Length; ++d)
+            for (var d = 0; d < frame.Data.Count; ++d)
             {
                 var preComputedState = frame.Data[d];
 
@@ -139,7 +152,7 @@ namespace Pliant.Runtime
                     var pParent = pState.Origin;
 
                     Frame target = null;
-                    if (!pState.Frame.Transitions.TryGetValue(leftHandSide, out target))
+                    if (!pState.Frame.Reductions.TryGetValue(leftHandSide, out target))
                         continue;
 
                     if (!_chart.Enqueue(i, new StateFrame(target, pParent)))
@@ -153,9 +166,55 @@ namespace Pliant.Runtime
             }
         }
 
-        private void Scan(int i, IToken token)
+        private void EarleyReduction(int location, Frame completed, INonTerminal leftHandSide)
         {
-            var set = _chart.FrameSets[i];
+
+        }
+
+        private void LeoReduction(int location, CachedStateFrameTransition transition)
+        {
+            var frameSet = _chart.FrameSets[transition.Origin];
+            // find root transition state?
+            // create topmost node
+            // create topmost.null node
+        }
+
+        private void MemoizeTransitions(int location)
+        {
+            var stateFrameSet = _chart.FrameSets[location];
+            var stateFrameSetFramesCount = stateFrameSet.Frames.Count;
+            for (var i = 0; i < stateFrameSetFramesCount; i++)
+            {
+                var stateFrame = stateFrameSet.Frames[i];
+                var stateFrameDataLength = stateFrame.Frame.Data.Count;
+                for (var j = 0; j < stateFrameDataLength; j++)
+                {
+                    var preComputedState = stateFrame.Frame.Data[j];
+                    if (IsComplete(preComputedState))
+                        continue;
+                    var postDotSymbol = GetPostDotSymbol(preComputedState);
+                    if (IsLeoEligible(postDotSymbol, stateFrameSet))
+                    {
+                        // Set Transitions (location, postDotSymbol) to Leo Item
+                    }
+                    else
+                    {
+                        // Set Transitions (location, postDotSymbol) to set of frames that have
+                        // postDotSymbol as their postdot symbol
+                    }
+                }
+            }
+        }
+
+        private bool IsLeoEligible(ISymbol symbol, StateFrameSet stateFrameSet)
+        {
+            return stateFrameSet.IsLeoUnique(symbol) 
+                && _precomputedGrammar.IsRightRecursive(symbol);
+        }
+
+        private void Scan(int location, IToken token)
+        {
+            var set = _chart.FrameSets[location];
             var frames = set.Frames;
             var framesCount = frames.Count;
             
@@ -165,11 +224,11 @@ namespace Pliant.Runtime
                 var parentOrigin = stateFrame.Origin;
                 var frame = stateFrame.Frame;
 
-                ScanFrame(i, token, parentOrigin, frame);
+                ScanFrame(location, token, parentOrigin, frame);
             }
         }
 
-        private void ScanFrame(int i, IToken token, int parent, Frame frame)
+        private void ScanFrame(int location, IToken token, int parent, Frame frame)
         {
             Frame target;
 
@@ -177,15 +236,15 @@ namespace Pliant.Runtime
             if (!frame.TokenTransitions.TryGetValue(token.TokenType, out target))
                 return;
 
-            if (!_chart.Enqueue(i + 1, new StateFrame(target, parent)))
+            if (!_chart.Enqueue(location + 1, new StateFrame(target, parent)))
                 return;
 
             if (target.NullTransition == null)
                 return;
 
-            _chart.Enqueue(i + 1, new StateFrame(target.NullTransition, i + 1));
+            _chart.Enqueue(location + 1, new StateFrame(target.NullTransition, location + 1));
         }
-
+        
         public void Reset()
         {
             _chart.Clear();
@@ -207,10 +266,32 @@ namespace Pliant.Runtime
             for (var i = 0; i < frameSet.Frames.Count; i++)
             {
                 var stateFrame = frameSet.Frames[i];
-                foreach (var lexerRule in stateFrame.Frame.Scans.Keys)
+                for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
+                {
+                    var lexerRule = stateFrame.Frame.ScanKeys[j];
                     list.Add(lexerRule);
+                }
             }
             return list;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool IsStartState(PreComputedState state)
+        {
+            var start = Grammar.Start;
+            return state.Production.LeftHandSide.Equals(start);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsComplete(PreComputedState preComputedState)
+        {
+            return preComputedState.Position == preComputedState.Production.RightHandSide.Count;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static ISymbol GetPostDotSymbol(PreComputedState preComputedState)
+        {
+            return preComputedState.Production.RightHandSide[preComputedState.Position];
         }
     }
 }
