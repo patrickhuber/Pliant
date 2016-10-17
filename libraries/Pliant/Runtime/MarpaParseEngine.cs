@@ -131,10 +131,25 @@ namespace Pliant.Runtime
                     if (!cachedCount.TryGetValue(postDotSymbol, out count))
                     {
                         cachedCount[postDotSymbol] = 1;
+
+                        var origin = stateFrame.Origin;
+                        CachedStateFrameTransition topCacheItem = null;
+                        while (true)
+                        {
+                            var originFrameSet = _chart.FrameSets[stateFrame.Origin];
+                            var nextCachedItem = originFrameSet.FindCachedStateFrameTransition(postDotSymbol);
+                            if (nextCachedItem == null)                            
+                                break;
+                            topCacheItem = nextCachedItem;
+                            if (origin == nextCachedItem.Origin)
+                                break;
+                            origin = topCacheItem.Origin;
+                        }
+                                                
                         cachedTransitions[postDotSymbol] = new CachedStateFrameTransition(
                             postDotSymbol,
-                            stateFrame.Frame, 
-                            stateFrame.Origin);
+                            stateFrame.Frame,
+                            topCacheItem == null ? stateFrame.Origin : origin);
                     }
                     else
                     {
