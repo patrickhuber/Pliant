@@ -10,14 +10,15 @@ namespace Pliant.Runtime
     public class MarpaParseEngine 
     {
         private PreComputedGrammar _preComputedGrammar;
-        private StateFrameChart _chart;
+
+        public StateFrameChart Chart { get; private set; }
         
         public int Location { get; private set; }
 
         public MarpaParseEngine(PreComputedGrammar preComputedGrammar)
         {
             _preComputedGrammar = preComputedGrammar;
-            _chart = new StateFrameChart();
+            Chart = new StateFrameChart();
             Initialize();
         }
 
@@ -34,7 +35,7 @@ namespace Pliant.Runtime
         public bool Pulse(IToken token)
         {
             ScanPasss(Location, token);
-            var tokenRecognized = _chart.FrameSets.Count > Location + 1;
+            var tokenRecognized = Chart.FrameSets.Count > Location + 1;
             if (!tokenRecognized)
                 return false;
             Location++;
@@ -44,7 +45,7 @@ namespace Pliant.Runtime
 
         private void ScanPasss(int iLoc, IToken token)
         {
-            var iES = _chart.FrameSets[iLoc];
+            var iES = Chart.FrameSets[iLoc];
             for (var i = 0; i < iES.Frames.Count; i++)
             {
                 var workEIM = iES.Frames[i];
@@ -60,7 +61,7 @@ namespace Pliant.Runtime
 
         private void ReductionPass(int iLoc)
         {
-            var iES = _chart.FrameSets[iLoc];
+            var iES = Chart.FrameSets[iLoc];
             var processed = SharedPools.Default<HashSet<ISymbol>>().AllocateAndClear();
             for (var i = 0; i < iES.Frames.Count; i++)
             {
@@ -88,7 +89,7 @@ namespace Pliant.Runtime
 
         private void ReduceOneLeftHandSide(int iLoc, int origLoc, INonTerminal lhsSym)
         {
-            var frameSet = _chart.FrameSets[origLoc];
+            var frameSet = Chart.FrameSets[origLoc];
             var transitionItem = frameSet.FindCachedStateFrameTransition(lhsSym);
             if (transitionItem != null)
                 LeoReductionOperation(iLoc, transitionItem);
@@ -104,7 +105,7 @@ namespace Pliant.Runtime
         
         private void MemoizeTransitions(int iLoc)
         {
-            var frameSet = _chart.FrameSets[iLoc];
+            var frameSet = Chart.FrameSets[iLoc];
             // leo eligibility needs to be cached before creating the cached transition
             // if the size of the list is != 1, do not enter the cached frame transition
             var cachedTransitionsPool = SharedPools.Default<Dictionary<ISymbol, CachedStateFrameTransition>>();
@@ -136,7 +137,7 @@ namespace Pliant.Runtime
                         CachedStateFrameTransition topCacheItem = null;
                         while (true)
                         {
-                            var originFrameSet = _chart.FrameSets[stateFrame.Origin];
+                            var originFrameSet = Chart.FrameSets[stateFrame.Origin];
                             var nextCachedItem = originFrameSet.FindCachedStateFrameTransition(postDotSymbol);
                             if (nextCachedItem == null)                            
                                 break;
@@ -200,11 +201,11 @@ namespace Pliant.Runtime
         {
             var confirmedEIM = new StateFrame(confirmedAH, origLoc);
             var predictedAH = Goto(confirmedAH);
-            _chart.Enqueue(iLoc, confirmedEIM);
+            Chart.Enqueue(iLoc, confirmedEIM);
             if (predictedAH == null)
                 return;
             var predictedEIM = new StateFrame(predictedAH, iLoc);
-            _chart.Enqueue(iLoc, predictedEIM);
+            Chart.Enqueue(iLoc, predictedEIM);
         }
 
         private static bool IsCompleted(PreComputedState dottedRule)

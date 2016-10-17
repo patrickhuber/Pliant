@@ -166,52 +166,6 @@ namespace Pliant.Runtime
             }
         }
 
-        private void EarleyReduction(int location, Frame completed, INonTerminal leftHandSide)
-        {
-
-        }
-
-        private void LeoReduction(int location, CachedStateFrameTransition transition)
-        {
-            var frameSet = _chart.FrameSets[transition.Origin];
-            // find root transition state?
-            // create topmost node
-            // create topmost.null node
-        }
-
-        private void MemoizeTransitions(int location)
-        {
-            var stateFrameSet = _chart.FrameSets[location];
-            var stateFrameSetFramesCount = stateFrameSet.Frames.Count;
-            for (var i = 0; i < stateFrameSetFramesCount; i++)
-            {
-                var stateFrame = stateFrameSet.Frames[i];
-                var stateFrameDataLength = stateFrame.Frame.Data.Count;
-                for (var j = 0; j < stateFrameDataLength; j++)
-                {
-                    var preComputedState = stateFrame.Frame.Data[j];
-                    if (IsComplete(preComputedState))
-                        continue;
-                    var postDotSymbol = GetPostDotSymbol(preComputedState);
-                    if (IsLeoEligible(postDotSymbol, stateFrameSet))
-                    {
-                        // Set Transitions (location, postDotSymbol) to Leo Item
-                    }
-                    else
-                    {
-                        // Set Transitions (location, postDotSymbol) to set of frames that have
-                        // postDotSymbol as their postdot symbol
-                    }
-                }
-            }
-        }
-
-        private bool IsLeoEligible(ISymbol symbol, StateFrameSet stateFrameSet)
-        {
-            return stateFrameSet.IsLeoUnique(symbol) 
-                && _precomputedGrammar.IsRightRecursive(symbol);
-        }
-
         private void Scan(int location, IToken token)
         {
             var set = _chart.FrameSets[location];
