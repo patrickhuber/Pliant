@@ -28,13 +28,15 @@ namespace Pliant.Collections
             _visited.Clear();
         }
 
-        public void Enqueue(T item)
+        public bool Enqueue(T item)
         {
             if (_visited.ContainsKey(item))
-                return;
+                return false;
 
             _visited[item] = item;
-            _queue.Enqueue(item);            
+            _queue.Enqueue(item);
+
+            return true;
         }
         
         public T EnqueueOrGetExisting(T item)
