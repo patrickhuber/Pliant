@@ -68,6 +68,7 @@
     <Compile Include="Collections\DictionaryExtensions.cs" />
     <Compile Include="Collections\FastLookupDictionary.cs" />
     <Compile Include="Collections\IndexedList.cs" />
+    <Compile Include="Collections\NonOverlappingIntervalSet.cs" />
     <Compile Include="Collections\UniqueList.cs" />
     <Compile Include="Forest\ForestNodeVisitorBase.cs" />
     <Compile Include="Forest\IForestNodeReference.cs" />
