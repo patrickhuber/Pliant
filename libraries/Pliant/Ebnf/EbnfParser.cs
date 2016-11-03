@@ -13,9 +13,10 @@ namespace Pliant.Ebnf
             var grammar = new EbnfGrammar();
             var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
             var parseRunner = new ParseRunner(parseEngine, ebnf);
+            var parseContext = new ParseContext();
             while (!parseRunner.EndOfStream())
             {
-                if (!parseRunner.Read())
+                if (!parseRunner.Read(parseContext))
                     throw new Exception(
                         $"Unable to parse Ebnf. Error at position {parseRunner.Position}.");
             }

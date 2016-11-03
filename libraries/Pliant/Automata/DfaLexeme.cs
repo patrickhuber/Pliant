@@ -70,7 +70,7 @@ namespace Pliant.Automata
             return _currentState.IsFinal;
         }
 
-        public bool Scan(char c)
+        public bool Scan(ILexContext context, char c)
         {
             for(var e = 0; e<_currentState.Transitions.Count; e++)
             {

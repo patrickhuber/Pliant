@@ -18,25 +18,35 @@ namespace Pliant.Runtime
         public int Location { get; private set; }
 
         public IReadOnlyChart Chart { get { return _chart; } }
-
+        
         public ParseEngineOptions Options { get; private set; }
-
+        
         private Chart _chart;
         private readonly ForestNodeSet _nodeSet;
-        
+
         public ParseEngine(IGrammar grammar)
             : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
         {
         }
 
         public ParseEngine(IGrammar grammar, ParseEngineOptions options)
+            : this(grammar, options, true)
+        {
+        }
+
+        public ParseEngine(IGrammar grammar, ParseEngineOptions options, bool initialize)
         {
             Options = options;
-            _nodeSet = new ForestNodeSet();
             Grammar = grammar;
-            Initialize();
+
+            _nodeSet = new ForestNodeSet();
+
+            if (initialize)
+            {
+                Initialize(null);
+            }
         }
-        
+
         public List<ILexerRule> GetExpectedLexerRules()
         {
             var earleySets = _chart.EarleySets;
@@ -89,7 +99,6 @@ namespace Pliant.Runtime
             return null;
         }
 
-
         public bool IsAccepted()
         {
             var lastEarleySet = _chart.EarleySets[_chart.Count - 1];
@@ -106,7 +115,7 @@ namespace Pliant.Runtime
             return false;
         }
 
-        private void Initialize()
+        public void Initialize(IParseContext context)
         {
             Location = 0;
             _chart = new Chart();
@@ -115,38 +124,39 @@ namespace Pliant.Runtime
             {
                 var startProduction = startProductions[s];
                 var startState = new NormalState(startProduction, 0, 0);
-                if (_chart.Enqueue(0, startState))
-                    Log("Start", 0, startState);
+                if (_chart.Enqueue(0, startState) && context != null)
+                    context.Started(0, startState);
             }
-            ReductionPass(Location);
-        }
 
-        public bool Pulse(IToken token)
+            ReductionPass(context, Location);
+        }
+        
+        public bool Pulse(IParseContext context, IToken token)
         {
-            ScanPass(Location, token);
+            ScanPass(context, Location, token);
 
             var tokenRecognized = _chart.EarleySets.Count > Location + 1;
             if (!tokenRecognized)
                 return false;
 
             Location++;
-            ReductionPass(Location);
+            ReductionPass(context, Location);
 
             _nodeSet.Clear();
             return true;
         }
-
-        private void ScanPass(int location, IToken token)
+        
+        private void ScanPass(IParseContext context, int location, IToken token)
         {
             var earleySet = _chart.EarleySets[location];
             for (int s = 0; s < earleySet.Scans.Count; s++)
             {
                 var scanState = earleySet.Scans[s];
-                Scan(scanState, location, token);
+                Scan(context, scanState, location, token);
             }
         }
 
-        private void Scan(INormalState scan, int j, IToken token)
+        private void Scan(IParseContext context, INormalState scan, int j, IToken token)
         {
             var i = scan.Origin;
             var currentSymbol = scan.PostDotSymbol;
@@ -160,15 +170,16 @@ namespace Pliant.Runtime
                     nextState,
                     scan.ParseNode,
                     tokenNode,
-                    j + 1);
+                    j + 1
+                );
                 nextState.ParseNode = parseNode;
 
-                if (_chart.Enqueue(j + 1, nextState))
-                    LogScan(j + 1, nextState, token);
+                if (_chart.Enqueue(j + 1, nextState) && context != null)
+                    context.Scanned(j + 1, scan, nextState, token);
             }
         }
         
-        private void ReductionPass(int location)
+        private void ReductionPass(IParseContext context, int location)
         {
             var earleySet = _chart.EarleySets[location];
             var resume = true;
@@ -182,7 +193,7 @@ namespace Pliant.Runtime
                 if (c < earleySet.Completions.Count)
                 {
                     var completion = earleySet.Completions[c];
-                    Complete(completion, location);
+                    Complete(context, completion, location);
                     c++;
                 }
                 // is there a new prediction?
@@ -191,7 +202,7 @@ namespace Pliant.Runtime
                     var predictions = earleySet.Predictions;
                     
                     var evidence = predictions[p];
-                    Predict(evidence, location);
+                    Predict(context, evidence, location);
                     
                     p++;
                 }
@@ -200,7 +211,7 @@ namespace Pliant.Runtime
             }
         }
         
-        private void Predict(INormalState evidence, int j)
+        private void Predict(IParseContext context, INormalState evidence, int j)
         {
             var nonTerminal = evidence.PostDotSymbol as INonTerminal;
             var rulesForNonTerminal = Grammar.RulesFor(nonTerminal);
@@ -209,23 +220,23 @@ namespace Pliant.Runtime
             for (int p = 0; p < rulesForNonTerminal.Count; p++)
             {
                 var production = rulesForNonTerminal[p];
-                PredictProduction(j, production);
+                PredictProduction(context, j, evidence, production);
             }
 
             var isNullable = Grammar.IsNullable(evidence.PostDotSymbol as INonTerminal);
-            if (isNullable)            
-                PredictAycockHorspool(evidence, j);            
+            if (isNullable)
+                PredictAycockHorspool(context, evidence, j);            
         }
 
-        private void PredictProduction(int j, IProduction production)
+        private void PredictProduction(IParseContext context, int j, INormalState evidence, IProduction production)
         {
             // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
             var predictedState = new NormalState(production, 0, j);
-            if (_chart.Enqueue(j, predictedState))
-                Log("Predict", j, predictedState);
+            if (_chart.Enqueue(j, predictedState) && context != null)
+                context.Predicted(PredictionMode.Earley, j, evidence, predictedState);
         }
 
-        private void PredictAycockHorspool(INormalState evidence, int j)
+        private void PredictAycockHorspool(IParseContext context, INormalState evidence, int j)
         {
             var nullParseNode = CreateNullParseNode(evidence.PostDotSymbol, j);
             var aycockHorspoolState = evidence.NextState();
@@ -239,12 +250,12 @@ namespace Pliant.Runtime
                 var parseNode = CreateParseNode(aycockHorspoolState, firstChildNode, nullParseNode, j);
                 aycockHorspoolState.ParseNode = parseNode;
             }
-            if (_chart.Enqueue(j, aycockHorspoolState))
-                Log("Predict", j, aycockHorspoolState);
+            if (_chart.Enqueue(j, aycockHorspoolState) && context != null)
+                context.Predicted(PredictionMode.AycockHorspool, j, evidence, aycockHorspoolState);
         }
 
 
-        private void Complete(INormalState completed, int k)
+        private void Complete(IParseContext context, INormalState completed, int k)
         {
             if (completed.ParseNode == null)
                 completed.ParseNode = CreateNullParseNode(completed.Production.LeftHandSide, k);
@@ -253,20 +264,20 @@ namespace Pliant.Runtime
             var searchSymbol = completed.Production.LeftHandSide;
 
             if(Options.OptimizeRightRecursion)
-                OptimizeReductionPath(searchSymbol, completed.Origin);
+                OptimizeReductionPath(context, searchSymbol, completed.Origin);
 
             var transitionState = earleySet.FindTransitionState(searchSymbol);
             if (transitionState != null)
             {
-                LeoComplete(transitionState, completed, k);
+                LeoComplete(context, transitionState, completed, k);
             }
             else
             {
-                EarleyComplete(completed, k);
+                EarleyComplete(context, completed, k);
             }
         }
 
-        private void LeoComplete(ITransitionState transitionState, IState completed, int k)
+        private void LeoComplete(IParseContext context, ITransitionState transitionState, IState completed, int k)
         {
             var earleySet = _chart.EarleySets[transitionState.Index];
             var rootTransitionState = earleySet.FindTransitionState(
@@ -284,11 +295,11 @@ namespace Pliant.Runtime
 
             topmostItem.ParseNode = virtualParseNode;
 
-            if (_chart.Enqueue(k, topmostItem))
-                Log("Complete", k, topmostItem);
+            if (_chart.Enqueue(k, topmostItem) && context != null)
+                context.Completed(CompletionMode.Leo, k, completed, topmostItem);
         }
         
-        private void EarleyComplete(INormalState completed, int k)
+        private void EarleyComplete(IParseContext context, INormalState completed, int k)
         {
             var j = completed.Origin;
             var sourceEarleySet = _chart.EarleySets[j];
@@ -308,22 +319,23 @@ namespace Pliant.Runtime
                     k);
                 nextState.ParseNode = parseNode;
 
-                if (_chart.Enqueue(k, nextState))
-                    Log("Complete", k, nextState);
+                if (_chart.Enqueue(k, nextState) && context != null)
+                    context.Completed(CompletionMode.Earley, k, completed, nextState);
             }
         }
         
-        private void OptimizeReductionPath(ISymbol searchSymbol, int k)
+        private void OptimizeReductionPath(IParseContext context, ISymbol searchSymbol, int k)
         {
             IState t_rule = null;
             ITransitionState previousTransitionState = null;
 
             var visited = SharedPools.Default<HashSet<IState>>().AllocateAndClear();
-            OptimizeReductionPathRecursive(searchSymbol, k, ref t_rule, ref previousTransitionState, visited);
+            OptimizeReductionPathRecursive(context, searchSymbol, k, ref t_rule, ref previousTransitionState, visited);
             SharedPools.Default<HashSet<IState>>().ClearAndFree(visited);
         }
 
         private void OptimizeReductionPathRecursive(
+            IParseContext context,
             ISymbol searchSymbol,
             int k,
             ref IState t_rule,
@@ -362,6 +374,7 @@ namespace Pliant.Runtime
 
             // T_Update(I0...Ik, B);
             OptimizeReductionPathRecursive(
+                context,
                 sourceState.Production.LeftHandSide,
                 sourceState.Origin,
                 ref t_rule,
@@ -389,8 +402,8 @@ namespace Pliant.Runtime
                   sourceState,
                   k);
 
-            if (_chart.Enqueue(k, currentTransitionState))
-                Log("Transition", k, currentTransitionState);
+            if (_chart.Enqueue(k, currentTransitionState) && context != null)
+                context.Transitioned(k, currentTransitionState);
 
             previousTransitionState = currentTransitionState;
         }
@@ -527,26 +540,9 @@ namespace Pliant.Runtime
             return Grammar.IsNullable(nonTerminal);
         }
 
-        public void Reset()
+        public void Reset(IParseContext context)
         {
-            Initialize();
-        }
-
-        private static void Log(string operation, int origin, IState state)
-        {
-            LogOriginStateOperation(operation, origin, state);
-            Debug.WriteLine(string.Empty);
-        }
-
-        private static void LogOriginStateOperation(string operation, int origin, IState state)
-        {
-            Debug.Write($"{origin.ToString().PadRight(50)}{state.ToString().PadRight(50)}{operation}");
-        }
-
-        private static void LogScan(int origin, IState state, IToken token)
-        {
-            LogOriginStateOperation("Scan", origin, state);
-            Debug.WriteLine($" {token.Value}");
-        }        
+            Initialize(context);
+        }  
     }
 }

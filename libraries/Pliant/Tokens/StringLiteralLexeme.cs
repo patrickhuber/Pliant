@@ -48,7 +48,7 @@ namespace Pliant.Tokens
             return _index >= Literal.Length;
         }
 
-        public bool Scan(char c)
+        public bool Scan(ILexContext context, char c)
         {
             if (_index >= Literal.Length)
                 return false;

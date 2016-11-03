@@ -24,13 +24,17 @@ namespace Pliant.Runtime
             }
         }
 
-        public DeterministicParseEngine(PreComputedGrammar preComputedGrammar)
+        public DeterministicParseEngine(PreComputedGrammar preComputedGrammar, bool initialize = true)
         {
             _precomputedGrammar = preComputedGrammar;
-            Initialize();
+
+            if (initialize)
+            {
+                Initialize(null);
+            }
         }
         
-        private void Initialize()
+        public void Initialize(IParseContext context)
         {
             Location = 0;
             _chart = new StateFrameChart();
@@ -54,7 +58,7 @@ namespace Pliant.Runtime
             return _chart.Enqueue(location, nullTransitionFrame);
         }
 
-        public bool Pulse(IToken token)
+        public bool Pulse(IParseContext context, IToken token)
         {
             Scan(Location, token);
             var tokenRecognized = _chart.FrameSets.Count > Location + 1;
@@ -197,7 +201,7 @@ namespace Pliant.Runtime
             _chart.Enqueue(location + 1, new StateFrame(target.NullTransition, location + 1));
         }
         
-        public void Reset()
+        public void Reset(IParseContext context)
         {
             _chart.Clear();
         }

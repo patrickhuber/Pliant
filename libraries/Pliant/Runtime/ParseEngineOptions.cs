@@ -1,6 +1,6 @@
 ﻿namespace Pliant.Runtime
 {
-    public class ParseEngineOptions
+    public class ParseEngineOptions : IParseEngineOptions
     {
         public bool OptimizeRightRecursion { get; private set; }
 
