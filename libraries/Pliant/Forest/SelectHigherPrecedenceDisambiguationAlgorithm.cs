@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pliant.Forest
 {
-    public class SelectHigherPresedenceDisambiguationAlgorithm : IForestDisambiguationAlgorithm
+    public class SelectHigherPrecedenceDisambiguationAlgorithm : IForestDisambiguationAlgorithm
     {
         public IAndForestNode GetCurrentAndNode(IInternalForestNode internalNode)
         {
