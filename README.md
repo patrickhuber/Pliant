@@ -49,7 +49,7 @@ public static int Main(string[] args)
 		= Expression ;
 		
 	Expression.Rule
-		= Edxpression + '+' + Term 
+		= Expression + '+' + Term 
 		| Term ;
 
 	Term.Rule 
