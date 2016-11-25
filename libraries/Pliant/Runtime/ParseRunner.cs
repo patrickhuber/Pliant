@@ -35,40 +35,44 @@ public class ParseRunner : IParseRunner
         Position = 0;
     }
 
-    public bool Read()
+    public bool Read(IParseContext context)
     {
         if (EndOfStream())
             return false;
+        
+        //Ensure we have a parse context
+        if (context == null)
+            context = new ParseContext();
+        
+        var character = ReadCharacter(context);
 
-        var character = ReadCharacter();
-
-        if (MatchesExistingIncompleteIgnoreLexemes(character))
+        if (MatchesExistingIncompleteIgnoreLexemes(context, character))
             return true;
 
-        if (MatchExistingLexemes(character))
+        if (MatchExistingLexemes(context, character))
         {
             if (EndOfStream())
-                return TryParseExistingToken();
+                return TryParseExistingToken(context);
             return true;
         }
 
         if (AnyExistingLexemes())
-            if (!TryParseExistingToken())
+            if (!TryParseExistingToken(context))
                 return false;
 
-        if (MatchesNewLexemes(character))
+        if (MatchesNewLexemes(context, character))
         {
             if (!EndOfStream())
                 return true;
-            return TryParseExistingToken();
+            return TryParseExistingToken(context);
         }
 
-        if (MatchesExistingIgnoreLexemes(character))
+        if (MatchesExistingIgnoreLexemes(context, character))
             return true;
 
         ClearExistingIngoreLexemes();
 
-        return MatchesNewIgnoreLexemes(character);
+        return MatchesNewIgnoreLexemes(context, character);
     }
 
     public bool EndOfStream()
@@ -76,7 +80,7 @@ public class ParseRunner : IParseRunner
         return _reader.Peek() == -1;
     }
 
-    private bool MatchesExistingIncompleteIgnoreLexemes(char character)
+    private bool MatchesExistingIncompleteIgnoreLexemes(ILexContext lexContext, char character)
     {
         if (!AnyExistingIngoreLexemes())
             return false;
@@ -89,7 +93,7 @@ public class ParseRunner : IParseRunner
             var lexeme = _ignoreLexemes[i];
             if (!lexeme.IsAccepted())
             {
-                if (lexeme.Scan(character))
+                if (lexeme.Scan(lexContext, character))
                     matches.Add(lexeme);
                 else
                     FreeLexeme(lexeme);
@@ -112,14 +116,17 @@ public class ParseRunner : IParseRunner
         return _ignoreLexemes.Count > 0;
     }
 
-    private char ReadCharacter()
+    private char ReadCharacter(ILexContext lexContext)
     {
         var character = (char)_reader.Read();
         Position++;
+
+        lexContext.ReadCharacter(Position, character);
+
         return character;
     }
 
-    private bool MatchExistingLexemes(char character)
+    private bool MatchExistingLexemes(ILexContext lexContext, char character)
     {
         if (!AnyExistingLexemes())
             return false;
@@ -131,7 +138,7 @@ public class ParseRunner : IParseRunner
         for (var i = 0; i < _existingLexemes.Count; i++)
         {
             var lexeme = _existingLexemes[i];
-            if (lexeme.Scan(character))
+            if (lexeme.Scan(lexContext, character))
                 matches.Add(lexeme);
             else
                 misses.Add(lexeme);
@@ -155,7 +162,7 @@ public class ParseRunner : IParseRunner
         return true;
     }
 
-    private bool TryParseExistingToken()
+    private bool TryParseExistingToken(IParseContext parseContext)
     {
         // PERF: Avoid Linq FirstOrDefault due to lambda allocation
         ILexeme longestAcceptedMatch = null;
@@ -177,7 +184,7 @@ public class ParseRunner : IParseRunner
         //var token = CreateTokenFromLexeme(longestAcceptedMatch);
         //if (token == null)
         //    return false;
-        if (!ParseEngine.Pulse(longestAcceptedMatch))
+        if (!ParseEngine.Pulse(parseContext, longestAcceptedMatch))
             return false;
 
         ClearExistingLexemes(doNotFreeLexemeIndex);
@@ -199,7 +206,7 @@ public class ParseRunner : IParseRunner
         ClearLexemes(_existingLexemes, doNotFreeLexemeIndex);
     }
 
-    private bool MatchesNewLexemes(char character)
+    private bool MatchesNewLexemes(ILexContext lexContext, char character)
     {
         var newLexerRules = ParseEngine.GetExpectedLexerRules();
         var anyMatchingLexeme = false;
@@ -208,7 +215,7 @@ public class ParseRunner : IParseRunner
             var lexerRule = newLexerRules[i];
             var factory = _lexemeFactoryRegistry.Get(lexerRule.LexerRuleType);
             var lexeme = factory.Create(lexerRule, Position);
-            if (!lexeme.Scan(character))
+            if (!lexeme.Scan(lexContext, character))
             {
                 factory.Free(lexeme);
                 continue;
@@ -221,7 +228,7 @@ public class ParseRunner : IParseRunner
         return anyMatchingLexeme;
     }
 
-    private bool MatchesExistingIgnoreLexemes(char character)
+    private bool MatchesExistingIgnoreLexemes(ILexContext lexContext, char character)
     {
         if (!AnyExistingIngoreLexemes())
             return false;
@@ -232,7 +239,7 @@ public class ParseRunner : IParseRunner
         for (int i = 0; i < _ignoreLexemes.Count; i++)
         {
             var lexeme = _ignoreLexemes[i];
-            if (!lexeme.Scan(character))
+            if (!lexeme.Scan(lexContext, character))
             {
                 FreeLexeme(lexeme);
                 continue;
@@ -260,7 +267,7 @@ public class ParseRunner : IParseRunner
         ClearLexemes(_ignoreLexemes);
     }
 
-    private bool MatchesNewIgnoreLexemes(char character)
+    private bool MatchesNewIgnoreLexemes(ILexContext lexContext, char character)
     {
         var lexerRules = ParseEngine.Grammar.Ignores;
         var pool = SharedPools.Default<List<ILexeme>>();
@@ -272,7 +279,7 @@ public class ParseRunner : IParseRunner
             var factory = _lexemeFactoryRegistry.Get(lexerRule.LexerRuleType);
             var lexeme = factory.Create(lexerRule, Position);
 
-            if (!lexeme.Scan(character))
+            if (!lexeme.Scan(lexContext, character))
             {
                 FreeLexeme(lexeme);
                 continue;

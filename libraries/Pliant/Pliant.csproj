@@ -68,6 +68,7 @@
     <Compile Include="Collections\DictionaryExtensions.cs" />
     <Compile Include="Collections\FastLookupDictionary.cs" />
     <Compile Include="Collections\IndexedList.cs" />
+    <Compile Include="Collections\NonOverlappingIntervalSet.cs" />
     <Compile Include="Collections\UniqueList.cs" />
     <Compile Include="Forest\ForestNodeVisitorBase.cs" />
     <Compile Include="Forest\IForestNodeReference.cs" />
@@ -86,6 +87,10 @@
     <Compile Include="Grammars\PreComputedState.cs" />
     <Compile Include="Runtime\DeterministicParseEngine.cs" />
     <Compile Include="Runtime\MarpaParseEngine.cs" />
+    <Compile Include="Runtime\ParseContext.cs" />
+    <Compile Include="Runtime\ParseEngineExtensions.cs" />
+    <Compile Include="Runtime\ParseRunnerExtensions.cs" />
+    <Compile Include="Tokens\LexemeExtensions.cs" />
     <Compile Include="Tree\ParseTreeEnumerable.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />
     <Compile Include="Forest\SelectFirstChildDisambiguationAlgorithm.cs" />

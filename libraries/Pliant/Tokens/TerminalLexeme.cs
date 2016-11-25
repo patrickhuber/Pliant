@@ -70,7 +70,7 @@ namespace Pliant.Tokens
             _capture = value;
         }
 
-        public bool Scan(char c)
+        public bool Scan(ILexContext context, char c)
         {
             if (IsAccepted())
                 return false;

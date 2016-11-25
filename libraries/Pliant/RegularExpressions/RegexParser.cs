@@ -12,9 +12,10 @@ namespace Pliant.RegularExpressions
             var grammar = new RegexGrammar();
             var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
             var parseRunner = new ParseRunner(parseEngine, regularExpression);
+            var parseContext = new ParseContext();
             while (!parseRunner.EndOfStream())
             {
-                if (!parseRunner.Read())
+                if (!parseRunner.Read(parseContext))
                     throw new Exception(
                         $"Unable to parse regular expression. Error at position {parseRunner.Position}.");
             }

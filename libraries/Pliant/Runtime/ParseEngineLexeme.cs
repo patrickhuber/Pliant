@@ -28,7 +28,7 @@ namespace Pliant.Runtime
             LexerRule = lexerRule;
         }
 
-        public bool Scan(char c)
+        public bool Scan(ILexContext context, char c)
         {
             // get expected lexems
             // PERF: Avoid Linq where, let and select expressions due to lambda allocation
@@ -43,7 +43,7 @@ namespace Pliant.Runtime
             // PERF: Avoid Linq FirstOrDefault due to lambda allocation
             TerminalLexeme firstPassingRule = null;
             foreach (var lexeme in expectedLexemes)
-                if (lexeme.Scan(c))
+                if (lexeme.Scan(context, c))
                 {
                     firstPassingRule = lexeme;
                     break;
@@ -56,7 +56,12 @@ namespace Pliant.Runtime
 
             var token = new Token(firstPassingRule.Value, _parseEngine.Location, firstPassingRule.TokenType);
 
-            var result = _parseEngine.Pulse(token);
+            //Use default parse context if the lex contexts isn't a parse context as well!
+            var parseContext = context as IParseContext;
+            if (parseContext == null)
+                parseContext = new ParseContext();
+
+            var result = _parseEngine.Pulse(parseContext, token);
             if (result)
                 _capture.Append(c);
 
