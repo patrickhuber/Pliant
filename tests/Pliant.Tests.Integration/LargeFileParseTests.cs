@@ -18,7 +18,8 @@ namespace Pliant.Tests.Integration.Runtime
 
         private ParseTester _parseTester;
         private ParseTester _compressedParseTester;
-
+        private ParseTester _marpaParseTester;
+        
         [ClassInitialize]
 #pragma warning disable CC0057 // Unused parameters
 #pragma warning disable RECS0154 // Parameter is never used
@@ -33,7 +34,11 @@ namespace Pliant.Tests.Integration.Runtime
         public void InitializeTest()
         {
             _parseTester = new ParseTester(_grammar);
-            _compressedParseTester = new ParseTester(new DeterministicParseEngine(new PreComputedGrammar(_grammar)));
+            var preComputedGrammar = new PreComputedGrammar(_grammar);
+            _compressedParseTester = new ParseTester(
+                new DeterministicParseEngine(preComputedGrammar));
+            _marpaParseTester = new ParseTester(
+                new MarpaParseEngine(preComputedGrammar));
         }
 
         [TestMethod]
@@ -76,6 +81,18 @@ namespace Pliant.Tests.Integration.Runtime
             using (var reader = new StreamReader(stream))
             {
                 _compressedParseTester.RunParse(reader);
+            }
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"10000.json", "Runtime")]
+        public void TestCanParseLargeJsonFileWithMarpa()
+        {
+            var path = Path.Combine(TestContext.TestDeploymentDir, "Runtime", "10000.json");
+            using (var stream = File.OpenRead(path))
+            using (var reader = new StreamReader(stream))
+            {
+                _marpaParseTester.RunParse(reader);
             }
         }
 

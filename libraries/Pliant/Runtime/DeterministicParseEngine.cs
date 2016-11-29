@@ -24,6 +24,11 @@ namespace Pliant.Runtime
             }
         }
 
+        public DeterministicParseEngine(IGrammar grammar)
+            : this(new PreComputedGrammar(grammar))
+        {
+        }
+
         public DeterministicParseEngine(PreComputedGrammar preComputedGrammar)
         {
             _precomputedGrammar = preComputedGrammar;

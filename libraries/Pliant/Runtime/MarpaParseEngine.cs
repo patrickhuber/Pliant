@@ -6,16 +6,19 @@ using Pliant.Utilities;
 using Pliant.Tokens;
 using System;
 using System.Runtime.CompilerServices;
+using Pliant.Forest;
 
 namespace Pliant.Runtime
 {
-    public class MarpaParseEngine 
+    public class MarpaParseEngine : IParseEngine
     {
         private PreComputedGrammar _preComputedGrammar;
 
         public StateFrameChart Chart { get; private set; }
         
         public int Location { get; private set; }
+
+        public IGrammar Grammar => _preComputedGrammar.Grammar;
 
         public MarpaParseEngine(PreComputedGrammar preComputedGrammar)
         {
@@ -32,6 +35,36 @@ namespace Pliant.Runtime
         {
             var start = _preComputedGrammar.Start;
             AddEimPair(0, start, 0);
+        }
+
+        public void Reset()
+        {
+            Initialize();
+        }
+
+        public IInternalForestNode GetParseForestRootNode()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<ILexerRule> GetExpectedLexerRules()
+        {
+            var list = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
+
+            if (Chart.FrameSets.Count == 0)
+                return list;
+
+            var frameSet = Chart.FrameSets[Chart.FrameSets.Count - 1];
+            for (var i = 0; i < frameSet.Frames.Count; i++)
+            {
+                var stateFrame = frameSet.Frames[i];
+                for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
+                {
+                    var lexerRule = stateFrame.Frame.ScanKeys[j];
+                    list.Add(lexerRule);
+                }
+            }
+            return list;
         }
 
         public bool Pulse(IToken token)

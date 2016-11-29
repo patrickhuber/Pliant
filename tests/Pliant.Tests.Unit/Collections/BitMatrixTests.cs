@@ -38,7 +38,7 @@ namespace Pliant.Tests.Unit.Collections
             // C -> c A | c
 
             // Verticies
-            // ------------
+            // ---------------
             // (0 ) A -> . a B 
             // (1 ) A -> . a
             // (2 ) A -> a . B
@@ -89,9 +89,46 @@ namespace Pliant.Tests.Unit.Collections
         }
 
         [TestMethod]
-        [Ignore]
-        public void BitMatrixShouldComputeTransitiveClosureOfAycockHorspool()
-        {            
+        //[Ignore]
+        public void BitMatrixShouldComputeTransitiveClosureNullableGrammar()
+        {
+            // Grammar
+            // -------
+            // SP -> S
+            // S  -> A A A A
+            // A  -> E
+            // A  -> a 
+            // E  -> null
+
+            // Verticies  
+            // ( 0) SP -> . S 
+            // ( 1) SP -> S .
+            // ( 2) S  -> . A A A A
+            // ( 3) S  -> A . A A A
+            // ( 4) S  -> A A . A A
+            // ( 5) S  -> A A A . A
+            // ( 6) S  -> A A A A .             
+            // ( 7) A  -> . E 
+            // ( 8) A  -> E . 
+            // ( 9) A  -> . a
+            // (10) A  -> a .
+            // (11) E  -> .
+            
+            var bitMatrix = new BitMatrix(12);
+            bitMatrix[0][2]  = true; // SP -> . S         predicts  S -> . A A A A
+            bitMatrix[2][7]  = true; // S  -> . A A A A   predicts  A -> . a
+            bitMatrix[2][9]  = true; // S  -> . A A A A   predicts  A -> . E
+            bitMatrix[3][7]  = true; // S  -> A . A A A   predicts  A -> . a
+            bitMatrix[3][9]  = true; // S  -> A . A A A   predicts  A -> . E
+            bitMatrix[4][9]  = true; // S  -> A A . A A   predicts  A -> . E
+            bitMatrix[4][7]  = true; // S  -> A A . A A   predicts  A -> . a
+            bitMatrix[5][7]  = true; // S  -> A A A . A   predicts  A -> . a
+            bitMatrix[5][9]  = true; // S  -> A A A . A   predicts  A -> . E
+            bitMatrix[7][11] = true; // A  -> . E         predicts  E -> .
+            bitMatrix[7][8]  = true; // A  -> . E         predicts  A -> . E
+
+            var transitiveClosure = bitMatrix.TransitiveClosure();
+
         }
     }
 }

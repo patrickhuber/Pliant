@@ -6,6 +6,7 @@ using Pliant.Runtime;
 using Pliant.Tests.Common;
 using Pliant.Tokens;
 using Pliant.Tests.Common.Grammars;
+using Pliant.LexerRules;
 
 namespace Pliant.Tests.Unit.Runtime
 {
@@ -134,7 +135,52 @@ namespace Pliant.Tests.Unit.Runtime
             const string input = "a";
             parseTester.RunParse(input);
         }
-        
+
+        [TestMethod]
+        public void DeterministicParseEngineShouldParseRepeatingRightRecursiveRule()
+        {
+            var number = new NumberLexerRule();
+            var openBracket = new TerminalLexerRule('[');
+            var closeBracket = new TerminalLexerRule(']');
+            var comma = new TerminalLexerRule(',');
+
+            ProductionExpression
+                A = "A",
+                V = "V",
+                VR = "VR";
+
+            A.Rule = openBracket + VR + closeBracket;
+            VR.Rule = V
+                | V + comma + VR
+                | (Expr)null;
+            V.Rule = number;
+
+            var grammar = new GrammarExpression(
+                A, new[] { A, V, VR }).ToGrammar();
+
+            var determinisicParseEngine = new DeterministicParseEngine(grammar);
+
+            var tokens = new[]
+            {
+                new Token("[", 0, openBracket.TokenType),
+                new Token("1", 1, number.TokenType),
+                new Token(",", 2, comma.TokenType),
+                new Token("2", 3, number.TokenType),
+                new Token("]", 4, closeBracket.TokenType)
+            };
+
+            for (var i = 0; i < tokens.Length; i++)
+            {
+                var result = determinisicParseEngine.Pulse(tokens[i]);
+                if (!result)
+                    Assert.Fail($"Failure parsing at position {determinisicParseEngine.Location}");
+            }
+
+            var accepted = determinisicParseEngine.IsAccepted();
+            if (!accepted)
+                Assert.Fail($"Input was not accepted.");
+        }
+
         private static void AssertExpectedLexerRulesReturnedFromInitializedParseEngine(IGrammar grammar, int expectedCount)
         {
             var preComputedGrammar = new PreComputedGrammar(grammar);

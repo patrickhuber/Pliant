@@ -122,8 +122,8 @@ public static int Main (string[] args)
 	:start = Calculator;
 	:ignore = Whitespace;";
 	
-	var compiler = new EbnfCompiler();
-	var grammar = compiler.Compile(grammarText);
+	var definition = new EbnfParser().Parse(grammarText);
+	var grammar = new EbnfGrammarGenerator().Generate(definition);
 	
 	// TODO: use the grammar in a parse.
 }
