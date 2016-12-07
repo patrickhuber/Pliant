@@ -107,7 +107,7 @@ namespace Pliant.Runtime
             return false;
         }
 
-        private bool AnyPreComputedStateAccepted(IReadOnlyList<PreComputedState> states)
+        private bool AnyPreComputedStateAccepted(IReadOnlyList<DottedRule> states)
         {
             for (var j = 0; j < states.Count; j++)
             {
@@ -289,12 +289,12 @@ namespace Pliant.Runtime
             Chart.Enqueue(iLoc, predictedEIM);
         }
 
-        private static bool IsCompleted(PreComputedState dottedRule)
+        private static bool IsCompleted(DottedRule dottedRule)
         {
             return dottedRule.Production.RightHandSide.Count == dottedRule.Position;
         }
 
-        private static ISymbol GetPostDotSymbol(PreComputedState preComputedState)
+        private static ISymbol GetPostDotSymbol(DottedRule preComputedState)
         {
             return preComputedState.Production.RightHandSide[preComputedState.Position];
         }
@@ -321,14 +321,14 @@ namespace Pliant.Runtime
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool IsStartState(PreComputedState state)
+        private bool IsStartState(DottedRule state)
         {
             var start = _preComputedGrammar.Grammar.Start;
             return state.Production.LeftHandSide.Equals(start);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsComplete(PreComputedState preComputedState)
+        private static bool IsComplete(DottedRule preComputedState)
         {
             return preComputedState.Position == preComputedState.Production.RightHandSide.Count;
         }

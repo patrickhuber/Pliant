@@ -7,14 +7,14 @@ namespace Pliant.Grammars
 {
     public class Frame
     {
-        private PreComputedState[] _cachedData;        
-        private SortedSet<PreComputedState> _set;
+        private DottedRule[] _cachedData;        
+        private SortedSet<DottedRule> _set;
         private Dictionary<ISymbol, Frame> _reductions;
         private Dictionary<TokenType, Frame> _tokenTransitions;
         private Dictionary<ILexerRule, Frame> _scans;
         private List<ILexerRule> _scanKeys;
 
-        public IReadOnlyList<PreComputedState> Data { get { return _cachedData; } }
+        public IReadOnlyList<DottedRule> Data { get { return _cachedData; } }
                 
         public IReadOnlyDictionary<ISymbol, Frame> Reductions { get { return _reductions; } }
 
@@ -26,7 +26,7 @@ namespace Pliant.Grammars
 
         public Frame NullTransition { get; set; }
 
-        public Frame(SortedSet<PreComputedState> set)
+        public Frame(SortedSet<DottedRule> set)
         {
             _set = set;
             _cachedData = _set.ToArray();
@@ -59,12 +59,12 @@ namespace Pliant.Grammars
             }
         }
 
-        public bool Contains(PreComputedState state)
+        public bool Contains(DottedRule state)
         {
             return _set.Contains(state);
         }
 
-        static int ComputeHashCode(SortedSet<PreComputedState> data)
+        static int ComputeHashCode(SortedSet<DottedRule> data)
         {
             return HashCode.Compute(data);
         }

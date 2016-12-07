@@ -79,7 +79,7 @@ namespace Pliant.Forest
             out VirtualForestNode node)
         {
             var targetState = transitionState.GetTargetState();
-            var hash = ComputeHashCode(targetState.Production.LeftHandSide, targetState.Origin, location);
+            var hash = ComputeHashCode(targetState.DottedRule.Production.LeftHandSide, targetState.Origin, location);
             return _virtualNodes.TryGetValue(hash, out node);
         }
 

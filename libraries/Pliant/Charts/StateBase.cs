@@ -1,4 +1,5 @@
-﻿using Pliant.Diagnostics;
+﻿using System;
+using Pliant.Diagnostics;
 using Pliant.Forest;
 using Pliant.Grammars;
 
@@ -6,23 +7,26 @@ namespace Pliant.Charts
 {
     public abstract class StateBase : IState
     {
-        public IProduction Production { get; private set; }
-
+        public IDottedRule DottedRule { get; private set; }
+        
         public int Origin { get; private set; }
 
         public ISymbol PreDotSymbol { get; private set; }
 
         public ISymbol PostDotSymbol { get; private set; }
-
-        public int Position { get; private set; }
-
+        
         public abstract StateType StateType { get; }
 
         public IForestNode ParseNode { get; set; }
         
         public bool IsComplete
         {
-            get { return Position == Production.RightHandSide.Count; }
+            get { return DottedRule.Position == DottedRule.Production.RightHandSide.Count; }
+        }
+
+        protected StateBase(IDottedRule dottedRule)
+        {
+            DottedRule = dottedRule;
         }
 
         protected StateBase(IProduction production, int position, int origin)
@@ -30,10 +34,9 @@ namespace Pliant.Charts
             Assert.IsNotNull(production, nameof(production));
             Assert.IsGreaterThanEqualToZero(position, nameof(position));
             Assert.IsGreaterThanEqualToZero(origin, nameof(origin));
-            
-            Production = production;
+
+            DottedRule = new DottedRule(production, position);
             Origin = origin;
-            Position = position;
             PostDotSymbol = GetPostDotSymbol(position, production);
             PreDotSymbol = GetPreDotSymbol(position, production);
         }

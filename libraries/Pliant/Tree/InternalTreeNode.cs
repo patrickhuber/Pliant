@@ -43,7 +43,7 @@ namespace Pliant.Tree
                     break;
 
                 case Forest.ForestNodeType.Intermediate:
-                    Symbol = (node as IIntermediateForestNode).State.Production.LeftHandSide;
+                    Symbol = (node as IIntermediateForestNode).State.DottedRule.Production.LeftHandSide;
                     break;
             }
         }

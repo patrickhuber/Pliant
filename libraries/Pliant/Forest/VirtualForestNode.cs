@@ -49,7 +49,7 @@ namespace Pliant.Forest
         {
             _paths = new List<VirtualForestNodePath>();
             
-            Symbol = targetState.Production.LeftHandSide;
+            Symbol = targetState.DottedRule.Production.LeftHandSide;
             _hashCode = ComputeHashCode();
             var path = new VirtualForestNodePath(transitionState, completedParseNode);
             AddUniquePath(path);

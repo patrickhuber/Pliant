@@ -16,7 +16,7 @@ namespace Pliant.Grammars
 
         private static readonly IProduction[] EmptyProductionArray = { };
         private static readonly ILexerRule[] EmptyLexerRuleArray = { };
-        private static readonly PreComputedState[] EmptyPredictionArray = { };        
+        private static readonly DottedRule[] EmptyPredictionArray = { };        
         
         public Grammar(
             INonTerminal start,

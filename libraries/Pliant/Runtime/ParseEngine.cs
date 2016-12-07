@@ -81,7 +81,7 @@ namespace Pliant.Runtime
             for (int c = 0; c < lastSet.Completions.Count; c++)
             {
                 var completion = lastSet.Completions[c];
-                if (completion.Production.LeftHandSide.Equals(start) && completion.Origin == 0)
+                if (completion.DottedRule.Production.LeftHandSide.Equals(start) && completion.Origin == 0)
                 {
                     return completion.ParseNode as IInternalForestNode;
                 }
@@ -100,7 +100,7 @@ namespace Pliant.Runtime
             {
                 var completion = lastEarleySet.Completions[c];
                 if (completion.Origin == 0
-                    && completion.Production.LeftHandSide.Value == startStateSymbol.Value)
+                    && completion.DottedRule.Production.LeftHandSide.Value == startStateSymbol.Value)
                     return true;
             }
             return false;
@@ -247,10 +247,10 @@ namespace Pliant.Runtime
         private void Complete(INormalState completed, int k)
         {
             if (completed.ParseNode == null)
-                completed.ParseNode = CreateNullParseNode(completed.Production.LeftHandSide, k);
+                completed.ParseNode = CreateNullParseNode(completed.DottedRule.Production.LeftHandSide, k);
                         
             var earleySet = _chart.EarleySets[completed.Origin];
-            var searchSymbol = completed.Production.LeftHandSide;
+            var searchSymbol = completed.DottedRule.Production.LeftHandSide;
 
             if(Options.OptimizeRightRecursion)
                 OptimizeReductionPath(searchSymbol, completed.Origin);
@@ -278,8 +278,8 @@ namespace Pliant.Runtime
             var virtualParseNode = CreateVirtualParseNode(completed, k, rootTransitionState);
 
             var topmostItem = new NormalState(
-                transitionState.Production,
-                transitionState.Position,
+                transitionState.DottedRule.Production,
+                transitionState.DottedRule.Position,
                 transitionState.Origin);
 
             topmostItem.ParseNode = virtualParseNode;
@@ -296,7 +296,7 @@ namespace Pliant.Runtime
             for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
             {
                 var prediction = sourceEarleySet.Predictions[p];
-                if (!prediction.IsSource(completed.Production.LeftHandSide))
+                if (!prediction.IsSource(completed.DottedRule.Production.LeftHandSide))
                     continue;
                                 
                 var nextState = prediction.NextState();
@@ -362,7 +362,7 @@ namespace Pliant.Runtime
 
             // T_Update(I0...Ik, B);
             OptimizeReductionPathRecursive(
-                sourceState.Production.LeftHandSide,
+                sourceState.DottedRule.Production.LeftHandSide,
                 sourceState.Origin,
                 ref t_rule,
                 ref previousTransitionState,
@@ -402,19 +402,19 @@ namespace Pliant.Runtime
         /// <returns>true if quasi complete, false otherwise</returns>
         private bool IsNextStateQuasiComplete(IState state)
         {
-            var ruleCount = state.Production.RightHandSide.Count;
+            var ruleCount = state.DottedRule.Production.RightHandSide.Count;
             if (ruleCount == 0)
                 return true;
 
-            var nextStatePosition = state.Position + 1;
-            var isComplete = nextStatePosition == state.Production.RightHandSide.Count;
+            var nextStatePosition = state.DottedRule.Position + 1;
+            var isComplete = nextStatePosition == state.DottedRule.Production.RightHandSide.Count;
             if (isComplete)
                 return true;
 
             // if all subsequent symbols are nullable
-            for (int i = nextStatePosition; i < state.Production.RightHandSide.Count; i++)
+            for (int i = nextStatePosition; i < state.DottedRule.Production.RightHandSide.Count; i++)
             {
-                var nextSymbol = state.Production.RightHandSide[nextStatePosition];
+                var nextSymbol = state.DottedRule.Production.RightHandSide[nextStatePosition];
                 var isSymbolNullable = IsSymbolNullable(nextSymbol);
                 if (!isSymbolNullable)
                     return false;
@@ -429,7 +429,7 @@ namespace Pliant.Runtime
                 //
                 // to fix this, check if S can derive S. Basically if we are in the Start state
                 // and the Start state is found and is nullable, exit with false
-                if (state.Production.LeftHandSide == Grammar.Start &&
+                if (state.DottedRule.Production.LeftHandSide == Grammar.Start &&
                     nextSymbol == Grammar.Start)
                     return false;
             }
@@ -456,11 +456,12 @@ namespace Pliant.Runtime
         {
             Assert.IsNotNull(v, nameof(v));
             var anyPreDotRuleNull = true;
-            if (nextState.Position > 1)
+            if (nextState.DottedRule.Position > 1)
             {
                 var predotPrecursorSymbol = nextState
+                    .DottedRule
                     .Production
-                    .RightHandSide[nextState.Position - 2];
+                    .RightHandSide[nextState.DottedRule.Position - 2];
                 anyPreDotRuleNull = IsSymbolNullable(predotPrecursorSymbol);
             }
             var anyPostDotRuleNull = IsSymbolNullable(nextState.PostDotSymbol);
@@ -472,7 +473,7 @@ namespace Pliant.Runtime
             {
                 internalNode = _nodeSet
                     .AddOrGetExistingSymbolNode(
-                        nextState.Production.LeftHandSide,
+                        nextState.DottedRule.Production.LeftHandSide,
                         nextState.Origin,
                         location);
             }

@@ -6,7 +6,7 @@ namespace Pliant.Charts
 {
     public interface IState
     {
-        IProduction Production { get; }
+        IDottedRule DottedRule { get; }
 
         int Origin { get; }
 
@@ -15,9 +15,7 @@ namespace Pliant.Charts
         ISymbol PreDotSymbol { get; }
 
         ISymbol PostDotSymbol { get; }
-
-        int Position { get; }
-
+        
         bool IsComplete { get; }
                 
         IForestNode ParseNode { get; set; }

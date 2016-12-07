@@ -20,8 +20,8 @@ namespace Pliant.Charts
             if (IsComplete)
                 return null;
             var state = new NormalState(
-                Production,
-                Position + 1,
+                DottedRule.Production,
+                DottedRule.Position + 1,
                 Origin);
             return state;
         }
@@ -49,9 +49,9 @@ namespace Pliant.Charts
         private int ComputeHashCode()
         {
             return HashCode.Compute(
-                Position.GetHashCode(),
+                DottedRule.Position.GetHashCode(),
                 Origin.GetHashCode(),
-                Production.GetHashCode());
+                DottedRule.Production.GetHashCode());
         }
 
         public override int GetHashCode()
@@ -62,18 +62,18 @@ namespace Pliant.Charts
         public override string ToString()
         {
             var stringBuilder = new StringBuilder()
-                .AppendFormat("{0} ->", Production.LeftHandSide.Value);
+                .AppendFormat("{0} ->", DottedRule.Production.LeftHandSide.Value);
             const string Dot = "\u25CF";
 
-            for (int p = 0; p < Production.RightHandSide.Count; p++)
+            for (int p = 0; p < DottedRule.Production.RightHandSide.Count; p++)
             {
                 stringBuilder.AppendFormat(
                     "{0}{1}",
-                    p == Position ? Dot : " ",
-                    Production.RightHandSide[p]);
+                    p == DottedRule.Position ? Dot : " ",
+                    DottedRule.Production.RightHandSide[p]);
             }
 
-            if (Position == Production.RightHandSide.Count)
+            if (DottedRule.Position == DottedRule.Production.RightHandSide.Count)
                 stringBuilder.Append(Dot);
 
             stringBuilder.Append($"\t\t({Origin})");

@@ -1,11 +1,11 @@
-﻿using Pliant.Grammars;
-using Pliant.Utilities;
+﻿using Pliant.Utilities;
 using System.Text;
 using System;
+using Pliant.Diagnostics;
 
 namespace Pliant.Grammars
 {
-    public class PreComputedState : IComparable<PreComputedState>
+    public class DottedRule : IComparable<DottedRule>, IDottedRule
     {
         private readonly int _hashCode;
         
@@ -13,8 +13,11 @@ namespace Pliant.Grammars
 
         public int Position { get; private set; }
                 
-        public PreComputedState(IProduction production, int position)
+        public DottedRule(IProduction production, int position)
         {
+            Assert.IsNotNull(production, nameof(production));
+            Assert.IsGreaterThanEqualToZero(position, nameof(position));
+
             Production = production;
             Position = position;
             _hashCode = ComputeHashCode(Production, Position);
@@ -34,7 +37,7 @@ namespace Pliant.Grammars
         {
             if (((object)obj) == null)
                 return false;
-            var preComputedState = obj as PreComputedState;
+            var preComputedState = obj as DottedRule;
             if (((object)preComputedState) == null)
                 return false;
             return preComputedState.Production.Equals(Production)
@@ -61,7 +64,7 @@ namespace Pliant.Grammars
             return stringBuilder.ToString();
         }
 
-        public int CompareTo(PreComputedState other)
+        public int CompareTo(DottedRule other)
         {
             return GetHashCode().CompareTo(other.GetHashCode());
         }
