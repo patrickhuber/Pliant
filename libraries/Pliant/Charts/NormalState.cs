@@ -20,17 +20,6 @@ namespace Pliant.Charts
             _hashCode = ComputeHashCode();
         }
         
-        public IState NextState()
-        {
-            if (IsComplete)
-                return null;
-            var state = new NormalState(
-                DottedRule.Production,
-                DottedRule.Position + 1,
-                Origin);
-            return state;
-        }
-        
         public override StateType StateType { get { return StateType.Normal; } }
 
         public bool IsSource(ISymbol searchSymbol)

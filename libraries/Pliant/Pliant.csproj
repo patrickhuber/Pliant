@@ -58,6 +58,8 @@
     <Compile Include="Builders\SymbolModelType.cs" />
     <Compile Include="Charts\INormalState.cs" />
     <Compile Include="Charts\IParseNode.cs" />
+    <Compile Include="Charts\IStateFactory.cs" />
+    <Compile Include="Charts\StateFactory.cs" />
     <Compile Include="Charts\StateFrameChart.cs" />
     <Compile Include="Charts\StateFrameSet.cs" />
     <Compile Include="Charts\StateBase.cs" />
@@ -76,9 +78,12 @@
     <Compile Include="Forest\VirtualForestNode.cs" />
     <Compile Include="Forest\VirtualForestNodePath.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Grammars\DottedRuleRegistry.cs" />
     <Compile Include="Grammars\Frame.cs" />
+    <Compile Include="Grammars\GrammarSeededDottedRuleRegistry.cs" />
     <Compile Include="Grammars\GrammarWrapper.cs" />
     <Compile Include="Grammars\IDottedRule.cs" />
+    <Compile Include="Grammars\IDottedRuleRegistry.cs" />
     <Compile Include="Grammars\Interval.cs" />
     <Compile Include="Grammars\WordTerminal.cs" />
     <Compile Include="LexerRules\NumberLexerRule.cs" />

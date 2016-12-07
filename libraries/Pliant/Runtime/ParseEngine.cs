@@ -21,6 +21,8 @@ namespace Pliant.Runtime
 
         public ParseEngineOptions Options { get; private set; }
 
+        public IStateFactory StateFactory { get; private set; }
+
         private Chart _chart;
         private readonly ForestNodeSet _nodeSet;
         
@@ -31,6 +33,8 @@ namespace Pliant.Runtime
 
         public ParseEngine(IGrammar grammar, ParseEngineOptions options)
         {
+            var ruleRegistry = new GrammarSeededDottedRuleRegistry(grammar);
+            StateFactory =  new StateFactory(ruleRegistry);
             Options = options;
             _nodeSet = new ForestNodeSet();
             Grammar = grammar;
@@ -110,11 +114,12 @@ namespace Pliant.Runtime
         {
             Location = 0;
             _chart = new Chart();
+
             var startProductions = Grammar.StartProductions();
             for (var s = 0; s< startProductions.Count; s++)
             {
                 var startProduction = startProductions[s];
-                var startState = new NormalState(startProduction, 0, 0);
+                var startState = StateFactory.NewState(startProduction, 0, 0);
                 if (_chart.Enqueue(0, startState))
                     Log("Start", 0, startState);
             }
@@ -155,7 +160,7 @@ namespace Pliant.Runtime
             if (token.TokenType == lexerRule.TokenType)
             {
                 var tokenNode = _nodeSet.AddOrGetExistingTokenNode(token);
-                var nextState = scan.NextState();
+                var nextState = StateFactory.NextState(scan);
                 var parseNode = CreateParseNode(
                     nextState,
                     scan.ParseNode,
@@ -220,7 +225,7 @@ namespace Pliant.Runtime
         private void PredictProduction(int j, IProduction production)
         {
             // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
-            var predictedState = new NormalState(production, 0, j);
+            var predictedState = StateFactory.NewState(production, 0, j);
             if (_chart.Enqueue(j, predictedState))
                 Log("Predict", j, predictedState);
         }
@@ -228,7 +233,7 @@ namespace Pliant.Runtime
         private void PredictAycockHorspool(INormalState evidence, int j)
         {
             var nullParseNode = CreateNullParseNode(evidence.PostDotSymbol, j);
-            var aycockHorspoolState = evidence.NextState();
+            var aycockHorspoolState = StateFactory.NextState(evidence);
             var evidenceParseNode = evidence.ParseNode as IInternalForestNode;
             if (evidenceParseNode == null)
                 aycockHorspoolState.ParseNode = CreateParseNode(aycockHorspoolState, null, nullParseNode, j);
@@ -277,7 +282,7 @@ namespace Pliant.Runtime
 
             var virtualParseNode = CreateVirtualParseNode(completed, k, rootTransitionState);
 
-            var topmostItem = new NormalState(
+            var topmostItem = StateFactory.NewState(
                 transitionState.DottedRule.Production,
                 transitionState.DottedRule.Position,
                 transitionState.Origin);
@@ -299,7 +304,7 @@ namespace Pliant.Runtime
                 if (!prediction.IsSource(completed.DottedRule.Production.LeftHandSide))
                     continue;
                                 
-                var nextState = prediction.NextState();
+                var nextState = StateFactory.NextState(prediction);
 
                 var parseNode = CreateParseNode(
                     nextState,
@@ -355,7 +360,7 @@ namespace Pliant.Runtime
                 return;
 
             // then t_rule := [B->aAb.]; t_pos=k;
-            t_rule = sourceState.NextState();
+            t_rule = StateFactory.NextState(sourceState);
             
             if (sourceState.Origin != k)
                 visited.Clear();

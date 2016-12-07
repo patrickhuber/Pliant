@@ -5,7 +5,7 @@ namespace Pliant.Charts
     public class Chart : IChart
     {
         private List<IEarleySet> _earleySets;
-
+        
         public IReadOnlyList<IEarleySet> EarleySets { get { return _earleySets; } }
 
         public Chart()

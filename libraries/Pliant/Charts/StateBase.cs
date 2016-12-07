@@ -26,17 +26,14 @@ namespace Pliant.Charts
 
         protected StateBase(IDottedRule dottedRule, int origin)
         {
+            Assert.IsNotNull(dottedRule, nameof(dottedRule));
             Assert.IsGreaterThanEqualToZero(origin, nameof(origin));
-            DottedRule = dottedRule; Origin = origin;
+            DottedRule = dottedRule;
+            Origin = origin;
             PostDotSymbol = GetPostDotSymbol(DottedRule);
             PreDotSymbol = GetPreDotSymbol(DottedRule);
         }
-
-        protected StateBase(IProduction production, int position, int origin)
-            : this(new DottedRule(production, position), origin)
-        {
-        }
-
+        
         private static ISymbol GetPreDotSymbol(int position, IProduction production)
         {
             if (position == 0 || production.IsEmpty)

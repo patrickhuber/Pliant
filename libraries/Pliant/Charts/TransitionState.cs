@@ -18,7 +18,7 @@ namespace Pliant.Charts
             IState transition,
             INormalState reduction,
             int index)
-            : base(transition.DottedRule.Production, transition.DottedRule.Position, transition.Origin)
+            : base(transition.DottedRule, transition.Origin)
         {
             Reduction = reduction;
             Recognized = recognized;
