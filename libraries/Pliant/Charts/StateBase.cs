@@ -8,39 +8,35 @@ namespace Pliant.Charts
     public abstract class StateBase : IState
     {
         public IDottedRule DottedRule { get; private set; }
-        
+
         public int Origin { get; private set; }
 
         public ISymbol PreDotSymbol { get; private set; }
 
         public ISymbol PostDotSymbol { get; private set; }
-        
+
         public abstract StateType StateType { get; }
 
         public IForestNode ParseNode { get; set; }
-        
+
         public bool IsComplete
         {
             get { return DottedRule.Position == DottedRule.Production.RightHandSide.Count; }
         }
 
-        protected StateBase(IDottedRule dottedRule)
+        protected StateBase(IDottedRule dottedRule, int origin)
         {
-            DottedRule = dottedRule;
+            Assert.IsGreaterThanEqualToZero(origin, nameof(origin));
+            DottedRule = dottedRule; Origin = origin;
+            PostDotSymbol = GetPostDotSymbol(DottedRule);
+            PreDotSymbol = GetPreDotSymbol(DottedRule);
         }
 
         protected StateBase(IProduction production, int position, int origin)
+            : this(new DottedRule(production, position), origin)
         {
-            Assert.IsNotNull(production, nameof(production));
-            Assert.IsGreaterThanEqualToZero(position, nameof(position));
-            Assert.IsGreaterThanEqualToZero(origin, nameof(origin));
-
-            DottedRule = new DottedRule(production, position);
-            Origin = origin;
-            PostDotSymbol = GetPostDotSymbol(position, production);
-            PreDotSymbol = GetPreDotSymbol(position, production);
         }
-        
+
         private static ISymbol GetPreDotSymbol(int position, IProduction production)
         {
             if (position == 0 || production.IsEmpty)
@@ -48,11 +44,25 @@ namespace Pliant.Charts
             return production.RightHandSide[position - 1];
         }
 
+        private static ISymbol GetPreDotSymbol(IDottedRule dottedRule)
+        {
+            if (dottedRule.Position == 0 || dottedRule.Production.IsEmpty)
+                return null;
+            return dottedRule.Production.RightHandSide[dottedRule.Position - 1];
+        }
+
         private static ISymbol GetPostDotSymbol(int position, IProduction production)
         {
             if (position >= production.RightHandSide.Count)
                 return null;
             return production.RightHandSide[position];
+        }
+
+        private static ISymbol GetPostDotSymbol(IDottedRule dottedRule)
+        {
+            if (dottedRule.Position >= dottedRule.Production.RightHandSide.Count)
+                return null;
+            return dottedRule.Production.RightHandSide[dottedRule.Position];
         }
     }
 }
