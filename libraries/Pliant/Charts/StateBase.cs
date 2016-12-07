@@ -24,9 +24,12 @@ namespace Pliant.Charts
             get { return DottedRule.Position == DottedRule.Production.RightHandSide.Count; }
         }
 
-        protected StateBase(IDottedRule dottedRule)
+        protected StateBase(IDottedRule dottedRule, int origin)
         {
             DottedRule = dottedRule;
+            Assert.IsGreaterThanEqualToZero(origin, nameof(origin));
+            PostDotSymbol = GetPostDotSymbol(dottedRule.Position, dottedRule.Production);
+            PreDotSymbol = GetPreDotSymbol(dottedRule.Position, dottedRule.Production);
         }
 
         protected StateBase(IProduction production, int position, int origin)

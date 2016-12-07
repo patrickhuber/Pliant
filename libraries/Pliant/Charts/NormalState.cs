@@ -1,7 +1,5 @@
-﻿using Pliant.Collections;
-using Pliant.Grammars;
+﻿using Pliant.Grammars;
 using Pliant.Utilities;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Pliant.Charts
@@ -9,6 +7,12 @@ namespace Pliant.Charts
     public class NormalState : StateBase, INormalState
     {        
         private readonly int _hashCode;
+
+        public NormalState(IDottedRule dottedRule, int origin)
+            : base(dottedRule, origin)
+        {
+        }
+
         public NormalState(IProduction production, int position, int origin)
             : base(production, position, origin)
         {

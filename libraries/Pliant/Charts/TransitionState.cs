@@ -18,14 +18,14 @@ namespace Pliant.Charts
             IState transition,
             INormalState reduction,
             int index)
-            : base(transition.DottedRule.Production, transition.DottedRule.Position, transition.Origin)
+            : base(transition.DottedRule, transition.Origin)
         {
             Reduction = reduction;
             Recognized = recognized;
             Index = index;
             _hashCode = ComputeHashCode();
         }
-
+        
         public override bool Equals(object obj)
         {
             if (obj == null)
