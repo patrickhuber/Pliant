@@ -202,10 +202,14 @@ namespace Pliant.Runtime
                     var preComputedState = stateFrame.Frame.Data[j];
                     if (IsCompleted(preComputedState))
                         continue;
+
                     var postDotSymbol = GetPostDotSymbol(preComputedState);
+                    if (postDotSymbol.SymbolType != SymbolType.NonTerminal)
+                        continue;
 
                     // leo eligibile items are right recursive directly or indirectly                    
-                    if (!_preComputedGrammar.IsRightRecursive(postDotSymbol))
+                    if (!_preComputedGrammar.IsRightRecursive(
+                        preComputedState.Production.LeftHandSide))
                         continue;
 
                     // to determine if the item is leo unique, cache it here
@@ -245,7 +249,7 @@ namespace Pliant.Runtime
             {
                 var count = cachedCount[symbol];
                 if (count != 1)
-                    return;
+                    continue;
                 frameSet.AddCachedTransition(cachedTransitions[symbol]);
             }
 

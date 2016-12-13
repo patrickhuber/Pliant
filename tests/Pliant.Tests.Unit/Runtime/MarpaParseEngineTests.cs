@@ -130,54 +130,6 @@ namespace Pliant.Tests.Unit.Runtime
             var accepted = marpaParseEngine.IsAccepted();
             if (!accepted)
                 Assert.Fail($"Input was not accepted.");
-        }
-
-        /// <summary>
-        /// TODO: Remove
-        /// </summary>
-        [TestMethod]
-        public void ParseEngineShouldParseEncapsulatedRepeatingRightRecursiveRule()
-        {
-            var number = new NumberLexerRule();
-            var openBracket = new TerminalLexerRule('[');
-            var closeBracket = new TerminalLexerRule(']');
-            var comma = new TerminalLexerRule(',');
-
-            ProductionExpression
-                A = "A",
-                V = "V",
-                VR = "VR";
-
-            A.Rule = openBracket + VR + closeBracket;
-            VR.Rule = V
-                | V + comma + VR
-                | (Expr)null;
-            V.Rule = number;
-
-            var grammar = new GrammarExpression(
-                A, new[] { A, V, VR }).ToGrammar();
-
-            var marpaParseEngine = new ParseEngine(grammar);
-
-            var tokens = new[]
-            {
-                new Token("[", 0, openBracket.TokenType),
-                new Token("1", 1, number.TokenType),
-                new Token(",", 2, comma.TokenType),
-                new Token("2", 3, number.TokenType),
-                new Token("]", 4, closeBracket.TokenType)
-            };
-
-            for (var i = 0; i < tokens.Length; i++)
-            {
-                var result = marpaParseEngine.Pulse(tokens[i]);
-                if (!result)
-                    Assert.Fail($"Failure parsing at position {marpaParseEngine.Location}");
-            }
-
-            var accepted = marpaParseEngine.IsAccepted();
-            if (!accepted)
-                Assert.Fail($"Input was not accepted.");
-        }
+        }        
     }
 }
