@@ -7,13 +7,7 @@ namespace Pliant.Charts
     public class NormalState : StateBase, INormalState
     {        
         private readonly int _hashCode;
-
-        public NormalState(IProduction production, int position, int origin)
-            : this(new DottedRule(production, position), origin)
-        {
-            _hashCode = ComputeHashCode();
-        }
-
+        
         public NormalState(IDottedRule dottedRule, int origin)
             : base(dottedRule, origin)
         {
