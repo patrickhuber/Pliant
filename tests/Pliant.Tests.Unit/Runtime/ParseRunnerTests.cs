@@ -1,7 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Pliant.Automata;
 using Pliant.Builders.Expressions;
 using Pliant.Charts;
+using Pliant.Ebnf;
 using Pliant.Grammars;
+using Pliant.LexerRules;
 using Pliant.Runtime;
 using Pliant.Tokens;
 using System;
@@ -9,12 +12,12 @@ using System;
 namespace Pliant.Tests.Unit.Runtime
 {
     [TestClass]
-    public class LexerTests
+    public class ParseRunnerTests
     {
         private GrammarLexerRule _whitespaceRule;
         private GrammarLexerRule _wordRule;
 
-        public LexerTests()
+        public ParseRunnerTests()
         {
             _whitespaceRule = CreateWhitespaceRule();
             _wordRule = CreateWordRule();
@@ -55,7 +58,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void LexerShouldParseSimpleWordSentence()
+        public void ParseRunnerShouldParseSimpleWordSentence()
         {
             ProductionExpression S = "S";
             S.Rule =
@@ -70,7 +73,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void LexerShouldIgnoreWhitespace()
+        public void ParseRunnerShouldIgnoreWhitespace()
         {
             // a <word boundary> abc <word boundary> a <word boundary> a
             const string input = "a abc a a";
@@ -89,7 +92,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void LexerShouldEmitTokenBetweenLexerRulesAndEndOfFile()
+        public void ParseRunnerShouldEmitTokenBetweenLexerRulesAndEndOfFile()
         {
             const string input = "aa";
             ProductionExpression S = "S";
@@ -106,7 +109,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void LexerShouldUseExistingMatchingLexemesToPerformMatch()
+        public void ParseRunnerShouldUseExistingMatchingLexemesToPerformMatch()
         {
             const string input = "aaaa";
 
@@ -129,7 +132,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void LexerWhenNoLexemesMatchCharacterShouldCreateNewLexeme()
+        public void ParseRunnerWhenNoLexemesMatchCharacterShouldCreateNewLexeme()
         {
             const string input = "aaaa";
 
@@ -152,7 +155,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void LexerShouldEmitTokenWhenIgnoreCharacterIsEncountered()
+        public void ParseRunnerShouldEmitTokenWhenIgnoreCharacterIsEncountered()
         {
             const string input = "aa aa";
             ProductionExpression S = "S";
@@ -175,7 +178,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void LexerShouldEmitTokenWhenCharacterMatchesNextProduction()
+        public void ParseRunnerShouldEmitTokenWhenCharacterMatchesNextProduction()
         {
             const string input = "aabb";
             ProductionExpression A = "A";
@@ -213,7 +216,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void LexerGivenIgnoreCharactersWhenOverlapWithTerminalShouldChooseTerminal()
+        public void ParseRunnerGivenIgnoreCharactersWhenOverlapWithTerminalShouldChooseTerminal()
         {
             var input = "word \t\r\n word";
 
@@ -229,6 +232,18 @@ namespace Pliant.Tests.Unit.Runtime
                 .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
+            RunParse(parseEngine, input);
+        }
+
+        [TestMethod]
+        public void ParseRunnerShouldRunInCompleteIgnoreRulesBeforeMovingToGrammarLexerRules()
+        {
+            var ebnfGrammar = new EbnfGrammar();
+            var parseEngine = new ParseEngine(ebnfGrammar);
+
+            var input = @"
+            /* letters and digits */
+            letter			~ /[a-zA-Z]/;";
             RunParse(parseEngine, input);
         }
 

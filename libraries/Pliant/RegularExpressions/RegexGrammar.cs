@@ -156,6 +156,7 @@ namespace Pliant.RegularExpressions
             escape.AddTransition(new DfaTransition(new AnyTerminal(), final));
             return new DfaLexerRule(start, "escape");
         }
+
         public RegexGrammar()
             : base(_regexGrammar)
         {

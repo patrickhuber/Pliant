@@ -1,18 +1,14 @@
 ﻿using Pliant.Grammars;
 using Pliant.Tokens;
 
-namespace Pliant.Lexemes
+namespace Pliant.Tokens
 {
-    public interface ILexeme
+    public interface ILexeme : IToken
     {
-        string Capture { get; }
-
         bool Scan(char c);
 
         bool IsAccepted();
-
-        TokenType TokenType { get; }
-
+             
         ILexerRule LexerRule { get; }
     }
 }

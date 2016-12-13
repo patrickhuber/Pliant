@@ -154,13 +154,50 @@ namespace Pliant.RegularExpressions
         {
             var start = new NfaState();
             var end = new NfaState();
-            ITerminal terminal = new CharacterTerminal(character.Value);
+
+            ITerminal terminal = null;
+            if (!character.IsEscaped)
+                terminal = new CharacterTerminal(character.Value);
+            else
+            {
+                switch (character.Value)
+                {
+                    case 's':
+                        terminal = new WhitespaceTerminal();
+                        break;
+                    case 'd':
+                        terminal = new DigitTerminal();
+                        break;
+                    case 'w':
+                        terminal = new WordTerminal();
+                        break;
+                    case 'D':
+                        terminal = new DigitTerminal();
+                        negate = !negate;
+                        break;
+                    case 'S':
+                        terminal = new WhitespaceTerminal();
+                        negate = !negate;
+                        break;
+                    case 'W':
+                        terminal = new WordTerminal();
+                        negate = !negate;
+                        break;
+                    default:
+                        terminal = new CharacterTerminal(character.Value);
+                        break;
+                }
+            }
+
             if (negate)
                 terminal = new NegationTerminal(terminal);
+
             var transition = new TerminalNfaTransition(
                 terminal: terminal,
                 target: end);
+
             start.AddTransistion(transition);
+
             return new Nfa(start, end);
         }
 

@@ -1,4 +1,4 @@
-﻿using Pliant.Lexemes;
+﻿
 using Pliant.Tokens;
 using Pliant.Utilities;
 using System.Text;
@@ -14,11 +14,13 @@ namespace Pliant.Automata
 
         private IDfaState _currentState;
 
+        public int Position { get; private set; }
+
         public TokenType TokenType { get { return LexerRule.TokenType; } }
 
         public ILexerRule LexerRule { get; private set; }
 
-        public string Capture
+        public string Value
         {
             get
             {
@@ -28,9 +30,10 @@ namespace Pliant.Automata
             }
         }
         
-        public DfaLexeme(IDfaLexerRule dfaLexerRule)
+        public DfaLexeme(IDfaLexerRule dfaLexerRule, int position)
         {
             LexerRule = dfaLexerRule;
+            Position = position;
             _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
             _currentState = dfaLexerRule.Start;
         }
@@ -51,8 +54,8 @@ namespace Pliant.Automata
 
         private void DeallocateStringBuilderAndAssignCapture()
         {
-            SharedPools.Default<StringBuilder>().Free(_stringBuilder);
             _capture = _stringBuilder.ToString();
+            SharedPools.Default<StringBuilder>().ClearAndFree(_stringBuilder);
             _stringBuilder = null;
         }
 

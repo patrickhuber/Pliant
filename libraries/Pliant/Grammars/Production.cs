@@ -11,7 +11,7 @@ namespace Pliant.Grammars
     {
         public INonTerminal LeftHandSide { get; private set; }
 
-        private ReadWriteList<ISymbol> _rightHandSide;
+        private List<ISymbol> _rightHandSide;
 
         public IReadOnlyList<ISymbol> RightHandSide { get { return _rightHandSide; } }
 
@@ -22,7 +22,7 @@ namespace Pliant.Grammars
             Assert.IsNotNull(leftHandSide, nameof(leftHandSide));
             Assert.IsNotNull(rightHandSide, nameof(rightHandSide));
             LeftHandSide = leftHandSide;
-            _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
+            _rightHandSide = new List<ISymbol>(new List<ISymbol>(rightHandSide));
             _hashCode = ComputeHashCode();
         }
 
@@ -31,7 +31,7 @@ namespace Pliant.Grammars
             Assert.IsNotNull(leftHandSide, nameof(leftHandSide));
             Assert.IsNotNull(rightHandSide, nameof(rightHandSide));
             LeftHandSide = leftHandSide;
-            _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
+            _rightHandSide = new List<ISymbol>(new List<ISymbol>(rightHandSide));
             _hashCode = ComputeHashCode();
         }
                 

@@ -5,6 +5,7 @@ using Pliant.Runtime;
 using Pliant.Tokens;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 namespace Pliant.Tests.Common
 {
@@ -25,6 +26,12 @@ namespace Pliant.Tests.Common
             ParseEngine = new ParseEngine(Grammar);
         }
 
+        public ParseTester(IParseEngine parseEngine)
+        {
+            Grammar = parseEngine.Grammar;
+            ParseEngine = parseEngine;
+        }
+
         public void RunParse(string input)
         {
             ParseRunner = new ParseRunner(ParseEngine, input);
@@ -39,16 +46,22 @@ namespace Pliant.Tests.Common
 
         private static void InternalRunParse(IParseRunner parseRunner)
         {
-            while (!parseRunner.EndOfStream())
-            {
-                Assert.IsTrue(parseRunner.Read(), $"Parse Failed at Position {parseRunner.Position}");
-            }
-            Assert.IsTrue(parseRunner.ParseEngine.IsAccepted(), $"Parse was not accepted");
+            while (!parseRunner.EndOfStream())            
+                if (!parseRunner.Read())
+                    Assert.Fail($"Parse Failed at Position {parseRunner.Position}");
+            
+            if (!parseRunner.ParseEngine.IsAccepted())            
+                Assert.Fail($"Parse was not accepted");            
         }
-        
-        public void Reset()
+
+        public void RunParse(IReadOnlyList<IToken> tokens)
         {
-            ParseEngine = new ParseEngine(Grammar);            
+            for (int i = 0; i < tokens.Count; i++)
+                if (!ParseEngine.Pulse(tokens[i]))
+                    Assert.Fail($"Parse Failed at Position {ParseEngine.Location}");
+
+            if (!ParseEngine.IsAccepted())
+                Assert.Fail($"Parse was not accepted");
         }
     }
 }

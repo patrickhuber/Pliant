@@ -7,11 +7,11 @@ namespace Pliant.Forest
     {
         public IReadOnlyList<IForestNode> Children { get { return _children; } }
 
-        private readonly ReadWriteList<IForestNode> _children;
+        private readonly List<IForestNode> _children;
 
         public AndForestNode()
         {
-            _children = new ReadWriteList<IForestNode>();
+            _children = new List<IForestNode>();
         }
 
         public void AddChild(IForestNode orNode)

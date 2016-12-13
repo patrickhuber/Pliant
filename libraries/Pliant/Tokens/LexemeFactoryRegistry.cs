@@ -2,15 +2,15 @@
 using Pliant.Grammars;
 using System.Collections.Generic;
 
-namespace Pliant.Lexemes
+namespace Pliant.Tokens
 {
     public class LexemeFactoryRegistry : ILexemeFactoryRegistry
     {
-        private readonly FastLookupDictionary<LexerRuleType, ILexemeFactory> _registry;        
+        private readonly Dictionary<LexerRuleType, ILexemeFactory> _registry;        
 
         public LexemeFactoryRegistry()
         {
-            _registry = new FastLookupDictionary<LexerRuleType, ILexemeFactory>();
+            _registry = new Dictionary<LexerRuleType, ILexemeFactory>();
         }
 
         public ILexemeFactory Get(LexerRuleType lexerRuleType)

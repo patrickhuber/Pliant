@@ -71,7 +71,7 @@ namespace Pliant.Builders
             _reachibilityMatrix.AddProduction(productionModel);
         }
 
-        public void OnResetProductions()
+        private void OnResetProductions()
         {
             Start = null;
             _reachibilityMatrix.ClearProductions();

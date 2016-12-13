@@ -12,7 +12,9 @@ namespace Pliant.Grammars
 
         IReadOnlyList<IProduction> RulesFor(INonTerminal nonTerminal);
 
-        IEnumerable<IProduction> StartProductions();
+        IReadOnlyList<IProduction> RulesContainingSymbol(INonTerminal nonTerminal);
+
+        IReadOnlyList<IProduction> StartProductions();
 
         bool IsNullable(INonTerminal nonTerminal);
     }

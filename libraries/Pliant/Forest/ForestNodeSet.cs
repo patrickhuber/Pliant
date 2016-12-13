@@ -58,7 +58,7 @@ namespace Pliant.Forest
             ITokenForestNode tokenNode = null;
             if (_tokenNodes.TryGetValue(token, out tokenNode))
                 return tokenNode;
-            tokenNode = new TokenForestNode(token, token.Origin, token.Value.Length);
+            tokenNode = new TokenForestNode(token, token.Position, token.Value.Length);
             _tokenNodes.Add(token, tokenNode);
             return tokenNode;
         }
@@ -79,7 +79,7 @@ namespace Pliant.Forest
             out VirtualForestNode node)
         {
             var targetState = transitionState.GetTargetState();
-            var hash = ComputeHashCode(targetState.Production.LeftHandSide, targetState.Origin, location);
+            var hash = ComputeHashCode(targetState.DottedRule.Production.LeftHandSide, targetState.Origin, location);
             return _virtualNodes.TryGetValue(hash, out node);
         }
 

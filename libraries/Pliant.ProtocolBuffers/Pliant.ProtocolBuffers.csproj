@@ -54,7 +54,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ProtocolBufferesV3.pliant" />
+    <None Include="ProtocolBufferesV3.pliant">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Grammar.tt">

@@ -1,25 +1,31 @@
-﻿using Pliant.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Pliant.Charts
 {
     public class Chart : IChart
     {
-        private ReadWriteList<IEarleySet> _earleySets;
-
+        private List<IEarleySet> _earleySets;
+        
         public IReadOnlyList<IEarleySet> EarleySets { get { return _earleySets; } }
 
         public Chart()
         {
-            _earleySets = new ReadWriteList<IEarleySet>();
+            _earleySets = new List<IEarleySet>();
         }
 
         public bool Enqueue(int index, IState state)
         {
+            IEarleySet earleySet = null;
             if (_earleySets.Count <= index)
-                _earleySets.Add(new EarleySet(index));
+            {
+                earleySet = new EarleySet(index);
+                _earleySets.Add(earleySet);
+            }
+            else
+            {
+                earleySet = _earleySets[index];
+            }
 
-            var earleySet = _earleySets[index];
             return earleySet.Enqueue(state);
         }
 

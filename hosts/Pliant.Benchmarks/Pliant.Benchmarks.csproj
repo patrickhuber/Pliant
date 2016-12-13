@@ -49,7 +49,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LargeJsonFileBenchmark.cs" />
-    <Compile Include="ParsingBenchmarks.cs" />
+    <Compile Include="LargeJsonFileDeterministicBenchmark.cs" />
+    <Compile Include="AnsiCBnfBenchmark.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -7,14 +7,14 @@ namespace Pliant.Tokens
     {
         public string Value { get; private set; }
 
-        public int Origin { get; private set; }
+        public int Position { get; private set; }
 
         public TokenType TokenType { get; private set; }
 
-        public Token(string value, int origin, TokenType tokenType)
+        public Token(string value, int position, TokenType tokenType)
         {
             Value = value;
-            Origin = origin;
+            Position = position;
             TokenType = tokenType;
             _hashCode = ComputeHashCode();
         }
@@ -23,7 +23,7 @@ namespace Pliant.Tokens
         {
             return HashCode.Compute(
                 TokenType.GetHashCode(), 
-                Origin.GetHashCode(), 
+                Position.GetHashCode(), 
                 Value.GetHashCode());
         }
 
@@ -42,7 +42,7 @@ namespace Pliant.Tokens
             if (token == null)
                 return false;
             return Value == token.Value
-                && Origin == token.Origin
+                && Position == token.Position
                 && TokenType.Equals(token.TokenType);
         }
     }

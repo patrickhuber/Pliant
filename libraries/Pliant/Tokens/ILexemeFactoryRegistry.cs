@@ -1,6 +1,6 @@
 ﻿using Pliant.Grammars;
 
-namespace Pliant.Lexemes
+namespace Pliant.Tokens
 {
     public interface ILexemeFactoryRegistry
     {

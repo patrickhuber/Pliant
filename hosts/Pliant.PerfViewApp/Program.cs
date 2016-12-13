@@ -1,4 +1,5 @@
 ﻿using Pliant.Bnf;
+using Pliant.Json;
 using Pliant.Runtime;
 using System;
 using System.Diagnostics;
@@ -11,12 +12,14 @@ namespace Pliant.PerfViewApp
         private static void Main(string[] args)
         {
             var sampleBnf = File.ReadAllText(
-                Path.Combine(Environment.CurrentDirectory, "AnsiC.bnf"));
+                Path.Combine(Environment.CurrentDirectory, "10000.json"));
 
-            var grammar = new BnfGrammar();
-            
-            for (long i = 0; i < 1000; i++)
+            var grammar = new JsonGrammar();
+
+            var loopCount = 100;
+            for (long i = 0; i < loopCount; i++)
             {
+                Console.WriteLine($"Iteration {i} of {loopCount}");
                 var parseEngine = new ParseEngine(grammar);
                 var parseRunner = new ParseRunner(parseEngine, sampleBnf);
 

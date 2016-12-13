@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Pliant.Lexemes
+namespace Pliant.Tokens
 {
     public class TerminalLexemeFactory : ILexemeFactory
     {
@@ -14,18 +14,18 @@ namespace Pliant.Lexemes
             _queue = new Queue<TerminalLexeme>();
         }
 
-        public ILexeme Create(ILexerRule lexerRule)
+        public ILexeme Create(ILexerRule lexerRule, int position)
         {
-            if (lexerRule.LexerRuleType != LexerRuleType)
+            if (!LexerRuleType.Equals(lexerRule.LexerRuleType))
                 throw new Exception(
                     $"Unable to create TerminalLexeme from type {lexerRule.GetType().FullName}. Expected TerminalLexerRule");
             
             var terminalLexerRule = lexerRule as ITerminalLexerRule;
             if (_queue.Count == 0)
-                return new TerminalLexeme(terminalLexerRule);
+                return new TerminalLexeme(terminalLexerRule, position);
             
             var reusedLexeme = _queue.Dequeue();
-            reusedLexeme.Reset(terminalLexerRule);
+            reusedLexeme.Reset(terminalLexerRule, position);
             return reusedLexeme;
         }
 
@@ -34,7 +34,7 @@ namespace Pliant.Lexemes
             var terminalLexeme = lexeme as TerminalLexeme;
             if (terminalLexeme == null)
                 throw new Exception($"Unable to free lexeme of type {lexeme.GetType()} from TerminalLexemeFactory");
-
+            
             _queue.Enqueue(terminalLexeme);
         }
     }

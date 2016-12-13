@@ -53,11 +53,17 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Automata\DfaLexemeTests.cs" />
+    <Compile Include="Collections\IndexedListTests.cs" />
+    <Compile Include="Grammars\CharacterTerminalTests.cs" />
+    <Compile Include="Grammars\IntervalTests.cs" />
     <Compile Include="Automata\SubsetConstructionAlgorithmTests.cs" />
+    <Compile Include="Automata\TableFiniteAutomataTests.cs" />
     <Compile Include="Builders\Expressions\NamespaceExpressionTests.cs" />
     <Compile Include="Builders\Expressions\ProductionExpressionTests.cs" />
     <Compile Include="Builders\GrammarModelTests.cs" />
     <Compile Include="Builders\ProductionModelTests.cs" />
+    <Compile Include="Collections\AvlTreeTests.cs" />
+    <Compile Include="Collections\BitMatrixTests.cs" />
     <Compile Include="Collections\FastLookupDictionaryTests.cs" />
     <Compile Include="Ebnf\EbnfGrammarGeneratorTests.cs" />
     <Compile Include="Ebnf\EbnfParserTests.cs" />
@@ -66,6 +72,11 @@
     <Compile Include="Bnf\BnfTests.cs" />
     <Compile Include="Charts\ChartTests.cs" />
     <Compile Include="Grammars\DigitTerminalTests.cs" />
+    <Compile Include="Grammars\NegationTerminalTests.cs" />
+    <Compile Include="Grammars\PreComputedGrammarTests.cs" />
+    <Compile Include="Grammars\SetTerminalTests.cs" />
+    <Compile Include="Grammars\WordTerminalTests.cs" />
+    <Compile Include="Runtime\DeterministicParseEngineTests.cs" />
     <Compile Include="Runtime\LoggingNodeVisitor.cs" />
     <Compile Include="Forest\ForestNodeVisitorTests.cs" />
     <Compile Include="Collections\ProcessOnceQueueTests.cs" />
@@ -78,6 +89,7 @@
     <Compile Include="Grammars\GrammarTests.cs" />
     <Compile Include="Runtime\AycockHorspoolAlgorithmTests.cs" />
     <Compile Include="Grammars\RangeTerminalTests.cs" />
+    <Compile Include="Runtime\MarpaParseEngineTests.cs" />
     <Compile Include="Runtime\ParseEngineTests.cs" />
     <Compile Include="Lexemes\ParseEngineLexemeTests.cs" />
     <Compile Include="Runtime\ParseRunnerTests.cs" />
@@ -104,7 +116,9 @@
       <Name>Pliant.Tests.Common</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Categories\" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

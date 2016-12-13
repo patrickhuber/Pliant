@@ -45,5 +45,27 @@ namespace Pliant.Diagnostics
                     nameof(paramterName),
                     $"{paramterName} can not be less than zero.");
         }
+
+        internal static void IsTrue(bool condition, string message)
+        {
+            if (condition)
+                throw new Exception(message);
+        }
+
+        internal static void IsTrue(bool condition)
+        {
+            IsTrue(condition, "Condition is expected to be true.");
+        }
+
+        internal static void IsFalse(bool condition, string message)
+        {
+            if (!condition)
+                throw new Exception(message);
+        }
+
+        internal static void IsFalse(bool condition)
+        {
+            IsFalse(condition, "Condition is expected to be false.");
+        }
     }
 }

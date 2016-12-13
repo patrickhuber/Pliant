@@ -1,5 +1,5 @@
 ﻿using Pliant.Grammars;
-using Pliant.Lexemes;
+
 using Pliant.Tokens;
 using Pliant.Utilities;
 using System.Collections.Generic;
@@ -10,11 +10,13 @@ namespace Pliant.Runtime
 {
     public class ParseEngineLexeme : ILexeme
     {
-        public string Capture { get { return _capture.ToString(); } }
+        public string Value { get { return _capture.ToString(); } }
 
         public TokenType TokenType { get { return LexerRule.TokenType; } }
 
         public ILexerRule LexerRule { get; private set; }
+
+        public int Position { get; private set; }
 
         private StringBuilder _capture;
         private IParseEngine _parseEngine;
@@ -35,7 +37,7 @@ namespace Pliant.Runtime
 
             foreach (var rule in expectedLexerRules)
                 if (rule.LexerRuleType == TerminalLexerRule.TerminalLexerRuleType)
-                    expectedLexemes.Add(new TerminalLexeme(rule as ITerminalLexerRule));
+                    expectedLexemes.Add(new TerminalLexeme(rule as ITerminalLexerRule, Position));
 
             // filter on first rule to pass (since all rules are one character per lexeme)
             // PERF: Avoid Linq FirstOrDefault due to lambda allocation
@@ -46,12 +48,13 @@ namespace Pliant.Runtime
                     firstPassingRule = lexeme;
                     break;
                 }
-            SharedPools.Default<List<TerminalLexeme>>().Free(expectedLexemes);
+            SharedPools.Default<List<TerminalLexeme>>()
+                .ClearAndFree(expectedLexemes);
 
             if (firstPassingRule == null)
                 return false;
 
-            var token = new Token(firstPassingRule.Capture, _parseEngine.Location, firstPassingRule.TokenType);
+            var token = new Token(firstPassingRule.Value, _parseEngine.Location, firstPassingRule.TokenType);
 
             var result = _parseEngine.Pulse(token);
             if (result)

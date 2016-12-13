@@ -1,14 +1,15 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Collections;
+using Pliant.Grammars;
 using System.Collections.Generic;
 
 namespace Pliant.Charts
 {
     public class EarleySet : IEarleySet
     {
-        private StateQueue<INormalState> _predictions;
-        private StateQueue<INormalState> _scans;
-        private StateQueue<INormalState> _completions;
-        private StateQueue<ITransitionState> _transitions;
+        private UniqueList<INormalState> _predictions;
+        private UniqueList<INormalState> _scans;
+        private UniqueList<INormalState> _completions;
+        private UniqueList<ITransitionState> _transitions;
 
         public IReadOnlyList<INormalState> Predictions { get { return _predictions; } }
 
@@ -22,10 +23,10 @@ namespace Pliant.Charts
 
         public EarleySet(int location)
         {
-            _predictions = new StateQueue<INormalState>();
-            _scans = new StateQueue<INormalState>();
-            _completions = new StateQueue<INormalState>();
-            _transitions = new StateQueue<ITransitionState>();
+            _predictions = new UniqueList<INormalState>();
+            _scans = new UniqueList<INormalState>();
+            _completions = new UniqueList<INormalState>();
+            _transitions = new UniqueList<ITransitionState>();
             Location = location;
         }
 
@@ -43,16 +44,16 @@ namespace Pliant.Charts
             {
                 var currentSymbol = state.PostDotSymbol;
                 if (currentSymbol.SymbolType == SymbolType.NonTerminal)
-                    return _predictions.Enqueue(normalState);
-                return _scans.Enqueue(normalState);
+                    return _predictions.AddUnique(normalState);
+                return _scans.AddUnique(normalState);
             }
 
-            return _completions.Enqueue(normalState);
+            return _completions.AddUnique(normalState);
         }
 
         private bool EnqueueTransition(ITransitionState transitionState)
         {
-            return _transitions.Enqueue(transitionState);
+            return _transitions.AddUnique(transitionState);
         }
 
         public ITransitionState FindTransitionState(ISymbol searchSymbol)
@@ -68,7 +69,6 @@ namespace Pliant.Charts
 
         public INormalState FindSourceState(ISymbol searchSymbol)
         {
-            // TODO: speed up by using a index lookup
             var sourceItemCount = 0;
             INormalState sourceItem = null;
 

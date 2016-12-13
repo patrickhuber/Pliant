@@ -7,48 +7,51 @@ namespace Pliant.Grammars
 {
     public class Grammar : IGrammar
     {
-        protected ReadWriteList<ILexerRule> _ignores;
-        protected ReadWriteList<IProduction> _productions;
-        private Dictionary<INonTerminal, ReadWriteList<IProduction>> _productionIndex;
-        private Dictionary<int, ReadWriteList<ILexerRule>> _ignoreIndex;
+        protected List<ILexerRule> _ignores;
+        protected List<IProduction> _productions;
+        private Dictionary<INonTerminal, List<IProduction>> _productionIndex;
+        private Dictionary<int, List<ILexerRule>> _ignoreIndex;
         private UniqueList<INonTerminal> _nullable;
         private Dictionary<INonTerminal, UniqueList<IProduction>> _reverseLookup;
 
         private static readonly IProduction[] EmptyProductionArray = { };
         private static readonly ILexerRule[] EmptyLexerRuleArray = { };
-
-        public Grammar()
-        {
-            _productions = new ReadWriteList<IProduction>();
-            _ignores = new ReadWriteList<ILexerRule>();
-            _productionIndex = new Dictionary<INonTerminal, ReadWriteList<IProduction>>();
-            _ignoreIndex = new Dictionary<int, ReadWriteList<ILexerRule>>();
-            _nullable = new UniqueList<INonTerminal>();
-            _reverseLookup = new Dictionary<INonTerminal, UniqueList<IProduction>>();
-        }
-
+        private static readonly DottedRule[] EmptyPredictionArray = { };        
+        
         public Grammar(
             INonTerminal start,
-            IEnumerable<IProduction> productions,
-            IEnumerable<ILexerRule> ignoreRules)
-            : this()
+            IReadOnlyList<IProduction> productions,
+            IReadOnlyList<ILexerRule> ignoreRules)
         {
+            _productions = new List<IProduction>();
+            _ignores = new List<ILexerRule>();
+            _productionIndex = new Dictionary<INonTerminal, List<IProduction>>();
+            _ignoreIndex = new Dictionary<int, List<ILexerRule>>();
+            _nullable = new UniqueList<INonTerminal>();
+            _reverseLookup = new Dictionary<INonTerminal, UniqueList<IProduction>>();
+
             Start = start;
             AddProductions(productions ?? EmptyProductionArray);
             AddIgnoreRules(ignoreRules ?? EmptyLexerRuleArray);
-            FindNullableSymbols();
+            FindNullableSymbols(_reverseLookup, _nullable);
         }
 
-        private void AddIgnoreRules(IEnumerable<ILexerRule> ignoreRules)
+        private void AddIgnoreRules(IReadOnlyList<ILexerRule> ignoreRules)
         {
-            foreach (var ignoreRule in ignoreRules)
+            for (int i = 0; i < ignoreRules.Count; i++)
+            {
+                var ignoreRule = ignoreRules[i];
                 AddIgnoreRule(ignoreRule);
+            }
         }
 
-        private void AddProductions(IEnumerable<IProduction> productions)
+        private void AddProductions(IReadOnlyList<IProduction> productions)
         {
-            foreach (var production in productions)
+            for (int i = 0; i < productions.Count; i++)
+            {
+                var production = productions[i];
                 AddProduction(production);
+            }
         }
 
         public IReadOnlyList<ILexerRule> Ignores
@@ -71,11 +74,8 @@ namespace Pliant.Grammars
         private void AddProductionToIndex(IProduction production)
         {
             var leftHandSide = production.LeftHandSide;
-            if (!_productionIndex.ContainsKey(leftHandSide))
-            {
-                _productionIndex.Add(leftHandSide, new ReadWriteList<IProduction>());
-            }
-            _productionIndex[leftHandSide].Add(production);
+            var indexedProductions = _productionIndex.AddOrGetExisting(leftHandSide);
+            indexedProductions.Add(production);
         }
 
         private void AddProductionToReverseLookup(IProduction production)
@@ -89,27 +89,25 @@ namespace Pliant.Grammars
                 if (symbol.SymbolType != SymbolType.NonTerminal)
                     continue;
                 var nonTerminal = symbol as INonTerminal;
-                UniqueList<IProduction> hashSet = null;
-                if (!_reverseLookup.TryGetValue(nonTerminal, out hashSet))
-                {
-                    hashSet = new UniqueList<IProduction>();
-                    _reverseLookup.Add(nonTerminal, hashSet);
-                }
+                var hashSet = _reverseLookup.AddOrGetExisting(nonTerminal);
                 hashSet.Add(production);
             }
         }
         
-        private void FindNullableSymbols()
+        private static void FindNullableSymbols(
+            Dictionary<INonTerminal, UniqueList<IProduction>> reverseLookup, 
+            UniqueList<INonTerminal> nullable)
         {
             // trace nullability through productions: http://cstheory.stackexchange.com/questions/2479/quickly-finding-empty-string-producing-nonterminals-in-a-cfg
-            var nullableQueue = new Queue<INonTerminal>(_nullable);
+            // I think this is Dijkstra's algorithm
+            var nullableQueue = new Queue<INonTerminal>(nullable);
             var productionSizes = new Dictionary<IProduction, int>();
             // foreach nullable symbol discovered in forming the reverse lookup
             while (nullableQueue.Count > 0)
             {
                 var nonTerminal = nullableQueue.Dequeue();
                 UniqueList<IProduction> productionsContainingNonTerminal = null;
-                if (_reverseLookup.TryGetValue(nonTerminal, out productionsContainingNonTerminal))
+                if (reverseLookup.TryGetValue(nonTerminal, out productionsContainingNonTerminal))
                 {
                     for (int p = 0; p < productionsContainingNonTerminal.Count; p++)
                     {
@@ -120,21 +118,21 @@ namespace Pliant.Grammars
                             size = production.RightHandSide.Count;
                             productionSizes[production] = size;
                         }
-                        for (var s=0; s< production.RightHandSide.Count; s++)
+                        for (var s = 0; s < production.RightHandSide.Count; s++)
                         {
                             var symbol = production.RightHandSide[s];
-                            if (symbol.SymbolType == SymbolType.NonTerminal 
+                            if (symbol.SymbolType == SymbolType.NonTerminal
                                 && nonTerminal.Equals(symbol))
                                 size--;
                         }
-                        if (size == 0 && _nullable.AddUnique(production.LeftHandSide))
+                        if (size == 0 && nullable.AddUnique(production.LeftHandSide))
                             nullableQueue.Enqueue(production.LeftHandSide);
                         productionSizes[production] = size;
                     }
                 }
             }
         }
-
+                
         private void AddIgnoreRule(ILexerRule lexerRule)
         {
             _ignores.Add(lexerRule);
@@ -144,10 +142,10 @@ namespace Pliant.Grammars
         private void AddIgnoreRuletoIndex(ILexerRule lexerRule)
         {
             var key = HashCode.Compute(
-                lexerRule.SymbolType.GetHashCode(),
+                ((int)lexerRule.SymbolType).GetHashCode(),
                 lexerRule.TokenType.Id.GetHashCode());
             if (!_ignoreIndex.ContainsKey(key))
-                _ignoreIndex.Add(key, new ReadWriteList<ILexerRule>());
+                _ignoreIndex.Add(key, new List<ILexerRule>());
             _ignoreIndex[key].Add(lexerRule);
         }
 
@@ -155,13 +153,21 @@ namespace Pliant.Grammars
 
         public IReadOnlyList<IProduction> RulesFor(INonTerminal symbol)
         {
-            ReadWriteList<IProduction> list;
+            List<IProduction> list;
             if (!_productionIndex.TryGetValue(symbol, out list))
                 return EmptyProductionArray;
             return list;
         }
 
-        public IEnumerable<IProduction> StartProductions()
+        public IReadOnlyList<IProduction> RulesContainingSymbol(INonTerminal symbol)
+        {
+            UniqueList<IProduction> list;
+            if (!_reverseLookup.TryGetValue(symbol, out list))
+                return EmptyProductionArray;
+            return list;
+        }
+        
+        public IReadOnlyList<IProduction> StartProductions()
         {
             return RulesFor(Start);
         }
@@ -169,6 +175,11 @@ namespace Pliant.Grammars
         public bool IsNullable(INonTerminal nonTerminal)
         {
             return _nullable.Contains(nonTerminal);
-        }        
+        }
+
+        public IReadOnlyList<INonTerminal> Nullable()
+        {
+            return _nullable;
+        }    
     }
 }

@@ -8,6 +8,6 @@ namespace Pliant.Grammars
 {
     public interface IOptional : ISymbol
     {
-        IReadOnlyCollection<ISymbol> Items { get; }
+        IReadOnlyList<ISymbol> Items { get; }
     }
 }

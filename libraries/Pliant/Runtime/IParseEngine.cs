@@ -34,12 +34,7 @@ namespace Pliant.Runtime
         /// </summary>
         /// <returns>The enumeration of lexer rules that apply at the current parse position.</returns>
         List<ILexerRule> GetExpectedLexerRules();
-
-        /// <summary>
-        /// Gets the current parse chart for use in recovery rules.
-        /// </summary>
-        IReadOnlyChart Chart { get; }
-
+        
         /// <summary>
         /// Accepts one token and incrementally moves the parser forward if successful.
         /// </summary>

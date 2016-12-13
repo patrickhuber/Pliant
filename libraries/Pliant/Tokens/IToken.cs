@@ -3,7 +3,7 @@
     public interface IToken
     {
         string Value { get; }
-        int Origin { get; }
+        int Position { get; }
         TokenType TokenType { get; }
     }
 }

@@ -4,7 +4,7 @@ namespace Pliant.Grammars
 {
     public class Repetition : Grouping, IRepetition
     {
-        public Repetition(IEnumerable<ISymbol> items)
+        public Repetition(IReadOnlyList<ISymbol> items)
             : base(items) { }
 
         public override SymbolType SymbolType

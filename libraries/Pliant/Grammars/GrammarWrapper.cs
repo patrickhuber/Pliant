@@ -31,7 +31,7 @@ namespace Pliant.Grammars
             return _innerGrammar.RulesFor(nonTerminal);
         }
 
-        public IEnumerable<IProduction> StartProductions()
+        public IReadOnlyList<IProduction> StartProductions()
         {
             return _innerGrammar.StartProductions();
         }
@@ -39,6 +39,11 @@ namespace Pliant.Grammars
         public bool IsNullable(INonTerminal nonTerminal)
         {
             return _innerGrammar.IsNullable(nonTerminal);
+        }
+
+        public IReadOnlyList<IProduction> RulesContainingSymbol(INonTerminal nonTerminal)
+        {
+            return _innerGrammar.RulesContainingSymbol(nonTerminal);
         }
     }
 }

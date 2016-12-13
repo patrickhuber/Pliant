@@ -10,7 +10,7 @@ using Pliant.Runtime;
 using Pliant.Tree;
 using Pliant.Tests.Common.Forest;
 using Pliant.Tests.Common;
-using Pliant.Tests.Common.Expressions;
+using Pliant.Tests.Common.Grammars;
 
 namespace Pliant.Tests.Unit.Runtime
 {
@@ -521,7 +521,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var grammar = new GrammarExpression(A, new[] { A })
                 .ToGrammar();
-
+            
             var input = Tokenize("aaaaa");
             var recognizer = new ParseEngine(grammar);
             ParseInput(recognizer, input);
@@ -545,6 +545,25 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.AreEqual(1, lastEarleySet.Transitions.Count);
             Assert.AreEqual(1, lastEarleySet.Predictions.Count);
             Assert.AreEqual(1, lastEarleySet.Scans.Count);
+        }
+
+
+        [TestMethod]
+        public void ParseEngineShouldHandleCyclesInGrammar()
+        {
+            const string input = "a";
+            var tokens = Tokenize(input);
+            var recognizer = new ParseEngine(new CycleGrammar());
+            ParseInput(recognizer, tokens);
+        }
+
+        [TestMethod]
+        public void ParseEngineShouldHandleHiddenRightRecursionsInSubCubicTime()
+        {
+            const string input = "abcabcabcabcabcabca";
+            var tokens = Tokenize(input);
+            var recognizer = new ParseEngine(new HiddenRightRecursionGrammar());
+            ParseInput(recognizer, tokens);
         }
 
         [TestMethod]
@@ -789,7 +808,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void ParseEngineShouldProduceSameLeoAndClassicForestWhenGivenAmbiuousNonTerminal()
+        public void ParseEngineShouldProduceSameLeoAndClassicForestWhenGivenAmbiguousNonTerminal()
         {
             var input = "1+2+3";
             var tokens = TokenizeNumericExpression(input);
@@ -814,6 +833,23 @@ namespace Pliant.Tests.Unit.Runtime
             // (E, 4, 5) = ('5', 4, 5)
             // (E, 6, 7) = ('7', 6, 7)
             Assert.Inconclusive();
+        }
+
+        [TestMethod]
+        public void ParseEngineCanParseNullableGrammar()
+        {
+            var parseEngine = new ParseEngine(new NullableGrammar());
+
+            var input = "aaaa";
+            var tokenType = new TokenType("a");
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                var result = parseEngine.Pulse(new Token("a", i, tokenType));
+                Assert.IsTrue(result, $"Error at position {i}");
+            }
+
+            Assert.IsTrue(parseEngine.IsAccepted(), "Parse was not accepted");
         }
 
         private static IEnumerable<IToken> TokenizeNumericExpression(string input)
@@ -963,28 +999,29 @@ namespace Pliant.Tests.Unit.Runtime
             return new Token(character.ToString(), position, new TokenType(character.ToString()));
         }
 
-        private static IEnumerable<IToken> Tokenize(string input)
+        private static IReadOnlyList<IToken> Tokenize(string input)
         {
             return input.Select((x, i) =>
-                new Token(x.ToString(), i, new TokenType(x.ToString())));
+                new Token(x.ToString(), i, new TokenType(x.ToString())))
+                .ToArray();
         }
 
-        private static IEnumerable<IToken> Tokenize(string input, string tokenType)
+        private static IReadOnlyList<IToken> Tokenize(string input, string tokenType)
         {
             return Tokenize(input, new TokenType(tokenType));
         }
 
-        private static IEnumerable<IToken> Tokenize(string input, TokenType tokenType)
+        private static IReadOnlyList<IToken> Tokenize(string input, TokenType tokenType)
         {
             return input.Select((x, i) =>
-                new Token(x.ToString(), i, tokenType));
+                new Token(x.ToString(), i, tokenType))
+                .ToArray();
         }
 
-        private static void ParseInput(IParseEngine parseEngine, IEnumerable<IToken> tokens)
+        private static void ParseInput(IParseEngine parseEngine, IReadOnlyList<IToken> tokens)
         {
-            foreach (var token in tokens)
-                Assert.IsTrue(parseEngine.Pulse(token));
-            Assert.IsTrue(parseEngine.IsAccepted());
+            var parseTester = new ParseTester(parseEngine);
+            parseTester.RunParse(tokens);
         }
     }
 }

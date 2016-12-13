@@ -4,6 +4,9 @@ Implementation of a modified Earley parser in C# inspired by the Marpa Parser pr
 ## Build Status
 ![](https://patrickhuber.visualstudio.com/_apis/public/build/definitions/d758f02e-3764-4572-aaff-9378f05b48f9/3/badge)
 
+## Gitter Chat
+[![Gitter](https://img.shields.io/gitter/room/pliant.net/lobby.svg?maxAge=2592000)](https://gitter.im/Pliant-net/Lobby)
+
 ## Description
 Pliant is a table driven parser that implements the Earley algorithm. Two optimizations are added to handle issues with the original Earley implementation: 
 
@@ -46,7 +49,7 @@ public static int Main(string[] args)
 		= Expression ;
 		
 	Expression.Rule
-		= Edxpression + '+' + Term 
+		= Expression + '+' + Term 
 		| Term ;
 
 	Term.Rule 
@@ -119,8 +122,8 @@ public static int Main (string[] args)
 	:start = Calculator;
 	:ignore = Whitespace;";
 	
-	var compiler = new EbnfCompiler();
-	var grammar = compiler.Compile(grammarText);
+	var definition = new EbnfParser().Parse(grammarText);
+	var grammar = new EbnfGrammarGenerator().Generate(definition);
 	
 	// TODO: use the grammar in a parse.
 }
@@ -187,7 +190,7 @@ If the parse is ambiguous, you may want to supply a custom IForestDisambiguation
 // get the parse forest root from the parse engine
 var parseForestRoot = parseEngine.GetParseForestRoot();
 
-// create a internal tree node and supply the state manager for tree traversal.
+// create a internal tree node and supply the disambiguation algorithm for tree traversal.
 var parseTree = new InternalTreeNode(
     parseForestRoot,
     new SelectFirstChildDisambiguationAlgorithm());
@@ -203,7 +206,7 @@ var parseTree = new InternalTreeNode(
 * [marpa parser](http://jeffreykegler.github.io/Ocean-of-Awareness-blog/)
 * [joop leo - optimizing right recursions](http://www.sciencedirect.com/science/article/pii/030439759190180A)
 * [parsing techniques - a practical guide](http://amzn.com/B0017AMLL8)
-* [practical earley parsing](http://webhome.cs.uvic.ca/~nigelh/Publications/PracticalEarleyParsing.pdf)
+* [practical earley parsing](http://www.cs.uvic.ca/~nigelh/Publications/PracticalEarleyParsing.pdf)
 * [detailed description of leo optimizations and internals of marpa](https://github.com/jeffreykegler/kollos/blob/master/notes/misc/leo2.md)
 * [theory of Marpa Algorithm](https://docs.google.com/file/d/0B9_mR_M2zOc4Ni1zSW5IYzk3TGc/edit)
 * [parse tree forest creation](http://www.sciencedirect.com/science/article/pii/S1571066108001497)
@@ -212,3 +215,5 @@ var parseTree = new InternalTreeNode(
 * [incremental reparsing](http://www.aclweb.org/anthology/E89-1033.pdf)
 * [An extension of Earley's Algorithm for extended grammars](http://link.springer.com/chapter/10.1007%2F978-1-4020-3953-9_22)
 * [Finding nullable productions in a grammar](http://cstheory.stackexchange.com/a/2493/32787)
+* [Directly-Executable Earley Parsing (Aycock and Horspool, 2001)](http://link.springer.com/chapter/10.1007%2F3-540-45306-7_16#)
+* [Context Senitive Earley Parsing](https://web.archive.org/web/20110708224600/https://danielmattosroberts.com/earley/context-sensitive-earley.pdf)
