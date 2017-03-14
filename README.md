@@ -151,7 +151,7 @@ var recognzied = false;
 var errorPosition = 0;
 while(!parseRunner.EndOfStream())
 {
-	recognzed = parseRunner.Read();
+	recognized = parseRunner.Read();
 	if(!recognized)
 	{	
 		errorPosition = parseRunner.Position;
