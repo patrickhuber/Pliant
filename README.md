@@ -165,7 +165,7 @@ while(!parseRunner.EndOfStream())
 var accepted = false;
 if(recognized)
 {
-	accepted = parseRunner.IsAccepted();
+	accepted = parseRunner.ParseEngine.IsAccepted();
 	if(!accepted)
 		errorPosition = parseRunner.Position;
 }
