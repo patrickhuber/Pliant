@@ -188,7 +188,7 @@ If the parse is ambiguous, you may want to supply a custom IForestDisambiguation
 
 ```csharp
 // get the parse forest root from the parse engine
-var parseForestRoot = parseEngine.GetParseForestRoot();
+var parseForestRoot = parseEngine.GetParseForestRootNode();
 
 // create a internal tree node and supply the disambiguation algorithm for tree traversal.
 var parseTree = new InternalTreeNode(
