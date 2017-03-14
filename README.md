@@ -147,7 +147,7 @@ var parseRunner = new ParseRunner(parseEngine, input);
 
 // when a parse is recognized, the parse engine is allowed to move
 // forward and continues to accept symbols. 
-var recognzied = false;
+var recognized = false;
 var errorPosition = 0;
 while(!parseRunner.EndOfStream())
 {
