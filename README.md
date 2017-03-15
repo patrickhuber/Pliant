@@ -147,11 +147,11 @@ var parseRunner = new ParseRunner(parseEngine, input);
 
 // when a parse is recognized, the parse engine is allowed to move
 // forward and continues to accept symbols. 
-var recognzied = false;
+var recognized = false;
 var errorPosition = 0;
 while(!parseRunner.EndOfStream())
 {
-	recognzied = parseRunner.Read();
+	recognized = parseRunner.Read();
 	if(!recognized)
 	{	
 		errorPosition = parseRunner.Position;
@@ -165,7 +165,7 @@ while(!parseRunner.EndOfStream())
 var accepted = false;
 if(recognized)
 {
-	accepted = parseRunner.IsAccepted();
+	accepted = parseRunner.ParseEngine.IsAccepted();
 	if(!accepted)
 		errorPosition = parseRunner.Position;
 }
@@ -188,7 +188,7 @@ If the parse is ambiguous, you may want to supply a custom IForestDisambiguation
 
 ```csharp
 // get the parse forest root from the parse engine
-var parseForestRoot = parseEngine.GetParseForestRoot();
+var parseForestRoot = parseEngine.GetParseForestRootNode();
 
 // create a internal tree node and supply the disambiguation algorithm for tree traversal.
 var parseTree = new InternalTreeNode(
