@@ -28,7 +28,7 @@ namespace Pliant.Runtime
                 return new ParseEngineLexeme(grammarLexerRule);
             
             var reusedLexeme = _queue.Dequeue();
-            reusedLexeme.Reset(grammarLexerRule);
+            reusedLexeme.Reset(grammarLexerRule, position);
             return reusedLexeme;
         }
 

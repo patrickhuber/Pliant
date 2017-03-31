@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Automata;
 using Pliant.Grammars;
+using Pliant.LexerRules;
 using Pliant.Tokens;
 
 namespace Pliant.Tests.Unit.Automata
@@ -54,6 +55,28 @@ namespace Pliant.Tests.Unit.Automata
             var letterLexeme = new DfaLexeme(dfaLexerRule, 0);
             Assert.IsFalse(letterLexeme.Scan(numberInput[0]));
             Assert.AreEqual(string.Empty, letterLexeme.Value);
+        }
+
+        [TestMethod]
+        public void DfaLexemeResetShouldResetLexemeValues()
+        {
+            var numberLexerRule = new NumberLexerRule();
+            var whitespaceLexerRule = new WhitespaceLexerRule();
+
+            var lexeme = new DfaLexeme(numberLexerRule, 0);
+            const string numberInput = "0123456";
+            for (var i = 0; i < numberInput.Length; i++)
+            {
+                var result = lexeme.Scan(numberInput[i]);
+                if (!result)
+                    Assert.Fail($"Did not recognize number {numberInput[i]}");
+            }
+            
+            lexeme.Reset(whitespaceLexerRule, 50);
+            Assert.AreEqual(string.Empty, lexeme.Value);
+            Assert.AreEqual(50, lexeme.Position);
+            Assert.AreEqual(whitespaceLexerRule.LexerRuleType, lexeme.LexerRule.LexerRuleType);
+            Assert.AreEqual(whitespaceLexerRule.TokenType, lexeme.TokenType);
         }
     }
 }

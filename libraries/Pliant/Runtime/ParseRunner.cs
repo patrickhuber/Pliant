@@ -159,7 +159,7 @@ public class ParseRunner : IParseRunner
     {
         // PERF: Avoid Linq FirstOrDefault due to lambda allocation
         ILexeme longestAcceptedMatch = null;
-        int doNotFreeLexemeIndex = -1;
+        var doNotFreeLexemeIndex = -1;
         for (int i = 0; i < _existingLexemes.Count; i++)
         {
             var lexeme = _existingLexemes[i];

@@ -1,7 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Ebnf;
 using Pliant.RegularExpressions;
+using Pliant.Runtime;
+using Pliant.Tests.Common.Forest;
 using System;
+using System.Text;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
@@ -261,6 +264,65 @@ namespace Pliant.Tests.Unit.Ebnf
                                 factor: new EbnfLexerRuleFactorLiteral("b"))))));
 
             Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void EbnfParserShouldParseComplexGrammarWithString()
+        {
+            var stringBuilder = new StringBuilder()
+            //.AppendLine("file = ws directives ws ;")
+            .AppendLine("ws = [ ows ] ; /* white space */")
+            .AppendLine("ows = \"_\" ; /* obligatory white space */");
+            //.AppendLine("directives = directive { ows directive };")
+            //.AppendLine("directive = \"0\" | \"1\"; ");
+            
+            //var actual = Parse(stringBuilder.ToString());
+
+            var grammar = new EbnfGrammar();
+            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
+            var parseRunner = new ParseRunner(parseEngine, stringBuilder.ToString());
+            while (!parseRunner.EndOfStream())
+            {
+                if (!parseRunner.Read())
+                    throw new Exception(
+                        $"Unable to parse Ebnf. Error at position {parseRunner.Position}.");
+            }
+            if (!parseEngine.IsAccepted())
+                throw new Exception(
+                    $"Unable to parse Ebnf. Error at position {parseRunner.Position}");
+
+            var parseForest = parseEngine.GetParseForestRootNode();
+            var visitor = new LoggingForestNodeVisitor(Console.Out);
+            parseForest.Accept(visitor);
+        }
+
+        [TestMethod]
+        public void EbnfParserShouldParseComplexGrammarWithRepeat()
+        {
+            var stringBuilder = new StringBuilder()
+            //.AppendLine("file = ws directives ws ;")
+            .AppendLine("file = \"1\" { \"2\" } \"1\";");
+            //.AppendLine("directives = directive { ows directive };")
+            //.AppendLine("directive = \"0\" | \"1\"; ");
+
+            var actual = Parse(stringBuilder.ToString());
+
+            var grammar = new EbnfGrammar();
+            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
+            var parseRunner = new ParseRunner(parseEngine, stringBuilder.ToString());
+            while (!parseRunner.EndOfStream())
+            {
+                if (!parseRunner.Read())
+                    throw new Exception(
+                        $"Unable to parse Ebnf. Error at position {parseRunner.Position}.");
+            }
+            if (!parseEngine.IsAccepted())
+                throw new Exception(
+                    $"Unable to parse Ebnf. Error at position {parseRunner.Position}");
+
+            var parseForest = parseEngine.GetParseForestRootNode();
+            var visitor = new LoggingForestNodeVisitor(Console.Out);
+            parseForest.Accept(visitor);
         }
 
         private static EbnfDefinition Parse(string input)

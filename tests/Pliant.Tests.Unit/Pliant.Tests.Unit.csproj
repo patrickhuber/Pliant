@@ -97,6 +97,7 @@
     <Compile Include="Grammars\WhitespaceTerminalTests.cs" />
     <Compile Include="RegularExpressions\RegexToDfaTests.cs" />
     <Compile Include="RegularExpressions\ThompsonConstructionTests.cs" />
+    <Compile Include="Tokens\StringLiteralLexemeTests.cs" />
     <Compile Include="Tree\TreeNodeTests.cs" />
     <Compile Include="Tree\ParseTreeEnumerableTests.cs" />
   </ItemGroup>

@@ -5,6 +5,7 @@ using Pliant.Grammars;
 using Pliant.RegularExpressions;
 using Pliant.Tokens;
 using System.Collections.Generic;
+using Pliant.LexerRules;
 
 namespace Pliant.Ebnf
 {
@@ -101,8 +102,8 @@ namespace Pliant.Ebnf
                 | grouping;
 
             literal.Rule = (Expr)
-                '"' + notDoubleQuote + '"'
-                | (Expr)"'" + notSingleQuote + "'";
+                new SingleQuoteStringLexerRule()
+                | new DoubleQuoteStringLexerRule();
 
             repetition.Rule = (Expr)
                 '{' + expression + '}';

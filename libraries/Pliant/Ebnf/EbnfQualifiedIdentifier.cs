@@ -1,4 +1,5 @@
-﻿using Pliant.Utilities;
+﻿using Pliant.Diagnostics;
+using Pliant.Utilities;
 using System;
 
 namespace Pliant.Ebnf
@@ -11,6 +12,7 @@ namespace Pliant.Ebnf
 
         public EbnfQualifiedIdentifier(string identifier)
         {
+            Assert.IsNotNull(identifier, nameof(identifier));
             Identifier = identifier;
             _hashCode = ComputeHashCode();
         }

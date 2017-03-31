@@ -87,6 +87,8 @@
     <Compile Include="Grammars\Interval.cs" />
     <Compile Include="Grammars\WordTerminal.cs" />
     <Compile Include="LexerRules\NumberLexerRule.cs" />
+    <Compile Include="LexerRules\SingleQuoteStringLexerRule.cs" />
+    <Compile Include="LexerRules\DoubleQuoteStringLexerRule.cs" />
     <Compile Include="LexerRules\WhitespaceLexerRule.cs" />
     <Compile Include="Grammars\PreComputedGrammar.cs" />
     <Compile Include="Grammars\DottedRule.cs" />
