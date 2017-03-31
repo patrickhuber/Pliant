@@ -25,7 +25,7 @@ namespace Pliant.Automata
             if (_queue.Count > 0)
             {
                 var reusedLexeme = _queue.Dequeue();
-                reusedLexeme.Reset(dfaLexerRule);
+                reusedLexeme.Reset(dfaLexerRule, position);
                 return reusedLexeme;
             }
             return new DfaLexeme(dfaLexerRule, position);

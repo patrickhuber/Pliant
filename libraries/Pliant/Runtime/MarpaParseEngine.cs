@@ -217,25 +217,7 @@ namespace Pliant.Runtime
                     if (!cachedCount.TryGetValue(postDotSymbol, out count))
                     {
                         cachedCount[postDotSymbol] = 1;
-
-                        var origin = stateFrame.Origin;
-                        CachedStateFrameTransition topCacheItem = null;
-                        while (true)
-                        {
-                            var originFrameSet = Chart.FrameSets[stateFrame.Origin];
-                            var nextCachedItem = originFrameSet.FindCachedStateFrameTransition(postDotSymbol);
-                            if (nextCachedItem == null)                            
-                                break;
-                            topCacheItem = nextCachedItem;
-                            if (origin == nextCachedItem.Origin)
-                                break;
-                            origin = topCacheItem.Origin;
-                        }
-                                                
-                        cachedTransitions[postDotSymbol] = new CachedStateFrameTransition(
-                            postDotSymbol,
-                            stateFrame.Frame,
-                            topCacheItem == null ? stateFrame.Origin : origin);
+                        cachedTransitions[postDotSymbol] = CreateTopCachedItem(stateFrame, postDotSymbol);
                     }
                     else
                     {
@@ -255,6 +237,31 @@ namespace Pliant.Runtime
 
             cachedTransitionsPool.ClearAndFree(cachedTransitions);
             cachedCountPool.ClearAndFree(cachedCount);
+        }
+
+        private CachedStateFrameTransition CreateTopCachedItem(
+            StateFrame stateFrame, 
+            ISymbol postDotSymbol)
+        {
+            var origin = stateFrame.Origin;
+            CachedStateFrameTransition topCacheItem = null;
+            // search for the top item in the leo chain
+            while (true)
+            {
+                var originFrameSet = Chart.FrameSets[stateFrame.Origin];
+                var nextCachedItem = originFrameSet.FindCachedStateFrameTransition(postDotSymbol);
+                if (nextCachedItem == null)
+                    break;
+                topCacheItem = nextCachedItem;
+                if (origin == nextCachedItem.Origin)
+                    break;
+                origin = topCacheItem.Origin;
+            }
+
+            return new CachedStateFrameTransition(
+                postDotSymbol,
+                stateFrame.Frame,
+                topCacheItem == null ? stateFrame.Origin : origin);
         }
 
         private void EarleyReductionOperation(int iLoc, StateFrame fromEim, ISymbol transSym)

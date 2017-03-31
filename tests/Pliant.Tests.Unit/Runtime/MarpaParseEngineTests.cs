@@ -130,6 +130,39 @@ namespace Pliant.Tests.Unit.Runtime
             var accepted = marpaParseEngine.IsAccepted();
             if (!accepted)
                 Assert.Fail($"Input was not accepted.");
-        }        
+        }
+
+        [TestMethod]
+        public void MarpaParseEngineShouldNotMemoizeRuleWhenSiblingIsRightRecursiveAndCurrentRuleIsNot()
+        {
+            ProductionExpression
+                S = "S",
+                A = "A";
+
+            S.Rule = A;
+            A.Rule = (Expr)'a' + 'a' + A
+                | (Expr) 'b' + 'b';
+
+            var grammar = new GrammarExpression(S, new[] { S, A }).ToGrammar();
+            var marpaParseEngine = new MarpaParseEngine(grammar);
+
+            var bTokenType = new TokenType("b");
+            var tokens = new[] 
+            {
+                new Token("b", 0, bTokenType),
+                new Token("b", 1, bTokenType)
+            };
+            
+            for (var i = 0; i < tokens.Length; i++)
+            {
+                var result = marpaParseEngine.Pulse(tokens[i]);
+                if (!result)
+                    Assert.Fail($"Failure parsing at position {marpaParseEngine.Location}");
+            }
+
+            var accepted = marpaParseEngine.IsAccepted();
+            if (!accepted)
+                Assert.Fail($"Input was not accepted.");
+        }     
     }
 }

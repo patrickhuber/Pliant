@@ -2,7 +2,6 @@
 using Pliant.Tokens;
 using Pliant.Utilities;
 using System.Text;
-using System;
 using Pliant.Grammars;
 
 namespace Pliant.Automata
@@ -20,6 +19,7 @@ namespace Pliant.Automata
 
         public ILexerRule LexerRule { get; private set; }
 
+        // TODO: Make property inspection work better for the debugger
         public string Value
         {
             get
@@ -43,13 +43,14 @@ namespace Pliant.Automata
             return _stringBuilder != null;
         }
 
-        public void Reset(IDfaLexerRule dfaLexerRule)
+        public void Reset(IDfaLexerRule dfaLexerRule, int position)
         {
             _capture = null;
             if(IsStringBuilderAllocated())
                 _stringBuilder.Clear();
             _currentState = dfaLexerRule.Start;
             LexerRule = dfaLexerRule;
+            Position = position;        
         }
 
         private void DeallocateStringBuilderAndAssignCapture()

@@ -68,12 +68,13 @@ namespace Pliant.Runtime
             return _parseEngine.IsAccepted();
         }
 
-        public void Reset(IGrammarLexerRule newGrammarRule)
+        public void Reset(IGrammarLexerRule newGrammarRule, int position)
         {
             LexerRule = newGrammarRule;
             _capture.Clear();
 
             _parseEngine = new ParseEngine(newGrammarRule.Grammar);
+            Position = position;
         }
     }
 }
