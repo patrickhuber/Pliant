@@ -3,11 +3,13 @@ using Pliant.Automata;
 using Pliant.Builders.Expressions;
 using Pliant.Charts;
 using Pliant.Ebnf;
+using Pliant.Forest;
 using Pliant.Grammars;
 using Pliant.LexerRules;
 using Pliant.Runtime;
 using Pliant.Tokens;
 using System;
+using System.Text;
 
 namespace Pliant.Tests.Unit.Runtime
 {
@@ -245,6 +247,35 @@ namespace Pliant.Tests.Unit.Runtime
             /* letters and digits */
             letter			~ /[a-zA-Z]/;";
             RunParse(parseEngine, input);
+        }
+
+        [TestMethod]
+        public void ParseRunnerShouldHandleCleanupOfUnUsedIgnoreLexemes()
+        {
+            var ebnfGrammar = new EbnfGrammar();
+            var parseEngine = new ParseEngine(ebnfGrammar);
+
+            var stringBuilder = new StringBuilder()
+            .AppendLine("ws = [ ows ] ; /* white space */")
+            .AppendLine("ows = \"_\" ; /* obligatory white space */");
+
+            RunParse(parseEngine, stringBuilder.ToString());
+
+            var chart = parseEngine.Chart;
+            Assert.IsTrue(chart.EarleySets.Count > 7);
+            var seventhSet = chart.EarleySets[7];
+            Assert.IsNotNull(seventhSet);
+
+            Assert.AreEqual(1, seventhSet.Completions.Count);
+            var onlyCompletion = seventhSet.Completions[0];
+            Assert.IsNotNull(onlyCompletion);
+
+            var parseNode = onlyCompletion.ParseNode as IInternalForestNode;
+            var parseNodeAndNode = parseNode.Children[0];
+            var tokenParseNode = parseNodeAndNode.Children[0] as ITokenForestNode;
+            var token = tokenParseNode.Token;
+            Assert.AreEqual(EbnfGrammar.TokenTypes.Identifier, token.TokenType);
+            Assert.AreEqual("ows", token.Value);
         }
 
         private static Chart GetParseEngineChart(ParseEngine parseEngine)

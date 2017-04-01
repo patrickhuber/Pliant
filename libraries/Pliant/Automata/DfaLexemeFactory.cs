@@ -28,7 +28,8 @@ namespace Pliant.Automata
                 reusedLexeme.Reset(dfaLexerRule, position);
                 return reusedLexeme;
             }
-            return new DfaLexeme(dfaLexerRule, position);
+            var dfaLexeme = new DfaLexeme(dfaLexerRule, position);
+            return dfaLexeme;
         }
 
         public void Free(ILexeme lexeme)

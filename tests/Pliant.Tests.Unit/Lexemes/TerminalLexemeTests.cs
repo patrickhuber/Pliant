@@ -28,5 +28,20 @@ namespace Pliant.Tests.Unit
             var terminalLexeme = new TerminalLexeme(new CharacterTerminal('c'), new TokenType("c"), 0);
             Assert.AreEqual(string.Empty, terminalLexeme.Value);
         }
+
+        [TestMethod]
+        public void TerminalLexemeResetShouldClearPreExistingValues()
+        {
+            var terminalLexeme = new TerminalLexeme(
+                new CharacterTerminal('c'),
+                new TokenType("c"),
+                0);
+            Assert.IsTrue(terminalLexeme.Scan('c'));
+            terminalLexeme.Reset(
+                new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a")),
+                10);
+
+            Assert.AreEqual(10, terminalLexeme.Position);            
+        }
     }
 }

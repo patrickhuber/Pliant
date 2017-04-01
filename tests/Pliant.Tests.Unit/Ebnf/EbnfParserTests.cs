@@ -265,37 +265,7 @@ namespace Pliant.Tests.Unit.Ebnf
 
             Assert.AreEqual(expected, actual);
         }
-
-        [TestMethod]
-        public void EbnfParserShouldParseComplexGrammarWithString()
-        {
-            var stringBuilder = new StringBuilder()
-            //.AppendLine("file = ws directives ws ;")
-            .AppendLine("ws = [ ows ] ; /* white space */")
-            .AppendLine("ows = \"_\" ; /* obligatory white space */");
-            //.AppendLine("directives = directive { ows directive };")
-            //.AppendLine("directive = \"0\" | \"1\"; ");
-            
-            //var actual = Parse(stringBuilder.ToString());
-
-            var grammar = new EbnfGrammar();
-            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
-            var parseRunner = new ParseRunner(parseEngine, stringBuilder.ToString());
-            while (!parseRunner.EndOfStream())
-            {
-                if (!parseRunner.Read())
-                    throw new Exception(
-                        $"Unable to parse Ebnf. Error at position {parseRunner.Position}.");
-            }
-            if (!parseEngine.IsAccepted())
-                throw new Exception(
-                    $"Unable to parse Ebnf. Error at position {parseRunner.Position}");
-
-            var parseForest = parseEngine.GetParseForestRootNode();
-            var visitor = new LoggingForestNodeVisitor(Console.Out);
-            parseForest.Accept(visitor);
-        }
-
+        
         [TestMethod]
         public void EbnfParserShouldParseComplexGrammarWithRepeat()
         {
