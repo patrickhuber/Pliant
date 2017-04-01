@@ -113,7 +113,7 @@ namespace Pliant.Ebnf
                     case TreeNodeType.Token:
                         var tokenNode = child as ITokenTreeNode;
                         var token = tokenNode.Token;
-                        if (token.TokenType.Id == "identifier")
+                        if (token.TokenType.Equals(EbnfGrammar.TokenTypes.Identifier))
                             identifier = token.Value;
                         break;
                 }
@@ -326,7 +326,7 @@ namespace Pliant.Ebnf
                     case TreeNodeType.Token:
                         var tokenNode = child as ITokenTreeNode;
                         var token = tokenNode.Token;
-                        if (token.TokenType.Id == nameof(settingIdentifier))
+                        if (token.TokenType.Equals(EbnfGrammar.TokenTypes.SettingIdentifier))
                             settingIdentifier = new EbnfSettingIdentifier(token.Value);
                         break;
 

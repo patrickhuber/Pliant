@@ -3,6 +3,7 @@ using Pliant.Tokens;
 using Pliant.Utilities;
 using System.Text;
 using Pliant.Grammars;
+using System.Diagnostics;
 
 namespace Pliant.Automata
 {
@@ -19,7 +20,10 @@ namespace Pliant.Automata
 
         public ILexerRule LexerRule { get; private set; }
 
-        // TODO: Make property inspection work better for the debugger
+        private static int _accumulator = 0;
+        public int Id { get; private set; }
+
+        // TODO: Make property inspection work better for the debugger        
         public string Value
         {
             get
@@ -28,7 +32,7 @@ namespace Pliant.Automata
                     DeallocateStringBuilderAndAssignCapture();
                 return _capture;
             }
-        }
+        }        
         
         public DfaLexeme(IDfaLexerRule dfaLexerRule, int position)
         {
@@ -36,6 +40,8 @@ namespace Pliant.Automata
             Position = position;
             _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
             _currentState = dfaLexerRule.Start;
+            Id = _accumulator;
+            _accumulator += 1;
         }
 
         private bool IsStringBuilderAllocated()
@@ -63,7 +69,8 @@ namespace Pliant.Automata
         private void ReallocateStringBuilderFromCapture()
         {
             _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
-            _stringBuilder.Append(_stringBuilder);
+            if(!string.IsNullOrWhiteSpace(_capture))
+                _stringBuilder.Append(_capture);
         }
 
         public bool IsAccepted()
