@@ -19,10 +19,7 @@ namespace Pliant.Automata
         public TokenType TokenType { get { return LexerRule.TokenType; } }
 
         public ILexerRule LexerRule { get; private set; }
-
-        private static int _accumulator = 0;
-        public int Id { get; private set; }
-
+        
         // TODO: Make property inspection work better for the debugger        
         public string Value
         {
@@ -40,8 +37,6 @@ namespace Pliant.Automata
             Position = position;
             _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
             _currentState = dfaLexerRule.Start;
-            Id = _accumulator;
-            _accumulator += 1;
         }
 
         private bool IsStringBuilderAllocated()

@@ -3,6 +3,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Ebnf;
 using Pliant.Grammars;
 using Pliant.Builders.Expressions;
+using Pliant.Runtime;
+using Pliant.Tests.Common;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
@@ -222,6 +224,24 @@ namespace Pliant.Tests.Unit.Ebnf
 
             var expectedGrammar = new GrammarExpression(R, new[] { R, optA, optD }).ToGrammar();
             Assert.AreEqual(expectedGrammar.Productions.Count, grammar.Productions.Count);
+        }
+
+        [TestMethod]
+        public void EbnfGrammarGeneratorShouldCreateGrammarForComplexDefinition()
+        {
+            var ebnf = 
+                @"file = ws directives ws ;
+                ws = [ ows ] ; /* white space */
+                ows = ""_""; /* obligatory white space */
+                directives = directive { ows directive };
+                directive = ""0"" | ""1""; ";
+
+            var parser = new EbnfParser();
+            var ebnfDefinition = parser.Parse(ebnf);
+            var generatedGrammar = GenerateGrammar(ebnfDefinition);
+            Assert.IsNotNull(generatedGrammar);
+            var parseTester = new ParseTester(generatedGrammar);
+            parseTester.RunParse("_0_1_0_0_1_1_");
         }
 
         private static IGrammar GenerateGrammar(EbnfDefinition definition)
