@@ -226,7 +226,7 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.AreEqual(expectedGrammar.Productions.Count, grammar.Productions.Count);
         }
 
-        [TestMethod]
+        [TestMethod][Ignore]
         public void EbnfGrammarGeneratorShouldCreateGrammarForComplexDefinition()
         {
             var ebnf = 
