@@ -13,29 +13,20 @@ namespace Pliant.Grammars
 
         private readonly ProcessOnceQueue<Frame> _frameQueue;
 
-        private readonly Dictionary<Frame, Frame> _frames;
-
-        private readonly HashSet<ISymbol> _rightRecursiveSymbols;
-
-        private readonly Dictionary<IProduction, Dictionary<int, DottedRule>> _states;
-
+        private readonly Dictionary<Frame, Frame> _frames;        
+        
         public PreComputedGrammar(IGrammar grammar)
         {
             _frameQueue = new ProcessOnceQueue<Frame>();
             _frames = new Dictionary<Frame, Frame>();
 
             Grammar = grammar;
-            Dictionary<ISymbol, UniqueList<ISymbol>> symbolPaths = null;
-
-            CreateStatesSymbolsAndSymbolPaths(grammar, out _states, out symbolPaths);
-
+            
             var startStates = Initialize(Grammar);
             Start = AddNewFrameOrGetExistingFrame(startStates);
             ProcessFrameQueue();
-
-            _rightRecursiveSymbols = CreateRightRecursiveLookup(Grammar, _states, symbolPaths);
         }
-
+        
         private void ProcessFrameQueue()
         {
             while (_frameQueue.Count > 0)
@@ -61,76 +52,9 @@ namespace Pliant.Grammars
             }
         }
 
-        private static void CreateStatesSymbolsAndSymbolPaths(
-            IGrammar grammar,
-            out Dictionary<IProduction, Dictionary<int, DottedRule>> states,
-            out Dictionary<ISymbol, UniqueList<ISymbol>> symbolPaths)
+        private SortedSet<IDottedRule> Initialize(IGrammar grammar)
         {
-            states = new Dictionary<IProduction, Dictionary<int, DottedRule>>();
-            symbolPaths = new Dictionary<ISymbol, UniqueList<ISymbol>>();
-
-            for (var p = 0; p < grammar.Productions.Count; p++)
-            {
-                var production = grammar.Productions[p];
-                var stateIndex = states.AddOrGetExisting(production);
-                var leftHandSide = production.LeftHandSide;
-                var symbolPath = symbolPaths.AddOrGetExisting(leftHandSide);
-
-                for (var s = 0; s <= production.RightHandSide.Count; s++)
-                {
-                    var preComputedState = new DottedRule(production, s);
-                    stateIndex.Add(s, preComputedState);
-
-                    if (s < production.RightHandSide.Count)
-                    {
-                        var postDotSymbol = production.RightHandSide[s];
-                        symbolPath.AddUnique(postDotSymbol);
-                    }
-                }
-            }
-        }
-        
-        private static HashSet<ISymbol> CreateRightRecursiveLookup(
-            IGrammar grammar, 
-            Dictionary<IProduction, Dictionary<int, DottedRule>> states,
-            Dictionary<ISymbol, UniqueList<ISymbol>> symbolPaths)
-        {
-            var hashSet = new HashSet<ISymbol>();
-            for (var p = 0; p < grammar.Productions.Count; p++)
-            {
-                var production = grammar.Productions[p];
-                var stateIndex = states[production];
-                var position = production.RightHandSide.Count;
-                var completed = stateIndex[position];
-                var symbolPath = symbolPaths[production.LeftHandSide];
-
-                for (var s = position; s > 0; s--)
-                {
-                    var preDotSymbol = production.RightHandSide[s - 1];
-                    if (preDotSymbol.SymbolType != SymbolType.NonTerminal)
-                        break;
-
-                    var preDotNonTerminal = preDotSymbol as INonTerminal;
-                    if (symbolPath.Contains(preDotNonTerminal))
-                    {
-                        hashSet.Add(production.LeftHandSide);
-                        break;
-                    }
-                    if (!grammar.IsNullable(preDotNonTerminal))
-                        break;
-                }
-            }
-            return hashSet;
-        }
-
-        public bool IsRightRecursive(ISymbol symbol)
-        {
-            return _rightRecursiveSymbols.Contains(symbol);
-        }
-
-        private SortedSet<DottedRule> Initialize(IGrammar grammar)
-        {
-            var pool = SharedPools.Default<SortedSet<DottedRule>>();
+            var pool = SharedPools.Default<SortedSet<IDottedRule>>();
             
             var startStates = pool.AllocateAndClear();
             var startProductions = grammar.StartProductions();
@@ -148,17 +72,17 @@ namespace Pliant.Grammars
             return confirmedStates;
         }
 
-        private  DottedRule GetPreComputedState(IProduction production, int position)
+        private IDottedRule GetPreComputedState(IProduction production, int position)
         {
-            return _states[production][position];
+            return Grammar.DottedRules.Get(production, position);
         }
 
-        private SortedSet<DottedRule> GetConfirmedStates(SortedSet<DottedRule> states)
+        private SortedSet<IDottedRule> GetConfirmedStates(SortedSet<IDottedRule> states)
         {
-            var pool = SharedPools.Default<Queue<DottedRule>>();
+            var pool = SharedPools.Default<Queue<IDottedRule>>();
 
             var queue = pool.AllocateAndClear();
-            var closure = new SortedSet<DottedRule>();
+            var closure = new SortedSet<IDottedRule>();
 
             foreach (var state in states)
                 if (closure.Add(state))
@@ -178,7 +102,7 @@ namespace Pliant.Grammars
                         break;
 
                     var nonTerminalPostDotSymbol = postDotSymbol as INonTerminal;
-                    if (!Grammar.IsNullable(nonTerminalPostDotSymbol))
+                    if (!Grammar.IsTransativeNullable(nonTerminalPostDotSymbol))
                         break;
 
                     var preComputedState = GetPreComputedState(production, s + 1);
@@ -190,12 +114,12 @@ namespace Pliant.Grammars
             return closure;
         }
 
-        private SortedSet<DottedRule> GetPredictedStates(Frame frame)
+        private SortedSet<IDottedRule> GetPredictedStates(Frame frame)
         {
-            var pool = SharedPools.Default<Queue<DottedRule>>();
+            var pool = SharedPools.Default<Queue<IDottedRule>>();
 
             var queue = pool.AllocateAndClear();
-            var closure = new SortedSet<DottedRule>();
+            var closure = new SortedSet<IDottedRule>();
 
             for (int i = 0; i < frame.Data.Count; i++)
             {
@@ -215,7 +139,7 @@ namespace Pliant.Grammars
                     continue;
 
                 var nonTerminalPostDotSymbol = postDotSymbol as INonTerminal;
-                if (Grammar.IsNullable(nonTerminalPostDotSymbol))
+                if (Grammar.IsTransativeNullable(nonTerminalPostDotSymbol))
                 {
                     var preComputedState = GetPreComputedState(state.Production, state.Position + 1);
                     if (!frame.Contains(preComputedState))
@@ -242,7 +166,7 @@ namespace Pliant.Grammars
             return closure;
         }
 
-        private Frame AddNewFrameOrGetExistingFrame(SortedSet<DottedRule> states)
+        private Frame AddNewFrameOrGetExistingFrame(SortedSet<IDottedRule> states)
         {
             var frame = new Frame(states);
             Frame outFrame;
@@ -254,7 +178,7 @@ namespace Pliant.Grammars
             return outFrame;
         }
 
-        private bool TryGetExistingFrameOrCreateNew(SortedSet<DottedRule> states, out Frame outFrame)
+        private bool TryGetExistingFrameOrCreateNew(SortedSet<IDottedRule> states, out Frame outFrame)
         {
             var newFrame = new Frame(states);
             if (_frames.TryGetValue(newFrame, out outFrame))
@@ -267,7 +191,7 @@ namespace Pliant.Grammars
 
         private void ProcessSymbolTransitions(Frame frame)
         {
-            var pool = SharedPools.Default<Dictionary<ISymbol, SortedSet<DottedRule>>>();
+            var pool = SharedPools.Default<Dictionary<ISymbol, SortedSet<IDottedRule>>>();
             var transitions = pool.AllocateAndClear();
 
             for (int i = 0; i < frame.Data.Count; i++)
@@ -293,12 +217,12 @@ namespace Pliant.Grammars
             pool.ClearAndFree(transitions);
         }
 
-        private static ISymbol GetPostDotSymbol(DottedRule state)
+        private static ISymbol GetPostDotSymbol(IDottedRule state)
         {
             return state.Production.RightHandSide[state.Position];
         }
 
-        private static bool IsComplete(DottedRule state)
+        private static bool IsComplete(IDottedRule state)
         {
             return state.Position == state.Production.RightHandSide.Count;
         }

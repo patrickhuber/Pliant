@@ -1,8 +1,9 @@
-﻿namespace Pliant.Grammars
+﻿using System.Collections.Generic;
+
+namespace Pliant.Grammars
 {
-    public interface IDottedRuleRegistry
+    public interface IDottedRuleRegistry : IReadOnlyDottedRuleRegistry
     {
-        IDottedRule Get(IProduction production, int position);
         void Register(IDottedRule dottedRule);
     }
 }

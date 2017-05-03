@@ -3,7 +3,7 @@ using Pliant.Collections;
 
 namespace Pliant.Grammars
 {
-    public abstract class DottedRuleRegistry : IDottedRuleRegistry
+    public class DottedRuleRegistry : IDottedRuleRegistry
     {
         private Dictionary<IProduction, Dictionary<int, IDottedRule>> _dottedRuleIndex;
 

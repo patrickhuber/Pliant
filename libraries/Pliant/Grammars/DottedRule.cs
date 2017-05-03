@@ -68,5 +68,10 @@ namespace Pliant.Grammars
         {
             return GetHashCode().CompareTo(other.GetHashCode());
         }
+
+        public int CompareTo(IDottedRule other)
+        {
+            return GetHashCode().CompareTo(other.GetHashCode());
+        }
     }
 }

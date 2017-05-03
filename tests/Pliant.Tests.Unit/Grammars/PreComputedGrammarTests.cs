@@ -56,7 +56,7 @@ namespace Pliant.Tests.Unit.Grammars
             for (var p = 0; p < grammar.Productions.Count; p++)
             {
                 var production = grammar.Productions[p];
-                Assert.IsTrue(preComputedGrammar.IsRightRecursive(production.LeftHandSide));
+                Assert.IsTrue(preComputedGrammar.Grammar.IsRightRecursive(production.LeftHandSide));
             }
         }
 
@@ -84,13 +84,13 @@ namespace Pliant.Tests.Unit.Grammars
             foreach(var rightRecursiveRule in rightRecursiveRules)
             {
                 var leftHandSide = rightRecursiveRule.ProductionModel.LeftHandSide.NonTerminal;
-                Assert.IsTrue(preComputedGrammar.IsRightRecursive(leftHandSide));
+                Assert.IsTrue(preComputedGrammar.Grammar.IsRightRecursive(leftHandSide));
             }
 
             foreach (var notRightRecursiveRule in notRightRecursiveRules)
             {
                 var leftHandSide = notRightRecursiveRule.ProductionModel.LeftHandSide.NonTerminal;
-                Assert.IsFalse(preComputedGrammar.IsRightRecursive(leftHandSide));
+                Assert.IsFalse(preComputedGrammar.Grammar.IsRightRecursive(leftHandSide));
             }
         }
         

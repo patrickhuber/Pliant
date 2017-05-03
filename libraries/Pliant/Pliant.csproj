@@ -85,6 +85,8 @@
     <Compile Include="Grammars\IDottedRule.cs" />
     <Compile Include="Grammars\IDottedRuleRegistry.cs" />
     <Compile Include="Grammars\Interval.cs" />
+    <Compile Include="Grammars\IReadOnlyDottedRuleRegistry.cs" />
+    <Compile Include="Grammars\Grammar.cs" />
     <Compile Include="Grammars\WordTerminal.cs" />
     <Compile Include="LexerRules\NumberLexerRule.cs" />
     <Compile Include="LexerRules\SingleQuoteStringLexerRule.cs" />
@@ -168,7 +170,6 @@
     <Compile Include="Charts\Chart.cs" />
     <Compile Include="Grammars\DigitTerminal.cs" />
     <Compile Include="Charts\EarleySet.cs" />
-    <Compile Include="Grammars\Grammar.cs" />
     <Compile Include="Forest\IAndForestNode.cs" />
     <Compile Include="Charts\IEarleySet.cs" />
     <Compile Include="Grammars\IGrammar.cs" />

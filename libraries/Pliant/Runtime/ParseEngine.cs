@@ -217,7 +217,7 @@ namespace Pliant.Runtime
                 PredictProduction(j, production);
             }
 
-            var isNullable = Grammar.IsNullable(evidence.PostDotSymbol as INonTerminal);
+            var isNullable = Grammar.IsTransativeNullable(evidence.PostDotSymbol as INonTerminal);
             if (isNullable)            
                 PredictAycockHorspool(evidence, j);            
         }
@@ -441,7 +441,7 @@ namespace Pliant.Runtime
 
             return true;
         }
-
+        
         private static readonly TokenType EmptyTokenType = new TokenType(string.Empty);
 
         private IForestNode CreateNullParseNode(ISymbol symbol, int location)
@@ -467,9 +467,9 @@ namespace Pliant.Runtime
                     .DottedRule
                     .Production
                     .RightHandSide[nextState.DottedRule.Position - 2];
-                anyPreDotRuleNull = IsSymbolNullable(predotPrecursorSymbol);
+                anyPreDotRuleNull = IsSymbolTransativeNullable(predotPrecursorSymbol);
             }
-            var anyPostDotRuleNull = IsSymbolNullable(nextState.PostDotSymbol);
+            var anyPostDotRuleNull = IsSymbolTransativeNullable(nextState.PostDotSymbol);
             if (anyPreDotRuleNull && !anyPostDotRuleNull)
                 return v;
 
@@ -531,6 +531,16 @@ namespace Pliant.Runtime
                 return false;
             var nonTerminal = symbol as INonTerminal;
             return Grammar.IsNullable(nonTerminal);
+        }
+
+        private bool IsSymbolTransativeNullable(ISymbol symbol)
+        {
+            if (symbol == null)
+                return true;
+            if (symbol.SymbolType != SymbolType.NonTerminal)
+                return false;
+            var nonTerminal = symbol as INonTerminal;
+            return Grammar.IsTransativeNullable(nonTerminal);
         }
 
         public void Reset()

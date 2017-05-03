@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Pliant.Collections
 {
-    public class IndexedList<T> : IList<T>
+    public class IndexedList<T> : IList<T>, IReadOnlyList<T>
     {
         private Dictionary<T, int> _indexOfDictionary;
         private List<T> _innerList;
@@ -69,6 +69,25 @@ namespace Pliant.Collections
         {
             _indexOfDictionary = new Dictionary<T, int>();
             _innerList = new List<T>();
+        }
+
+        public IndexedList(IEnumerable<T> enumerable)
+            : this()
+        {
+            if (enumerable is IReadOnlyList<T> list)
+            {
+                for (var i = 0; i < list.Count; i++)
+                {
+                    Add(list[i]);
+                }
+            }
+            else
+            {
+                foreach (var item in enumerable)
+                {
+                    Add(item);
+                }
+            }
         }
 
         public void Insert(int index, T item)

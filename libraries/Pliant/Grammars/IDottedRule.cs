@@ -1,6 +1,8 @@
-﻿namespace Pliant.Grammars
+﻿using System;
+
+namespace Pliant.Grammars
 {
-    public interface IDottedRule
+    public interface IDottedRule : IComparable<IDottedRule>
     {
         int Position { get; }
         IProduction Production { get; }

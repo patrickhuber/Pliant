@@ -226,7 +226,7 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.AreEqual(expectedGrammar.Productions.Count, grammar.Productions.Count);
         }
 
-        [TestMethod][Ignore]
+        [TestMethod]
         public void EbnfGrammarGeneratorShouldCreateGrammarForComplexDefinition()
         {
             var ebnf = 
@@ -240,7 +240,8 @@ namespace Pliant.Tests.Unit.Ebnf
             var ebnfDefinition = parser.Parse(ebnf);
             var generatedGrammar = GenerateGrammar(ebnfDefinition);
             Assert.IsNotNull(generatedGrammar);
-            var parseTester = new ParseTester(generatedGrammar);
+            var parseEngine = new ParseEngine(generatedGrammar, new ParseEngineOptions(optimizeRightRecursion: true ));
+            var parseTester = new ParseTester(parseEngine);
             parseTester.RunParse("_0_1_0_0_1_1_");
         }
 

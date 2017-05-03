@@ -107,7 +107,7 @@ namespace Pliant.Runtime
             return false;
         }
 
-        private bool AnyPreComputedStateAccepted(IReadOnlyList<DottedRule> states)
+        private bool AnyPreComputedStateAccepted(IReadOnlyList<IDottedRule> states)
         {
             for (var j = 0; j < states.Count; j++)
             {
@@ -208,7 +208,7 @@ namespace Pliant.Runtime
                         continue;
 
                     // leo eligibile items are right recursive directly or indirectly                    
-                    if (!_preComputedGrammar.IsRightRecursive(
+                    if (!_preComputedGrammar.Grammar.IsRightRecursive(
                         preComputedState.Production.LeftHandSide))
                         continue;
 
@@ -300,22 +300,16 @@ namespace Pliant.Runtime
             Chart.Enqueue(iLoc, predictedEIM);
         }
 
-        private static bool IsCompleted(DottedRule dottedRule)
+        private static bool IsCompleted(IDottedRule dottedRule)
         {
             return dottedRule.Production.RightHandSide.Count == dottedRule.Position;
         }
 
-        private static ISymbol GetPostDotSymbol(DottedRule preComputedState)
+        private static ISymbol GetPostDotSymbol(IDottedRule preComputedState)
         {
             return preComputedState.Production.RightHandSide[preComputedState.Position];
         }
-
-        private bool IsLeoEligible(ISymbol symbol, StateFrameSet stateFrameSet)
-        {
-            return stateFrameSet.IsLeoUnique(symbol)
-                && _preComputedGrammar.IsRightRecursive(symbol);
-        }
-
+        
         private static Frame Goto(Frame fromAH)
         {
             return fromAH.NullTransition;
@@ -332,14 +326,14 @@ namespace Pliant.Runtime
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool IsStartState(DottedRule state)
+        private bool IsStartState(IDottedRule state)
         {
             var start = _preComputedGrammar.Grammar.Start;
             return state.Production.LeftHandSide.Equals(start);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsComplete(DottedRule preComputedState)
+        private static bool IsComplete(IDottedRule preComputedState)
         {
             return preComputedState.Position == preComputedState.Production.RightHandSide.Count;
         }
