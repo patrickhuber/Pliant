@@ -201,11 +201,12 @@ namespace Pliant.RegularExpressions
                     continue;
                 var childTokenNode = child as ITokenTreeNode;
 
-                var value = childTokenNode.Token.Value.StartsWith(@"\", StringComparison.CurrentCulture)
+                var isEscaped = childTokenNode.Token.Value.StartsWith(@"\", StringComparison.CurrentCulture);
+                var value = isEscaped
                     ? childTokenNode.Token.Value[1]
                     : childTokenNode.Token.Value[0];
 
-                return new RegexCharacter(value);
+                return new RegexCharacter(value, isEscaped);
             }
             throw new Exception("Invalid character detected.");
         }

@@ -154,13 +154,25 @@ namespace Pliant.RegularExpressions
         {
             var start = new NfaState();
             var end = new NfaState();
+            var terminal = CreateTerminalForCharacter(character.Value, character.IsEscaped, negate);
 
+            var transition = new TerminalNfaTransition(
+                terminal: terminal,
+                target: end);
+
+            start.AddTransistion(transition);
+
+            return new Nfa(start, end);
+        }
+
+        private static ITerminal CreateTerminalForCharacter(char value, bool isEscaped, bool negate)
+        {
             ITerminal terminal = null;
-            if (!character.IsEscaped)
-                terminal = new CharacterTerminal(character.Value);
+            if (!isEscaped)
+                terminal = new CharacterTerminal(value);
             else
             {
-                switch (character.Value)
+                switch (value)
                 {
                     case 's':
                         terminal = new WhitespaceTerminal();
@@ -184,32 +196,29 @@ namespace Pliant.RegularExpressions
                         negate = !negate;
                         break;
                     default:
-                        terminal = new CharacterTerminal(character.Value);
+                        terminal = new CharacterTerminal(value);
                         break;
                 }
             }
 
             if (negate)
                 terminal = new NegationTerminal(terminal);
-
-            var transition = new TerminalNfaTransition(
-                terminal: terminal,
-                target: end);
-
-            start.AddTransistion(transition);
-
-            return new Nfa(start, end);
+            return terminal;
         }
 
         private static INfa Character(RegexCharacter character)
         {
             var start = new NfaState();
             var end = new NfaState();
-            var terminal = new CharacterTerminal(character.Value);
+            
+            var terminal = CreateTerminalForCharacter(character.Value, character.IsEscaped, false);
+
             var transition = new TerminalNfaTransition(
                 terminal: terminal,
                 target: end);
+
             start.AddTransistion(transition);
+
             return new Nfa(start, end);
         }
 

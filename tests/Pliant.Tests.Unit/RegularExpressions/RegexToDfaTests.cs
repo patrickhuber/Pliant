@@ -16,9 +16,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
         public void RegexToDfaShouldConvertCharacterRegexToDfa()
         {
             var pattern = "a";
-            var regex = new RegexParser().Parse(pattern);
-            var nfa = new ThompsonConstructionAlgorithm().Transform(regex);
-            var dfa = new SubsetConstructionAlgorithm().Transform(nfa);
+            var dfa = CreateDfaFromRegexPattern(pattern);
             Assert.IsNotNull(dfa);
 
             var lexerRule = new DfaLexerRule(dfa, "a");
@@ -30,15 +28,35 @@ namespace Pliant.Tests.Unit.RegularExpressions
         public void RegexToDfaShouldConvertOptionalCharacterClassToDfa()
         {
             var pattern = @"[-+]?[0-9]";
-            var regex = new RegexParser().Parse(pattern);
-            var nfa = new ThompsonConstructionAlgorithm().Transform(regex);
-            var dfa = new SubsetConstructionAlgorithm().Transform(nfa);
+            var dfa = CreateDfaFromRegexPattern(pattern);
             Assert.IsNotNull(dfa);
             Assert.AreEqual(3, dfa.Transitions.Count);
             var lexerRule = new DfaLexerRule(dfa, pattern);
             AssertLexerRuleMatches(lexerRule, "+0");
             AssertLexerRuleMatches(lexerRule, "-1");
             AssertLexerRuleMatches(lexerRule, "9");
+        }
+
+        [TestMethod]
+        public void RegexToDfaShouldConvertSlasSToWhitespaceCharacterClass()
+        {
+            var pattern = @"\s";
+            var dfa = CreateDfaFromRegexPattern(pattern);
+            Assert.IsNotNull(dfa);
+            Assert.AreEqual(1, dfa.Transitions.Count);
+            Assert.AreEqual(0, dfa.Transitions[0].Target.Transitions.Count);
+            var lexerRule = new DfaLexerRule(dfa, pattern);
+            AssertLexerRuleMatches(lexerRule, " ");
+            AssertLexerRuleMatches(lexerRule, "\t");
+            AssertLexerRuleMatches(lexerRule, "\f");
+        }
+        
+        private static IDfaState CreateDfaFromRegexPattern(string pattern)
+        {
+            var regex = new RegexParser().Parse(pattern);
+            var nfa = new ThompsonConstructionAlgorithm().Transform(regex);
+            var dfa = new SubsetConstructionAlgorithm().Transform(nfa);
+            return dfa;
         }
 
         private static DfaLexemeFactory _factory = new DfaLexemeFactory();

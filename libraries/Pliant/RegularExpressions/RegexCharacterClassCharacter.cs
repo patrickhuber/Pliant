@@ -41,11 +41,14 @@ namespace Pliant.RegularExpressions
             var characterClassCharacter = obj as RegexCharacterClassCharacter;
             if ((object)characterClassCharacter == null)
                 return false;
-            return characterClassCharacter.Value.Equals(Value);
+            return characterClassCharacter.Value.Equals(Value)
+                && characterClassCharacter.IsEscaped.Equals(IsEscaped);
         }
 
         public override string ToString()
         {
+            if (IsEscaped)
+                return $"\\{Value}";
             return Value.ToString();
         }
     }

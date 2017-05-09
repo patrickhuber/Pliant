@@ -110,7 +110,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
                     new RegexTerm(
                         new RegexFactor(
                             new RegexAtomCharacter(
-                                new RegexCharacter('.'))))), 
+                                new RegexCharacter('.', true))))), 
                 false);
             Assert.AreEqual(expected, actual);
         }
