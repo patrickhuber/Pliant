@@ -27,11 +27,11 @@ lexer rule =
 
 expression =   
       term
-    | term, '|', expression
+    | term, '|', expression;
 
 term =   
       factor
-    | factor, term
+    | factor, term;
 
 factor =   
       qualified identifier
