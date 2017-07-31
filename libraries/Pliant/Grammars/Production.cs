@@ -44,9 +44,10 @@ namespace Pliant.Grammars
                 return false;
             if (!LeftHandSide.Equals(production.LeftHandSide))
                 return false;
-            if (RightHandSide.Count != production.RightHandSide.Count)
+            var rightHandSideCount = RightHandSide.Count;
+            if (rightHandSideCount != production.RightHandSide.Count)
                 return false;
-            for (int i = 0; i < RightHandSide.Count; i++)
+            for (int i = 0; i < rightHandSideCount; i++)
                 if (!RightHandSide[i].Equals(production.RightHandSide[i]))
                     return false;
             return true;
