@@ -43,23 +43,27 @@ namespace Pliant.Charts
 
         private static ISymbol GetPreDotSymbol(IDottedRule dottedRule)
         {
-            if (dottedRule.Position == 0 || dottedRule.Production.IsEmpty)
+            var production = dottedRule.Production;
+            var position = dottedRule.Position;
+            if (position == 0 || production.IsEmpty)
                 return null;
-            return dottedRule.Production.RightHandSide[dottedRule.Position - 1];
+            return production.RightHandSide[position - 1];
         }
 
         private static ISymbol GetPostDotSymbol(int position, IProduction production)
         {
-            if (position >= production.RightHandSide.Count)
+            var productionRighHandSide = production.RightHandSide;
+            if (position >= productionRighHandSide.Count)
                 return null;
-            return production.RightHandSide[position];
+            return productionRighHandSide[position];
         }
 
         private static ISymbol GetPostDotSymbol(IDottedRule dottedRule)
         {
-            if (dottedRule.Position >= dottedRule.Production.RightHandSide.Count)
+            var rightHandSide = dottedRule.Production.RightHandSide;
+            if (dottedRule.Position >= rightHandSide.Count)
                 return null;
-            return dottedRule.Production.RightHandSide[dottedRule.Position];
+            return rightHandSide[dottedRule.Position];
         }
     }
 }
