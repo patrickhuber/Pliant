@@ -9,8 +9,8 @@ namespace Pliant.Benchmarks
         static void Main(string[] args)
         {
             //var summary = BenchmarkRunner.Run<AnsiCBnfBenchmark>();
-            var summary = BenchmarkRunner.Run<LargeJsonFileDeterministicBenchmark>();
-            //var summary = BenchmarkRunner.Run<LargeJsonFileBenchmark>();
+            // var summary = BenchmarkRunner.Run<LargeJsonFileDeterministicBenchmark>();
+            var summary = BenchmarkRunner.Run<LargeJsonFileBenchmark>();
         }
     }
 }
