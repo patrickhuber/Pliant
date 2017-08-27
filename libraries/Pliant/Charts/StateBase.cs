@@ -43,11 +43,7 @@ namespace Pliant.Charts
 
         private static ISymbol GetPreDotSymbol(IDottedRule dottedRule)
         {
-            var production = dottedRule.Production;
-            var position = dottedRule.Position;
-            if (position == 0 || production.IsEmpty)
-                return null;
-            return production.RightHandSide[position - 1];
+            return GetPreDotSymbol(dottedRule.Position, dottedRule.Production);
         }
 
         private static ISymbol GetPostDotSymbol(int position, IProduction production)
@@ -60,10 +56,7 @@ namespace Pliant.Charts
 
         private static ISymbol GetPostDotSymbol(IDottedRule dottedRule)
         {
-            var rightHandSide = dottedRule.Production.RightHandSide;
-            if (dottedRule.Position >= rightHandSide.Count)
-                return null;
-            return rightHandSide[dottedRule.Position];
+            return GetPostDotSymbol(dottedRule.Position, dottedRule.Production);
         }
     }
 }
