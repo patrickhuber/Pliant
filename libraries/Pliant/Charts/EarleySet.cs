@@ -40,9 +40,10 @@ namespace Pliant.Charts
 
         private bool EnqueueNormal(IState state, INormalState normalState)
         {
-            if (!state.IsComplete)
+            var dottedRule = state.DottedRule;
+            if (!dottedRule.IsComplete)
             {
-                var currentSymbol = state.PostDotSymbol;
+                var currentSymbol = dottedRule.PostDotSymbol;
                 if (currentSymbol.SymbolType == SymbolType.NonTerminal)
                     return _predictions.AddUnique(normalState);
                 return _scans.AddUnique(normalState);

@@ -10,13 +10,7 @@ namespace Pliant.Charts
 
         int Origin { get; }
 
-        StateType StateType { get; }
-
-        ISymbol PreDotSymbol { get; }
-
-        ISymbol PostDotSymbol { get; }
-        
-        bool IsComplete { get; }
+        StateType StateType { get; }        
                 
         IForestNode ParseNode { get; set; }
     }

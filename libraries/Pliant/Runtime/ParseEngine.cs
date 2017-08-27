@@ -56,7 +56,7 @@ namespace Pliant.Runtime
             for (int s = 0; s < scanStates.Count; s++)
             {
                 var scanState = scanStates[s];
-                var postDotSymbol = scanState.PostDotSymbol;
+                var postDotSymbol = scanState.DottedRule.PostDotSymbol;
                 if (postDotSymbol != null
                     && postDotSymbol.SymbolType == SymbolType.LexerRule)
                 {
@@ -154,7 +154,7 @@ namespace Pliant.Runtime
         private void Scan(INormalState scan, int j, IToken token)
         {
             var i = scan.Origin;
-            var currentSymbol = scan.PostDotSymbol;
+            var currentSymbol = scan.DottedRule.PostDotSymbol;
             var lexerRule = currentSymbol as ILexerRule;
             
             if (token.TokenType == lexerRule.TokenType)
@@ -207,7 +207,8 @@ namespace Pliant.Runtime
         
         private void Predict(INormalState evidence, int j)
         {
-            var nonTerminal = evidence.PostDotSymbol as INonTerminal;
+            var dottedRule = evidence.DottedRule;
+            var nonTerminal = dottedRule.PostDotSymbol as INonTerminal;
             var rulesForNonTerminal = Grammar.RulesFor(nonTerminal);
             
             // PERF: Avoid boxing enumerable
@@ -217,7 +218,7 @@ namespace Pliant.Runtime
                 PredictProduction(j, production);
             }
 
-            var isNullable = Grammar.IsTransativeNullable(evidence.PostDotSymbol as INonTerminal);
+            var isNullable = Grammar.IsTransativeNullable(nonTerminal);
             if (isNullable)            
                 PredictAycockHorspool(evidence, j);            
         }
@@ -232,7 +233,7 @@ namespace Pliant.Runtime
 
         private void PredictAycockHorspool(INormalState evidence, int j)
         {
-            var nullParseNode = CreateNullParseNode(evidence.PostDotSymbol, j);
+            var nullParseNode = CreateNullParseNode(evidence.DottedRule.PostDotSymbol, j);
             var aycockHorspoolState = StateFactory.NextState(evidence);
             var evidenceParseNode = evidence.ParseNode as IInternalForestNode;
             if (evidenceParseNode == null)
@@ -275,7 +276,7 @@ namespace Pliant.Runtime
         {
             var earleySet = _chart.EarleySets[transitionState.Index];
             var rootTransitionState = earleySet.FindTransitionState(
-                transitionState.PreDotSymbol);
+                transitionState.DottedRule.PreDotSymbol);
 
             if (rootTransitionState == null)
                 rootTransitionState = transitionState;
@@ -469,7 +470,7 @@ namespace Pliant.Runtime
                     .RightHandSide[nextState.DottedRule.Position - 2];
                 anyPreDotRuleNull = IsSymbolTransativeNullable(predotPrecursorSymbol);
             }
-            var anyPostDotRuleNull = IsSymbolTransativeNullable(nextState.PostDotSymbol);
+            var anyPostDotRuleNull = IsSymbolTransativeNullable(nextState.DottedRule.PostDotSymbol);
             if (anyPreDotRuleNull && !anyPostDotRuleNull)
                 return v;
 
