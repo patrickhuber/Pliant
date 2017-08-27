@@ -113,7 +113,7 @@ namespace Pliant.Runtime
             {
                 var preComputedState = states[j];
                 var isCompleted = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
-                if (!IsComplete(preComputedState))
+                if (!preComputedState.IsComplete)
                     continue;
 
                 if (!IsStartState(preComputedState))
@@ -153,7 +153,7 @@ namespace Pliant.Runtime
                 for (var j = 0; j < workAH.Data.Count; j++)
                 {
                     var dottedRule = workAH.Data[j];
-                    if (!IsCompleted(dottedRule))
+                    if (!dottedRule.IsComplete)
                         continue;
 
                     var lhsSym = dottedRule.Production.LeftHandSide;
@@ -197,13 +197,17 @@ namespace Pliant.Runtime
             for (var i = 0; i < frameSet.Frames.Count; i++)
             {
                 var stateFrame = frameSet.Frames[i];
-                for (var j = 0; j < stateFrame.Frame.Data.Count; j++)
+                var frame = stateFrame.Frame;
+                var frameData = frame.Data;
+                var stateFrameDataCount = frameData.Count;
+
+                for (var j = 0; j < stateFrameDataCount; j++)
                 {
-                    var preComputedState = stateFrame.Frame.Data[j];
-                    if (IsCompleted(preComputedState))
+                    var preComputedState = frameData[j];
+                    if (preComputedState.IsComplete)
                         continue;
 
-                    var postDotSymbol = GetPostDotSymbol(preComputedState);
+                    var postDotSymbol = preComputedState.PostDotSymbol;
                     if (postDotSymbol.SymbolType != SymbolType.NonTerminal)
                         continue;
 
@@ -299,17 +303,7 @@ namespace Pliant.Runtime
             var predictedEIM = new StateFrame(predictedAH, iLoc);
             Chart.Enqueue(iLoc, predictedEIM);
         }
-
-        private static bool IsCompleted(IDottedRule dottedRule)
-        {
-            return dottedRule.Production.RightHandSide.Count == dottedRule.Position;
-        }
-
-        private static ISymbol GetPostDotSymbol(IDottedRule preComputedState)
-        {
-            return preComputedState.Production.RightHandSide[preComputedState.Position];
-        }
-        
+                
         private static Frame Goto(Frame fromAH)
         {
             return fromAH.NullTransition;
@@ -331,12 +325,5 @@ namespace Pliant.Runtime
             var start = _preComputedGrammar.Grammar.Start;
             return state.Production.LeftHandSide.Equals(start);
         }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsComplete(IDottedRule preComputedState)
-        {
-            return preComputedState.Position == preComputedState.Production.RightHandSide.Count;
-        }
-
     }
 }

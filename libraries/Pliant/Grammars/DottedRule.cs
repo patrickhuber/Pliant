@@ -17,6 +17,8 @@ namespace Pliant.Grammars
 
         public ISymbol PostDotSymbol { get; private set; }
 
+        public bool IsComplete { get; private set; }
+
         public DottedRule(IProduction production, int position)
         {
             Assert.IsNotNull(production, nameof(production));
@@ -27,6 +29,7 @@ namespace Pliant.Grammars
             _hashCode = ComputeHashCode(Production, Position);
             PostDotSymbol = GetPostDotSymbol(position, production);
             PreDotSymbol = GetPreDotSymbol(position, production);
+            IsComplete = IsCompleted(position, production);
         }
         
         private static int ComputeHashCode(IProduction production, int position)
@@ -69,10 +72,10 @@ namespace Pliant.Grammars
 
             return stringBuilder.ToString();
         }
-
-        public bool IsComplete
+        
+        private static bool IsCompleted(int position, IProduction production)
         {
-            get { return Position == Production.RightHandSide.Count; }
+            return position == production.RightHandSide.Count;
         }
 
         public int CompareTo(DottedRule other)
