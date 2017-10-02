@@ -12,7 +12,13 @@ namespace Pliant.Grammars
         public IProduction Production { get; private set; }
 
         public int Position { get; private set; }
-                
+
+        public ISymbol PreDotSymbol { get; private set; }
+
+        public ISymbol PostDotSymbol { get; private set; }
+
+        public bool IsComplete { get; private set; }
+
         public DottedRule(IProduction production, int position)
         {
             Assert.IsNotNull(production, nameof(production));
@@ -21,6 +27,9 @@ namespace Pliant.Grammars
             Production = production;
             Position = position;
             _hashCode = ComputeHashCode(Production, Position);
+            PostDotSymbol = GetPostDotSymbol(position, production);
+            PreDotSymbol = GetPreDotSymbol(position, production);
+            IsComplete = IsCompleted(position, production);
         }
         
         private static int ComputeHashCode(IProduction production, int position)
@@ -63,6 +72,11 @@ namespace Pliant.Grammars
 
             return stringBuilder.ToString();
         }
+        
+        private static bool IsCompleted(int position, IProduction production)
+        {
+            return position == production.RightHandSide.Count;
+        }
 
         public int CompareTo(DottedRule other)
         {
@@ -73,5 +87,20 @@ namespace Pliant.Grammars
         {
             return GetHashCode().CompareTo(other.GetHashCode());
         }
+
+        private static ISymbol GetPreDotSymbol(int position, IProduction production)
+        {
+            if (position == 0 || production.IsEmpty)
+                return null;
+            return production.RightHandSide[position - 1];
+        }
+        
+        private static ISymbol GetPostDotSymbol(int position, IProduction production)
+        {
+            var productionRighHandSide = production.RightHandSide;
+            if (position >= productionRighHandSide.Count)
+                return null;
+            return productionRighHandSide[position];
+        }        
     }
 }

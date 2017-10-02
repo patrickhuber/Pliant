@@ -142,9 +142,8 @@ namespace Pliant.Runtime
                 var preComputedState = frame.Data[d];
 
                 var production = preComputedState.Production;
-
-                var isComplete = preComputedState.Position == production.RightHandSide.Count;
-                if (!isComplete)
+                
+                if (!preComputedState.IsComplete)
                     continue;
 
                 var leftHandSide = production.LeftHandSide;

@@ -1,5 +1,6 @@
 ﻿using Pliant.Builders.Expressions;
 using Pliant.Grammars;
+using Pliant.LexerRules;
 
 namespace Pliant.Tests.Common.Grammars
 {
@@ -9,12 +10,14 @@ namespace Pliant.Tests.Common.Grammars
 
         static SimpleExpressionGrammar()
         {
-            var digit = new DigitTerminal();
+            var number = new NumberLexerRule();
             ProductionExpression E = "E";
             E.Rule =
                 E + "+" + E
                 | E + "*" + E
-                | digit;
+                | E + "/" + E
+                | E + "-" + E
+                | number;
             _innerGrammar = new GrammarExpression(E, new[] { E }).ToGrammar();
         }
 

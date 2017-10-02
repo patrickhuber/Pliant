@@ -1,5 +1,6 @@
 ﻿using Pliant.Builders.Expressions;
 using Pliant.Grammars;
+using Pliant.LexerRules;
 
 namespace Pliant.Tests.Common.Grammars
 {
@@ -9,6 +10,8 @@ namespace Pliant.Tests.Common.Grammars
 
         static ExpressionGrammar()
         {
+            var number = new NumberLexerRule();
+
             ProductionExpression
                 S = nameof(S),
                 E = nameof(E),
@@ -20,11 +23,11 @@ namespace Pliant.Tests.Common.Grammars
                 | E + '-' + T
                 | T;
             T.Rule = T + '*' + F
-                | T + '|' + F
+                | T + '/' + F
                 | F;
             F.Rule = '+' + F
                 | '-' + F
-                | 'n'
+                | number
                 | '(' + E + ')';
 
             _grammar = new GrammarExpression(S).ToGrammar();

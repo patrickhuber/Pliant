@@ -13,7 +13,7 @@ namespace Pliant.Charts
 
         public IState NextState(IState state)
         {
-            if (state.IsComplete)
+            if (state.DottedRule.IsComplete)
                 return null;
             var dottedRule = DottedRuleRegistry.Get(
                 state.DottedRule.Production, 
