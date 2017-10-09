@@ -58,6 +58,7 @@
     <Compile Include="Builders\SymbolModelType.cs" />
     <Compile Include="Charts\INormalState.cs" />
     <Compile Include="Charts\IParseNode.cs" />
+    <Compile Include="Charts\IRelativeState.cs" />
     <Compile Include="Charts\IStateFactory.cs" />
     <Compile Include="Charts\StateFactory.cs" />
     <Compile Include="Charts\StateFrameChart.cs" />

@@ -18,9 +18,10 @@ namespace Pliant.Charts
 
         public bool IsSource(ISymbol searchSymbol)
         {
-            if (IsComplete)
+            var dottedRule = DottedRule;
+            if (dottedRule.IsComplete)
                 return false;
-            return PostDotSymbol.Equals(searchSymbol);
+            return dottedRule.PostDotSymbol.Equals(searchSymbol);
         }
 
         public override bool Equals(object obj)
