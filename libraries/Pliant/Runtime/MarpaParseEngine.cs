@@ -47,14 +47,39 @@ namespace Pliant.Runtime
             throw new NotImplementedException();
         }
 
-        public List<ILexerRule> GetExpectedLexerRules()
+        private Dictionary<int, IReadOnlyList<ILexerRule>> _expectedLexerRuleCache = new Dictionary<int, IReadOnlyList<ILexerRule>>();
+        private static readonly ILexerRule[] EmptyLexerRules = { };
+
+        public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
-            var list = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
+            var frameSets = Chart.FrameSets;
+            var frameSetCount = frameSets.Count;
 
-            if (Chart.FrameSets.Count == 0)
-                return list;
+            if (frameSetCount == 0)
+                return EmptyLexerRules;
 
-            var frameSet = Chart.FrameSets[Chart.FrameSets.Count - 1];
+            var hashCode = 0;
+            var frameSet = frameSets[frameSetCount - 1];
+            var count = 0;
+
+            for (var i = 0; i < frameSet.Frames.Count; i++)
+            {
+                var stateFrame = frameSet.Frames[i];
+                for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
+                {
+                    var lexerRule = stateFrame.Frame.ScanKeys[j];
+                    hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, count == 0);
+                    count++;
+                }
+            }
+
+            IReadOnlyList<ILexerRule> cachedLexerRules = null;
+
+            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
+                return cachedLexerRules;
+
+            List<ILexerRule> list = new List<ILexerRule>();
+
             for (var i = 0; i < frameSet.Frames.Count; i++)
             {
                 var stateFrame = frameSet.Frames[i];
@@ -64,6 +89,7 @@ namespace Pliant.Runtime
                     list.Add(lexerRule);
                 }
             }
+
             return list;
         }
 

@@ -1,21 +1,23 @@
-﻿using System;
-using System.IO;
-using Pliant.Runtime;
-
-using Pliant.Automata;
+﻿using System.IO;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using Pliant.Runtime;
+using Pliant.Automata;
 using Pliant.Utilities;
 using Pliant.Tokens;
-using Pliant.Grammars;
 
 public class ParseRunner : IParseRunner
 {
     private TextReader _reader;
     private readonly ILexemeFactoryRegistry _lexemeFactoryRegistry;
-    private List<ILexeme> _existingLexemes;
+    private List<ILexeme> _tokenLexemes;
     private List<ILexeme> _ignoreLexemes;
 
     public int Position { get; private set; }
+
+    public int Line { get; private set; }
+
+    public int Column { get; private set; }
 
     public IParseEngine ParseEngine { get; private set; }
 
@@ -28,7 +30,7 @@ public class ParseRunner : IParseRunner
     {
         ParseEngine = parseEngine;
         _reader = reader;
-        _existingLexemes = new List<ILexeme>();
+        _tokenLexemes = new List<ILexeme>();
         _ignoreLexemes = new List<ILexeme>();
         _lexemeFactoryRegistry = new LexemeFactoryRegistry();
         RegisterDefaultLexemeFactories(_lexemeFactoryRegistry);
@@ -41,22 +43,23 @@ public class ParseRunner : IParseRunner
             return false;
 
         var character = ReadCharacter();
+        UpdatePositionMetrics(character);
 
         if (MatchesExistingIncompleteIgnoreLexemes(character))
             return true;
 
-        if (MatchExistingLexemes(character))
+        if (MatchExistingTokenLexemes(character))
         {
             if (EndOfStream())
                 return TryParseExistingToken();
             return true;
         }
 
-        if (AnyExistingLexemes())
+        if (AnyExistingTokenLexemes())
             if (!TryParseExistingToken())
                 return false;
 
-        if (MatchesNewLexemes(character))
+        if (MatchesNewTokenLexemes(character))
         {
             if (!EndOfStream())
                 return true;
@@ -69,6 +72,33 @@ public class ParseRunner : IParseRunner
         ClearExistingIngoreLexemes();
 
         return MatchesNewIgnoreLexemes(character);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void UpdatePositionMetrics(char character)
+    {
+        Position++;
+        if (IsEndOfLineCharacter(character))
+        {
+            Column = 0;
+            Line++;
+        }
+        else
+        {
+            Column++;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsEndOfLineCharacter(char character)
+    {
+        switch (character)
+        {
+            case '\n':
+                return false;
+            default:
+                return true;
+        }
     }
 
     public bool EndOfStream()
@@ -119,9 +149,9 @@ public class ParseRunner : IParseRunner
         return character;
     }
 
-    private bool MatchExistingLexemes(char character)
+    private bool MatchExistingTokenLexemes(char character)
     {
-        if (!AnyExistingLexemes())
+        if (!AnyExistingTokenLexemes())
             return false;
 
         var pool = SharedPools.Default<List<ILexeme>>();
@@ -130,9 +160,9 @@ public class ParseRunner : IParseRunner
 
         // partition the existing lexemes into misses and matches
         // by scanning the current character
-        for (var i = 0; i < _existingLexemes.Count; i++)
+        for (var i = 0; i < _tokenLexemes.Count; i++)
         {
-            var lexeme = _existingLexemes[i];
+            var lexeme = _tokenLexemes[i];
             if (lexeme.Scan(character))
                 matches.Add(lexeme);
             else
@@ -155,10 +185,10 @@ public class ParseRunner : IParseRunner
         // free the misses collection and the _existingLexemes collection 
         // to the collection pool
         pool.ClearAndFree(misses);
-        pool.ClearAndFree(_existingLexemes);
+        pool.ClearAndFree(_tokenLexemes);
 
         // promote the new _existingLexemes to be the matches
-        _existingLexemes = matches;
+        _tokenLexemes = matches;
 
         return true;
     }
@@ -168,9 +198,9 @@ public class ParseRunner : IParseRunner
         // PERF: Avoid Linq FirstOrDefault due to lambda allocation
         ILexeme longestAcceptedMatch = null;
         var doNotFreeLexemeIndex = -1;
-        for (int i = 0; i < _existingLexemes.Count; i++)
+        for (int i = 0; i < _tokenLexemes.Count; i++)
         {
-            var lexeme = _existingLexemes[i];
+            var lexeme = _tokenLexemes[i];
             if (lexeme.IsAccepted())
             {
                 doNotFreeLexemeIndex = i;
@@ -204,10 +234,10 @@ public class ParseRunner : IParseRunner
 
     private void ClearExistingLexemes(int doNotFreeLexemeIndex)
     {
-        ClearLexemes(_existingLexemes, doNotFreeLexemeIndex);
+        ClearLexemes(_tokenLexemes, doNotFreeLexemeIndex);
     }
 
-    private bool MatchesNewLexemes(char character)
+    private bool MatchesNewTokenLexemes(char character)
     {
         var newLexerRules = ParseEngine.GetExpectedLexerRules();
         var anyMatchingLexeme = false;
@@ -222,10 +252,9 @@ public class ParseRunner : IParseRunner
                 continue;
             }
             anyMatchingLexeme = true;
-            _existingLexemes.Add(lexeme);
+            _tokenLexemes.Add(lexeme);
         }
-
-        SharedPools.Default<List<ILexerRule>>().ClearAndFree(newLexerRules);
+        
         return anyMatchingLexeme;
     }
 
@@ -309,7 +338,7 @@ public class ParseRunner : IParseRunner
 
         return true;
     }
-
+    
     private void ClearLexemes(List<ILexeme> lexemes, int doNotFreeLexemeIndex = -1)
     {
         for (var i = 0; i < lexemes.Count; i++)
@@ -324,9 +353,9 @@ public class ParseRunner : IParseRunner
         lexemeFactory.Free(lexeme);
     }
 
-    private bool AnyExistingLexemes()
+    private bool AnyExistingTokenLexemes()
     {
-        return _existingLexemes.Count > 0;
+        return _tokenLexemes.Count > 0;
     }
 
     private static void RegisterDefaultLexemeFactories(ILexemeFactoryRegistry lexemeFactoryRegistry)

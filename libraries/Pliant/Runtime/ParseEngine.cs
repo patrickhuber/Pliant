@@ -40,16 +40,37 @@ namespace Pliant.Runtime
             Grammar = grammar;
             Initialize();
         }
-        
-        public List<ILexerRule> GetExpectedLexerRules()
+
+        private Dictionary<int, IReadOnlyList<ILexerRule>> _expectedLexerRuleCache = new Dictionary<int, IReadOnlyList<ILexerRule>>();
+        private static readonly ILexerRule[] EmptyLexerRules = { };
+
+        public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
             var earleySets = _chart.EarleySets;
             var currentIndex = earleySets.Count - 1;
             var currentEarleySet = earleySets[currentIndex];
             var scanStates = currentEarleySet.Scans;
 
-            var returnList = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
-            var expectedRules = SharedPools.Default<UniqueList<TokenType>>().AllocateAndClear();
+            if (scanStates.Count == 0)
+                return EmptyLexerRules;
+
+            var hashCode = 0;
+
+            for (int s = 0; s < scanStates.Count; s++)
+            {
+                var scanState = scanStates[s];
+                hashCode = HashCode.ComputeIncrementalHash(scanState.GetHashCode(), hashCode, s == 0);
+            }
+
+            IReadOnlyList<ILexerRule> cachedLexerRules = null;
+            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
+                return cachedLexerRules;
+
+            var returnListPool = SharedPools.Default<List<ILexerRule>>();
+            var returnList = returnListPool.AllocateAndClear();
+
+            var uniqueTokenTypeListPool = SharedPools.Default<HashSet<TokenType>>();
+            var uniqueTokenTypes = uniqueTokenTypeListPool.AllocateAndClear();
 
             // PERF: Avoid Linq Select, Where due to lambda allocation
             // PERF: Avoid foreach enumeration due to IEnumerable boxing
@@ -61,18 +82,22 @@ namespace Pliant.Runtime
                     && postDotSymbol.SymbolType == SymbolType.LexerRule)
                 {
                     var lexerRule = postDotSymbol as ILexerRule;
-                    if (expectedRules.AddUnique(lexerRule.TokenType))
+                    if (uniqueTokenTypes.Add(lexerRule.TokenType))
                     {
                         returnList.Add(lexerRule);
                     }
                 }
             }
-            SharedPools
-                .Default<UniqueList<TokenType>>()
-                .ClearAndFree(expectedRules);
-            return returnList;
+            uniqueTokenTypeListPool.ClearAndFree(uniqueTokenTypes);
+
+            var array = returnList.ToArray();
+            returnListPool.ClearAndFree(returnList);
+            
+            _expectedLexerRuleCache.Add(hashCode, array);
+            return array;
         }
-        
+
+
         public IInternalForestNode GetParseForestRootNode()
         {
             if (!IsAccepted())

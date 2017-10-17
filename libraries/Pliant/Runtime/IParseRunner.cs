@@ -14,6 +14,16 @@
         int Position { get; }
 
         /// <summary>
+        /// The Line number of the current position
+        /// </summary>
+        int Line { get; }
+
+        /// <summary>
+        /// The current column is the current position within the current line
+        /// </summary>
+        int Column { get; }
+
+        /// <summary>
         /// Gets the current <see cref="IParseEngine">parse engine</see> used by the <see cref="IParseRunner">Pase Interface</see>
         /// </summary>
         IParseEngine ParseEngine { get; }
