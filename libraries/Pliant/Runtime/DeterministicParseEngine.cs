@@ -218,28 +218,17 @@ namespace Pliant.Runtime
         {
             if (_chart.FrameSets.Count == 0)
                 return EmptyLexerRules;
-
-            var hashCode = 0;
+            
             var frameSet = _chart.FrameSets[_chart.FrameSets.Count - 1];
-            var count = 0;
-
-            for (var i = 0; i < frameSet.Frames.Count; i++)
-            {
-                var stateFrame = frameSet.Frames[i];
-                for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
-                {
-                    var lexerRule = stateFrame.Frame.ScanKeys[j];
-                    hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, count == 0);
-                    count++;
-                }
-            }
+            var hashCode = ComputeExpectedLexerRulesHashCode(frameSet);
 
             IReadOnlyList<ILexerRule> cachedLexerRules = null;
 
             if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
                 return cachedLexerRules;
 
-            List<ILexerRule> list = new List<ILexerRule>();
+            var listPool = SharedPools.Default<List<ILexerRule>>();
+            List<ILexerRule> list = listPool.AllocateAndClear();
 
             for (var i = 0; i < frameSet.Frames.Count; i++)
             {
@@ -251,7 +240,30 @@ namespace Pliant.Runtime
                 }
             }
 
-            return list;
+            var array = list.ToArray();
+            listPool.ClearAndFree(list);
+
+            _expectedLexerRuleCache.Add(hashCode, array);
+
+            return array;
+        }
+
+        private static int ComputeExpectedLexerRulesHashCode(StateFrameSet frameSet)
+        {
+            var hashCode = 0;
+            var firstHash = true;
+            for (var i = 0; i < frameSet.Frames.Count; i++)
+            {
+                var stateFrame = frameSet.Frames[i];
+                for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
+                {
+                    var lexerRule = stateFrame.Frame.ScanKeys[j];
+                    hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, firstHash);
+                    firstHash = false;
+                }
+            }
+
+            return hashCode;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

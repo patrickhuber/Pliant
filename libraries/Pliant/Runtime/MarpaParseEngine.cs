@@ -57,28 +57,17 @@ namespace Pliant.Runtime
 
             if (frameSetCount == 0)
                 return EmptyLexerRules;
-
-            var hashCode = 0;
+                        
             var frameSet = frameSets[frameSetCount - 1];
-            var count = 0;
-
-            for (var i = 0; i < frameSet.Frames.Count; i++)
-            {
-                var stateFrame = frameSet.Frames[i];
-                for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
-                {
-                    var lexerRule = stateFrame.Frame.ScanKeys[j];
-                    hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, count == 0);
-                    count++;
-                }
-            }
+            var hashCode = ComputeExpectedLexerRulesHashCode(frameSet);
 
             IReadOnlyList<ILexerRule> cachedLexerRules = null;
 
             if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
                 return cachedLexerRules;
 
-            List<ILexerRule> list = new List<ILexerRule>();
+            var listPool = SharedPools.Default<List<ILexerRule>>();
+            List<ILexerRule> list = listPool.AllocateAndClear();
 
             for (var i = 0; i < frameSet.Frames.Count; i++)
             {
@@ -90,7 +79,30 @@ namespace Pliant.Runtime
                 }
             }
 
-            return list;
+            var array = list.ToArray();
+            listPool.ClearAndFree(list);
+
+            _expectedLexerRuleCache.Add(hashCode, array);
+
+            return array;
+        }
+
+        private static int ComputeExpectedLexerRulesHashCode(StateFrameSet frameSet)
+        {
+            var hashCode = 0;
+            var count = 0;
+            for (var i = 0; i < frameSet.Frames.Count; i++)
+            {
+                var stateFrame = frameSet.Frames[i];
+                for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
+                {
+                    var lexerRule = stateFrame.Frame.ScanKeys[j];
+                    hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, count == 0);
+                    count++;
+                }
+            }
+            
+            return hashCode;
         }
 
         public bool Pulse(IToken token)

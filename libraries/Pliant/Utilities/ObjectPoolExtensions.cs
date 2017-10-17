@@ -103,6 +103,23 @@ namespace Pliant.Utilities
 
         #endregion Dictionary<TKey, TValue>
 
+        #region SortedList<TKey, TValue>
+
+        internal static SortedList<TKey, TValue> AllocateAndClear<TKey, TValue>(this ObjectPool<SortedList<TKey, TValue>> pool)
+        {
+            var sortedList = pool.Allocate();
+            sortedList.Clear();
+            return sortedList;
+        }
+
+        internal static void ClearAndFree<TKey, TValue>(this ObjectPool<SortedList<TKey, TValue>> pool, SortedList<TKey, TValue> sortedList)
+        {
+            sortedList.Clear();
+            pool.Free(sortedList);
+        }
+
+        #endregion SortedList<TKey, TValue>
+
         #region List<T>
 
         internal static List<T> AllocateAndClear<T>(this ObjectPool<List<T>> pool)
