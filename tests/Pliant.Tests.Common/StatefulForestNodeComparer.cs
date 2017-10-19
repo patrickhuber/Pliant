@@ -79,8 +79,8 @@ namespace Pliant.Tests.Common
 
         bool AreIntermediateNodesEqual(IIntermediateForestNode firstIntermediateForestNode, IIntermediateForestNode secondIntermediateForestNode)
         {
-            if (!firstIntermediateForestNode.State.Equals(
-                secondIntermediateForestNode.State))
+            if (!firstIntermediateForestNode.DottedRule.Equals(
+                secondIntermediateForestNode.DottedRule))
                 return false;
             return AreChildNodesEqual(firstIntermediateForestNode, secondIntermediateForestNode);
         }

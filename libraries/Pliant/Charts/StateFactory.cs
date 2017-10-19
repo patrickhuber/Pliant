@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Forest;
+using Pliant.Grammars;
 
 namespace Pliant.Charts
 {
@@ -11,14 +12,16 @@ namespace Pliant.Charts
             DottedRuleRegistry = dottedRuleRegistry;
         }
 
-        public IState NextState(IState state)
+        public IState NextState(IState state, IForestNode parseNode = null)
         {
             if (state.DottedRule.IsComplete)
                 return null;
             var dottedRule = DottedRuleRegistry.Get(
                 state.DottedRule.Production, 
                 state.DottedRule.Position + 1);
-            return new NormalState(dottedRule, state.Origin);
+            return parseNode == null 
+                ? new NormalState(dottedRule, state.Origin)
+                : new NormalState(dottedRule, state.Origin, parseNode);
         }
 
         public IState NewState(IProduction production, int position, int origin)

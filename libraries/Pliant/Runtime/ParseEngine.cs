@@ -25,7 +25,8 @@ namespace Pliant.Runtime
 
         private Chart _chart;
         private readonly ForestNodeSet _nodeSet;
-        
+        private readonly IDottedRuleRegistry _dottedRuleRegistry;
+
         public ParseEngine(IGrammar grammar)
             : this(grammar, new ParseEngineOptions(optimizeRightRecursion: true))
         {
@@ -33,8 +34,8 @@ namespace Pliant.Runtime
 
         public ParseEngine(IGrammar grammar, ParseEngineOptions options)
         {
-            var ruleRegistry = new GrammarSeededDottedRuleRegistry(grammar);
-            StateFactory =  new StateFactory(ruleRegistry);
+            _dottedRuleRegistry = new GrammarSeededDottedRuleRegistry(grammar);
+            StateFactory =  new StateFactory(_dottedRuleRegistry);
             Options = options;
             _nodeSet = new ForestNodeSet();
             Grammar = grammar;
@@ -184,14 +185,19 @@ namespace Pliant.Runtime
             
             if (token.TokenType == lexerRule.TokenType)
             {
-                var tokenNode = _nodeSet.AddOrGetExistingTokenNode(token);
-                var nextState = StateFactory.NextState(scan);
+                var dottedRule = _dottedRuleRegistry.GetNext(scan.DottedRule);
+                if (_chart.Contains(j + 1, StateType.Normal, dottedRule, i))
+                {
+                    return;
+                }
+                var tokenNode = _nodeSet.AddOrGetExistingTokenNode(token);                
                 var parseNode = CreateParseNode(
-                    nextState,
+                    dottedRule,
+                    scan.Origin,
                     scan.ParseNode,
                     tokenNode,
                     j + 1);
-                nextState.ParseNode = parseNode;
+                var nextState = StateFactory.NextState(scan, parseNode);
 
                 if (_chart.Enqueue(j + 1, nextState))
                     LogScan(j + 1, nextState, token);
@@ -250,6 +256,9 @@ namespace Pliant.Runtime
 
         private void PredictProduction(int j, IProduction production)
         {
+            IDottedRule dottedRule = _dottedRuleRegistry.Get(production, 0);
+            if (_chart.Contains(j, StateType.Normal, dottedRule, 0))
+                return;
             // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
             var predictedState = StateFactory.NewState(production, 0, j);
             if (_chart.Enqueue(j, predictedState))
@@ -259,21 +268,34 @@ namespace Pliant.Runtime
         private void PredictAycockHorspool(INormalState evidence, int j)
         {
             var nullParseNode = CreateNullParseNode(evidence.DottedRule.PostDotSymbol, j);
-            var aycockHorspoolState = StateFactory.NextState(evidence);
+            var dottedRule = _dottedRuleRegistry.GetNext(evidence.DottedRule);
+            
             var evidenceParseNode = evidence.ParseNode as IInternalForestNode;
+            IForestNode parseNode = null;
             if (evidenceParseNode == null)
-                aycockHorspoolState.ParseNode = CreateParseNode(aycockHorspoolState, null, nullParseNode, j);
+            {
+                parseNode = CreateParseNode(
+                    dottedRule,
+                    evidence.Origin,
+                    null,
+                    nullParseNode,
+                    j);
+            }
             else if (evidenceParseNode.Children.Count > 0
                 && evidenceParseNode.Children[0].Children.Count > 0)
             {
                 var firstChildNode = evidenceParseNode;
-                var parseNode = CreateParseNode(aycockHorspoolState, firstChildNode, nullParseNode, j);
-                aycockHorspoolState.ParseNode = parseNode;
+                parseNode = CreateParseNode(
+                    dottedRule,
+                    evidence.Origin,
+                    firstChildNode,
+                    nullParseNode,
+                    j);                
             }
+            var aycockHorspoolState = StateFactory.NextState(evidence, parseNode);
             if (_chart.Enqueue(j, aycockHorspoolState))
                 Log("Predict", j, aycockHorspoolState);
         }
-
 
         private void Complete(INormalState completed, int k)
         {
@@ -333,7 +355,8 @@ namespace Pliant.Runtime
                 var nextState = StateFactory.NextState(prediction);
 
                 var parseNode = CreateParseNode(
-                    nextState,
+                    nextState.DottedRule,
+                    nextState.Origin,
                     prediction.ParseNode,
                     completed.ParseNode,
                     k);
@@ -477,47 +500,48 @@ namespace Pliant.Runtime
             var nullNode = new TokenForestNode(token, location, location);
             symbolNode.AddUniqueFamily(nullNode);
             return symbolNode;
-        }        
+        }
+
 
         private IForestNode CreateParseNode(
-            IState nextState,
+            IDottedRule nextDottedRule,
+            int origin,
             IForestNode w,
             IForestNode v,
             int location)
         {
             Assert.IsNotNull(v, nameof(v));
             var anyPreDotRuleNull = true;
-            if (nextState.DottedRule.Position > 1)
+            if (nextDottedRule.Position > 1)
             {
-                var predotPrecursorSymbol = nextState
-                    .DottedRule
+                var predotPrecursorSymbol = nextDottedRule
                     .Production
-                    .RightHandSide[nextState.DottedRule.Position - 2];
+                    .RightHandSide[nextDottedRule.Position - 2];
                 anyPreDotRuleNull = IsSymbolTransativeNullable(predotPrecursorSymbol);
             }
-            var anyPostDotRuleNull = IsSymbolTransativeNullable(nextState.DottedRule.PostDotSymbol);
+            var anyPostDotRuleNull = IsSymbolTransativeNullable(nextDottedRule.PostDotSymbol);
             if (anyPreDotRuleNull && !anyPostDotRuleNull)
                 return v;
 
-            IInternalForestNode internalNode = null; 
+            IInternalForestNode internalNode = null;
             if (anyPostDotRuleNull)
             {
                 internalNode = _nodeSet
                     .AddOrGetExistingSymbolNode(
-                        nextState.DottedRule.Production.LeftHandSide,
-                        nextState.Origin,
+                        nextDottedRule.Production.LeftHandSide,
+                        origin,
                         location);
             }
             else
             {
                 internalNode = _nodeSet
                     .AddOrGetExistingIntermediateNode(
-                        nextState,
-                        nextState.Origin,
+                        nextDottedRule,
+                        origin,
                         location
                     );
             }
-                        
+
             // if w = null and y doesn't have a family of children (v)
             if (w == null)
                 internalNode.AddUniqueFamily(v);
@@ -528,7 +552,7 @@ namespace Pliant.Runtime
 
             return internalNode;
         }
-        
+
         private VirtualForestNode CreateVirtualParseNode(IState completed, int k, ITransitionState rootTransitionState)
         {
             VirtualForestNode virtualParseNode = null;

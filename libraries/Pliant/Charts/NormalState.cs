@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Forest;
+using Pliant.Grammars;
 using Pliant.Utilities;
 using System.Text;
 
@@ -7,13 +8,19 @@ namespace Pliant.Charts
     public class NormalState : StateBase, INormalState
     {        
         private readonly int _hashCode;
-        
+
         public NormalState(IDottedRule dottedRule, int origin)
             : base(dottedRule, origin)
         {
             _hashCode = ComputeHashCode();
         }
-        
+
+        public NormalState(IDottedRule dottedRule, int origin, IForestNode parseNode) 
+            : this(dottedRule, origin)
+        {
+            ParseNode = parseNode;
+        }
+
         public override StateType StateType { get { return StateType.Normal; } }
 
         public bool IsSource(ISymbol searchSymbol)

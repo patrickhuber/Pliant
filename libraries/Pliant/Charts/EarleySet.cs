@@ -1,6 +1,7 @@
 ﻿using Pliant.Collections;
 using Pliant.Grammars;
 using System.Collections.Generic;
+using System;
 
 namespace Pliant.Charts
 {
@@ -28,6 +29,22 @@ namespace Pliant.Charts
             _completions = new UniqueList<INormalState>();
             _transitions = new UniqueList<ITransitionState>();
             Location = location;
+        }
+
+        public bool Contains(StateType stateType, IDottedRule dottedRule, int origin)
+        {
+            if (stateType != StateType.Normal)
+                return false;
+
+            var hashCode = NormalStateHashCodeAlgorithm.Compute(dottedRule, origin);
+            if (dottedRule.IsComplete)
+                return _completions.ContainsHash(hashCode);
+
+            var currentSymbol = dottedRule.PostDotSymbol;
+            if (currentSymbol.SymbolType == SymbolType.NonTerminal)
+                return _predictions.ContainsHash(hashCode);
+
+            return _scans.ContainsHash(hashCode);
         }
 
         public bool Enqueue(IState state)
