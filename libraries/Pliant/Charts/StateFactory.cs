@@ -27,6 +27,11 @@ namespace Pliant.Charts
         public IState NewState(IProduction production, int position, int origin)
         {
             var dottedRule = DottedRuleRegistry.Get(production, position);
+            return NewState(dottedRule, origin);
+        }
+
+        public IState NewState(IDottedRule dottedRule, int origin)
+        {
             return new NormalState(dottedRule, origin);
         }
     }

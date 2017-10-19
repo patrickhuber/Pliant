@@ -260,7 +260,7 @@ namespace Pliant.Runtime
             if (_chart.Contains(j, StateType.Normal, dottedRule, 0))
                 return;
             // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
-            var predictedState = StateFactory.NewState(production, 0, j);
+            var predictedState = StateFactory.NewState(dottedRule, j);
             if (_chart.Enqueue(j, predictedState))
                 Log("Predict", j, predictedState);
         }
@@ -330,9 +330,9 @@ namespace Pliant.Runtime
 
             var virtualParseNode = CreateVirtualParseNode(completed, k, rootTransitionState);
 
+            var dottedRule = transitionState.DottedRule;
             var topmostItem = StateFactory.NewState(
-                transitionState.DottedRule.Production,
-                transitionState.DottedRule.Position,
+                dottedRule,
                 transitionState.Origin);
 
             topmostItem.ParseNode = virtualParseNode;

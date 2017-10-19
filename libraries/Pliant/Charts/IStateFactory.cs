@@ -9,6 +9,8 @@ namespace Pliant.Charts
 
         IState NewState(IProduction production, int position, int origin);
 
+        IState NewState(IDottedRule dottedRule, int origin);
+
         IState NextState(IState state, IForestNode parseNode = null);
     }
 }
