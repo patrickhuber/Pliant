@@ -113,6 +113,7 @@ public class ParseRunner : IParseRunner
 
         var pool = SharedPools.Default<List<ILexeme>>();
         var matches = pool.AllocateAndClear();
+        var misses = pool.AllocateAndClear();
 
         for (var i = 0; i < _ignoreLexemes.Count; i++)
         {
@@ -122,17 +123,22 @@ public class ParseRunner : IParseRunner
                 if (lexeme.Scan(character))
                     matches.Add(lexeme);
                 else
-                    FreeLexeme(lexeme);
+                    misses.Add(lexeme);
             }
         }
 
         if (matches.Count == 0)
         {
             pool.ClearAndFree(matches);
+            pool.ClearAndFree(misses);
             return false;
         }
 
-        pool.ClearAndFree(_ignoreLexemes);
+        for (var i = 0; i < misses.Count; i++)
+            FreeLexeme(misses[i]);
+
+        pool.ClearAndFree(misses);
+
         _ignoreLexemes = matches;
         return true;
     }
@@ -211,10 +217,7 @@ public class ParseRunner : IParseRunner
 
         if (longestAcceptedMatch == null)
             return false;
-
-        //var token = CreateTokenFromLexeme(longestAcceptedMatch);
-        //if (token == null)
-        //    return false;
+        
         if (!ParseEngine.Pulse(longestAcceptedMatch))
             return false;
 
@@ -280,7 +283,6 @@ public class ParseRunner : IParseRunner
         {
             pool.ClearAndFree(matches);
             pool.ClearAndFree(misses);
-            _ignoreLexemes.Clear();
             return false;
         }
 
