@@ -98,6 +98,8 @@
     <Compile Include="Grammars\DottedRule.cs" />
     <Compile Include="Runtime\DeterministicParseEngine.cs" />
     <Compile Include="Runtime\MarpaParseEngine.cs" />
+    <Compile Include="Tokens\ITrivia.cs" />
+    <Compile Include="Tokens\LexemeBase.cs" />
     <Compile Include="Tree\ParseTreeEnumerable.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />
     <Compile Include="Forest\SelectFirstChildDisambiguationAlgorithm.cs" />

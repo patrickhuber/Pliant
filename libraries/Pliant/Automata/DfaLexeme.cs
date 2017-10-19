@@ -2,26 +2,18 @@
 using Pliant.Tokens;
 using Pliant.Utilities;
 using System.Text;
-using Pliant.Grammars;
-using System.Diagnostics;
 
 namespace Pliant.Automata
 {
-    public class DfaLexeme : ILexeme
+    public class DfaLexeme : LexemeBase<IDfaLexerRule>, ILexeme
     {
         private StringBuilder _stringBuilder;
         private string _capture;
 
         private IDfaState _currentState;
 
-        public int Position { get; private set; }
-
-        public TokenType TokenType { get { return LexerRule.TokenType; } }
-
-        public ILexerRule LexerRule { get; private set; }
-        
         // TODO: Make property inspection work better for the debugger        
-        public string Value
+        public override string Value
         {
             get
             {
@@ -32,9 +24,8 @@ namespace Pliant.Automata
         }        
         
         public DfaLexeme(IDfaLexerRule dfaLexerRule, int position)
+            : base(dfaLexerRule, position)
         {
-            LexerRule = dfaLexerRule;
-            Position = position;
             _stringBuilder = SharedPools.Default<StringBuilder>().AllocateAndClear();
             _currentState = dfaLexerRule.Start;
         }
@@ -43,15 +34,13 @@ namespace Pliant.Automata
         {
             return _stringBuilder != null;
         }
-
-        public void Reset(IDfaLexerRule dfaLexerRule, int position)
+        
+        public override void Reset()
         {
             _capture = null;
-            if(IsStringBuilderAllocated())
+            if (IsStringBuilderAllocated())
                 _stringBuilder.Clear();
-            _currentState = dfaLexerRule.Start;
-            LexerRule = dfaLexerRule;
-            Position = position;        
+            _currentState = ConcreteLexerRule.Start;
         }
 
         private void DeallocateStringBuilderAndAssignCapture()
@@ -68,12 +57,12 @@ namespace Pliant.Automata
                 _stringBuilder.Append(_capture);
         }
 
-        public bool IsAccepted()
+        public override bool IsAccepted()
         {
             return _currentState.IsFinal;
         }
 
-        public bool Scan(char c)
+        public override bool Scan(char c)
         {
             for(var e = 0; e<_currentState.Transitions.Count; e++)
             {

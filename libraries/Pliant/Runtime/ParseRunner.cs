@@ -225,16 +225,7 @@ public class ParseRunner : IParseRunner
 
         return true;
     }
-
-    private IToken CreateTokenFromLexeme(ILexeme lexeme)
-    {
-        var capture = lexeme.Value;
-        return new Token(
-            capture,
-            Position - capture.Length - 1,
-            lexeme.TokenType);
-    }
-
+    
     private void ClearExistingLexemes(int doNotFreeLexemeIndex)
     {
         ClearLexemes(_tokenLexemes, doNotFreeLexemeIndex);

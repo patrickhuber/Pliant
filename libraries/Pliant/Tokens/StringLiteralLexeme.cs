@@ -3,16 +3,14 @@ using Pliant.Tokens;
 
 namespace Pliant.Tokens
 {
-    public class StringLiteralLexeme : ILexeme
+    public class StringLiteralLexeme : LexemeBase<IStringLiteralLexerRule>, ILexeme
     {
         private string _capture;
         private int _index;
+        
+        public string Literal { get { return ConcreteLexerRule.Literal; } }
 
-        public int Position { get; private set; }
-
-        public string Literal { get; private set; }
-
-        public string Value
+        public override string Value
         {
             get
             {
@@ -20,15 +18,13 @@ namespace Pliant.Tokens
                     _capture = AllocateSubString();
                 return _capture;
             }
-        }
-
-        public TokenType TokenType { get { return LexerRule.TokenType; } }
-
-        public ILexerRule LexerRule { get; private set; }
+        }        
         
         public StringLiteralLexeme(IStringLiteralLexerRule lexerRule, int position)
+            : base(lexerRule, position)
         {
-            Reset(lexerRule, position);
+            _index = 0;
+            _capture = null;
         }
 
         private bool IsSubStringAllocated()
@@ -43,12 +39,12 @@ namespace Pliant.Tokens
             return Literal.Substring(0, _index);
         }
 
-        public bool IsAccepted()
+        public override bool IsAccepted()
         {
             return _index >= Literal.Length;
         }
 
-        public bool Scan(char c)
+        public override bool Scan(char c)
         {
             if (_index >= Literal.Length)
                 return false;
@@ -58,13 +54,10 @@ namespace Pliant.Tokens
             return true;
         }
 
-        public void Reset(IStringLiteralLexerRule newLiteral, int position)
+        public override void Reset()
         {
-            LexerRule = newLiteral;
             _index = 0;
             _capture = null;
-            Position = position;
-            Literal = newLiteral.Literal;
-        }        
+        }      
     }
 }
