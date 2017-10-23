@@ -128,7 +128,7 @@ namespace Pliant.RegularExpressions
                 new Production(characterClassCharacter, escape)
             };
 
-            _regexGrammar = new Grammar(regex, productions, null);
+            _regexGrammar = new Grammar(regex, productions, null, null);
         }
         
         private static BaseLexerRule CreateNotMetaLexerRule()

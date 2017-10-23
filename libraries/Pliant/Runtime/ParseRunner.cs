@@ -6,6 +6,7 @@ using Pliant.Automata;
 using Pliant.Utilities;
 using Pliant.Tokens;
 using Pliant.Grammars;
+using System;
 
 public class ParseRunner : IParseRunner
 {
@@ -48,6 +49,7 @@ public class ParseRunner : IParseRunner
 
         var character = ReadCharacter();
         UpdatePositionMetrics(character);
+        ShiftTrivia(character);
 
         if (MatchesExistingIncompleteIgnoreLexemes(character))
             return true;
@@ -77,7 +79,7 @@ public class ParseRunner : IParseRunner
 
         return MatchesNewIgnoreLexemes(character);
     }
-
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void UpdatePositionMetrics(char character)
     {
@@ -91,6 +93,32 @@ public class ParseRunner : IParseRunner
         {
             Column++;
         }
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void ShiftTrivia(char character)
+    {
+        if (!IsEndOfLineCharacter(character))
+            return;
+
+        if (_currentTrivia == null)
+            return;
+
+        bool isFirstToken = _previousTokenLexeme == null;
+        if (isFirstToken)
+        {
+            if (_leadingTrivia == null)
+                _leadingTrivia = new List<ILexeme>();
+            _leadingTrivia.Add(_currentTrivia);
+            var matchingTrivia = MatchLexerRules(character, ParseEngine.Grammar.Trivia);
+            if(matchingTrivia == null)
+            {
+                _currentTrivia = null;
+                return;
+            }
+        }
+        else
+        { }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -5,7 +5,7 @@ namespace Pliant.Grammars
 {
     public abstract class GrammarWrapper : IGrammar
     {
-        private IGrammar _innerGrammar;
+        private readonly IGrammar _innerGrammar;
 
         protected GrammarWrapper(IGrammar innerGrammar)
         {
@@ -25,6 +25,11 @@ namespace Pliant.Grammars
         public IReadOnlyList<ILexerRule> Ignores
         {
             get { return _innerGrammar.Ignores; }
+        }
+
+        public IReadOnlyList<ILexerRule> Trivia
+        {
+            get { return _innerGrammar.Trivia; }
         }
 
         public IReadOnlyDottedRuleRegistry DottedRules

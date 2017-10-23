@@ -7,6 +7,7 @@ using Pliant.Forest;
 using Pliant.Grammars;
 using Pliant.LexerRules;
 using Pliant.Runtime;
+using Pliant.Tests.Common;
 using Pliant.Tokens;
 using System;
 using System.Text;
@@ -16,13 +17,15 @@ namespace Pliant.Tests.Unit.Runtime
     [TestClass]
     public class ParseRunnerTests
     {
-        private GrammarLexerRule _whitespaceRule;
-        private GrammarLexerRule _wordRule;
+        private static readonly GrammarLexerRule _whitespaceRule;
+        private static readonly GrammarLexerRule _wordRule;
+        private static readonly IGrammar _repeatingWordGrammar;
 
-        public ParseRunnerTests()
+        static ParseRunnerTests()
         {
             _whitespaceRule = CreateWhitespaceRule();
             _wordRule = CreateWordRule();
+            _repeatingWordGrammar = CreateRepeatingWordGrammar();
         }
 
         private static GrammarLexerRule CreateWhitespaceRule()
@@ -58,6 +61,24 @@ namespace Pliant.Tests.Unit.Runtime
             var wordGrammar = new GrammarExpression(W, new[] { W, word }).ToGrammar();
             return new GrammarLexerRule(nameof(word), wordGrammar);
         }
+        
+        private static IGrammar CreateRepeatingWordGrammar()
+        {
+            var word = new WordLexerRule();
+            ProductionExpression
+                RepeatingWord = nameof(RepeatingWord);
+
+            RepeatingWord.Rule =
+                word
+                | word + RepeatingWord;
+
+            return new GrammarExpression(
+                RepeatingWord,
+                new[] { RepeatingWord },
+                null,
+                new[] { new WhitespaceLexerRule() })
+                .ToGrammar();
+        }
 
         [TestMethod]
         public void ParseRunnerShouldParseSimpleWordSentence()
@@ -86,7 +107,8 @@ namespace Pliant.Tests.Unit.Runtime
             var grammar = new GrammarExpression(
                 A,
                 new[] { A },
-                new[] {_whitespaceRule })
+                new[] {_whitespaceRule },
+                null)
                 .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
@@ -167,7 +189,8 @@ namespace Pliant.Tests.Unit.Runtime
             var grammar = new GrammarExpression(
                 S,
                 new[] { S },
-                new[] { _whitespaceRule })
+                new[] { _whitespaceRule },
+                null)
                 .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
@@ -230,7 +253,8 @@ namespace Pliant.Tests.Unit.Runtime
             var grammar = new GrammarExpression(
                 S,
                 new[] { S },
-                new[] { _whitespaceRule })
+                new[] { _whitespaceRule },
+                null)
                 .ToGrammar();
 
             var parseEngine = new ParseEngine(grammar);
@@ -276,6 +300,85 @@ namespace Pliant.Tests.Unit.Runtime
             var token = tokenParseNode.Token;
             Assert.AreEqual(EbnfGrammar.TokenTypes.Identifier, token.TokenType);
             Assert.AreEqual("ows", token.Value);
+        }
+
+
+        [TestMethod]
+        public void ParseRunnerShouldAddLeadingTriviaToCurrentToken()
+        {
+            var input = "    aa aa";
+            var tokens = RunTriviaTestRepeatingWordGrammarParse(input);
+            var firstToken = tokens.Item1;
+            var secondToken = tokens.Item2;
+
+            Assert.IsNotNull(firstToken.LeadingTrivia);
+            Assert.IsNull(firstToken.TrailingTrivia);
+            Assert.IsNotNull(secondToken.LeadingTrivia);
+            Assert.IsNull(secondToken.TrailingTrivia);
+        }
+
+        [TestMethod]
+        public void ParseRunnerShouldAddFileEndTriviaToLastToken()
+        {
+            var input = "aa aa   ";
+            var tokens = RunTriviaTestRepeatingWordGrammarParse(input);
+            var firstToken = tokens.Item1;
+            var secondToken = tokens.Item2;
+
+            Assert.IsNull(firstToken.LeadingTrivia);
+            Assert.IsNull(firstToken.TrailingTrivia);
+            Assert.IsNotNull(secondToken.LeadingTrivia);
+            Assert.IsNotNull(secondToken.TrailingTrivia);
+        }
+
+        [TestMethod]
+        public void ParseRunnerShouldAddTriviaAtEndOfLineToCurrentTokenAndNextLineTriviaToNextToken()
+        {
+            var input = "aa \r\n aa";
+            var tokens = RunTriviaTestRepeatingWordGrammarParse(input);
+            var firstToken = tokens.Item1;
+            var secondToken = tokens.Item2;
+
+            Assert.IsNotNull(firstToken.LeadingTrivia);
+            Assert.IsNull(firstToken.TrailingTrivia);
+            Assert.IsNotNull(secondToken.LeadingTrivia);
+            Assert.IsNull(secondToken.TrailingTrivia);
+        }
+
+        [TestMethod]
+        public void ParseRunnerShouldAddTriviaAtEndOfFileToLastToken()
+        {
+            var input = "aa aa\r\n\r\n\r\n\r\n";
+            var tokens = RunTriviaTestRepeatingWordGrammarParse(input);
+            var firstToken = tokens.Item1;
+            var secondToken = tokens.Item2;
+
+            Assert.IsNotNull(firstToken.LeadingTrivia);
+            Assert.IsNull(firstToken.TrailingTrivia);
+            Assert.IsNotNull(secondToken.LeadingTrivia);
+            Assert.IsNull(secondToken.TrailingTrivia);
+        }
+
+        private static Tuple<IToken, IToken> RunTriviaTestRepeatingWordGrammarParse(string input)
+        {
+            var parseTester = new ParseTester(_repeatingWordGrammar);
+            parseTester.RunParse(input);
+            var parseForestRoot = parseTester.ParseEngine.GetParseForestRootNode();
+
+            var firstTokenForestNode = parseForestRoot
+                .AssertInBoundsAndNavigate(andNode => andNode.Children, 0)
+                .AssertInBoundsAndNavigate(forestNode => forestNode.Children, 0)
+                .AssertIsInstanceOfTypeAndCast<ITokenForestNode>();
+
+            var secondTokenForestNode = parseForestRoot
+                .AssertInBoundsAndNavigate(andNode => andNode.Children, 0)
+                .AssertInBoundsAndNavigate(forestNode => forestNode.Children, 1)
+                .AssertIsInstanceOfTypeAndCast<IInternalForestNode>()
+                .AssertInBoundsAndNavigate(internalForestNode => internalForestNode.Children, 0)
+                .AssertInBoundsAndNavigate(andNode => andNode.Children, 0)
+                .AssertIsInstanceOfTypeAndCast<ITokenForestNode>();
+
+            return new Tuple<IToken, IToken>(firstTokenForestNode.Token, secondTokenForestNode.Token);
         }
 
         private static Chart GetParseEngineChart(ParseEngine parseEngine)

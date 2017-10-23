@@ -10,10 +10,13 @@ namespace Pliant.Builders
     {
         private ObservableCollection<ProductionModel> _productions;
         private List<LexerRuleModel> _ignoreRules;
+        private List<LexerRuleModel> _triviaRules;
 
         public ICollection<ProductionModel> Productions { get { return _productions; } }
 
         public ICollection<LexerRuleModel> IgnoreRules { get { return _ignoreRules; } }
+
+        public ICollection<LexerRuleModel> TriviaRules { get { return _triviaRules; } }
 
         public ProductionModel Start { get; set; }
 
@@ -25,6 +28,7 @@ namespace Pliant.Builders
             _productions.CollectionChanged += CollectionChanged;
             _reachibilityMatrix = new ReachibilityMatrix();
             _ignoreRules = new List<LexerRuleModel>();
+            _triviaRules = new List<LexerRuleModel>();
         }
 
         public GrammarModel(ProductionModel start)
@@ -90,8 +94,13 @@ namespace Pliant.Builders
 
             var productions = GetProductionsFromProductionsModel();
             var ignoreRules = GetIgnoreRulesFromIgnoreRulesModel();
+            var triviaRules = GetTriviaRulesFromTriviaRulesModel();
 
-            return new Grammar(Start.LeftHandSide.NonTerminal, productions, ignoreRules);
+            return new Grammar(
+                Start.LeftHandSide.NonTerminal, 
+                productions, 
+                ignoreRules, 
+                triviaRules);
         }
 
         private List<IProduction> GetProductionsFromProductionsModel()
@@ -110,7 +119,15 @@ namespace Pliant.Builders
                 ignoreRules.Add(ignoreRuleModel.Value);
             return ignoreRules;
         }
-        
+
+        private List<ILexerRule> GetTriviaRulesFromTriviaRulesModel()
+        {
+            var triviaRules = new List<ILexerRule>();
+            foreach (var triviaRuleModel in _triviaRules)
+                triviaRules.Add(triviaRuleModel.Value);
+            return triviaRules;
+        }
+
         private void PopulateMissingProductionsFromStart(ProductionModel start)
         {
             var visited = new HashSet<INonTerminal>();

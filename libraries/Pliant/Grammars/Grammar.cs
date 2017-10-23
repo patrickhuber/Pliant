@@ -12,6 +12,7 @@ namespace Pliant.Grammars
         private static readonly DottedRule[] EmptyPredictionArray = { };
 
         protected readonly IndexedList<ILexerRule> _ignores;
+        protected readonly IndexedList<ILexerRule> _trivia;
         protected readonly IndexedList<ISymbol> _symbols;
         protected readonly IndexedList<IProduction> _productions;
         
@@ -28,15 +29,20 @@ namespace Pliant.Grammars
 
         public IReadOnlyList<ILexerRule> Ignores { get { return _ignores; } }
 
+        public IReadOnlyList<ILexerRule> Trivia { get { return _trivia; } }
+
         public IReadOnlyDottedRuleRegistry DottedRules { get { return _dottedRuleRegistry; } }
 
         public Grammar(
-            INonTerminal start, 
-            IReadOnlyList<IProduction> productions, 
-            IReadOnlyList<ILexerRule> ignoreRules)
+            INonTerminal start,
+            IReadOnlyList<IProduction> productions,
+            IReadOnlyList<ILexerRule> ignoreRules,
+            IReadOnlyList<ILexerRule> triviaRules)
         {
             _productions = new IndexedList<IProduction>();
             _ignores = new IndexedList<ILexerRule>();
+            _trivia = new IndexedList<ILexerRule>();
+
             _transativeNullableSymbols = new UniqueList<INonTerminal>();
             _symbolsReverseLookup = new Dictionary<INonTerminal, UniqueList<IProduction>>();
             _symbols = new IndexedList<ISymbol>();
@@ -47,6 +53,7 @@ namespace Pliant.Grammars
             Start = start;
             AddProductions(productions ?? EmptyProductionArray);
             AddIgnoreRules(ignoreRules ?? EmptyLexerRuleArray);
+            AddTriviaRules(triviaRules ?? EmptyLexerRuleArray);
 
             _rightRecursiveSymbols = CreateRightRecursiveSymbols(_dottedRuleRegistry, _symbolPaths, _transativeNullableSymbols);
             FindNullableSymbols(_symbolsReverseLookup, _transativeNullableSymbols);
@@ -127,13 +134,17 @@ namespace Pliant.Grammars
             for (int i = 0; i < ignoreRules.Count; i++)
             {
                 var ignoreRule = ignoreRules[i];
-                AddIgnoreRule(ignoreRule);
+                _ignores.Add(ignoreRule);
             }
         }
 
-        private void AddIgnoreRule(ILexerRule lexerRule)
+        private void AddTriviaRules(IReadOnlyList<ILexerRule> triviaRules)
         {
-            _ignores.Add(lexerRule);
+            for (int i = 0; i < triviaRules.Count; i++)
+            {
+                var triviaRule = triviaRules[i];
+                _trivia.Add(triviaRule);
+            }
         }
 
         private static void FindNullableSymbols(

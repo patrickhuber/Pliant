@@ -96,6 +96,7 @@
     <Compile Include="LexerRules\WhitespaceLexerRule.cs" />
     <Compile Include="Grammars\PreComputedGrammar.cs" />
     <Compile Include="Grammars\DottedRule.cs" />
+    <Compile Include="LexerRules\WordLexerRule.cs" />
     <Compile Include="Runtime\DeterministicParseEngine.cs" />
     <Compile Include="Runtime\MarpaParseEngine.cs" />
     <Compile Include="Tokens\ITrivia.cs" />
