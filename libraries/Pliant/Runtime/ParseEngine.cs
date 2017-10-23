@@ -197,7 +197,7 @@ namespace Pliant.Runtime
                     scan.ParseNode,
                     tokenNode,
                     j + 1);
-                var nextState = StateFactory.NextState(scan, parseNode);
+                var nextState = StateFactory.NewState(dottedRule, scan.Origin, parseNode);
 
                 if (_chart.Enqueue(j + 1, nextState))
                     LogScan(j + 1, nextState, token);
@@ -284,15 +284,14 @@ namespace Pliant.Runtime
             else if (evidenceParseNode.Children.Count > 0
                 && evidenceParseNode.Children[0].Children.Count > 0)
             {
-                var firstChildNode = evidenceParseNode;
                 parseNode = CreateParseNode(
                     dottedRule,
                     evidence.Origin,
-                    firstChildNode,
+                    evidenceParseNode,
                     nullParseNode,
                     j);                
             }
-            var aycockHorspoolState = StateFactory.NextState(evidence, parseNode);
+            var aycockHorspoolState = StateFactory.NewState(dottedRule, evidence.Origin, parseNode);
             if (_chart.Enqueue(j, aycockHorspoolState))
                 Log("Predict", j, aycockHorspoolState);
         }
@@ -333,9 +332,8 @@ namespace Pliant.Runtime
             var dottedRule = transitionState.DottedRule;
             var topmostItem = StateFactory.NewState(
                 dottedRule,
-                transitionState.Origin);
-
-            topmostItem.ParseNode = virtualParseNode;
+                transitionState.Origin,
+                virtualParseNode);
 
             if (_chart.Enqueue(k, topmostItem))
                 Log("Complete", k, topmostItem);
@@ -351,16 +349,18 @@ namespace Pliant.Runtime
                 var prediction = sourceEarleySet.Predictions[p];
                 if (!prediction.IsSource(completed.DottedRule.Production.LeftHandSide))
                     continue;
-                                
-                var nextState = StateFactory.NextState(prediction);
+
+                var dottedRule = _dottedRuleRegistry.GetNext(prediction.DottedRule);
+                var origin = prediction.Origin;
 
                 var parseNode = CreateParseNode(
-                    nextState.DottedRule,
-                    nextState.Origin,
+                    dottedRule,
+                    origin,
                     prediction.ParseNode,
                     completed.ParseNode,
                     k);
-                nextState.ParseNode = parseNode;
+
+                var nextState = StateFactory.NewState(dottedRule, origin, parseNode);
 
                 if (_chart.Enqueue(k, nextState))
                     Log("Complete", k, nextState);

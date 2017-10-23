@@ -30,9 +30,11 @@ namespace Pliant.Charts
             return NewState(dottedRule, origin);
         }
 
-        public IState NewState(IDottedRule dottedRule, int origin)
+        public IState NewState(IDottedRule dottedRule, int origin, IForestNode forestNode = null)
         {
-            return new NormalState(dottedRule, origin);
+            return forestNode == null
+                ? new NormalState(dottedRule, origin)
+                : new NormalState(dottedRule, origin, forestNode);
         }
     }
 }
