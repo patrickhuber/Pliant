@@ -76,8 +76,36 @@ namespace Pliant.Tests.Unit.Runtime
                 RepeatingWord,
                 new[] { RepeatingWord },
                 null,
-                new[] { new WhitespaceLexerRule() })
+                new[] { new WhitespaceLexerRule(), CreateMultiLineCommentLexerRule() })
                 .ToGrammar();
+        }
+
+        private static BaseLexerRule CreateMultiLineCommentLexerRule()
+        {
+            var states = new DfaState[5];
+            for (int i = 0; i < states.Length; i++)
+                states[i] = new DfaState(i == 4);
+
+            var slash = new CharacterTerminal('/');
+            var star = new CharacterTerminal('*');
+            var notStar = new NegationTerminal(star);
+            var notSlash = new NegationTerminal(slash);
+
+            var firstSlash = new DfaTransition(slash, states[1]);
+            var firstStar = new DfaTransition(star, states[2]);
+            var repeatNotStar = new DfaTransition(notStar, states[2]);
+            var lastStar = new DfaTransition(star, states[3]);
+            var goBackNotSlash = new DfaTransition(notSlash, states[2]);
+            var lastSlash = new DfaTransition(slash, states[4]);
+
+            states[0].AddTransition(firstSlash);
+            states[1].AddTransition(firstStar);
+            states[2].AddTransition(repeatNotStar);
+            states[2].AddTransition(lastStar);
+            states[3].AddTransition(goBackNotSlash);
+            states[3].AddTransition(lastSlash);
+            
+            return new DfaLexerRule(states[0], new TokenType(@"\/[*]([*][^\/]|[^*])*[*][\/]"));
         }
 
         [TestMethod]
@@ -311,10 +339,10 @@ namespace Pliant.Tests.Unit.Runtime
             var firstToken = tokens.Item1;
             var secondToken = tokens.Item2;
 
-            Assert.IsNotNull(firstToken.LeadingTrivia);
-            Assert.IsNull(firstToken.TrailingTrivia);
-            Assert.IsNotNull(secondToken.LeadingTrivia);
-            Assert.IsNull(secondToken.TrailingTrivia);
+            Assert.AreEqual(1, firstToken.LeadingTrivia.Count);
+            Assert.AreEqual(0, firstToken.TrailingTrivia.Count);
+            Assert.AreEqual(1, secondToken.LeadingTrivia.Count);
+            Assert.AreEqual(0, secondToken.TrailingTrivia.Count);
         }
 
         [TestMethod]
@@ -325,10 +353,10 @@ namespace Pliant.Tests.Unit.Runtime
             var firstToken = tokens.Item1;
             var secondToken = tokens.Item2;
 
-            Assert.IsNull(firstToken.LeadingTrivia);
-            Assert.IsNull(firstToken.TrailingTrivia);
-            Assert.IsNotNull(secondToken.LeadingTrivia);
-            Assert.IsNotNull(secondToken.TrailingTrivia);
+            Assert.AreEqual(0, firstToken.LeadingTrivia.Count);
+            Assert.AreEqual(0, firstToken.TrailingTrivia.Count);
+            Assert.AreEqual(1, secondToken.LeadingTrivia.Count);
+            Assert.AreEqual(1, secondToken.TrailingTrivia.Count);
         }
 
         [TestMethod]
@@ -339,10 +367,10 @@ namespace Pliant.Tests.Unit.Runtime
             var firstToken = tokens.Item1;
             var secondToken = tokens.Item2;
 
-            Assert.IsNotNull(firstToken.LeadingTrivia);
-            Assert.IsNull(firstToken.TrailingTrivia);
-            Assert.IsNotNull(secondToken.LeadingTrivia);
-            Assert.IsNull(secondToken.TrailingTrivia);
+            Assert.AreEqual(0, firstToken.LeadingTrivia.Count);
+            Assert.AreEqual(1, firstToken.TrailingTrivia.Count);
+            Assert.AreEqual(1, secondToken.LeadingTrivia.Count);
+            Assert.AreEqual(0, secondToken.TrailingTrivia.Count);
         }
 
         [TestMethod]
@@ -353,10 +381,25 @@ namespace Pliant.Tests.Unit.Runtime
             var firstToken = tokens.Item1;
             var secondToken = tokens.Item2;
 
-            Assert.IsNotNull(firstToken.LeadingTrivia);
-            Assert.IsNull(firstToken.TrailingTrivia);
-            Assert.IsNotNull(secondToken.LeadingTrivia);
-            Assert.IsNull(secondToken.TrailingTrivia);
+
+            Assert.AreEqual(0, firstToken.LeadingTrivia.Count);
+            Assert.AreEqual(0, firstToken.TrailingTrivia.Count);
+            Assert.AreEqual(1, secondToken.LeadingTrivia.Count);
+            Assert.AreEqual(4, secondToken.TrailingTrivia.Count);            
+        }
+
+        [TestMethod]
+        public void ParseRunnerMultiLineCommentTriviaShouldBeOneTrivia()
+        {
+            var input = "aa/* this is a comment \r\n and this is the second line */\r\naa";
+            var tokens = RunTriviaTestRepeatingWordGrammarParse(input);
+            var firstToken = tokens.Item1;
+            var secondToken = tokens.Item2;
+            
+            Assert.AreEqual(0, firstToken.LeadingTrivia.Count);
+            Assert.AreEqual(2, firstToken.TrailingTrivia.Count);
+            Assert.AreEqual(0, secondToken.LeadingTrivia.Count);
+            Assert.AreEqual(0, secondToken.TrailingTrivia.Count);
         }
 
         private static Tuple<IToken, IToken> RunTriviaTestRepeatingWordGrammarParse(string input)

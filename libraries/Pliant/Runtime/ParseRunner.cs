@@ -15,8 +15,8 @@ public class ParseRunner : IParseRunner
     private List<ILexeme> _tokenLexemes;
     private List<ILexeme> _ignoreLexemes;
     private ILexeme _previousTokenLexeme;
-    private List<ILexeme> _leadingTrivia;
-    private ILexeme _currentTrivia;
+    private List<ILexeme> _triviaAccumulator;
+    private List<ILexeme> _triviaLexemes;
 
     public int Position { get; private set; }
 
@@ -37,6 +37,8 @@ public class ParseRunner : IParseRunner
         _reader = reader;
         _tokenLexemes = new List<ILexeme>();
         _ignoreLexemes = new List<ILexeme>();
+        _triviaLexemes = new List<ILexeme>();
+        _triviaAccumulator = new List<ILexeme>();
         _lexemeFactoryRegistry = new LexemeFactoryRegistry();
         RegisterDefaultLexemeFactories(_lexemeFactoryRegistry);
         Position = 0;
@@ -44,16 +46,18 @@ public class ParseRunner : IParseRunner
 
     public bool Read()
     {
-        if (EndOfStream())
-            return false;
+        if (EndOfStream())                    
+            return false;        
 
         var character = ReadCharacter();
         UpdatePositionMetrics(character);
-        ShiftTrivia(character);
-
+        
         if (MatchesExistingIncompleteIgnoreLexemes(character))
             return true;
 
+        if (MatchesExistingIncompleteTriviaLexemes(character))
+            return true;                
+        
         if (MatchExistingTokenLexemes(character))
         {
             if (EndOfStream())
@@ -68,18 +72,62 @@ public class ParseRunner : IParseRunner
         if (MatchesNewTokenLexemes(character))
         {
             if (!EndOfStream())
+            {
+                if (AnyExistingTriviaLexemes())
+                    AccumulateAcceptedTrivia();
                 return true;
+            }
             return TryParseExistingToken();
         }
+
+        if (MatchesExistingTriviaLexemes(character))
+        {
+            if (EndOfStream() || IsEndOfLineCharacter(character))
+            {
+                AccumulateAcceptedTrivia();
+                AddTrailingTriviaToPreviousToken();
+            }
+            return true;
+        }
+
+        if (AnyExistingTriviaLexemes())
+            AccumulateAcceptedTrivia();
 
         if (MatchesExistingIgnoreLexemes(character))
             return true;
 
-        ClearExistingIngoreLexemes();
+        ClearExistingIgnoreLexemes();
+
+        if (MatchesNewTriviaLexemes(character))
+        {
+            if (IsEndOfLineCharacter(character))
+            {
+                AccumulateAcceptedTrivia();
+                AddTrailingTriviaToPreviousToken();
+            }
+            return true;
+        }
 
         return MatchesNewIgnoreLexemes(character);
     }
-    
+
+    private bool AnyExistingTriviaLexemes()
+    {
+        return _triviaLexemes.Count > 0;
+    }
+
+    private void AddTrailingTriviaToPreviousToken()
+    {
+        if (_previousTokenLexeme == null)
+            return;
+
+        for (var a = 0; a < _triviaAccumulator.Count; a++)
+            _previousTokenLexeme.AddTrailingTrivia(_triviaAccumulator[a]);
+
+        _triviaLexemes.Clear();
+        _triviaAccumulator.Clear();
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void UpdatePositionMetrics(char character)
     {
@@ -94,32 +142,6 @@ public class ParseRunner : IParseRunner
             Column++;
         }
     }
-    
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void ShiftTrivia(char character)
-    {
-        if (!IsEndOfLineCharacter(character))
-            return;
-
-        if (_currentTrivia == null)
-            return;
-
-        bool isFirstToken = _previousTokenLexeme == null;
-        if (isFirstToken)
-        {
-            if (_leadingTrivia == null)
-                _leadingTrivia = new List<ILexeme>();
-            _leadingTrivia.Add(_currentTrivia);
-            var matchingTrivia = MatchLexerRules(character, ParseEngine.Grammar.Trivia);
-            if(matchingTrivia == null)
-            {
-                _currentTrivia = null;
-                return;
-            }
-        }
-        else
-        { }
-    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsEndOfLineCharacter(char character)
@@ -127,15 +149,64 @@ public class ParseRunner : IParseRunner
         switch (character)
         {
             case '\n':
-                return false;
-            default:
                 return true;
+            default:
+                return false;
         }
     }
 
     public bool EndOfStream()
     {
         return _reader.Peek() == -1;
+    }
+        
+    private char ReadCharacter()
+    {
+        var character = (char)_reader.Read();
+        Position++;
+        return character;
+    }
+
+    private bool MatchesNewTriviaLexemes(char character)
+    {
+        var matches = MatchLexerRules(character, ParseEngine.Grammar.Trivia);
+        if (matches == null)
+            return false;
+        SharedPools.Default<List<ILexeme>>().ClearAndFree(_triviaLexemes);
+        _triviaLexemes = matches;
+        return true; 
+    }
+
+    private bool MatchesExistingIncompleteTriviaLexemes(char character)
+    {
+        var matches = MatchExistingIncompleteLexemes(character, _triviaLexemes);
+        if (matches == null)
+            return false;
+        SharedPools.Default<List<ILexeme>>().ClearAndFree(_triviaLexemes);
+        _triviaLexemes = matches;
+        return true;
+    }
+
+    private bool MatchesExistingTriviaLexemes(char character)
+    {
+        var matches = MatchExistingLexemes(character, _triviaLexemes);
+        if (matches == null)
+            return false;
+
+        SharedPools.Default<List<ILexeme>>().ClearAndFree(_triviaLexemes);
+        _triviaLexemes = matches;
+        return true;
+    }
+
+    private void AccumulateAcceptedTrivia()
+    {
+        for (var i = 0; i < _triviaLexemes.Count; i++)
+        {
+            var trivia = _triviaLexemes[i];
+            if (trivia.IsAccepted())
+                _triviaAccumulator.Add(trivia);
+        }
+        _triviaLexemes.Clear();
     }
 
     private bool MatchesExistingIncompleteIgnoreLexemes(char character)
@@ -149,13 +220,6 @@ public class ParseRunner : IParseRunner
             return true;
         }
         return false;
-    }
-    
-    private char ReadCharacter()
-    {
-        var character = (char)_reader.Read();
-        Position++;
-        return character;
     }
 
     private bool MatchExistingTokenLexemes(char character)
@@ -193,6 +257,11 @@ public class ParseRunner : IParseRunner
 
         ClearTokenLexemes(doNotFreeLexemeIndex);
 
+        for (var i = 0; i < _triviaAccumulator.Count; i++)
+            longestAcceptedMatch.AddLeadingTrivia(_triviaAccumulator[i]);
+
+        _triviaAccumulator.Clear();
+
         return true;
     }
     
@@ -227,7 +296,7 @@ public class ParseRunner : IParseRunner
         return true;
     }
     
-    private void ClearExistingIngoreLexemes()
+    private void ClearExistingIgnoreLexemes()
     {
         ClearLexemes(_ignoreLexemes);
     }
@@ -283,7 +352,7 @@ public class ParseRunner : IParseRunner
 
     private List<ILexeme> MatchExistingLexemes(char character, List<ILexeme> lexemes)
     {
-        var anyLexemes = lexemes.Count > 0;
+        var anyLexemes = lexemes != null && lexemes.Count > 0;
         if (!anyLexemes)
             return null;
 
@@ -329,7 +398,7 @@ public class ParseRunner : IParseRunner
 
     private List<ILexeme> MatchExistingIncompleteLexemes(char character, List<ILexeme> lexemes)
     {
-        var anyLexemes = lexemes.Count > 0;
+        var anyLexemes = lexemes != null && lexemes.Count > 0;
         if (!anyLexemes)
             return null;
 
