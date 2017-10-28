@@ -49,13 +49,17 @@
     <Compile Include="Builders\Expressions\SymbolExpression.cs" />
     <Compile Include="Builders\AlterationModel.cs" />
     <Compile Include="Builders\GrammarModel.cs" />
+    <Compile Include="Builders\IgnoreSettingModel.cs" />
+    <Compile Include="Builders\SettingModel.cs" />
     <Compile Include="Builders\NonTerminalModel.cs" />
     <Compile Include="Builders\ProductionModel.cs" />
     <Compile Include="Builders\LexerRuleModel.cs" />
     <Compile Include="Builders\ProductionReferenceModel.cs" />
     <Compile Include="Builders\ReachibilityMatrix.cs" />
+    <Compile Include="Builders\StartProductionSettingModel.cs" />
     <Compile Include="Builders\SymbolModel.cs" />
     <Compile Include="Builders\SymbolModelType.cs" />
+    <Compile Include="Builders\TriviaSettingModel.cs" />
     <Compile Include="Charts\INormalState.cs" />
     <Compile Include="Charts\IParseNode.cs" />
     <Compile Include="Charts\IRelativeState.cs" />

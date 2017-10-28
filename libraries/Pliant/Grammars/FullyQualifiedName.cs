@@ -4,12 +4,15 @@
     {
         public string Name { get; private set; }
         public string Namespace { get; private set; }
-        public string FullName { get { return $"{Namespace}.{Name}"; } }
+        public string FullName { get; private set; }
 
         public FullyQualifiedName(string @namespace, string name)
         {
             Namespace = @namespace;
             Name = name;
+            FullName = !string.IsNullOrWhiteSpace(@namespace)
+                ? $"{@namespace}.{name}"
+                : $"{name}";
         }
 
         public override string ToString()

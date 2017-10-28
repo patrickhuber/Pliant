@@ -5,6 +5,7 @@ using Pliant.Grammars;
 using Pliant.Builders.Expressions;
 using Pliant.Runtime;
 using Pliant.Tests.Common;
+using Pliant.RegularExpressions;
 
 namespace Pliant.Tests.Unit.Ebnf
 {
@@ -243,6 +244,91 @@ namespace Pliant.Tests.Unit.Ebnf
             var parseEngine = new ParseEngine(generatedGrammar, new ParseEngineOptions(optimizeRightRecursion: true ));
             var parseTester = new ParseTester(parseEngine);
             parseTester.RunParse("_0_1_0_0_1_1_");
+        }
+
+
+        [TestMethod]
+        public void EbnfGeneratorShouldGenerateIgnores()
+        {
+            var whiteSpaceRegex = new Regex(
+                false, 
+                new RegexExpressionTerm(
+                    new RegexTerm(
+                        new RegexFactorIterator(                            
+                            new RegexAtomSet(
+                                new RegexSet(
+                                    false,
+                                    new RegexCharacterClass(
+                                        new RegexCharacterUnitRange(
+                                            new RegexCharacterClassCharacter(' '))))),
+                            RegexIterator.OneOrMany))),
+                false);
+            var definition = new EbnfDefinitionConcatenation(
+                new EbnfBlockRule(
+                    new EbnfRule(
+                        new EbnfQualifiedIdentifier("S"),
+                        new EbnfExpression(
+                            new EbnfTerm(
+                                new EbnfFactorLiteral("a"))))),
+                new EbnfDefinitionConcatenation(
+                    new EbnfBlockLexerRule(
+                        new EbnfLexerRule(
+                            new EbnfQualifiedIdentifier("whitespace"), 
+                            new EbnfLexerRuleExpression(
+                                new EbnfLexerRuleTerm(
+                                    new EbnfLexerRuleFactorRegex(
+                                        whiteSpaceRegex))))),
+                    new EbnfDefinition(
+                        new EbnfBlockSetting(
+                            new EbnfSetting(
+                                new EbnfSettingIdentifier("ignore"),
+                                new EbnfQualifiedIdentifier("whitespace"))))));
+            
+            var grammar = GenerateGrammar(definition);
+            Assert.IsNotNull(grammar.Ignores);
+            Assert.AreEqual(1, grammar.Ignores.Count);
+        }
+
+        [TestMethod]
+        public void EbnfGeneratorShouldGenerateTrivia()
+        {
+            var whiteSpaceRegex = new Regex(
+                false,
+                new RegexExpressionTerm(
+                    new RegexTerm(
+                        new RegexFactorIterator(
+                            new RegexAtomSet(
+                                new RegexSet(
+                                    false,
+                                    new RegexCharacterClass(
+                                        new RegexCharacterUnitRange(
+                                            new RegexCharacterClassCharacter(' '))))),
+                            RegexIterator.OneOrMany))),
+                false);
+            var definition = new EbnfDefinitionConcatenation(
+                new EbnfBlockRule(
+                    new EbnfRule(
+                        new EbnfQualifiedIdentifier("S"),
+                        new EbnfExpression(
+                            new EbnfTerm(
+                                new EbnfFactorLiteral("a"))))),
+                new EbnfDefinitionConcatenation(
+                    new EbnfBlockLexerRule(
+                        new EbnfLexerRule(
+                            new EbnfQualifiedIdentifier("whitespace"),
+                            new EbnfLexerRuleExpression(
+                                new EbnfLexerRuleTerm(
+                                    new EbnfLexerRuleFactorRegex(
+                                        whiteSpaceRegex))))),
+                    new EbnfDefinition(
+                        new EbnfBlockSetting(
+                            new EbnfSetting(
+                                new EbnfSettingIdentifier("trivia"),
+                                new EbnfQualifiedIdentifier("whitespace"))))));
+
+            var grammar = GenerateGrammar(definition);
+            Assert.IsNotNull(grammar.Trivia);
+            Assert.AreEqual(1, grammar.Trivia.Count);
         }
 
         private static IGrammar GenerateGrammar(EbnfDefinition definition)

@@ -40,7 +40,7 @@ namespace Pliant.Ebnf
         int ComputeHashCode()
         {
             return HashCode.Compute(
-                NodeType.GetHashCode(),
+                ((int)NodeType).GetHashCode(),
                 SettingIdentifier.GetHashCode(),
                 QualifiedIdentifier.GetHashCode());
         }
