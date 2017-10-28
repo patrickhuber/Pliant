@@ -4,27 +4,15 @@ namespace Pliant.Grammars
 {
     public class NonTerminal : Symbol, INonTerminal
     {
-        public string Value { get; private set; }
+        public FullyQualifiedName FullyQualifiedName { get; private set; }
 
-        public string Namespace { get; private set; }
-
-        public string Name { get; private set; }
-
+        public string Value { get { return FullyQualifiedName.FullName; } }
+        
         private readonly int _hashCode;
 
         public NonTerminal(string @namespace, string name)
-            : base(SymbolType.NonTerminal)
+            : this(new FullyQualifiedName(@namespace, name))
         {
-            Namespace = @namespace;
-            Name = name;
-
-            // precompute to same time on property execution
-            if (string.IsNullOrEmpty(@namespace))
-                Value = Name;
-            else
-                Value = $"{Namespace}.{Name}";
-
-            _hashCode = ComputeHashCode(Value);
         }
 
         public NonTerminal(string name)
@@ -33,8 +21,12 @@ namespace Pliant.Grammars
         }
         
         public NonTerminal(FullyQualifiedName fullyQualifiedName)
-            : this(fullyQualifiedName.Namespace, fullyQualifiedName.Name)
+            : base(SymbolType.NonTerminal)
         {
+            FullyQualifiedName = fullyQualifiedName;
+
+            // precompute to same time on property execution            
+            _hashCode = ComputeHashCode(Value);
         }
 
         public override int GetHashCode()

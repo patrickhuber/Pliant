@@ -4,18 +4,19 @@ using Pliant.Tokens;
 
 namespace Pliant.Tokens
 {
-    public class TerminalLexeme : ILexeme
+    public class TerminalLexeme : LexemeBase<ITerminalLexerRule>, ILexeme
     {
-        public ITerminal Terminal { get; private set; }
+        public ITerminal Terminal
+        {
+            get { return ConcreteLexerRule.Terminal; }
+        }
 
         string _stringCapture;
         char _capture;
         bool _captureRendered;
         bool _isAccepted;
-
-        public int Position { get; private set; }
-
-        public string Value
+                
+        public override string Value
         {
             get
             {
@@ -32,13 +33,11 @@ namespace Pliant.Tokens
             }
         }
 
-        public TokenType TokenType { get { return LexerRule.TokenType; } }
-
-        public ILexerRule LexerRule { get; private set; }
-
         public TerminalLexeme(ITerminalLexerRule lexerRule, int position)
+            : base(lexerRule, position)
         {
-            Reset(lexerRule, position);
+            _captureRendered = false;
+            _isAccepted = false;
         }
 
         public TerminalLexeme(ITerminal terminal, TokenType tokenType, int position)
@@ -46,16 +45,13 @@ namespace Pliant.Tokens
         {
         }
 
-        public void Reset(ITerminalLexerRule terminalLexerRule, int position)
+        public override void Reset()
         {
-            LexerRule = terminalLexerRule;
-            Terminal = terminalLexerRule.Terminal;
             _captureRendered = false;
             _isAccepted = false;
-            Position = position;
         }
-        
-        public bool IsAccepted()
+                
+        public override bool IsAccepted()
         {
             return _isAccepted;
         }
@@ -70,7 +66,7 @@ namespace Pliant.Tokens
             _capture = value;
         }
 
-        public bool Scan(char c)
+        public override bool Scan(char c)
         {
             if (IsAccepted())
                 return false;
@@ -82,5 +78,6 @@ namespace Pliant.Tokens
             SetAccepted(true);
             return true;
         }
+
     }
 }

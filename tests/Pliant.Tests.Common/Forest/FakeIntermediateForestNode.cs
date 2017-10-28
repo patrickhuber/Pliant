@@ -1,14 +1,15 @@
 ﻿using Pliant.Charts;
 using Pliant.Forest;
+using Pliant.Grammars;
 
 namespace Pliant.Tests.Common.Forest
 {
     public class FakeIntermediateForestNode : FakeInternalForestNode, IIntermediateForestNode
     {
-        public FakeIntermediateForestNode(IState state, int origin, int location, params IAndForestNode[] children) 
+        public FakeIntermediateForestNode(IDottedRule dottedRule, int origin, int location, params IAndForestNode[] children) 
             : base(origin, location, children)
         {
-            State = state;
+            DottedRule = dottedRule;
         }
 
         public override ForestNodeType NodeType
@@ -16,6 +17,6 @@ namespace Pliant.Tests.Common.Forest
             get { return ForestNodeType.Intermediate; }
         }
 
-        public IState State { get; private set; }
+        public IDottedRule DottedRule { get; private set; }
     }
 }

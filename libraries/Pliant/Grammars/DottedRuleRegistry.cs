@@ -31,6 +31,11 @@ namespace Pliant.Grammars
             return dottedRule;
         }
 
+        public IDottedRule GetNext(IDottedRule dottedRule)
+        {
+            return Get(dottedRule.Production, dottedRule.Position + 1);
+        }
+
         private class HashCodeEqualityComparer : IEqualityComparer<IProduction>
         {
             public bool Equals(IProduction x, IProduction y)

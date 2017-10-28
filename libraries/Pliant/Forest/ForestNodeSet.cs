@@ -42,15 +42,25 @@ namespace Pliant.Forest
                 location.GetHashCode());
         }
 
-        public IIntermediateForestNode AddOrGetExistingIntermediateNode(IState trigger, int origin, int location)
+        public IIntermediateForestNode AddOrGetExistingIntermediateNode(IDottedRule dottedRule, int origin, int location)
         {
-            var hash = trigger.GetHashCode();
+            int hash = ComputeHashCode(dottedRule, origin, location);
+
             IIntermediateForestNode intermediateNode = null;
             if (_intermediateNodes.TryGetValue(hash, out intermediateNode))
                 return intermediateNode;
-            intermediateNode = new IntermediateForestNode(trigger, origin, location);
+
+            intermediateNode = new IntermediateForestNode(dottedRule, origin, location);
             _intermediateNodes.Add(hash, intermediateNode);
             return intermediateNode;
+        }
+
+        private static int ComputeHashCode(IDottedRule dottedRule, int origin, int location)
+        {
+            return HashCode.Compute(
+                dottedRule.GetHashCode(),
+                origin.GetHashCode(),
+                location.GetHashCode());
         }
 
         public ITokenForestNode AddOrGetExistingTokenNode(IToken token)

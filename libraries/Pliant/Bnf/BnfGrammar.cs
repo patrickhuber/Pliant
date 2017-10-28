@@ -67,7 +67,7 @@ namespace Pliant.Bnf
                 whitespace
             };
 
-            _bnfGrammar = new Grammar(grammar, productions, ignore);
+            _bnfGrammar = new Grammar(grammar, productions, ignore, null);
         }
 
         private static ILexerRule CreateNotSingleQuoteLexerRule()

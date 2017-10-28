@@ -49,17 +49,22 @@
     <Compile Include="Builders\Expressions\SymbolExpression.cs" />
     <Compile Include="Builders\AlterationModel.cs" />
     <Compile Include="Builders\GrammarModel.cs" />
+    <Compile Include="Builders\IgnoreSettingModel.cs" />
+    <Compile Include="Builders\SettingModel.cs" />
     <Compile Include="Builders\NonTerminalModel.cs" />
     <Compile Include="Builders\ProductionModel.cs" />
     <Compile Include="Builders\LexerRuleModel.cs" />
     <Compile Include="Builders\ProductionReferenceModel.cs" />
     <Compile Include="Builders\ReachibilityMatrix.cs" />
+    <Compile Include="Builders\StartProductionSettingModel.cs" />
     <Compile Include="Builders\SymbolModel.cs" />
     <Compile Include="Builders\SymbolModelType.cs" />
+    <Compile Include="Builders\TriviaSettingModel.cs" />
     <Compile Include="Charts\INormalState.cs" />
     <Compile Include="Charts\IParseNode.cs" />
     <Compile Include="Charts\IRelativeState.cs" />
     <Compile Include="Charts\IStateFactory.cs" />
+    <Compile Include="Charts\NormalStateHashCodeAlgorithm.cs" />
     <Compile Include="Charts\StateFactory.cs" />
     <Compile Include="Charts\StateFrameChart.cs" />
     <Compile Include="Charts\StateFrameSet.cs" />
@@ -95,8 +100,11 @@
     <Compile Include="LexerRules\WhitespaceLexerRule.cs" />
     <Compile Include="Grammars\PreComputedGrammar.cs" />
     <Compile Include="Grammars\DottedRule.cs" />
+    <Compile Include="LexerRules\WordLexerRule.cs" />
     <Compile Include="Runtime\DeterministicParseEngine.cs" />
     <Compile Include="Runtime\MarpaParseEngine.cs" />
+    <Compile Include="Tokens\ITrivia.cs" />
+    <Compile Include="Tokens\LexemeBase.cs" />
     <Compile Include="Tree\ParseTreeEnumerable.cs" />
     <Compile Include="Tree\ParseTreeEnumerator.cs" />
     <Compile Include="Forest\SelectFirstChildDisambiguationAlgorithm.cs" />
@@ -261,9 +269,12 @@
     <Compile Include="Utilities\SharedPools.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Pliant.nuspec" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Analyzer Include="..\..\packages\ClrHeapAllocationAnalyzer.1.0.0.8\analyzers\dotnet\cs\ClrHeapAllocationAnalyzer.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

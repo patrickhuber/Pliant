@@ -58,7 +58,8 @@ namespace Pliant.Json
             InnerGrammar = new GrammarExpression(
                 Json,
                 null,
-                new[] { new WhitespaceLexerRule() })
+                new[] { new WhitespaceLexerRule() },
+                null)
             .ToGrammar();
         }
 

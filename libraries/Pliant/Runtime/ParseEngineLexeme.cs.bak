@@ -8,21 +8,27 @@ using System;
 
 namespace Pliant.Runtime
 {
-    public class ParseEngineLexeme : LexemeBase<IGrammarLexerRule>, ILexeme
+    public class ParseEngineLexeme : ILexeme
     {
-        public override string Value { get { return _capture.ToString(); } }
-        
+        public string Value { get { return _capture.ToString(); } }
+
+        public TokenType TokenType { get { return LexerRule.TokenType; } }
+
+        public ILexerRule LexerRule { get; private set; }
+
+        public int Position { get; private set; }
+
         private StringBuilder _capture;
         private IParseEngine _parseEngine;
 
         public ParseEngineLexeme(IGrammarLexerRule lexerRule)
-            : base(lexerRule, 0)
         {
             _capture = new StringBuilder();
             _parseEngine = new ParseEngine(lexerRule.Grammar);
+            LexerRule = lexerRule;
         }
 
-        public override bool Scan(char c)
+        public bool Scan(char c)
         {
             // get expected lexems
             // PERF: Avoid Linq where, let and select expressions due to lambda allocation
@@ -47,23 +53,28 @@ namespace Pliant.Runtime
 
             if (firstPassingRule == null)
                 return false;
-            
-            var result = _parseEngine.Pulse(firstPassingRule);
+
+            var token = new Token(firstPassingRule.Value, _parseEngine.Location, firstPassingRule.TokenType);
+
+            var result = _parseEngine.Pulse(token);
             if (result)
                 _capture.Append(c);
 
             return result;
         }
 
-        public override bool IsAccepted()
+        public bool IsAccepted()
         {
             return _parseEngine.IsAccepted();
         }
 
-        public override void Reset()
+        public void Reset(IGrammarLexerRule newGrammarRule, int position)
         {
+            LexerRule = newGrammarRule;
             _capture.Clear();
-            _parseEngine = new ParseEngine(ConcreteLexerRule.Grammar);
+
+            _parseEngine = new ParseEngine(newGrammarRule.Grammar);
+            Position = position;
         }
     }
 }

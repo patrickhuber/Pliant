@@ -4,8 +4,9 @@
     {
         public virtual void Visit(IInternalTreeNode node)
         {
-            foreach (var child in node.Children)
-                child.Accept(this);
+            var nodeChildrenCount = node.Children.Count;
+            for (var i = 0; i < nodeChildrenCount; i++)
+                node.Children[i].Accept(this);            
         }
 
         public virtual void Visit(ITokenTreeNode node)

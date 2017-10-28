@@ -132,7 +132,7 @@ namespace Pliant.Tests.Common.Forest
 
         private static string GetIntermediateNodeString(IIntermediateForestNode node)
         {
-            return $"({node.State.DottedRule}, {node.Origin}, {node.Location})";
+            return $"({node.DottedRule}, {node.Origin}, {node.Location})";
         }
 
         private static string GetTokenNodeString(ITokenForestNode node)

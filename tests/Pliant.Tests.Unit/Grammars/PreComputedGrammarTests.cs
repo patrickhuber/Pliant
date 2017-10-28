@@ -142,7 +142,8 @@ namespace Pliant.Tests.Unit.Grammars
             return new GrammarExpression(
                 Json,
                 null,
-                new[] { new WhitespaceLexerRule() }).ToGrammar();
+                new[] { new WhitespaceLexerRule() },
+                null).ToGrammar();
         }
 
         private static BaseLexerRule String()

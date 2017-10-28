@@ -47,14 +47,28 @@ namespace Pliant.Runtime
             throw new NotImplementedException();
         }
 
-        public List<ILexerRule> GetExpectedLexerRules()
+        private Dictionary<int, IReadOnlyList<ILexerRule>> _expectedLexerRuleCache = new Dictionary<int, IReadOnlyList<ILexerRule>>();
+        private static readonly ILexerRule[] EmptyLexerRules = { };
+
+        public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
-            var list = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
+            var frameSets = Chart.FrameSets;
+            var frameSetCount = frameSets.Count;
 
-            if (Chart.FrameSets.Count == 0)
-                return list;
+            if (frameSetCount == 0)
+                return EmptyLexerRules;
+                        
+            var frameSet = frameSets[frameSetCount - 1];
+            var hashCode = ComputeExpectedLexerRulesHashCode(frameSet);
 
-            var frameSet = Chart.FrameSets[Chart.FrameSets.Count - 1];
+            IReadOnlyList<ILexerRule> cachedLexerRules = null;
+
+            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
+                return cachedLexerRules;
+
+            var listPool = SharedPools.Default<List<ILexerRule>>();
+            List<ILexerRule> list = listPool.AllocateAndClear();
+
             for (var i = 0; i < frameSet.Frames.Count; i++)
             {
                 var stateFrame = frameSet.Frames[i];
@@ -64,7 +78,31 @@ namespace Pliant.Runtime
                     list.Add(lexerRule);
                 }
             }
-            return list;
+
+            var array = list.ToArray();
+            listPool.ClearAndFree(list);
+
+            _expectedLexerRuleCache.Add(hashCode, array);
+
+            return array;
+        }
+
+        private static int ComputeExpectedLexerRulesHashCode(StateFrameSet frameSet)
+        {
+            var hashCode = 0;
+            var count = 0;
+            for (var i = 0; i < frameSet.Frames.Count; i++)
+            {
+                var stateFrame = frameSet.Frames[i];
+                for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
+                {
+                    var lexerRule = stateFrame.Frame.ScanKeys[j];
+                    hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, count == 0);
+                    count++;
+                }
+            }
+            
+            return hashCode;
         }
 
         public bool Pulse(IToken token)

@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FluentAssertions.cs" />
     <Compile Include="Forest\LoggingForestNodeVisitor.cs" />
     <Compile Include="Grammars\CycleGrammar.cs" />
     <Compile Include="Grammars\ExpressionGrammar.cs" />

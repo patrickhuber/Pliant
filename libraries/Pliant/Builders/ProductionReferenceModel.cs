@@ -4,8 +4,8 @@ namespace Pliant.Builders
 {
     public class ProductionReferenceModel : SymbolModel
     {
-
         public IGrammar Grammar { get; private set; }
+
         public INonTerminal Reference { get; private set; }
 
         public override SymbolModelType ModelType

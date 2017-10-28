@@ -10,6 +10,8 @@ namespace Pliant.Grammars
 
         IReadOnlyList<ILexerRule> Ignores { get; }
 
+        IReadOnlyList<ILexerRule> Trivia { get; }
+
         IReadOnlyDottedRuleRegistry DottedRules { get; }
 
         IReadOnlyList<IProduction> RulesFor(INonTerminal nonTerminal);
@@ -19,7 +21,9 @@ namespace Pliant.Grammars
         IReadOnlyList<IProduction> StartProductions();
 
         bool IsNullable(INonTerminal nonTerminal);
+
         bool IsTransativeNullable(INonTerminal nonTerminal);
+
         bool IsRightRecursive(ISymbol symbol);
     }
 }

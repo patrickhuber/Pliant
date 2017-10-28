@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Forest;
+using Pliant.Grammars;
 
 namespace Pliant.Charts
 {
@@ -8,6 +9,8 @@ namespace Pliant.Charts
 
         IState NewState(IProduction production, int position, int origin);
 
-        IState NextState(IState state);
+        IState NewState(IDottedRule dottedRule, int origin, IForestNode parseNode = null);
+
+        IState NextState(IState state, IForestNode parseNode = null);
     }
 }
