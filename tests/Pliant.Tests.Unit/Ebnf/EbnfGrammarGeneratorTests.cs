@@ -331,6 +331,30 @@ namespace Pliant.Tests.Unit.Ebnf
             Assert.AreEqual(1, grammar.Trivia.Count);
         }
 
+        [TestMethod]
+        public void EbnfGrammarGeneratorStartSettingShouldSetStartProduction()
+        {
+            // :start S;
+            // S = 'a';
+            var definition = new EbnfDefinitionConcatenation(
+                new EbnfBlockSetting(
+                    new EbnfSetting(
+                        new EbnfSettingIdentifier("start"),
+                        new EbnfQualifiedIdentifier("S"))), 
+                new EbnfDefinition(
+                new EbnfBlockRule(
+                    new EbnfRule(
+                        new EbnfQualifiedIdentifier("S"),
+                        new EbnfExpression(
+                            new EbnfTerm(
+                                new EbnfFactorLiteral("a")))))));
+
+
+            var grammar = GenerateGrammar(definition);
+            Assert.IsNotNull(grammar.Start);
+            Assert.AreEqual(grammar.Start.FullyQualifiedName.Name, "S");
+        }
+
         private static IGrammar GenerateGrammar(EbnfDefinition definition)
         {
             var generator = new EbnfGrammarGenerator();
