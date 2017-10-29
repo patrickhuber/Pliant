@@ -10,7 +10,7 @@ namespace Pliant.Benchmarks
     {
         string sampleBnf;
 
-        [Setup]
+        [GlobalSetup]
         public void Setup()
         {
             sampleBnf = File.ReadAllText(

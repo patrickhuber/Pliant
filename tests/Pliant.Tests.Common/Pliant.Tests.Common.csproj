@@ -1,76 +1,15 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{695B08BA-6B90-4B25-A99B-A09E4F84DFEE}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Pliant.Tests.Common</RootNamespace>
-    <AssemblyName>Pliant.Tests.Common</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>netstandard1.0</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Forest\LoggingForestNodeVisitor.cs" />
-    <Compile Include="Grammars\CycleGrammar.cs" />
-    <Compile Include="Grammars\ExpressionGrammar.cs" />
-    <Compile Include="Grammars\HiddenRightRecursionGrammar.cs" />
-    <Compile Include="Grammars\NullableGrammar.cs" />
-    <Compile Include="Grammars\RightRecursionGrammar.cs" />
-    <Compile Include="Grammars\SimpleExpressionGrammar.cs" />
-    <Compile Include="Forest\FakeAndForestNode.cs" />
-    <Compile Include="Forest\FakeIntermediateForestNode.cs" />
-    <Compile Include="Forest\FakeInternalForestNode.cs" />
-    <Compile Include="Forest\FakeSymbolForestNode.cs" />
-    <Compile Include="Forest\FakeTokenForestNode.cs" />
-    <Compile Include="ParseTester.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StatefulForestNodeComparer.cs" />
+    <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj">
-      <Project>{5c23805f-0ffc-4039-b853-e5acbe63a3c0}</Project>
-      <Name>Pliant</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
