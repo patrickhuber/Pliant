@@ -10,7 +10,7 @@ namespace Pliant.Benchmarks
     {
         string json;
 
-        [Setup]
+        [GlobalSetup]
         public void Setup()
         {
             json = File.ReadAllText(

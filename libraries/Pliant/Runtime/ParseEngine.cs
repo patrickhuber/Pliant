@@ -600,19 +600,17 @@ namespace Pliant.Runtime
 
         private static void Log(string operation, int origin, IState state)
         {
-            LogOriginStateOperation(operation, origin, state);
-            Debug.WriteLine(string.Empty);
+            Debug.WriteLine(GetOriginStateOperationString(operation, origin, state));
         }
 
-        private static void LogOriginStateOperation(string operation, int origin, IState state)
+        private static string GetOriginStateOperationString(string operation, int origin, IState state)
         {
-            Debug.Write($"{origin.ToString().PadRight(50)}{state.ToString().PadRight(50)}{operation}");
+            return $"{origin.ToString().PadRight(50)}{state.ToString().PadRight(50)}{operation}";
         }
 
         private static void LogScan(int origin, IState state, IToken token)
         {
-            LogOriginStateOperation("Scan", origin, state);
-            Debug.WriteLine($" {token.Value}");
+            Debug.WriteLine($"{GetOriginStateOperationString("Scan", origin, state)}{token.Value}");
         }        
     }
 }

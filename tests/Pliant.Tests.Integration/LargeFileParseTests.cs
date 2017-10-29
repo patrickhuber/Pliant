@@ -64,7 +64,7 @@ namespace Pliant.Tests.Integration.Runtime
         [DeploymentItem(@"10000.json", "Runtime")]
         public void TestCanParseLargeJsonFile()
         {
-            var path = Path.Combine(TestContext.TestDeploymentDir, "Runtime", "10000.json");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Runtime", "10000.json");
             using (var stream = File.OpenRead(path))
             using (var reader = new StreamReader(stream))
             {
@@ -76,7 +76,7 @@ namespace Pliant.Tests.Integration.Runtime
         [DeploymentItem(@"10000.json", "Runtime")]
         public void TestCanParseLargeJsonFileWithCompression()
         {
-            var path = Path.Combine(TestContext.TestDeploymentDir, "Runtime", "10000.json");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Runtime", "10000.json");
             using (var stream = File.OpenRead(path))
             using (var reader = new StreamReader(stream))
             {
@@ -88,7 +88,7 @@ namespace Pliant.Tests.Integration.Runtime
         [DeploymentItem(@"10000.json", "Runtime")]
         public void TestCanParseLargeJsonFileWithMarpa()
         {
-            var path = Path.Combine(TestContext.TestDeploymentDir, "Runtime", "10000.json");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Runtime", "10000.json");
             using (var stream = File.OpenRead(path))
             using (var reader = new StreamReader(stream))
             {

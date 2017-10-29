@@ -50,7 +50,7 @@ namespace Pliant.Collections
             var bitMatrix = new BitMatrix(_matrix.Length);
             for (int i = 0; i < _matrix.Length; i++)
             {
-                bitMatrix._matrix[i] = _matrix[i].Clone() as BitArray;
+                bitMatrix._matrix[i] = new BitArray(_matrix[i]);
             }
             return bitMatrix;
         }
