@@ -76,6 +76,14 @@ public class ParseRunner : IParseRunner
         return _reader.Peek() == -1;
     }
 
+    public bool RunToEnd()
+    {
+        while (!EndOfStream())
+            if (!Read())
+                return false;
+        return ParseEngine.IsAccepted();
+    }
+
     private bool MatchesExistingIncompleteIgnoreLexemes(char character)
     {
         if (!AnyExistingIngoreLexemes())

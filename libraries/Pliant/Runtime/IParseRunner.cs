@@ -23,5 +23,11 @@
         /// </summary>
         /// <returns>true if the end of stream has been reached, false otherwise.</returns>
         bool EndOfStream();
+
+        /// <summary>
+        /// Runs the parse runner to the end of stream or until an error is encountered.
+        /// </summary>
+        /// <returns>true if end of stream, false if error is encountered.</returns>
+        bool RunToEnd();
     }
 }
