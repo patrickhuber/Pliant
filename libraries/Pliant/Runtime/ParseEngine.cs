@@ -23,6 +23,11 @@ namespace Pliant.Runtime
 
         public IStateFactory StateFactory { get; private set; }
 
+        private const string PredictionLogName = "Predict";
+        private const string StartLogName = "Start";
+        private const string CompleteLogName = "Complete";
+        private const string TransitionLogName = "Transition";
+
         private Chart _chart;
         private readonly ForestNodeSet _nodeSet;
         private readonly IDottedRuleRegistry _dottedRuleRegistry;
@@ -147,7 +152,7 @@ namespace Pliant.Runtime
                 var startProduction = startProductions[s];
                 var startState = StateFactory.NewState(startProduction, 0, 0);
                 if (_chart.Enqueue(0, startState))
-                    Log("Start", 0, startState);
+                    Log(StartLogName, 0, startState);
             }
             ReductionPass(Location);
         }
@@ -262,7 +267,7 @@ namespace Pliant.Runtime
             // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
             var predictedState = StateFactory.NewState(dottedRule, j);
             if (_chart.Enqueue(j, predictedState))
-                Log("Predict", j, predictedState);
+                Log(PredictionLogName, j, predictedState);
         }
 
         private void PredictAycockHorspool(INormalState evidence, int j)
@@ -293,7 +298,7 @@ namespace Pliant.Runtime
             }
             var aycockHorspoolState = StateFactory.NewState(dottedRule, evidence.Origin, parseNode);
             if (_chart.Enqueue(j, aycockHorspoolState))
-                Log("Predict", j, aycockHorspoolState);
+                Log(PredictionLogName, j, aycockHorspoolState);
         }
 
         private void Complete(INormalState completed, int k)
@@ -336,7 +341,7 @@ namespace Pliant.Runtime
                 virtualParseNode);
 
             if (_chart.Enqueue(k, topmostItem))
-                Log("Complete", k, topmostItem);
+                Log(CompleteLogName, k, topmostItem);
         }
         
         private void EarleyComplete(INormalState completed, int k)
@@ -363,7 +368,7 @@ namespace Pliant.Runtime
                 var nextState = StateFactory.NewState(dottedRule, origin, parseNode);
 
                 if (_chart.Enqueue(k, nextState))
-                    Log("Complete", k, nextState);
+                    Log(CompleteLogName, k, nextState);
             }
         }
         
@@ -444,7 +449,9 @@ namespace Pliant.Runtime
                   k);
 
             if (_chart.Enqueue(k, currentTransitionState))
-                Log("Transition", k, currentTransitionState);
+            {                
+                Log(TransitionLogName, k, currentTransitionState);
+            }
 
             previousTransitionState = currentTransitionState;
         }
