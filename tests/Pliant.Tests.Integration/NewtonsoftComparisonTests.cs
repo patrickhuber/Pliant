@@ -16,10 +16,10 @@ namespace Pliant.Tests.Integration
         public TestContext TestContext { get; set; }
 
         [TestMethod]
-        [DeploymentItem(@"Runtime\10000.json", "Runtime")]
+        [DeploymentItem(@"10000.json")]
         public void NewtonsoftCanParseLargeJsonFile()
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Runtime", "10000.json");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "10000.json");
             using (var stream = File.OpenRead(path))
             using (var reader = new StreamReader(stream))
             using (var jsonTextReader = new JsonTextReader(reader))
