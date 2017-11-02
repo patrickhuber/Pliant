@@ -104,6 +104,26 @@ namespace Pliant.Tests.Integration.Runtime
         }
 
         [TestMethod]
+        [DeploymentItem(@"10000.json")]
+        public void TestCanParseLargeJsonFileWithCustomLexer()
+        {
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "10000.json");
+            var jsonLexer = new JsonLexer();
+            var parser = _parseTester.ParseEngine;
+            using (var stream = File.OpenRead(path))
+            using (var reader = new StreamReader(stream))
+            {
+                var tokens = jsonLexer.Lex(reader);
+                foreach (var token in tokens)
+                    if(token.TokenType != JsonLexer.Whitespace)
+                        if(!parser.Pulse(token))
+                            Assert.Fail($"unable to parse token {token.TokenType} at {token.Position}");
+            }
+            if (!parser.IsAccepted())
+                Assert.Fail("Parse was not accepted");
+        }
+
+        [TestMethod]
         public void TestCanParseJsonObjectWithCompression()
         {
             var json = @"
