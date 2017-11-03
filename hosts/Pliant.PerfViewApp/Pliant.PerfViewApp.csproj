@@ -14,4 +14,10 @@
     <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="10000.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
