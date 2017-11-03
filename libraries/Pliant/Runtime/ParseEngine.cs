@@ -605,9 +605,10 @@ namespace Pliant.Runtime
             Initialize();
         }
 
-        private static void Log(string operation, int origin, IState state)
+        private void Log(string operation, int origin, IState state)
         {
-            Debug.WriteLine(GetOriginStateOperationString(operation, origin, state));
+            if(Options.LoggingEnabled)
+                Debug.WriteLine(GetOriginStateOperationString(operation, origin, state));
         }
 
         private static string GetOriginStateOperationString(string operation, int origin, IState state)
@@ -615,9 +616,10 @@ namespace Pliant.Runtime
             return $"{origin.ToString().PadRight(50)}{state.ToString().PadRight(50)}{operation}";
         }
 
-        private static void LogScan(int origin, IState state, IToken token)
+        private void LogScan(int origin, IState state, IToken token)
         {
-            Debug.WriteLine($"{GetOriginStateOperationString("Scan", origin, state)}{token.Value}");
+            if(Options.LoggingEnabled)
+                Debug.WriteLine($"{GetOriginStateOperationString("Scan", origin, state)}{token.Value}");
         }        
     }
 }
