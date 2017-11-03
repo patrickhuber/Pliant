@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Pliant.Utilities;
 using Pliant.Diagnostics;
 using Pliant.Collections;
+using System.Linq;
 
 namespace Pliant.Runtime
 {
@@ -62,24 +63,9 @@ namespace Pliant.Runtime
 
             var hashCode = 0;
 
-            for (int s = 0; s < scanStates.Count; s++)
-            {
-                var scanState = scanStates[s];
-                hashCode = HashCode.ComputeIncrementalHash(scanState.GetHashCode(), hashCode, s == 0);
-            }
+            var uniqueLexerRulesPool = SharedPools.Default<HashSet<ILexerRule>>();
+            var uniqueLexerRules = uniqueLexerRulesPool.AllocateAndClear();
 
-            IReadOnlyList<ILexerRule> cachedLexerRules = null;
-            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
-                return cachedLexerRules;
-
-            var returnListPool = SharedPools.Default<List<ILexerRule>>();
-            var returnList = returnListPool.AllocateAndClear();
-
-            var uniqueTokenTypeListPool = SharedPools.Default<HashSet<TokenType>>();
-            var uniqueTokenTypes = uniqueTokenTypeListPool.AllocateAndClear();
-
-            // PERF: Avoid Linq Select, Where due to lambda allocation
-            // PERF: Avoid foreach enumeration due to IEnumerable boxing
             for (int s = 0; s < scanStates.Count; s++)
             {
                 var scanState = scanStates[s];
@@ -88,17 +74,26 @@ namespace Pliant.Runtime
                     && postDotSymbol.SymbolType == SymbolType.LexerRule)
                 {
                     var lexerRule = postDotSymbol as ILexerRule;
-                    if (uniqueTokenTypes.Add(lexerRule.TokenType))
+                    if (uniqueLexerRules.Add(lexerRule))
                     {
-                        returnList.Add(lexerRule);
+                        hashCode = HashCode.ComputeIncrementalHash(
+                            lexerRule.GetHashCode(),
+                            hashCode, 
+                            hashCode == 0);
                     }
                 }
             }
-            uniqueTokenTypeListPool.ClearAndFree(uniqueTokenTypes);
 
-            var array = returnList.ToArray();
-            returnListPool.ClearAndFree(returnList);
-            
+            IReadOnlyList<ILexerRule> cachedLexerRules = null;
+            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
+            {
+                uniqueLexerRulesPool.ClearAndFree(uniqueLexerRules);
+                return cachedLexerRules;
+            }
+
+            var array = uniqueLexerRules.ToArray();
+            uniqueLexerRulesPool.ClearAndFree(uniqueLexerRules);
+
             _expectedLexerRuleCache.Add(hashCode, array);
             return array;
         }

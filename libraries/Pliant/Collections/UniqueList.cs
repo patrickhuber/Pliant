@@ -218,5 +218,10 @@ namespace Pliant.Collections
                 return false;
             return _innerList.Equals(uniqueList._innerList);
         }
+
+        public T[] ToArray()
+        {
+            return _innerList.ToArray();
+        }
     }
 }

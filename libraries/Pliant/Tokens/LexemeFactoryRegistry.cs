@@ -1,5 +1,6 @@
 ﻿using Pliant.Collections;
 using Pliant.Grammars;
+using Pliant.Utilities;
 using System.Collections.Generic;
 
 namespace Pliant.Tokens
@@ -10,7 +11,8 @@ namespace Pliant.Tokens
 
         public LexemeFactoryRegistry()
         {
-            _registry = new Dictionary<LexerRuleType, ILexemeFactory>();
+            _registry = new Dictionary<LexerRuleType, ILexemeFactory>(
+                new HashCodeEqualityComparer<LexerRuleType>());
         }
 
         public ILexemeFactory Get(LexerRuleType lexerRuleType)

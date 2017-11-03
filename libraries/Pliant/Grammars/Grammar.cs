@@ -55,7 +55,7 @@ namespace Pliant.Grammars
             AddIgnoreRules(ignoreRules ?? EmptyLexerRuleArray);
             AddTriviaRules(triviaRules ?? EmptyLexerRuleArray);
 
-            _rightRecursiveSymbols = CreateRightRecursiveSymbols(_dottedRuleRegistry, _symbolPaths, _transativeNullableSymbols);
+            _rightRecursiveSymbols = CreateRightRecursiveSymbols(_dottedRuleRegistry, _symbolPaths);
             FindNullableSymbols(_symbolsReverseLookup, _transativeNullableSymbols);
         }
 
@@ -189,8 +189,7 @@ namespace Pliant.Grammars
 
         private HashSet<ISymbol> CreateRightRecursiveSymbols(
             IDottedRuleRegistry dottedRuleRegistry,
-            Dictionary<ISymbol, UniqueList<ISymbol>> symbolPaths,
-            UniqueList<INonTerminal> nullableSymbols)
+            Dictionary<ISymbol, UniqueList<ISymbol>> symbolPaths)
         {
             var hashSet = new HashSet<ISymbol>();
             for (var p = 0; p < _productions.Count; p++)
