@@ -261,7 +261,7 @@ namespace Pliant.Runtime
 
         private void PredictProduction(int j, IProduction production)
         {
-            IDottedRule dottedRule = _dottedRuleRegistry.Get(production, 0);
+            var dottedRule = _dottedRuleRegistry.Get(production, 0);
             if (_chart.Contains(j, StateType.Normal, dottedRule, 0))
                 return;
             // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
@@ -296,6 +296,10 @@ namespace Pliant.Runtime
                     nullParseNode,
                     j);                
             }
+
+            if (_chart.Contains(j, StateType.Normal, dottedRule, evidence.Origin))
+                return;
+
             var aycockHorspoolState = StateFactory.NewState(dottedRule, evidence.Origin, parseNode);
             if (_chart.Enqueue(j, aycockHorspoolState))
                 Log(PredictionLogName, j, aycockHorspoolState);
@@ -358,12 +362,16 @@ namespace Pliant.Runtime
                 var dottedRule = _dottedRuleRegistry.GetNext(prediction.DottedRule);
                 var origin = prediction.Origin;
 
+                // this will not create a node if the state already exists
                 var parseNode = CreateParseNode(
                     dottedRule,
                     origin,
                     prediction.ParseNode,
                     completed.ParseNode,
                     k);
+
+                if (_chart.Contains(k, StateType.Normal, dottedRule, origin))
+                    continue;
 
                 var nextState = StateFactory.NewState(dottedRule, origin, parseNode);
 
@@ -508,8 +516,7 @@ namespace Pliant.Runtime
             symbolNode.AddUniqueFamily(nullNode);
             return symbolNode;
         }
-
-
+        
         private IForestNode CreateParseNode(
             IDottedRule nextDottedRule,
             int origin,
