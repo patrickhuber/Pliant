@@ -70,6 +70,18 @@ namespace Pliant.Runtime
             return true;
         }
 
+        public bool Pulse(IReadOnlyList<IToken> tokens)
+        {
+            for(var i=0;i<tokens.Count;i++)
+                Scan(Location, tokens[i]);
+            var tokenRecognized = _chart.FrameSets.Count > Location + 1;
+            if (!tokenRecognized)
+                return false;
+            Location++;
+            Reduce(Location);
+            return true;
+        }
+
         public bool IsAccepted()
         {
             var anyEarleySets = _chart.FrameSets.Count > 0;

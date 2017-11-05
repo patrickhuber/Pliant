@@ -40,7 +40,6 @@ namespace Pliant.Ebnf
                 any = new TerminalLexerRule(new AnyTerminal(), "."),
                 notCloseBracket = new TerminalLexerRule(
                     new NegationTerminal(new CharacterTerminal(']')), "[^\\]]"),
-                notMeta = CreateNotMetaLexerRule(),
                 escapeCharacter = CreateEscapeCharacterLexerRule(),
                 whitespace = CreateWhitespaceLexerRule(),
                 multiLineComment = CreateMultiLineCommentLexerRule();
@@ -277,15 +276,7 @@ namespace Pliant.Ebnf
             var whitespace = new DfaLexerRule(startWhitespace, TokenTypes.Whitespace);
             return whitespace;
         }
-
-        private static BaseLexerRule CreateNotMetaLexerRule()
-        {
-            return new TerminalLexerRule(
-                    new NegationTerminal(
-                        new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')),
-                    TokenTypes.NotMeta);
-        }
-
+        
         private static BaseLexerRule CreateMultiLineCommentLexerRule()
         {
             var states = new DfaState[5];

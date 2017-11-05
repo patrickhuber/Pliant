@@ -28,13 +28,13 @@ namespace Pliant.Benchmarks
             return RunParse(new ParseEngine(_grammar), _json);
         }
         
-        [Benchmark]
+        //[Benchmark]
         public bool DeterministicParseEngineParse()
         {
             return RunParse(new DeterministicParseEngine(_grammar), _json);
         }
         
-        [Benchmark]
+        //[Benchmark]
         public bool MarpaParseEngineParse()
         {
             return RunParse(new MarpaParseEngine(_grammar), _json);

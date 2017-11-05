@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders.Expressions;
+using Pliant.LexerRules;
+using Pliant.RegularExpressions;
 using System.Linq;
 
 namespace Pliant.Tests.Unit
@@ -79,6 +81,46 @@ namespace Pliant.Tests.Unit
 
             var rulesContainingS = grammar.RulesContainingSymbol(S.ProductionModel.LeftHandSide.NonTerminal);
             Assert.AreEqual(0, rulesContainingS.Count);
+        }
+
+        [TestMethod]
+        public void GrammarShouldContainAllLexerRulesInSuppliedProductionsIgnoresAndTrivia()
+        {
+            ProductionExpression
+                S = nameof(S),
+                A = nameof(A),
+                B = nameof(B),
+                C = nameof(C);
+
+            S.Rule = A | B;
+            A.Rule = A | C | 'a';
+            B.Rule = 'b' | B;
+            C.Rule = 'c';
+
+            var grammarExpression = new GrammarExpression(
+                S, 
+                null, 
+                new[] { new WhitespaceLexerRule() }, 
+                new[] { new WordLexerRule() });
+
+            var grammar = grammarExpression.ToGrammar();
+
+            Assert.IsNotNull(grammar.LexerRules);
+            Assert.AreEqual(5, grammar.LexerRules.Count);
+            for(var i = 0;i<grammar.LexerRules.Count;i++)
+                Assert.IsNotNull(grammar.LexerRules[i]);
+        }
+
+        [TestMethod]
+        public void GrammarShouldContainAllLexerRulesInReferencedGrammars()
+        {
+            var regex = new ProductionReferenceExpression(new RegexGrammar());
+            ProductionExpression S = nameof(S);
+            S.Rule = regex;
+            var grammarExpression = new GrammarExpression(S);
+            var grammar = grammarExpression.ToGrammar();
+            Assert.IsNotNull(grammar.LexerRules);
+            Assert.AreEqual(15, grammar.LexerRules.Count);
         }
     }
 }

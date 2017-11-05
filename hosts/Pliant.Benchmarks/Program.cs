@@ -7,7 +7,7 @@ namespace Pliant.Benchmarks
     {
         static void Main(string[] args)
         {
-            BenchmarkRunner.Run<AnsiCBnfBenchmark>();
+            //BenchmarkRunner.Run<AnsiCBnfBenchmark>();
             BenchmarkRunner.Run<JsonBenchmark>();
         }
     }
