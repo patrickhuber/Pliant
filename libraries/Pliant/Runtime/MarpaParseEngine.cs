@@ -107,7 +107,19 @@ namespace Pliant.Runtime
 
         public bool Pulse(IToken token)
         {
-            ScanPasss(Location, token);
+            ScanPass(Location, token);
+            var tokenRecognized = Chart.FrameSets.Count > Location + 1;
+            if (!tokenRecognized)
+                return false;
+            Location++;
+            ReductionPass(Location);
+            return true;
+        }
+
+        public bool Pulse(IReadOnlyList<IToken> tokens)
+        {
+            for (var i = 0; i < tokens.Count; i++)
+                ScanPass(Location, tokens[i]);
             var tokenRecognized = Chart.FrameSets.Count > Location + 1;
             if (!tokenRecognized)
                 return false;
@@ -162,7 +174,7 @@ namespace Pliant.Runtime
             return false;
         }
 
-        private void ScanPasss(int iLoc, IToken token)
+        private void ScanPass(int iLoc, IToken token)
         {
             var iES = Chart.FrameSets[iLoc];
             for (var i = 0; i < iES.Frames.Count; i++)

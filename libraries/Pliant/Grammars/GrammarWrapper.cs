@@ -32,10 +32,20 @@ namespace Pliant.Grammars
             get { return _innerGrammar.Trivia; }
         }
 
+        public IReadOnlyList<ILexerRule> LexerRules
+        {
+            get { return _innerGrammar.LexerRules; }
+        }
+
         public IReadOnlyDottedRuleRegistry DottedRules
         {
             get { return _innerGrammar.DottedRules; }
-        } 
+        }
+
+        public int GetLexerRuleIndex(ILexerRule lexerRule)
+        {
+            return _innerGrammar.GetLexerRuleIndex(lexerRule);
+        }
 
         public IReadOnlyList<IProduction> RulesFor(INonTerminal nonTerminal)
         {

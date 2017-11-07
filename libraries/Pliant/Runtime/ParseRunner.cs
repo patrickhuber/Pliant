@@ -14,7 +14,7 @@ public class ParseRunner : IParseRunner
     private readonly ILexemeFactoryRegistry _lexemeFactoryRegistry;
     private List<ILexeme> _tokenLexemes;
     private List<ILexeme> _ignoreLexemes;
-    private ILexeme _previousTokenLexeme;
+    private List<ILexeme> _previousTokenLexemes;
     private List<ILexeme> _triviaAccumulator;
     private List<ILexeme> _triviaLexemes;
 
@@ -118,11 +118,13 @@ public class ParseRunner : IParseRunner
 
     private void AddTrailingTriviaToPreviousToken()
     {
-        if (_previousTokenLexeme == null)
+        if (_previousTokenLexemes == null
+            || _previousTokenLexemes.Count == 0)
             return;
 
         for (var a = 0; a < _triviaAccumulator.Count; a++)
-            _previousTokenLexeme.AddTrailingTrivia(_triviaAccumulator[a]);
+            for (var l = 0; l < _previousTokenLexemes.Count; l++)
+                _previousTokenLexemes[l].AddTrailingTrivia(_triviaAccumulator[a]);
 
         _triviaLexemes.Clear();
         _triviaAccumulator.Clear();
@@ -159,7 +161,14 @@ public class ParseRunner : IParseRunner
     {
         return _reader.Peek() == -1;
     }
-        
+    public bool RunToEnd()
+    {
+        while (!EndOfStream())
+            if (!Read())
+                return false;
+        return ParseEngine.IsAccepted();
+    }
+
     private char ReadCharacter()
     {
         var character = (char)_reader.Read();
@@ -234,42 +243,61 @@ public class ParseRunner : IParseRunner
 
     private bool TryParseExistingToken()
     {
-        // PERF: Avoid Linq FirstOrDefault due to lambda allocation
-        ILexeme longestAcceptedMatch = null;
-        var doNotFreeLexemeIndex = -1;
+        var listPool = SharedPools.Default<List<ILexeme>>();
+
+        List<ILexeme> matches = null;
+        List<ILexeme> misses = null;
+
         for (int i = 0; i < _tokenLexemes.Count; i++)
         {
             var lexeme = _tokenLexemes[i];
             if (lexeme.IsAccepted())
             {
-                doNotFreeLexemeIndex = i;
-                longestAcceptedMatch = lexeme;
-                break;
+                if (matches == null)
+                    matches = listPool.AllocateAndClear();
+                matches.Add(lexeme);
+            }
+            else
+            {
+                if (misses == null)
+                    misses = listPool.AllocateAndClear();
+                misses.Add(lexeme);
             }
         }
 
-        if (longestAcceptedMatch == null)
+        if (matches == null)
+        {
+            if (misses != null)
+                listPool.ClearAndFree(misses);
             return false;
+        }
+
+        if (!ParseEngine.Pulse(matches))
+        {
+            listPool.ClearAndFree(matches);
+            if (misses != null)
+                listPool.ClearAndFree(misses);
+            return false;
+        }
+
+
+        if (misses != null)
+        {
+            listPool.ClearAndFree(misses);
+            ClearLexemes(misses);
+        }
+        _tokenLexemes.Clear();
         
-        if (!ParseEngine.Pulse(longestAcceptedMatch))
-            return false;
-        _previousTokenLexeme = longestAcceptedMatch;
-
-        ClearTokenLexemes(doNotFreeLexemeIndex);
-
         for (var i = 0; i < _triviaAccumulator.Count; i++)
-            longestAcceptedMatch.AddLeadingTrivia(_triviaAccumulator[i]);
+            for(var j=0;j<matches.Count;j++)
+                matches[j].AddLeadingTrivia(_triviaAccumulator[i]);
 
         _triviaAccumulator.Clear();
+        _previousTokenLexemes = matches;
 
-        return true;
+        return true;        
     }
     
-    private void ClearTokenLexemes(int doNotFreeLexemeIndex)
-    {
-        ClearLexemes(_tokenLexemes, doNotFreeLexemeIndex);
-    }
-
     private bool MatchesNewTokenLexemes(char character)
     {
         var lexerRules = ParseEngine.GetExpectedLexerRules();
@@ -441,10 +469,9 @@ public class ParseRunner : IParseRunner
         return matches;
     }
 
-    private void ClearLexemes(List<ILexeme> lexemes, int doNotFreeLexemeIndex = -1)
+    private void ClearLexemes(List<ILexeme> lexemes)
     {
         for (var i = 0; i < lexemes.Count; i++)
-            if(i != doNotFreeLexemeIndex)
                 FreeLexeme(lexemes[i]);
         lexemes.Clear();
     }

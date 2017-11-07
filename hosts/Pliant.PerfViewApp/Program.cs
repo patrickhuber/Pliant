@@ -1,8 +1,6 @@
-﻿using Pliant.Bnf;
-using Pliant.Json;
+﻿using Pliant.Json;
 using Pliant.Runtime;
 using System;
-using System.Diagnostics;
 using System.IO;
 
 namespace Pliant.PerfViewApp

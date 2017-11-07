@@ -31,7 +31,7 @@ namespace Pliant.Grammars
 
         public override string ToString()
         {
-            return Terminal.ToString();
+            return TokenType.ToString();
         }
 
         public override bool Equals(object obj)

@@ -14,6 +14,10 @@ namespace Pliant.Grammars
 
         IReadOnlyDottedRuleRegistry DottedRules { get; }
 
+        IReadOnlyList<ILexerRule> LexerRules { get; }
+
+        int GetLexerRuleIndex(ILexerRule lexerRule);
+
         IReadOnlyList<IProduction> RulesFor(INonTerminal nonTerminal);
 
         IReadOnlyList<IProduction> RulesContainingSymbol(INonTerminal nonTerminal);

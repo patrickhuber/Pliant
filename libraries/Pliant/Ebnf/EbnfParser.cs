@@ -11,17 +11,21 @@ namespace Pliant.Ebnf
         public EbnfDefinition Parse(string ebnf)
         {
             var grammar = new EbnfGrammar();
-            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
+            var parseEngine = new ParseEngine(
+                grammar, 
+                new ParseEngineOptions(
+                    optimizeRightRecursion: true,
+                    loggingEnabled: false));
             var parseRunner = new ParseRunner(parseEngine, ebnf);
             while (!parseRunner.EndOfStream())
             {
                 if (!parseRunner.Read())
                     throw new Exception(
-                        $"Unable to parse Ebnf. Error at position {parseRunner.Position}.");
+                        $"Unable to parse Ebnf. Error at line {parseRunner.Line}, column {parseRunner.Column}.");
             }
             if (!parseEngine.IsAccepted())
                 throw new Exception(
-                    $"Unable to parse Ebnf. Error at position {parseRunner.Position}");
+                    $"Ebnf parse not accepted. Error at line {parseRunner.Line}, column {parseRunner.Column}.");
 
             var parseForest = parseEngine.GetParseForestRootNode();
 

@@ -43,6 +43,13 @@ namespace Pliant.Runtime
         bool Pulse(IToken token);
 
         /// <summary>
+        /// Accepts multiple tokens into the current Earley Set and incrementally moves the parser forward if any are successful
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        bool Pulse(IReadOnlyList<IToken> tokens);
+
+        /// <summary>
         /// Gets the grammar used by the parse engine.
         /// </summary>
         IGrammar Grammar { get; }

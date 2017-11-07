@@ -7,27 +7,57 @@ namespace Pliant.Charts
 {
     public class EarleySet : IEarleySet
     {
+        private static readonly INormalState[] EmptyNormalStates = { };
+        private static readonly ITransitionState[] EmptyTransitionStates = { };
         private UniqueList<INormalState> _predictions;
         private UniqueList<INormalState> _scans;
         private UniqueList<INormalState> _completions;
         private UniqueList<ITransitionState> _transitions;
 
-        public IReadOnlyList<INormalState> Predictions { get { return _predictions; } }
+        public IReadOnlyList<INormalState> Predictions
+        {
+            get
+            {
+                if (_predictions == null)
+                    return EmptyNormalStates;
+                return _predictions;
+            } 
+        }
 
-        public IReadOnlyList<INormalState> Scans { get { return _scans; } }
+        public IReadOnlyList<INormalState> Scans
+        {
+            get
+            {
+                if (_scans == null)
+                    return EmptyNormalStates;
+                return _scans;
+            }
+        }
 
-        public IReadOnlyList<INormalState> Completions { get { return _completions; } }
+        public IReadOnlyList<INormalState> Completions
+        {
+            get
+            {
+                if (_completions == null)
+                    return EmptyNormalStates;
+                return _completions;
+            }
+        }
 
-        public IReadOnlyList<ITransitionState> Transitions { get { return _transitions; } }
+        public IReadOnlyList<ITransitionState> Transitions
+        {
+            get
+            {
+                if (_transitions == null)
+                    return EmptyTransitionStates;
+                return _transitions;
+            }
+        }
 
         public int Location { get; private set; }
 
         public EarleySet(int location)
         {
-            _predictions = new UniqueList<INormalState>();
-            _scans = new UniqueList<INormalState>();
-            _completions = new UniqueList<INormalState>();
-            _transitions = new UniqueList<ITransitionState>();
             Location = location;
         }
 
@@ -38,12 +68,33 @@ namespace Pliant.Charts
 
             var hashCode = NormalStateHashCodeAlgorithm.Compute(dottedRule, origin);
             if (dottedRule.IsComplete)
-                return _completions.ContainsHash(hashCode);
+                return CompletionsContainsHash(hashCode);
 
             var currentSymbol = dottedRule.PostDotSymbol;
             if (currentSymbol.SymbolType == SymbolType.NonTerminal)
-                return _predictions.ContainsHash(hashCode);
+                return PredictionsContainsHash(hashCode);
 
+            return ScansContainsHash(hashCode);
+        }
+
+        private bool CompletionsContainsHash(int hashCode)
+        {
+            if (_completions == null)
+                return false;
+            return _completions.ContainsHash(hashCode);
+        }
+
+        private bool PredictionsContainsHash(int hashCode)
+        {
+            if (_predictions == null)
+                return false;
+            return _predictions.ContainsHash(hashCode);
+        }
+
+        private bool ScansContainsHash(int hashCode)
+        {
+            if (_scans == null)
+                return false;
             return _scans.ContainsHash(hashCode);
         }
 
@@ -62,15 +113,38 @@ namespace Pliant.Charts
             {
                 var currentSymbol = dottedRule.PostDotSymbol;
                 if (currentSymbol.SymbolType == SymbolType.NonTerminal)
-                    return _predictions.AddUnique(normalState);
-                return _scans.AddUnique(normalState);
+                    return AddUniquePrediction(normalState);
+                return AddUniqueScan(normalState);
             }
 
+            return AddUniqueCompletion(normalState);
+        }
+
+        private bool AddUniqueCompletion(INormalState normalState)
+        {
+            if (_completions == null)
+                _completions = new UniqueList<INormalState>();
             return _completions.AddUnique(normalState);
+        }
+
+        private bool AddUniqueScan(INormalState normalState)
+        {
+            if (_scans == null)
+                _scans = new UniqueList<INormalState>();
+            return _scans.AddUnique(normalState);
+        }
+
+        private bool AddUniquePrediction(INormalState normalState)
+        {
+            if (_predictions == null)
+                _predictions = new UniqueList<INormalState>();
+            return _predictions.AddUnique(normalState);
         }
 
         private bool EnqueueTransition(ITransitionState transitionState)
         {
+            if (_transitions == null)
+                _transitions = new UniqueList<ITransitionState>();
             return _transitions.AddUnique(transitionState);
         }
 

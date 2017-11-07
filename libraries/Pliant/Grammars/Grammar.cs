@@ -13,7 +13,7 @@ namespace Pliant.Grammars
 
         protected readonly IndexedList<ILexerRule> _ignores;
         protected readonly IndexedList<ILexerRule> _trivia;
-        protected readonly IndexedList<ISymbol> _symbols;
+        protected readonly IndexedList<ILexerRule> _lexerRules;
         protected readonly IndexedList<IProduction> _productions;
         
         private readonly HashSet<ISymbol> _rightRecursiveSymbols;
@@ -26,6 +26,8 @@ namespace Pliant.Grammars
         public INonTerminal Start { get; private set; }
 
         public IReadOnlyList<IProduction> Productions { get { return _productions; } }
+
+        public IReadOnlyList<ILexerRule> LexerRules { get { return _lexerRules; } }
 
         public IReadOnlyList<ILexerRule> Ignores { get { return _ignores; } }
 
@@ -45,18 +47,23 @@ namespace Pliant.Grammars
 
             _transativeNullableSymbols = new UniqueList<INonTerminal>();
             _symbolsReverseLookup = new Dictionary<INonTerminal, UniqueList<IProduction>>();
-            _symbols = new IndexedList<ISymbol>();
+            _lexerRules = new IndexedList<ILexerRule>();
             _leftHandSideToProductions = new Dictionary<INonTerminal, List<IProduction>>();
             _dottedRuleRegistry = new DottedRuleRegistry();
             _symbolPaths = new Dictionary<ISymbol, UniqueList<ISymbol>>();
-
+            
             Start = start;
             AddProductions(productions ?? EmptyProductionArray);
             AddIgnoreRules(ignoreRules ?? EmptyLexerRuleArray);
             AddTriviaRules(triviaRules ?? EmptyLexerRuleArray);
 
-            _rightRecursiveSymbols = CreateRightRecursiveSymbols(_dottedRuleRegistry, _symbolPaths, _transativeNullableSymbols);
+            _rightRecursiveSymbols = CreateRightRecursiveSymbols(_dottedRuleRegistry, _symbolPaths);
             FindNullableSymbols(_symbolsReverseLookup, _transativeNullableSymbols);
+        }
+
+        public int GetLexerRuleIndex(ILexerRule lexerRule)
+        {
+            return _lexerRules.IndexOf(lexerRule);
         }
 
         private void AddProductions(IReadOnlyList<IProduction> productions)
@@ -84,7 +91,8 @@ namespace Pliant.Grammars
             for (var s = 0; s < production.RightHandSide.Count; s++)
             {
                 var symbol = production.RightHandSide[s];
-                AddSymbol(symbol);
+                if(symbol.SymbolType == SymbolType.LexerRule)
+                    AddLexerRule(symbol as ILexerRule);
                 RegisterDottedRule(production, s);
                 RegisterSymbolPath(production, symbolPath, s);
                 RegisterSymbolInReverseLookup(production, symbol);
@@ -99,9 +107,9 @@ namespace Pliant.Grammars
             indexedProductions.Add(production);
         }
         
-        private void AddSymbol(ISymbol symbol)
+        private void AddLexerRule(ILexerRule lexerRule)
         {
-            _symbols.Add(symbol);
+            _lexerRules.Add(lexerRule);
         }
 
         private void RegisterSymbolInReverseLookup(IProduction production, ISymbol symbol)
@@ -135,6 +143,7 @@ namespace Pliant.Grammars
             {
                 var ignoreRule = ignoreRules[i];
                 _ignores.Add(ignoreRule);
+                _lexerRules.Add(ignoreRule);
             }
         }
 
@@ -144,6 +153,7 @@ namespace Pliant.Grammars
             {
                 var triviaRule = triviaRules[i];
                 _trivia.Add(triviaRule);
+                _lexerRules.Add(triviaRule);
             }
         }
 
@@ -189,8 +199,7 @@ namespace Pliant.Grammars
 
         private HashSet<ISymbol> CreateRightRecursiveSymbols(
             IDottedRuleRegistry dottedRuleRegistry,
-            Dictionary<ISymbol, UniqueList<ISymbol>> symbolPaths,
-            UniqueList<INonTerminal> nullableSymbols)
+            Dictionary<ISymbol, UniqueList<ISymbol>> symbolPaths)
         {
             var hashSet = new HashSet<ISymbol>();
             for (var p = 0; p < _productions.Count; p++)

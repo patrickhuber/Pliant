@@ -135,7 +135,7 @@ namespace Pliant.RegularExpressions
         {
             return new TerminalLexerRule(
                 new NegationTerminal(
-                       new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')),
+                       new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\', '/')),
                 "NotMeta");
         }
 

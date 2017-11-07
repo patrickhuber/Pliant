@@ -61,10 +61,10 @@ namespace Pliant.Tests.Integration.Runtime
         }
 
         [TestMethod]
-        [DeploymentItem(@"10000.json", "Runtime")]
+        [DeploymentItem(@"10000.json")]
         public void TestCanParseLargeJsonFile()
         {
-            var path = Path.Combine(TestContext.TestDeploymentDir, "Runtime", "10000.json");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "10000.json");
             using (var stream = File.OpenRead(path))
             using (var reader = new StreamReader(stream))
             {
@@ -73,10 +73,10 @@ namespace Pliant.Tests.Integration.Runtime
         }
 
         [TestMethod]
-        [DeploymentItem(@"10000.json", "Runtime")]
+        [DeploymentItem(@"10000.json")]
         public void TestCanParseLargeJsonFileWithCompression()
         {
-            var path = Path.Combine(TestContext.TestDeploymentDir, "Runtime", "10000.json");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "10000.json");
             using (var stream = File.OpenRead(path))
             using (var reader = new StreamReader(stream))
             {
@@ -85,10 +85,10 @@ namespace Pliant.Tests.Integration.Runtime
         }
 
         [TestMethod]
-        [DeploymentItem(@"10000.json", "Runtime")]
+        [DeploymentItem(@"10000.json")]
         public void TestCanParseLargeJsonFileWithMarpa()
         {
-            var path = Path.Combine(TestContext.TestDeploymentDir, "Runtime", "10000.json");
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "10000.json");
             using (var stream = File.OpenRead(path))
             using (var reader = new StreamReader(stream))
             {
@@ -101,6 +101,26 @@ namespace Pliant.Tests.Integration.Runtime
         {
             var json = @"[""one"", ""two""]";
             _compressedParseTester.RunParse(json);
+        }
+
+        [TestMethod]
+        [DeploymentItem(@"10000.json")]
+        public void TestCanParseLargeJsonFileWithCustomLexer()
+        {
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "10000.json");
+            var jsonLexer = new JsonLexer();
+            var parser = _parseTester.ParseEngine;
+            using (var stream = File.OpenRead(path))
+            using (var reader = new StreamReader(stream))
+            {
+                var tokens = jsonLexer.Lex(reader);
+                foreach (var token in tokens)
+                    if(token.TokenType != JsonLexer.Whitespace)
+                        if(!parser.Pulse(token))
+                            Assert.Fail($"unable to parse token {token.TokenType} at {token.Position}");
+            }
+            if (!parser.IsAccepted())
+                Assert.Fail("Parse was not accepted");
         }
 
         [TestMethod]

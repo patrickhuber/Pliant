@@ -20,7 +20,8 @@ namespace Pliant.ProtocolBuffers.Tests.Unit
         [Ignore]
         public void TestProtcolBuffersV3Grammar()
         {
-            var ebnfPath = Path.Combine(TestContext.TestDeploymentDir, "Runtime", GrammarFile);
+            var testDirectory = Directory.GetCurrentDirectory();
+            var ebnfPath = Path.Combine(testDirectory, "Runtime", GrammarFile);
             var ebnf = File.ReadAllText(ebnfPath);
             var ebnfGenerator = new EbnfGrammarGenerator();
             var ebnfParser = new EbnfParser();
@@ -28,7 +29,7 @@ namespace Pliant.ProtocolBuffers.Tests.Unit
 
             var parseEngine = new ParseEngine(ebnfGenerator.Generate(ebnfDefintion));
 
-            var inputPath = Path.Combine(TestContext.TestDeploymentDir, "Runtime", ProtoFile);
+            var inputPath = Path.Combine(testDirectory, "Runtime", ProtoFile);
             var input = File.ReadAllText(inputPath);
             var parseRunner = new ParseRunner(parseEngine, input);
 

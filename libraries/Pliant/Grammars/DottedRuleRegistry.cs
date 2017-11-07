@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Pliant.Collections;
+using Pliant.Utilities;
 
 namespace Pliant.Grammars
 {
@@ -11,7 +12,7 @@ namespace Pliant.Grammars
         public DottedRuleRegistry()
         {
             _dottedRuleIndex = new Dictionary<IProduction, Dictionary<int, IDottedRule>>(
-                new HashCodeEqualityComparer());
+                new HashCodeEqualityComparer<IProduction>());
         }
 
         public void Register(IDottedRule dottedRule)
@@ -34,19 +35,6 @@ namespace Pliant.Grammars
         public IDottedRule GetNext(IDottedRule dottedRule)
         {
             return Get(dottedRule.Production, dottedRule.Position + 1);
-        }
-
-        private class HashCodeEqualityComparer : IEqualityComparer<IProduction>
-        {
-            public bool Equals(IProduction x, IProduction y)
-            {
-                return x.GetHashCode().Equals(y.GetHashCode());
-            }
-
-            public int GetHashCode(IProduction obj)
-            {
-                return obj.GetHashCode();
-            }
-        }
+        }        
     }
 }

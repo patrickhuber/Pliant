@@ -112,7 +112,10 @@ namespace Pliant.Tests.Unit.Ebnf
         [TestInitialize]
         public void Initialize_EbnfTests()
         {
-            _parseEngine = new ParseEngine(ebnfGrammar);
+            _parseEngine = new ParseEngine(
+                ebnfGrammar, 
+                new ParseEngineOptions(loggingEnabled:true)
+            );
         }
 
         [TestMethod]
@@ -149,13 +152,33 @@ namespace Pliant.Tests.Unit.Ebnf
         }
 
         [TestMethod]
+        public void EbnfShouldParseSetting()
+        {
+            ParseInput(":setting = value;");
+        }
+
+        [TestMethod]
+        public void EbnfShouldParseLexerRuleFollowedBySetting()
+        {
+            ParseInput(@"
+            Whitespace ~ /\s+/;
+            :ignore = Whitespace;");
+        }
+
+        [TestMethod]
         public void EbnfShouldParseCharacter()
         {
             ParseInput("Rule = 'a';");
         }
 
         [TestMethod]
-        public void EbnfShouldParseRegex()
+        public void EbnfShouldParseTrivialRegex()
+        {
+            ParseInput("Rule = /s/;");
+        }
+
+        [TestMethod]
+        public void EbnfShouldParseRegexCharacterClass()
         {
             ParseInput("Rule = /[a-zA-Z0-9]/;");
         }
@@ -248,11 +271,13 @@ namespace Pliant.Tests.Unit.Ebnf
         private IForestNode ParseInput(string input)
         {
             var parseRunner = new ParseRunner(_parseEngine, input);
-            for (int i = 0; i < input.Length; i++)
-            {
-                Assert.IsTrue(parseRunner.Read(), $"Error found in position {parseRunner.Position}");
-            }
-            Assert.IsTrue(parseRunner.ParseEngine.IsAccepted());
+            while (!parseRunner.EndOfStream())
+                if(!parseRunner.Read())
+                    Assert.Fail($"Error found in on line {parseRunner.Line}, column {parseRunner.Column}");
+            
+            if(!parseRunner.ParseEngine.IsAccepted())
+                Assert.Fail("Parse was not accepted.");
+
             return parseRunner.ParseEngine.GetParseForestRootNode();
         }
 
