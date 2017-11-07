@@ -166,7 +166,6 @@ namespace Pliant.Ebnf
             public static readonly TokenType SettingIdentifier = new TokenType("settingIdentifier");
             public static readonly TokenType Identifier = new TokenType("identifier");
             public static readonly TokenType Whitespace = new TokenType("whitespace");
-            public static readonly TokenType NotMeta = new TokenType("notMeta");
             public static readonly TokenType MultiLineComment = new TokenType(@"\/[*]([*][^\/]|[^*])*[*][\/]");
         }
 

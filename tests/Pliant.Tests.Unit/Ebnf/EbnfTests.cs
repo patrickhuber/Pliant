@@ -114,7 +114,7 @@ namespace Pliant.Tests.Unit.Ebnf
         {
             _parseEngine = new ParseEngine(
                 ebnfGrammar, 
-                new ParseEngineOptions()
+                new ParseEngineOptions(loggingEnabled:true)
             );
         }
 
@@ -149,6 +149,20 @@ namespace Pliant.Tests.Unit.Ebnf
         public void EbnfShouldParseString()
         {
             ParseInput("Rule = \"string\";");
+        }
+
+        [TestMethod]
+        public void EbnfShouldParseSetting()
+        {
+            ParseInput(":setting = value;");
+        }
+
+        [TestMethod]
+        public void EbnfShouldParseLexerRuleFollowedBySetting()
+        {
+            ParseInput(@"
+            Whitespace ~ /\s+/;
+            :ignore = Whitespace;");
         }
 
         [TestMethod]
