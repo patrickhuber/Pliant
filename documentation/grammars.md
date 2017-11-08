@@ -149,7 +149,7 @@ Pliant supports the full utf-16 character set. When reading the file, specify th
 ```
 string grammarUtf8Source = System.IO.File.ReadAllText("c:\\path\\to\\a\\file.pliant", Encoding.UTF8);
 
-string grammarUtf16Source = System.IO.File.ReadAllText("c:\\path\\to\\a\\file.pliant", Encoding.UTF17);
+string grammarUtf16Source = System.IO.File.ReadAllText("c:\\path\\to\\a\\file.pliant", Encoding.UTF16);
 ```
 
 ### Planned support for unicode escapes
