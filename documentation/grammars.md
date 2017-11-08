@@ -92,18 +92,18 @@ letter or digit =
 
 (* 
     https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form#Extensibility 
-    Defining "? regex {regular expression} ?" where {regular expression} is a POSIX compliant regular expression.
+    Defining "? /{regular expression}/ ?" where {regular expression} is a POSIX compliant regular expression.
 *)
 
 single quote string = 
-    ? regex ['][^']*['] ?;
+    ? /['][^']*[']/ ?;
 
 double quote string = 
-    ? regex ["][^"]*["] ?;
+    ? /["][^"]*["]/ ?;
 
 (* whitespace *)
 ws = 
-    ? regex \s+ ?;                    
+    ? /\s+/ ?;                    
 ```
 
 # Predefined Settings
@@ -113,4 +113,5 @@ Settings are used to add meta information to the parser. The following settings 
 | Setting | Description | Example Use |
 | ------- | ----------- | ----------- |
 | start   | denotes the start symbol | :start S ;|
-| ignore  | ignores the lexeme in the gramar | :ignore /\s+/ ; |
+| ignore  | ignores the lexeme in the gramar | :ignore whitespace ; |
+| trivia  | see [trivia in roslyn](https://github.com/dotnet/roslyn/wiki/Roslyn%20Overview#syntax-trivia) | :trivia whitespace; |
