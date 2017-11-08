@@ -2,7 +2,7 @@
 
 Grammars in Pliant are defined by an bnf dialect similar to abnf and ebnf. Some additional control statements have been added for ignoring whitespace and specifying start productions.
 
-# Grammar of Grammars
+## Grammar of Grammars
 
 The supported language for grammars in Pliant is defined by the following BNF grammar. 
 
@@ -101,17 +101,57 @@ single quote string =
 double quote string = 
     ? /["][^"]*["]/ ?;
 
-(* whitespace *)
-ws = 
-    ? /\s+/ ?;                    
 ```
 
-# Predefined Settings
+## Meta Lexer Rules
+
+Meta lexer rules ignored throughout the grammar.
+
+Currently the two meta lexer rules are whitespace and comment lexer rules.
+
+```ebnf
+whitespace =
+      ? /\s+/ ?; 
+
+comment =
+      ? /\/\*(\*(?!\/)|[^*])*\*\// ?;
+```
+
+## Predefined Settings
 
 Settings are used to add meta information to the parser. The following settings are recognized in pliant.
 
 | Setting | Description | Example Use |
 | ------- | ----------- | ----------- |
-| start   | denotes the start symbol | :start S ;|
-| ignore  | ignores the lexeme in the gramar | :ignore whitespace ; |
-| trivia  | see [trivia in roslyn](https://github.com/dotnet/roslyn/wiki/Roslyn%20Overview#syntax-trivia) | :trivia whitespace; |
+| start   | denotes the start symbol | :start = S ;|
+| ignore  | ignores the lexeme in the gramar | :ignore = whitespace ; |
+| trivia  | see [trivia in roslyn](https://github.com/dotnet/roslyn/wiki/Roslyn%20Overview#syntax-trivia) | :trivia = whitespace; |
+
+## Comments
+
+Comments are c style multi line comments. There are no single line c style comments.
+
+```
+/* this is a comment */
+
+/* this is 
+a multi-line 
+comment 
+*/
+```
+
+## Unicode Support
+
+Pliant supports the full utf-16 character set. When reading the file, specify the encoding as UTF8 or UTF16.
+
+### Loading a grammar  file using UTF8 or UTF16 encoding.
+
+```
+string grammarUtf8Source = System.IO.File.ReadAllText("c:\\path\\to\\a\\file.pliant", Encoding.UTF8);
+
+string grammarUtf16Source = System.IO.File.ReadAllText("c:\\path\\to\\a\\file.pliant", Encoding.UTF17);
+```
+
+### Planned support for unicode escapes
+
+Unicode escapes of the form \uxxxx where "xxxx" are hex values is a planned support enhancement. Regular expressions and string literals are planned. 

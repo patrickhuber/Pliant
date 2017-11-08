@@ -1,6 +1,8 @@
 # Simple Morse Code Grammar
 
 ```
+:start = MorseCode ;
+
 MorseCode = Character
             | Character MorseCode ;
 
@@ -91,7 +93,7 @@ NewPageSignal ~ '.-.-.';
 Understood ~ '...-.';
 Wait ~ '.-...';
 
-Whitespace ~ /\w+/;
-:ignore Whitespace;
+Whitespace ~ /\s+/;
+:ignore = Whitespace;
 
 ```
