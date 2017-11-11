@@ -60,5 +60,10 @@ namespace Pliant.Grammars
                 tokenType.GetHashCode(),
                 terminal.GetHashCode());
         }
+
+        public override bool CanApply(char c)
+        {
+            return Terminal.IsMatch(c);
+        }
     }
 }

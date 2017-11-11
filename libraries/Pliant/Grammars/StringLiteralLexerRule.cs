@@ -52,5 +52,12 @@ namespace Pliant.Grammars
                 tokenType.GetHashCode(),
                 literal.GetHashCode());
         }
+
+        public override bool CanApply(char c)
+        {
+            if (Literal.Length == 0)
+                return false;
+            return Literal[0].Equals(c);
+        }
     }
 }

@@ -311,6 +311,45 @@ namespace Pliant.Runtime
             return true;
         }
 
+        private List<ILexeme> MatchLexerRules(char character, IReadOnlyList<ILexerRule> lexerRules, IList<ILexeme> lexemes)
+        {
+            var pool = SharedPools.Default<List<ILexeme>>();
+
+            // defer creation of matches until one match is made
+            List<ILexeme> matches = null;
+
+            for (var i = 0; i < lexerRules.Count; i++)
+            {
+                var lexerRule = lexerRules[i];
+                if (!lexerRule.CanApply(character))
+                    continue;
+                var factory = _lexemeFactoryRegistry.Get(lexerRule.LexerRuleType);
+                var lexeme = factory.Create(lexerRule, Position);
+
+                if (!lexeme.Scan(character))
+                {
+                    FreeLexeme(lexeme);
+                    continue;
+                }
+
+                if (matches == null)
+                    matches = pool.AllocateAndClear();
+
+                matches.Add(lexeme);
+            }
+
+            if (matches == null)
+                return null;
+
+            if (matches.Count == 0)
+            {
+                pool.ClearAndFree(matches);
+                return null;
+            }
+
+            return matches;
+        }
+
         private List<ILexeme> MatchLexerRules(char character, IReadOnlyList<ILexerRule> lexerRules)
         {
             var pool = SharedPools.Default<List<ILexeme>>();
@@ -321,6 +360,8 @@ namespace Pliant.Runtime
             for (var i = 0; i < lexerRules.Count; i++)
             {
                 var lexerRule = lexerRules[i];
+                if (!lexerRule.CanApply(character))
+                    continue;
                 var factory = _lexemeFactoryRegistry.Get(lexerRule.LexerRuleType);
                 var lexeme = factory.Create(lexerRule, Position);
 
