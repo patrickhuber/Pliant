@@ -47,7 +47,28 @@ namespace Pliant.Tests.Unit.RegularExpressions
                 false);
             Assert.AreEqual(expected, actual);
         }
-        
+
+        [TestMethod]
+        public void RegexParserShouldParseNegativeSet()
+        {
+            var regexParser = new RegexParser();
+            var actual = regexParser.Parse("[^a]");
+
+            var expected = new Regex(
+                false,
+                new RegexExpressionTerm(
+                    new RegexTerm(
+                        new RegexFactor(
+                            new RegexAtomSet(
+                                new RegexSet(true,
+                                    new RegexCharacterClass(
+                                        new RegexCharacterUnitRange(
+                                            new RegexCharacterClassCharacter('a')))))))),
+                false);
+
+            Assert.AreEqual(expected, actual);
+        }
+
         [TestMethod]
         public void RegexParserShouldParseMultipleRanges()
         {

@@ -37,7 +37,7 @@ namespace Pliant.Tests.Common
             ParseRunner = new ParseRunner(ParseEngine, input);
             InternalRunParse(ParseRunner);
         }
-
+        
         public void RunParse(TextReader reader)
         {
             ParseRunner = new ParseRunner(ParseEngine, reader);
@@ -48,7 +48,7 @@ namespace Pliant.Tests.Common
         {
             while (!parseRunner.EndOfStream())            
                 if (!parseRunner.Read())
-                    Assert.Fail($"Parse Failed at Position {parseRunner.Position}");
+                    Assert.Fail($"Parse Failed at Line: {parseRunner.Line}, Column: {parseRunner.Column}, Position: {parseRunner.Position}");
             
             if (!parseRunner.ParseEngine.IsAccepted())            
                 Assert.Fail($"Parse was not accepted");            

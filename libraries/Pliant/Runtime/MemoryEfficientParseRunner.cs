@@ -7,21 +7,10 @@ using Pliant.Utilities;
 using Pliant.Tokens;
 using Pliant.Grammars;
 using System;
-
 namespace Pliant.Runtime
 {
-    public class ParseRunner : MemoryEfficientParseRunner
-    {
-        public ParseRunner(IParseEngine parseEngine, string input) 
-            : base(parseEngine, input)
-        { }
 
-        public ParseRunner(IParseEngine parseEngine, TextReader textReader)
-            : base(parseEngine, textReader)
-        { }
-    }
-
-    public class ParseRunner1 : IParseRunner
+    public class MemoryEfficientParseRunner : IParseRunner
     {
         private TextReader _reader;
         private readonly ILexemeFactoryRegistry _lexemeFactoryRegistry;
@@ -39,12 +28,12 @@ namespace Pliant.Runtime
 
         public IParseEngine ParseEngine { get; private set; }
 
-        public ParseRunner1(IParseEngine parseEngine, string input)
+        public MemoryEfficientParseRunner(IParseEngine parseEngine, string input)
             : this(parseEngine, new StringReader(input))
         {
         }
 
-        public ParseRunner1(IParseEngine parseEngine, TextReader reader)
+        public MemoryEfficientParseRunner(IParseEngine parseEngine, TextReader reader)
         {
             ParseEngine = parseEngine;
             _reader = reader;
@@ -201,23 +190,12 @@ namespace Pliant.Runtime
 
         private bool MatchesExistingIncompleteTriviaLexemes(char character)
         {
-            var matches = MatchExistingIncompleteLexemes(character, _triviaLexemes);
-            if (matches == null)
-                return false;
-            SharedPools.Default<List<ILexeme>>().ClearAndFree(_triviaLexemes);
-            _triviaLexemes = matches;
-            return true;
+            return MatchesExistingIncompleteLexemes(character, _triviaLexemes);
         }
 
         private bool MatchesExistingTriviaLexemes(char character)
         {
-            var matches = MatchExistingLexemes(character, _triviaLexemes);
-            if (matches == null)
-                return false;
-
-            SharedPools.Default<List<ILexeme>>().ClearAndFree(_triviaLexemes);
-            _triviaLexemes = matches;
-            return true;
+            return MatchesExistingLexemes(character, _triviaLexemes);
         }
 
         private void AccumulateAcceptedTrivia()
@@ -233,25 +211,12 @@ namespace Pliant.Runtime
 
         private bool MatchesExistingIncompleteIgnoreLexemes(char character)
         {
-            var matches = MatchExistingIncompleteLexemes(character, _ignoreLexemes);
-            if (matches != null)
-            {
-                SharedPools.Default<List<ILexeme>>()
-                    .ClearAndFree(_ignoreLexemes);
-                _ignoreLexemes = matches;
-                return true;
-            }
-            return false;
+            return MatchesExistingIncompleteLexemes(character, _ignoreLexemes);
         }
 
         private bool MatchExistingTokenLexemes(char character)
         {
-            var matches = MatchExistingLexemes(character, _tokenLexemes);
-            if (matches == null)
-                return false;
-            SharedPools.Default<List<ILexeme>>().ClearAndFree(_tokenLexemes);
-            _tokenLexemes = matches;
-            return true;
+            return MatchesExistingLexemes(character, _tokenLexemes);
         }
 
         private bool TryParseExistingToken()
@@ -326,15 +291,7 @@ namespace Pliant.Runtime
 
         private bool MatchesExistingIgnoreLexemes(char character)
         {
-            var matches = MatchExistingLexemes(character, _ignoreLexemes);
-            if (matches == null)
-            {
-                return false;
-            }
-
-            SharedPools.Default<List<ILexeme>>().ClearAndFree(_ignoreLexemes);
-            _ignoreLexemes = matches;
-            return true;
+            return MatchesExistingLexemes(character, _ignoreLexemes);
         }
 
         private void ClearExistingIgnoreLexemes()
@@ -391,114 +348,84 @@ namespace Pliant.Runtime
             return matches;
         }
 
-        private List<ILexeme> MatchExistingLexemes(char character, List<ILexeme> lexemes)
+        private bool MatchesExistingLexemes(char character, List<ILexeme> lexemes)
         {
             var anyLexemes = lexemes != null && lexemes.Count > 0;
             if (!anyLexemes)
-                return null;
+                return false;
 
-            var pool = SharedPools.Default<List<ILexeme>>();
+            var i = 0;
+            var size = lexemes.Count;
 
-            List<ILexeme> matches = null;
-            List<ILexeme> misses = null;
-
-            // partition the existing lexemes into misses and matches
-            // by scanning the current character
-            // we need two collections because the original _existingLexemes collection
-            // needs to be preserved. Agressively freeing here would break that constraint. 
-            for (var i = 0; i < lexemes.Count; i++)
+            while (i < size)
             {
                 var lexeme = lexemes[i];
                 if (lexeme.Scan(character))
-                {
-                    if (matches == null)
-                        matches = pool.AllocateAndClear();
-                    matches.Add(lexeme);
-                }
+                    i++;
                 else
                 {
-                    if (misses == null)
-                        misses = pool.AllocateAndClear();
-                    misses.Add(lexeme);
+                    if (i < size - 1)
+                    {
+                        var temp = lexemes[i];
+                        lexemes[i] = lexemes[size - 1];
+                        lexemes[size - 1] = temp;
+                    }
+                    size--;
                 }
             }
 
-            // If there were no matches return and free the collections lexemes needs to be preserved.
-            // Do not free each individual missed lexeme as this will destroy the lexemes integrity
-            if (matches == null || matches.Count == 0)
+            var anyMatches = size > 0;
+            if (!anyMatches)
+                return false;
+
+            i = lexemes.Count - 1;
+            while (i >= size)
             {
-                pool.ClearAndFree(matches);
-                pool.ClearAndFree(misses);
-                return null;
+                FreeLexeme(lexemes[i]);
+                lexemes.RemoveAt(i);
+                i--;
             }
-
-            // remove any missed lexemes returning them to the lexeme pool
-            // we know that we have at least one match at this point so the integrity of the lexems collection
-            // can be broken
-            if (misses != null)
-            {
-                for (var i = 0; i < misses.Count; i++)
-                    FreeLexeme(misses[i]);
-
-                // free the collection as it is no longer used
-                pool.ClearAndFree(misses);
-            }
-
-            // return the matched items collection
-            return matches;
+            return true;
         }
-
-        private List<ILexeme> MatchExistingIncompleteLexemes(char character, List<ILexeme> lexemes)
+        
+        private bool MatchesExistingIncompleteLexemes(char character, List<ILexeme> lexemes)
         {
             var anyLexemes = lexemes != null && lexemes.Count > 0;
             if (!anyLexemes)
-                return null;
+                return false;
 
-            // partition the lexemes into missing and matching collections
-            // we will recycle the missing collection and use the matching collection as the 
-            // return value
-            var pool = SharedPools.Default<List<ILexeme>>();
-            List<ILexeme> matches = null;
-            List<ILexeme> misses = null;
+            var i = 0;
+            var size = lexemes.Count;
 
-            for (var i = 0; i < lexemes.Count; i++)
+            while (i < size)
             {
                 var lexeme = lexemes[i];
                 if (!lexeme.IsAccepted() && lexeme.Scan(character))
-                {
-                    if (matches == null)
-                        matches = pool.AllocateAndClear();
-                    matches.Add(lexeme);
-                }
+                    i++;
                 else
                 {
-                    if (misses == null)
-                        misses = pool.AllocateAndClear();
-                    misses.Add(lexeme);
+                    if (i < size - 1)
+                    {
+                        var temp = lexemes[i];
+                        lexemes[i] = lexemes[size - 1];
+                        lexemes[size - 1] = temp;
+                    }
+                    size--;
                 }
             }
 
-            // if no matches, cleanup the missing and matching collections and return null
-            if (matches == null || matches.Count == 0)
+            var anyMatches = size > 0;
+            if (!anyMatches)
+                return false;
+
+            i = lexemes.Count - 1;
+            while (i >= size)
             {
-                pool.ClearAndFree(matches);
-                pool.ClearAndFree(misses);
-                return null;
+                FreeLexeme(lexemes[i]);
+                lexemes.RemoveAt(i);
+                i--;
             }
-
-            // remove any missed lexemes returning them to the lexeme pool
-            // we know that we have at least one match at this point so the integrity of the lexems collection
-            // can be broken
-            if (misses != null)
-            {
-                for (var i = 0; i < misses.Count; i++)
-                    FreeLexeme(misses[i]);
-
-                // free the collection as it is no longer used
-                pool.ClearAndFree(misses);
-            }
-
-            return matches;
+            return true;
         }
 
         private void ClearLexemes(List<ILexeme> lexemes)
@@ -528,5 +455,4 @@ namespace Pliant.Runtime
         }
 
     }
-
 }
