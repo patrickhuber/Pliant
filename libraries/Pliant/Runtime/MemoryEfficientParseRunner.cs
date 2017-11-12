@@ -216,57 +216,58 @@ namespace Pliant.Runtime
 
         private bool TryParseExistingToken()
         {
-            var listPool = SharedPools.Default<List<ILexeme>>();
+            var anyLexemes = _tokenLexemes.Count > 0;
+            if (!anyLexemes)
+                return false;
 
-            List<ILexeme> matches = null;
-            List<ILexeme> misses = null;
+            var i = 0;
+            var size = _tokenLexemes.Count;
 
-            for (int i = 0; i < _tokenLexemes.Count; i++)
+            while (i < size)
             {
                 var lexeme = _tokenLexemes[i];
                 if (lexeme.IsAccepted())
-                {
-                    if (matches == null)
-                        matches = listPool.AllocateAndClear();
-                    matches.Add(lexeme);
-                }
+                    i++;
                 else
                 {
-                    if (misses == null)
-                        misses = listPool.AllocateAndClear();
-                    misses.Add(lexeme);
+                    if (i < size - 1)
+                    {
+                        _tokenLexemes[i] = _tokenLexemes[size - 1];
+                        _tokenLexemes[size - 1] = lexeme;
+                    }
+                    size--;
                 }
             }
 
-            if (matches == null)
-            {
-                if (misses != null)
-                    listPool.ClearAndFree(misses);
+            var anyMatches = size > 0;
+            if (!anyMatches)
                 return false;
+
+            i = _tokenLexemes.Count - 1;
+            while (i >= size)
+            {
+                FreeLexeme(_tokenLexemes[i]);
+                _tokenLexemes.RemoveAt(i);
+                i--;
             }
 
-            if (!ParseEngine.Pulse(matches))
-            {
-                listPool.ClearAndFree(matches);
-                if (misses != null)
-                    listPool.ClearAndFree(misses);
+            if (!ParseEngine.Pulse(_tokenLexemes))
                 return false;
-            }
-
-
-            if (misses != null)
-            {
-                listPool.ClearAndFree(misses);
-                ClearLexemes(misses);
-            }
-            _tokenLexemes.Clear();
-
-            for (var i = 0; i < _triviaAccumulator.Count; i++)
-                for (var j = 0; j < matches.Count; j++)
-                    matches[j].AddLeadingTrivia(_triviaAccumulator[i]);
+            
+            for (i = 0; i < _triviaAccumulator.Count; i++)
+                for (var j = 0; j < _tokenLexemes.Count; j++)
+                    _tokenLexemes[j].AddLeadingTrivia(_triviaAccumulator[i]);
 
             _triviaAccumulator.Clear();
-            _previousTokenLexemes = matches;
+            if (_previousTokenLexemes != null)
+            {
+                _previousTokenLexemes.Clear();
+                _previousTokenLexemes.AddRange(_tokenLexemes);
+            }
+            else
+                _previousTokenLexemes = new List<ILexeme>(_tokenLexemes);
+
+            _tokenLexemes.Clear();
 
             return true;
         }
@@ -317,48 +318,9 @@ namespace Pliant.Runtime
                 lexemes.Add(lexeme);
             }
 
-            return anyMatches;;
+            return anyMatches;
         }
-
-        private List<ILexeme> MatchLexerRules(char character, IReadOnlyList<ILexerRule> lexerRules)
-        {
-            var pool = SharedPools.Default<List<ILexeme>>();
-
-            // defer creation of matches until one match is made
-            List<ILexeme> matches = null;
-
-            for (var i = 0; i < lexerRules.Count; i++)
-            {
-                var lexerRule = lexerRules[i];
-                if (!lexerRule.CanApply(character))
-                    continue;
-                var factory = _lexemeFactoryRegistry.Get(lexerRule.LexerRuleType);
-                var lexeme = factory.Create(lexerRule, Position);
-
-                if (!lexeme.Scan(character))
-                {
-                    FreeLexeme(lexeme);
-                    continue;
-                }
-
-                if (matches == null)
-                    matches = pool.AllocateAndClear();
-
-                matches.Add(lexeme);
-            }
-
-            if (matches == null)
-                return null;
-
-            if (matches.Count == 0)
-            {
-                pool.ClearAndFree(matches);
-                return null;
-            }
-
-            return matches;
-        }
-
+        
         private bool MatchesExistingLexemes(char character, List<ILexeme> lexemes)
         {
             var anyLexemes = lexemes != null && lexemes.Count > 0;
@@ -377,9 +339,8 @@ namespace Pliant.Runtime
                 {
                     if (i < size - 1)
                     {
-                        var temp = lexemes[i];
                         lexemes[i] = lexemes[size - 1];
-                        lexemes[size - 1] = temp;
+                        lexemes[size - 1] = lexeme;
                     }
                     size--;
                 }
@@ -417,9 +378,8 @@ namespace Pliant.Runtime
                 {
                     if (i < size - 1)
                     {
-                        var temp = lexemes[i];
                         lexemes[i] = lexemes[size - 1];
-                        lexemes[size - 1] = temp;
+                        lexemes[size - 1] = lexeme;
                     }
                     size--;
                 }
