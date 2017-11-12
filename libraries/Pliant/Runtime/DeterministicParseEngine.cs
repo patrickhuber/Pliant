@@ -6,6 +6,7 @@ using Pliant.Forest;
 using System.Collections.Generic;
 using Pliant.Utilities;
 using System.Runtime.CompilerServices;
+using System.Collections;
 
 namespace Pliant.Runtime
 {
@@ -223,59 +224,68 @@ namespace Pliant.Runtime
             throw new NotImplementedException();
         }
 
-        private Dictionary<int, IReadOnlyList<ILexerRule>> _expectedLexerRuleCache = new Dictionary<int, IReadOnlyList<ILexerRule>>();
+        private Dictionary<int, ILexerRule[]> _expectedLexerRuleCache;
         private static readonly ILexerRule[] EmptyLexerRules = { };
+        private BitArray _expectedLexerRuleIndicies;
 
         public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
-            if (_chart.FrameSets.Count == 0)
+            var frameSets = _chart.FrameSets;
+            var frameSetCount = frameSets.Count;
+
+            if (frameSetCount == 0)
                 return EmptyLexerRules;
-            
-            var frameSet = _chart.FrameSets[_chart.FrameSets.Count - 1];
-            var hashCode = ComputeExpectedLexerRulesHashCode(frameSet);
 
-            IReadOnlyList<ILexerRule> cachedLexerRules = null;
+            var hashCode = 0;
+            var count = 0;
 
-            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
-                return cachedLexerRules;
+            if (_expectedLexerRuleIndicies == null)
+                _expectedLexerRuleIndicies = new BitArray(Grammar.LexerRules.Count);
+            else
+                _expectedLexerRuleIndicies.SetAll(false);
 
-            var listPool = SharedPools.Default<List<ILexerRule>>();
-            List<ILexerRule> list = listPool.AllocateAndClear();
-
+            var frameSet = frameSets[frameSets.Count - 1];
             for (var i = 0; i < frameSet.Frames.Count; i++)
             {
                 var stateFrame = frameSet.Frames[i];
                 for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
                 {
                     var lexerRule = stateFrame.Frame.ScanKeys[j];
-                    list.Add(lexerRule);
+                    var index = Grammar.GetLexerRuleIndex(lexerRule);
+                    if (index < 0)
+                        continue;
+                    if (_expectedLexerRuleIndicies[index])
+                        continue;
+
+                    _expectedLexerRuleIndicies[index] = true;
+                    hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, count == 0);
+                    count++;
                 }
             }
 
-            var array = list.ToArray();
-            listPool.ClearAndFree(list);
+            if (_expectedLexerRuleCache == null)
+                _expectedLexerRuleCache = new Dictionary<int, ILexerRule[]>();
+
+            // if the hash is found in the cached lexer rule lists, return the cached array
+            ILexerRule[] cachedLexerRules = null;
+            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
+            {
+                return cachedLexerRules;
+            }
+
+            // compute the new lexer rule array and add it to the cache
+            var array = new ILexerRule[count];
+            var returnItemIndex = 0;
+            for (var i = 0; i < Grammar.LexerRules.Count; i++)
+                if (_expectedLexerRuleIndicies[i])
+                {
+                    array[returnItemIndex] = Grammar.LexerRules[i];
+                    returnItemIndex++;
+                }
 
             _expectedLexerRuleCache.Add(hashCode, array);
 
             return array;
-        }
-
-        private static int ComputeExpectedLexerRulesHashCode(StateFrameSet frameSet)
-        {
-            var hashCode = 0;
-            var firstHash = true;
-            for (var i = 0; i < frameSet.Frames.Count; i++)
-            {
-                var stateFrame = frameSet.Frames[i];
-                for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
-                {
-                    var lexerRule = stateFrame.Frame.ScanKeys[j];
-                    hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, firstHash);
-                    firstHash = false;
-                }
-            }
-
-            return hashCode;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -51,7 +51,7 @@ namespace Pliant.Runtime
 
         private Dictionary<int, ILexerRule[]> _expectedLexerRuleCache;
         private static readonly ILexerRule[] EmptyLexerRules = { };
-        private BitArray _expectedLexerRuleIndexes;
+        private BitArray _expectedLexerRuleIndicies;
 
         public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
@@ -66,8 +66,10 @@ namespace Pliant.Runtime
             var hashCode = 0;
             var count = 0;
 
-            if (_expectedLexerRuleIndexes == null)
-                _expectedLexerRuleIndexes = new BitArray(Grammar.LexerRules.Count);
+            if (_expectedLexerRuleIndicies == null)
+                _expectedLexerRuleIndicies = new BitArray(Grammar.LexerRules.Count);
+            else
+                _expectedLexerRuleIndicies.SetAll(false); 
 
             // compute the lexer rule hash for caching the list of lexer rules
             // compute the unique lexer rule count 
@@ -76,20 +78,21 @@ namespace Pliant.Runtime
             {
                 var scanState = scanStates[s];
                 var postDotSymbol = scanState.DottedRule.PostDotSymbol;
-                if (postDotSymbol != null
-                    && postDotSymbol.SymbolType == SymbolType.LexerRule)
-                {
-                    var lexerRule = postDotSymbol as ILexerRule;
-                    var index = Grammar.GetLexerRuleIndex(lexerRule);
-                    
-                    if (index >= 0)
-                    {
-                        if (!_expectedLexerRuleIndexes[index])
-                            count++;
-                        _expectedLexerRuleIndexes[index] = true;
-                        hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, hashCode == 0);
-                    }
-                }
+                if (postDotSymbol == null || postDotSymbol.SymbolType != SymbolType.LexerRule)
+                    continue;
+
+                var lexerRule = postDotSymbol as ILexerRule;
+                var index = Grammar.GetLexerRuleIndex(lexerRule);
+
+                if (index < 0)
+                    continue;
+
+                if (_expectedLexerRuleIndicies[index])
+                    continue;
+
+                count++;
+                _expectedLexerRuleIndicies[index] = true;
+                hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, hashCode == 0);                                    
             }
 
             if (_expectedLexerRuleCache == null)
@@ -99,7 +102,6 @@ namespace Pliant.Runtime
             ILexerRule[] cachedLexerRules = null;
             if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
             {
-                _expectedLexerRuleIndexes.SetAll(false);
                 return cachedLexerRules;
             }
 
@@ -107,14 +109,12 @@ namespace Pliant.Runtime
             var array = new ILexerRule[count];
             var returnItemIndex = 0;
             for (var i = 0; i < Grammar.LexerRules.Count; i++)
-                if (_expectedLexerRuleIndexes[i])
+                if (_expectedLexerRuleIndicies[i])
                 {
                     array[returnItemIndex] = Grammar.LexerRules[i];
                     returnItemIndex++;
                 }
-
-            _expectedLexerRuleIndexes.SetAll(false);
-
+            
             _expectedLexerRuleCache.Add(hashCode, array);
 
             return array;
@@ -162,7 +162,7 @@ namespace Pliant.Runtime
             Location = 0;
             _chart = new Chart();
             _expectedLexerRuleCache = null;
-            _expectedLexerRuleIndexes = null;
+            _expectedLexerRuleIndicies = null;
             var startProductions = Grammar.StartProductions();
             for (var s = 0; s < startProductions.Count; s++)
             {

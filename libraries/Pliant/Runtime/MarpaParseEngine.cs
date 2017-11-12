@@ -7,6 +7,7 @@ using Pliant.Tokens;
 using System;
 using System.Runtime.CompilerServices;
 using Pliant.Forest;
+using System.Collections;
 
 namespace Pliant.Runtime
 {
@@ -46,9 +47,10 @@ namespace Pliant.Runtime
         {
             throw new NotImplementedException();
         }
-
-        private Dictionary<int, IReadOnlyList<ILexerRule>> _expectedLexerRuleCache = new Dictionary<int, IReadOnlyList<ILexerRule>>();
+        
+        private Dictionary<int, ILexerRule[]> _expectedLexerRuleCache;
         private static readonly ILexerRule[] EmptyLexerRules = { };
+        private BitArray _expectedLexerRuleIndicies;
 
         public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
@@ -57,54 +59,59 @@ namespace Pliant.Runtime
 
             if (frameSetCount == 0)
                 return EmptyLexerRules;
-                        
-            var frameSet = frameSets[frameSetCount - 1];
-            var hashCode = ComputeExpectedLexerRulesHashCode(frameSet);
 
-            IReadOnlyList<ILexerRule> cachedLexerRules = null;
-
-            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
-                return cachedLexerRules;
-
-            var listPool = SharedPools.Default<List<ILexerRule>>();
-            List<ILexerRule> list = listPool.AllocateAndClear();
-
-            for (var i = 0; i < frameSet.Frames.Count; i++)
-            {
-                var stateFrame = frameSet.Frames[i];
-                for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
-                {
-                    var lexerRule = stateFrame.Frame.ScanKeys[j];
-                    list.Add(lexerRule);
-                }
-            }
-
-            var array = list.ToArray();
-            listPool.ClearAndFree(list);
-
-            _expectedLexerRuleCache.Add(hashCode, array);
-
-            return array;
-        }
-
-        private static int ComputeExpectedLexerRulesHashCode(StateFrameSet frameSet)
-        {
             var hashCode = 0;
             var count = 0;
+
+            if (_expectedLexerRuleIndicies == null)
+                _expectedLexerRuleIndicies = new BitArray(Grammar.LexerRules.Count);
+            else
+                _expectedLexerRuleIndicies.SetAll(false);
+
+            var frameSet = frameSets[frameSets.Count - 1];
             for (var i = 0; i < frameSet.Frames.Count; i++)
             {
                 var stateFrame = frameSet.Frames[i];
                 for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
                 {
                     var lexerRule = stateFrame.Frame.ScanKeys[j];
+                    var index = Grammar.GetLexerRuleIndex(lexerRule);
+                    if (index < 0)
+                        continue;
+                    if (_expectedLexerRuleIndicies[index])
+                        continue;
+
+                    _expectedLexerRuleIndicies[index] = true;
                     hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, count == 0);
                     count++;
                 }
             }
-            
-            return hashCode;
-        }
 
+            if (_expectedLexerRuleCache == null)
+                _expectedLexerRuleCache = new Dictionary<int, ILexerRule[]>();
+
+            // if the hash is found in the cached lexer rule lists, return the cached array
+            ILexerRule[] cachedLexerRules = null;
+            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
+            {
+                return cachedLexerRules;
+            }
+
+            // compute the new lexer rule array and add it to the cache
+            var array = new ILexerRule[count];
+            var returnItemIndex = 0;
+            for (var i = 0; i < Grammar.LexerRules.Count; i++)
+                if (_expectedLexerRuleIndicies[i])
+                {
+                    array[returnItemIndex] = Grammar.LexerRules[i];
+                    returnItemIndex++;
+                }
+            
+            _expectedLexerRuleCache.Add(hashCode, array);
+
+            return array;
+        }
+        
         public bool Pulse(IToken token)
         {
             ScanPass(Location, token);
