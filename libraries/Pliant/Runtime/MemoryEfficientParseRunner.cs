@@ -180,12 +180,7 @@ namespace Pliant.Runtime
 
         private bool MatchesNewTriviaLexemes(char character)
         {
-            var matches = MatchLexerRules(character, ParseEngine.Grammar.Trivia);
-            if (matches == null)
-                return false;
-            SharedPools.Default<List<ILexeme>>().ClearAndFree(_triviaLexemes);
-            _triviaLexemes = matches;
-            return true;
+            return MatchLexerRules(character, ParseEngine.Grammar.Trivia, _triviaLexemes);
         }
 
         private bool MatchesExistingIncompleteTriviaLexemes(char character)
@@ -277,16 +272,8 @@ namespace Pliant.Runtime
         }
 
         private bool MatchesNewTokenLexemes(char character)
-        {
-            var lexerRules = ParseEngine.GetExpectedLexerRules();
-            var matches = MatchLexerRules(character, lexerRules);
-            if (matches == null)
-                return false;
-
-            SharedPools.Default<List<ILexeme>>().ClearAndFree(_tokenLexemes);
-            _tokenLexemes = matches;
-
-            return true;
+        {            
+            return MatchLexerRules(character, ParseEngine.GetExpectedLexerRules(), _tokenLexemes);
         }
 
         private bool MatchesExistingIgnoreLexemes(char character)
@@ -301,23 +288,12 @@ namespace Pliant.Runtime
 
         private bool MatchesNewIgnoreLexemes(char character)
         {
-            var matches = MatchLexerRules(character, ParseEngine.Grammar.Ignores);
-            if (matches == null)
-                return false;
-
-            SharedPools.Default<List<ILexeme>>().ClearAndFree(_ignoreLexemes);
-            _ignoreLexemes = matches;
-
-            return true;
+            return MatchLexerRules(character, ParseEngine.Grammar.Ignores, _ignoreLexemes);
         }
 
-        private List<ILexeme> MatchLexerRules(char character, IReadOnlyList<ILexerRule> lexerRules, IList<ILexeme> lexemes)
+        private bool MatchLexerRules(char character, IReadOnlyList<ILexerRule> lexerRules, List<ILexeme> lexemes)
         {
-            var pool = SharedPools.Default<List<ILexeme>>();
-
-            // defer creation of matches until one match is made
-            List<ILexeme> matches = null;
-
+            var anyMatches = false;
             for (var i = 0; i < lexerRules.Count; i++)
             {
                 var lexerRule = lexerRules[i];
@@ -332,22 +308,16 @@ namespace Pliant.Runtime
                     continue;
                 }
 
-                if (matches == null)
-                    matches = pool.AllocateAndClear();
+                if (!anyMatches)
+                {
+                    anyMatches = true;
+                    lexemes.Clear();
+                }
 
-                matches.Add(lexeme);
+                lexemes.Add(lexeme);
             }
 
-            if (matches == null)
-                return null;
-
-            if (matches.Count == 0)
-            {
-                pool.ClearAndFree(matches);
-                return null;
-            }
-
-            return matches;
+            return anyMatches;;
         }
 
         private List<ILexeme> MatchLexerRules(char character, IReadOnlyList<ILexerRule> lexerRules)
