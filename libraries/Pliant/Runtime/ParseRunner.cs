@@ -1,15 +1,12 @@
 ﻿using System.IO;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Pliant.Runtime;
 using Pliant.Automata;
-using Pliant.Utilities;
 using Pliant.Tokens;
 using Pliant.Grammars;
-using System;
+
 namespace Pliant.Runtime
 {
-
     public class ParseRunner : IParseRunner
     {
         private TextReader _reader;
