@@ -36,9 +36,9 @@ namespace Pliant.Tests.Unit.Runtime
             if (!accepted)
                 Assert.Fail($"Parse is not accepted. ");
 
-            var stateFrameChart = parseEngine.Chart;
-            var lastFrameSet = stateFrameChart.FrameSets[stateFrameChart.FrameSets.Count - 1];
-            Assert.AreEqual(4, lastFrameSet.Frames.Count);
+            var deterministicChart = parseEngine.Chart;
+            var lastDeterministicSet = deterministicChart.Sets[deterministicChart.Sets.Count - 1];
+            Assert.AreEqual(4, lastDeterministicSet.States.Count);
         }
 
         [TestMethod]

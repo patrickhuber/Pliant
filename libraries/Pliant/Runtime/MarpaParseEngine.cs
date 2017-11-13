@@ -15,7 +15,7 @@ namespace Pliant.Runtime
     {
         private PreComputedGrammar _preComputedGrammar;
 
-        public StateFrameChart Chart { get; private set; }
+        public DeterministicChart Chart { get; private set; }
         
         public int Location { get; private set; }
 
@@ -24,7 +24,7 @@ namespace Pliant.Runtime
         public MarpaParseEngine(PreComputedGrammar preComputedGrammar)
         {
             _preComputedGrammar = preComputedGrammar;
-            Chart = new StateFrameChart();
+            Chart = new DeterministicChart();
             Initialize();
         }
 
@@ -54,7 +54,7 @@ namespace Pliant.Runtime
 
         public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
-            var frameSets = Chart.FrameSets;
+            var frameSets = Chart.Sets;
             var frameSetCount = frameSets.Count;
 
             if (frameSetCount == 0)
@@ -69,12 +69,12 @@ namespace Pliant.Runtime
                 _expectedLexerRuleIndicies.SetAll(false);
 
             var frameSet = frameSets[frameSets.Count - 1];
-            for (var i = 0; i < frameSet.Frames.Count; i++)
+            for (var i = 0; i < frameSet.States.Count; i++)
             {
-                var stateFrame = frameSet.Frames[i];
-                for (int j = 0; j < stateFrame.Frame.ScanKeys.Count; j++)
+                var stateFrame = frameSet.States[i];
+                for (int j = 0; j < stateFrame.DottedRuleSet.ScanKeys.Count; j++)
                 {
-                    var lexerRule = stateFrame.Frame.ScanKeys[j];
+                    var lexerRule = stateFrame.DottedRuleSet.ScanKeys[j];
                     var index = Grammar.GetLexerRuleIndex(lexerRule);
                     if (index < 0)
                         continue;
@@ -115,7 +115,7 @@ namespace Pliant.Runtime
         public bool Pulse(IToken token)
         {
             ScanPass(Location, token);
-            var tokenRecognized = Chart.FrameSets.Count > Location + 1;
+            var tokenRecognized = Chart.Sets.Count > Location + 1;
             if (!tokenRecognized)
                 return false;
             Location++;
@@ -127,7 +127,7 @@ namespace Pliant.Runtime
         {
             for (var i = 0; i < tokens.Count; i++)
                 ScanPass(Location, tokens[i]);
-            var tokenRecognized = Chart.FrameSets.Count > Location + 1;
+            var tokenRecognized = Chart.Sets.Count > Location + 1;
             if (!tokenRecognized)
                 return false;
             Location++;
@@ -137,27 +137,27 @@ namespace Pliant.Runtime
 
         public bool IsAccepted()
         {
-            var anyEarleySets = Chart.FrameSets.Count > 0;
+            var anyEarleySets = Chart.Sets.Count > 0;
             if (!anyEarleySets)
                 return false;
 
-            var lastFrameSetIndex = Chart.FrameSets.Count - 1;
-            var lastFrameSet = Chart.FrameSets[lastFrameSetIndex];
+            var lastDeterministicSetIndex = Chart.Sets.Count - 1;
+            var lastDeterministicSet = Chart.Sets[lastDeterministicSetIndex];
 
-            return AnyStateFrameAccepted(lastFrameSet);
+            return AnyDeterministicStateAccepted(lastDeterministicSet);
         }
 
-        private bool AnyStateFrameAccepted(StateFrameSet lastFrameSet)
+        private bool AnyDeterministicStateAccepted(DeterministicSet lastFrameSet)
         {
-            var lastFrameSetFramesCount = lastFrameSet.Frames.Count;
-            for (var i = 0; i < lastFrameSetFramesCount; i++)
+            var lastDeterministicStateCount = lastFrameSet.States.Count;
+            for (var i = 0; i < lastDeterministicStateCount; i++)
             {
-                var stateFrame = lastFrameSet.Frames[i];
-                var originIsFirstEarleySet = stateFrame.Origin == 0;
+                var deterministicState = lastFrameSet.States[i];
+                var originIsFirstEarleySet = deterministicState.Origin == 0;
                 if (!originIsFirstEarleySet)
                     continue;
 
-                if (AnyPreComputedStateAccepted(stateFrame.Frame.Data))
+                if (AnyPreComputedStateAccepted(deterministicState.DottedRuleSet.Data))
                     return true;
             }
 
@@ -183,11 +183,11 @@ namespace Pliant.Runtime
 
         private void ScanPass(int iLoc, IToken token)
         {
-            var iES = Chart.FrameSets[iLoc];
-            for (var i = 0; i < iES.Frames.Count; i++)
+            var iES = Chart.Sets[iLoc];
+            for (var i = 0; i < iES.States.Count; i++)
             {
-                var workEIM = iES.Frames[i];
-                var fromAH = workEIM.Frame;
+                var workEIM = iES.States[i];
+                var fromAH = workEIM.DottedRuleSet;
                 var origLoc = workEIM.Origin;
 
                 var toAH = Goto(fromAH, token);
@@ -199,12 +199,12 @@ namespace Pliant.Runtime
 
         private void ReductionPass(int iLoc)
         {
-            var iES = Chart.FrameSets[iLoc];
+            var iES = Chart.Sets[iLoc];
             var processed = SharedPools.Default<HashSet<ISymbol>>().AllocateAndClear();
-            for (var i = 0; i < iES.Frames.Count; i++)
+            for (var i = 0; i < iES.States.Count; i++)
             {
-                var workEIM = iES.Frames[i];
-                var workAH = workEIM.Frame;
+                var workEIM = iES.States[i];
+                var workAH = workEIM.DottedRuleSet;
                 var origLoc = workEIM.Origin;
 
                 for (var j = 0; j < workAH.Data.Count; j++)
@@ -227,15 +227,15 @@ namespace Pliant.Runtime
 
         private void ReduceOneLeftHandSide(int iLoc, int origLoc, INonTerminal lhsSym)
         {
-            var frameSet = Chart.FrameSets[origLoc];
-            var transitionItem = frameSet.FindCachedStateFrameTransition(lhsSym);
+            var frameSet = Chart.Sets[origLoc];
+            var transitionItem = frameSet.FindCachedDottedRuleSetTransition(lhsSym);
             if (transitionItem != null)
                 LeoReductionOperation(iLoc, transitionItem);
             else
             {
-                for (var i = 0; i < frameSet.Frames.Count; i++)
+                for (var i = 0; i < frameSet.States.Count; i++)
                 {
-                    var stateFrame = frameSet.Frames[i];
+                    var stateFrame = frameSet.States[i];
                     EarleyReductionOperation(iLoc, stateFrame, lhsSym);
                 }
             }
@@ -243,18 +243,18 @@ namespace Pliant.Runtime
         
         private void MemoizeTransitions(int iLoc)
         {
-            var frameSet = Chart.FrameSets[iLoc];
+            var frameSet = Chart.Sets[iLoc];
             // leo eligibility needs to be cached before creating the cached transition
             // if the size of the list is != 1, do not enter the cached frame transition
-            var cachedTransitionsPool = SharedPools.Default<Dictionary<ISymbol, CachedStateFrameTransition>>();
+            var cachedTransitionsPool = SharedPools.Default<Dictionary<ISymbol, CachedDottedRuleSetTransition>>();
             var cachedTransitions = cachedTransitionsPool.AllocateAndClear();
             var cachedCountPool = SharedPools.Default<Dictionary<ISymbol, int>>();
             var cachedCount = cachedCountPool.AllocateAndClear();
 
-            for (var i = 0; i < frameSet.Frames.Count; i++)
+            for (var i = 0; i < frameSet.States.Count; i++)
             {
-                var stateFrame = frameSet.Frames[i];
-                var frame = stateFrame.Frame;
+                var stateFrame = frameSet.States[i];
+                var frame = stateFrame.DottedRuleSet;
                 var frameData = frame.Data;
                 var stateFrameDataCount = frameData.Count;
 
@@ -300,17 +300,17 @@ namespace Pliant.Runtime
             cachedCountPool.ClearAndFree(cachedCount);
         }
 
-        private CachedStateFrameTransition CreateTopCachedItem(
-            StateFrame stateFrame, 
+        private CachedDottedRuleSetTransition CreateTopCachedItem(
+            DeterministicState stateFrame, 
             ISymbol postDotSymbol)
         {
             var origin = stateFrame.Origin;
-            CachedStateFrameTransition topCacheItem = null;
+            CachedDottedRuleSetTransition topCacheItem = null;
             // search for the top item in the leo chain
             while (true)
             {
-                var originFrameSet = Chart.FrameSets[stateFrame.Origin];
-                var nextCachedItem = originFrameSet.FindCachedStateFrameTransition(postDotSymbol);
+                var originFrameSet = Chart.Sets[stateFrame.Origin];
+                var nextCachedItem = originFrameSet.FindCachedDottedRuleSetTransition(postDotSymbol);
                 if (nextCachedItem == null)
                     break;
                 topCacheItem = nextCachedItem;
@@ -319,15 +319,15 @@ namespace Pliant.Runtime
                 origin = topCacheItem.Origin;
             }
 
-            return new CachedStateFrameTransition(
+            return new CachedDottedRuleSetTransition(
                 postDotSymbol,
-                stateFrame.Frame,
+                stateFrame.DottedRuleSet,
                 topCacheItem == null ? stateFrame.Origin : origin);
         }
 
-        private void EarleyReductionOperation(int iLoc, StateFrame fromEim, ISymbol transSym)
+        private void EarleyReductionOperation(int iLoc, DeterministicState fromEim, ISymbol transSym)
         {
-            var fromAH = fromEim.Frame;
+            var fromAH = fromEim.DottedRuleSet;
             var originLoc = fromEim.Origin;
 
             var toAH = Goto(fromAH, transSym);
@@ -337,9 +337,9 @@ namespace Pliant.Runtime
             AddEimPair(iLoc, toAH, originLoc);
         }
 
-        private void LeoReductionOperation(int iLoc, CachedStateFrameTransition fromLim)
+        private void LeoReductionOperation(int iLoc, CachedDottedRuleSetTransition fromLim)
         {
-            var fromAH = fromLim.Frame;
+            var fromAH = fromLim.DottedRuleSet;
             var transSym = fromLim.Symbol;
             var originLoc = fromLim.Origin;
 
@@ -350,28 +350,28 @@ namespace Pliant.Runtime
             AddEimPair(iLoc, toAH, originLoc);
         }
 
-        private void AddEimPair(int iLoc, Frame confirmedAH, int origLoc)
+        private void AddEimPair(int iLoc, DottedRuleSet confirmedAH, int origLoc)
         {
-            var confirmedEIM = new StateFrame(confirmedAH, origLoc);
+            var confirmedEIM = new DeterministicState(confirmedAH, origLoc);
             var predictedAH = Goto(confirmedAH);
             Chart.Enqueue(iLoc, confirmedEIM);
             if (predictedAH == null)
                 return;
-            var predictedEIM = new StateFrame(predictedAH, iLoc);
+            var predictedEIM = new DeterministicState(predictedAH, iLoc);
             Chart.Enqueue(iLoc, predictedEIM);
         }
                 
-        private static Frame Goto(Frame fromAH)
+        private static DottedRuleSet Goto(DottedRuleSet fromAH)
         {
             return fromAH.NullTransition;
         }
 
-        private static Frame Goto(Frame fromAH, ISymbol symbol)
+        private static DottedRuleSet Goto(DottedRuleSet fromAH, ISymbol symbol)
         {
             return fromAH.Reductions.GetOrReturnNull(symbol);         
         }
 
-        private static Frame Goto(Frame fromAH, IToken token)
+        private static DottedRuleSet Goto(DottedRuleSet fromAH, IToken token)
         {
             return fromAH.TokenTransitions.GetOrReturnNull(token.TokenType);
         }
