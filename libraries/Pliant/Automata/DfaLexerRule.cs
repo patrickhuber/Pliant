@@ -50,5 +50,16 @@ namespace Pliant.Automata
         {
             return _hashCode;
         }
+
+        public override bool CanApply(char c)
+        {
+            for (var i = 0; i < Start.Transitions.Count; i++)
+            {
+                var transition = Start.Transitions[i];
+                if (transition.Terminal.IsMatch(c))
+                    return true;
+            }
+            return false;
+        }
     }
 }

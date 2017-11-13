@@ -5,34 +5,34 @@ using System.Linq;
 
 namespace Pliant.Grammars
 {
-    public class Frame
+    public class DottedRuleSet
     {
         private IDottedRule[] _cachedData;        
         private SortedSet<IDottedRule> _set;
-        private Dictionary<ISymbol, Frame> _reductions;
-        private Dictionary<TokenType, Frame> _tokenTransitions;
-        private Dictionary<ILexerRule, Frame> _scans;
+        private Dictionary<ISymbol, DottedRuleSet> _reductions;
+        private Dictionary<TokenType, DottedRuleSet> _tokenTransitions;
+        private Dictionary<ILexerRule, DottedRuleSet> _scans;
         private List<ILexerRule> _scanKeys;
 
         public IReadOnlyList<IDottedRule> Data { get { return _cachedData; } }
                 
-        public IReadOnlyDictionary<ISymbol, Frame> Reductions { get { return _reductions; } }
+        public IReadOnlyDictionary<ISymbol, DottedRuleSet> Reductions { get { return _reductions; } }
 
-        public IReadOnlyDictionary<TokenType, Frame> TokenTransitions { get { return _tokenTransitions; } }
+        public IReadOnlyDictionary<TokenType, DottedRuleSet> TokenTransitions { get { return _tokenTransitions; } }
 
-        public IReadOnlyDictionary<ILexerRule, Frame> Scans { get { return _scans; } }
+        public IReadOnlyDictionary<ILexerRule, DottedRuleSet> Scans { get { return _scans; } }
 
         public IReadOnlyList<ILexerRule> ScanKeys { get { return _scanKeys; } }
 
-        public Frame NullTransition { get; set; }
+        public DottedRuleSet NullTransition { get; set; }
 
-        public Frame(SortedSet<IDottedRule> set)
+        public DottedRuleSet(SortedSet<IDottedRule> set)
         {
             _set = set;
             _cachedData = _set.ToArray();
-            _reductions = new Dictionary<ISymbol, Frame>();
-            _tokenTransitions = new Dictionary<TokenType, Frame>();
-            _scans = new Dictionary<ILexerRule, Frame>();
+            _reductions = new Dictionary<ISymbol, DottedRuleSet>();
+            _tokenTransitions = new Dictionary<TokenType, DottedRuleSet>();
+            _scans = new Dictionary<ILexerRule, DottedRuleSet>();
             _scanKeys = new List<ILexerRule>();
 
             _hashCode = ComputeHashCode(set);
@@ -40,7 +40,7 @@ namespace Pliant.Grammars
 
         private readonly int _hashCode;
 
-        public void AddTransistion(ISymbol symbol, Frame target)
+        public void AddTransistion(ISymbol symbol, DottedRuleSet target)
         {
             if (symbol.SymbolType == SymbolType.NonTerminal)
             {
@@ -79,12 +79,12 @@ namespace Pliant.Grammars
             if (((object)obj) == null)
                 return false;
 
-            var frame = obj as Frame;
-            if (((object)frame) == null)
+            var dottedRuleSet = obj as DottedRuleSet;
+            if (((object)dottedRuleSet) == null)
                 return false;
 
             foreach (var item in _cachedData)
-                if (!frame.Contains(item))
+                if (!dottedRuleSet.Contains(item))
                     return false;
 
             return true;
