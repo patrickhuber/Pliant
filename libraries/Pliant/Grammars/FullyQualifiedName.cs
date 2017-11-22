@@ -1,15 +1,28 @@
-﻿namespace Pliant.Grammars
+﻿using System;
+
+namespace Pliant.Grammars
 {
     public class FullyQualifiedName
     {
         public string Name { get; private set; }
         public string Namespace { get; private set; }
-        public string FullName { get { return $"{Namespace}.{Name}"; } }
+        public string FullName { get; private set; }
+
+        private readonly int _hashCode;
 
         public FullyQualifiedName(string @namespace, string name)
         {
             Namespace = @namespace;
             Name = name;
+            FullName = !string.IsNullOrWhiteSpace(@namespace)
+                ? $"{@namespace}.{name}"
+                : $"{name}";
+            _hashCode = ComputeHashCode(FullName);
+        }
+
+        private static int ComputeHashCode(string fullName)
+        {
+            return fullName.GetHashCode();
         }
 
         public override string ToString()
@@ -39,7 +52,7 @@
 
         public override int GetHashCode()
         {
-            return FullName.GetHashCode();
+            return _hashCode;
         }
     }
 }

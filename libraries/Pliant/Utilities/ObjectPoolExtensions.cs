@@ -6,6 +6,23 @@ namespace Pliant.Utilities
 {
     public static class ObjectPoolExtensions
     {
+        #region Queue<T>
+        
+        internal static Queue<T> AllocateAndClear<T>(this ObjectPool<Queue<T>> pool)
+        {
+            var queue = pool.Allocate();
+            queue.Clear();
+            return queue;
+        }
+
+        internal static void ClearAndFree<T>(this ObjectPool<Queue<T>> pool, Queue<T> queue)
+        {
+            queue.Clear();
+            pool.Free(queue);
+        }
+
+        #endregion Queue<T>
+
         #region UniqueList<T>
 
         internal static UniqueList<T> AllocateAndClear<T>(this ObjectPool<UniqueList<T>> pool)
@@ -13,6 +30,12 @@ namespace Pliant.Utilities
             var list = pool.Allocate();
             list.Clear();
             return list;
+        }
+
+        internal static void ClearAndFree<T>(this ObjectPool<UniqueList<T>> pool, UniqueList<T> list)
+        {
+            list.Clear();
+            pool.Free(list);
         }
 
         #endregion UniqueList<T>
@@ -37,7 +60,31 @@ namespace Pliant.Utilities
             return hashSet;
         }
 
+        internal static void ClearAndFree<TValue>(this ObjectPool<HashSet<TValue>> pool, HashSet<TValue> hashSet)
+        {
+            hashSet.Clear();
+            pool.Free(hashSet);
+        }
+
         #endregion HashSet<T>
+
+
+        #region SortedSet<T>
+
+        internal static SortedSet<TValue> AllocateAndClear<TValue>(this ObjectPool<SortedSet<TValue>> pool)
+        {
+            var hashSet = pool.Allocate();
+            hashSet.Clear();
+            return hashSet;
+        }
+
+        internal static void ClearAndFree<TValue>(this ObjectPool<SortedSet<TValue>> pool, SortedSet<TValue> hashSet)
+        {
+            hashSet.Clear();
+            pool.Free(hashSet);
+        }
+
+        #endregion SortedSet<T>
 
         #region Dictionary<TKey, TValue>
 
@@ -55,7 +102,7 @@ namespace Pliant.Utilities
         }
 
         #endregion Dictionary<TKey, TValue>
-
+        
         #region List<T>
 
         internal static List<T> AllocateAndClear<T>(this ObjectPool<List<T>> pool)

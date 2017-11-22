@@ -18,7 +18,7 @@ namespace Pliant.Charts
             IState transition,
             INormalState reduction,
             int index)
-            : base(transition.Production, transition.Position, transition.Origin)
+            : base(transition.DottedRule, transition.Origin)
         {
             Reduction = reduction;
             Recognized = recognized;
@@ -43,10 +43,10 @@ namespace Pliant.Charts
 
         private int ComputeHashCode()
         {
-            return HashCode.ComputeHash(
-                Position.GetHashCode(),
+            return HashCode.Compute(
+                DottedRule.Position.GetHashCode(),
                 Origin.GetHashCode(),
-                Production.GetHashCode(),
+                DottedRule.Production.GetHashCode(),
                 Recognized.GetHashCode(),
                 Reduction.GetHashCode(),
                 Index.GetHashCode());
@@ -59,7 +59,7 @@ namespace Pliant.Charts
 
         public override string ToString()
         {
-            return $"{Recognized} : {base.ToString()}";
+            return $"{Recognized} : {Reduction}";
         }
 
         public override StateType StateType { get { return StateType.Transitive; } }

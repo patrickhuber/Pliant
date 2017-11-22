@@ -1,9 +1,10 @@
 ﻿using Pliant.Charts;
+using Pliant.Grammars;
 
 namespace Pliant.Forest
 {
     public interface IIntermediateForestNode : IInternalForestNode
     {
-        IState State { get; }
+        IDottedRule DottedRule { get; }
     }
 }

@@ -23,5 +23,18 @@ namespace Pliant.Grammars
         {
             return TokenType.Id;
         }
+        
+        public override bool CanApply(char c)
+        {
+            // this is the best I could come up with without copying the initialization and reduction code necessary to 
+            // determine if the lexer rules are indeed start rules
+            for (var i = 0; i < Grammar.LexerRules.Count; i++)
+            {
+                var lexerRule = Grammar.LexerRules[i];
+                if (lexerRule.CanApply(c))
+                    return true;
+            }
+            return false;
+        }
     }
 }

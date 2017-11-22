@@ -1,7 +1,6 @@
-﻿using Pliant.Collections;
+﻿using Pliant.Forest;
 using Pliant.Grammars;
 using Pliant.Utilities;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Pliant.Charts
@@ -9,30 +8,27 @@ namespace Pliant.Charts
     public class NormalState : StateBase, INormalState
     {        
         private readonly int _hashCode;
-        public NormalState(IProduction production, int position, int origin)
-            : base(production, position, origin)
+
+        public NormalState(IDottedRule dottedRule, int origin)
+            : base(dottedRule, origin)
         {
             _hashCode = ComputeHashCode();
         }
-        
-        public IState NextState()
+
+        public NormalState(IDottedRule dottedRule, int origin, IForestNode parseNode) 
+            : this(dottedRule, origin)
         {
-            if (IsComplete)
-                return null;
-            var state = new NormalState(
-                Production,
-                Position + 1,
-                Origin);
-            return state;
+            ParseNode = parseNode;
         }
-        
+
         public override StateType StateType { get { return StateType.Normal; } }
 
         public bool IsSource(ISymbol searchSymbol)
         {
-            if (IsComplete)
+            var dottedRule = DottedRule;
+            if (dottedRule.IsComplete)
                 return false;
-            return PostDotSymbol.Equals(searchSymbol);
+            return dottedRule.PostDotSymbol.Equals(searchSymbol);
         }
 
         public override bool Equals(object obj)
@@ -49,9 +45,9 @@ namespace Pliant.Charts
         private int ComputeHashCode()
         {
             return HashCode.Compute(
-                Position.GetHashCode(),
+                DottedRule.Position.GetHashCode(),
                 Origin.GetHashCode(),
-                Production.GetHashCode());
+                DottedRule.Production.GetHashCode());
         }
 
         public override int GetHashCode()
@@ -62,18 +58,18 @@ namespace Pliant.Charts
         public override string ToString()
         {
             var stringBuilder = new StringBuilder()
-                .AppendFormat("{0} ->", Production.LeftHandSide.Value);
+                .AppendFormat("{0} ->", DottedRule.Production.LeftHandSide.Value);
             const string Dot = "\u25CF";
 
-            for (int p = 0; p < Production.RightHandSide.Count; p++)
+            for (int p = 0; p < DottedRule.Production.RightHandSide.Count; p++)
             {
                 stringBuilder.AppendFormat(
                     "{0}{1}",
-                    p == Position ? Dot : " ",
-                    Production.RightHandSide[p]);
+                    p == DottedRule.Position ? Dot : " ",
+                    DottedRule.Production.RightHandSide[p]);
             }
 
-            if (Position == Production.RightHandSide.Count)
+            if (DottedRule.Position == DottedRule.Production.RightHandSide.Count)
                 stringBuilder.Append(Dot);
 
             stringBuilder.Append($"\t\t({Origin})");

@@ -1,11 +1,16 @@
-﻿using Pliant.Utilities;
+﻿using System;
+using Pliant.Utilities;
+using System.Collections.Generic;
 
 namespace Pliant.Grammars
 {
     public class RangeTerminal : BaseTerminal
     {
         public char Start { get; private set; }
+
         public char End { get; private set; }
+
+        private Interval[] _intervals;
 
         public RangeTerminal(char start, char end)
         {
@@ -37,6 +42,13 @@ namespace Pliant.Grammars
                 return false;
             return rangeTerminal.End == End
                 && rangeTerminal.Start == Start;
+        }
+
+        public override IReadOnlyList<Interval> GetIntervals()
+        {
+            if(_intervals == null)
+                _intervals = new[] { new Interval(Start, End) };
+            return _intervals;
         }
     }
 }

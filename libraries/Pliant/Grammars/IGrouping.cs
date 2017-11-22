@@ -4,6 +4,6 @@ namespace Pliant.Grammars
 {
     public interface IGrouping : ISymbol
     {
-        IReadOnlyCollection<ISymbol> Items { get; }
+        IReadOnlyList<ISymbol> Items { get; }
     }
 }

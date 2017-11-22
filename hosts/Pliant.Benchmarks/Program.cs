@@ -1,6 +1,5 @@
-﻿using BenchmarkDotNet.Running;
-using System;
-using System.IO;
+﻿using System;
+using BenchmarkDotNet.Running;
 
 namespace Pliant.Benchmarks
 {
@@ -8,7 +7,8 @@ namespace Pliant.Benchmarks
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<ParsingBenchmarks>();
+            //BenchmarkRunner.Run<AnsiCBnfBenchmark>();
+            BenchmarkRunner.Run<JsonBenchmark>();
         }
     }
 }

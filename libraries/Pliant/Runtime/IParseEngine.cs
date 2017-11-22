@@ -33,19 +33,21 @@ namespace Pliant.Runtime
         /// Returns the list of expected lexer rules based on the current state of the parse.
         /// </summary>
         /// <returns>The enumeration of lexer rules that apply at the current parse position.</returns>
-        List<ILexerRule> GetExpectedLexerRules();
-
-        /// <summary>
-        /// Gets the current parse chart for use in recovery rules.
-        /// </summary>
-        IReadOnlyChart Chart { get; }
-
+        IReadOnlyList<ILexerRule> GetExpectedLexerRules();
+        
         /// <summary>
         /// Accepts one token and incrementally moves the parser forward if successful.
         /// </summary>
         /// <param name="token">The next token to move the parser forward.</param>
         /// <returns>True if the token was accepted, false otherwise.</returns>
         bool Pulse(IToken token);
+
+        /// <summary>
+        /// Accepts multiple tokens into the current Earley Set and incrementally moves the parser forward if any are successful
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        bool Pulse(IReadOnlyList<IToken> tokens);
 
         /// <summary>
         /// Gets the grammar used by the parse engine.

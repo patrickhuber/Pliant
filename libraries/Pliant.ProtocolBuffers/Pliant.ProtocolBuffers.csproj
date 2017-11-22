@@ -48,13 +48,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Pliant\Pliant.csproj">
-      <Project>{5c23805f-0ffc-4039-b853-e5acbe63a3c0}</Project>
-      <Name>Pliant</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ProtocolBufferesV3.pliant" />
+    <None Include="ProtocolBufferesV3.pliant">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Grammar.tt">
@@ -64,6 +60,12 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Pliant\Pliant.csproj">
+      <Project>{bcabdec3-1b03-4eae-b7b6-bf4839678ec9}</Project>
+      <Name>Pliant</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

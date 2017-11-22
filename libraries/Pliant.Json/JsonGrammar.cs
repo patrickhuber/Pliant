@@ -8,7 +8,7 @@ namespace Pliant.Json
 {
     public class JsonGrammar : GrammarWrapper
     {
-        private static IGrammar _innerGrammar;
+        private static readonly IGrammar InnerGrammar;
 
         static JsonGrammar()
         {
@@ -55,15 +55,16 @@ namespace Pliant.Json
                 | "false"
                 | "null";
 
-            _innerGrammar = new GrammarExpression(
+            InnerGrammar = new GrammarExpression(
                 Json,
                 null,
-                new[] { new WhitespaceLexerRule() })
+                new[] { new WhitespaceLexerRule() },
+                null)
             .ToGrammar();
         }
 
         public JsonGrammar() 
-            : base(_innerGrammar) { }
+            : base(InnerGrammar) { }
         
         private static BaseLexerRule String()
         {

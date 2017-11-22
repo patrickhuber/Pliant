@@ -1,48 +1,46 @@
-﻿using Pliant.Automata;
-using Pliant.Collections;
-using Pliant.Grammars;
-using Pliant.Lexemes;
-using Pliant.Tokens;
-using Pliant.Utilities;
+﻿using System.IO;
 using System.Collections.Generic;
-using System.IO;
+using System.Runtime.CompilerServices;
+using Pliant.Automata;
+using Pliant.Tokens;
+using Pliant.Grammars;
 
 namespace Pliant.Runtime
 {
     public class ParseRunner : IParseRunner
     {
-        private List<ILexeme> _existingLexemes;
-        private List<ILexeme> _ignoreLexemes;
+        private TextReader _reader;
         private readonly ILexemeFactoryRegistry _lexemeFactoryRegistry;
+        private List<ILexeme> _tokenLexemes;
+        private List<ILexeme> _ignoreLexemes;
+        private List<ILexeme> _previousTokenLexemes;
+        private List<ILexeme> _triviaAccumulator;
+        private List<ILexeme> _triviaLexemes;
 
-        private readonly TextReader _textReader;
+        public int Position { get; private set; }
+
+        public int Line { get; private set; }
+
+        public int Column { get; private set; }
 
         public IParseEngine ParseEngine { get; private set; }
 
-        public int Position { get; private set; }
-        
         public ParseRunner(IParseEngine parseEngine, string input)
             : this(parseEngine, new StringReader(input))
         {
         }
 
-        public ParseRunner(IParseEngine parseEngine, TextReader input)
+        public ParseRunner(IParseEngine parseEngine, TextReader reader)
         {
-            _textReader = input;
-
+            ParseEngine = parseEngine;
+            _reader = reader;
+            _tokenLexemes = new List<ILexeme>();
+            _ignoreLexemes = new List<ILexeme>();
+            _triviaLexemes = new List<ILexeme>();
+            _triviaAccumulator = new List<ILexeme>();
             _lexemeFactoryRegistry = new LexemeFactoryRegistry();
             RegisterDefaultLexemeFactories(_lexemeFactoryRegistry);
-
-            _ignoreLexemes = new List<ILexeme>();
-            _existingLexemes = new List<ILexeme>();
-
             Position = 0;
-            ParseEngine = parseEngine;
-        }
-
-        public bool EndOfStream()
-        {
-            return _textReader.Peek() == -1;
         }
 
         public bool Read()
@@ -51,34 +49,369 @@ namespace Pliant.Runtime
                 return false;
 
             var character = ReadCharacter();
+            UpdatePositionMetrics(character);
 
             if (MatchesExistingIncompleteIgnoreLexemes(character))
                 return true;
-            
-            if (MatchesExistingLexemes(character))
+
+            if (MatchesExistingIncompleteTriviaLexemes(character))
+                return true;
+
+            if (MatchExistingTokenLexemes(character))
             {
-                if (!EndOfStream())
-                    return true;
-                return TryParseExistingToken();
+                if (EndOfStream())
+                    return TryParseExistingToken();
+                return true;
             }
 
-            if (AnyExistingLexemes())
+            if (AnyExistingTokenLexemes())
                 if (!TryParseExistingToken())
                     return false;
 
-            if (MatchesNewLexemes(character))
+            if (MatchesNewTokenLexemes(character))
             {
                 if (!EndOfStream())
+                {
+                    if (AnyExistingTriviaLexemes())
+                        AccumulateAcceptedTrivia();
                     return true;
+                }
                 return TryParseExistingToken();
             }
+
+            if (MatchesExistingTriviaLexemes(character))
+            {
+                if (EndOfStream() || IsEndOfLineCharacter(character))
+                {
+                    AccumulateAcceptedTrivia();
+                    AddTrailingTriviaToPreviousToken();
+                }
+                return true;
+            }
+
+            if (AnyExistingTriviaLexemes())
+                AccumulateAcceptedTrivia();
 
             if (MatchesExistingIgnoreLexemes(character))
                 return true;
 
-            ClearExistingIngoreLexemes();
+            ClearExistingIgnoreLexemes();
+
+            if (MatchesNewTriviaLexemes(character))
+            {
+                if (IsEndOfLineCharacter(character))
+                {
+                    AccumulateAcceptedTrivia();
+                    AddTrailingTriviaToPreviousToken();
+                }
+                return true;
+            }
 
             return MatchesNewIgnoreLexemes(character);
+        }
+
+        private bool AnyExistingTriviaLexemes()
+        {
+            return _triviaLexemes.Count > 0;
+        }
+
+        private void AddTrailingTriviaToPreviousToken()
+        {
+            if (_previousTokenLexemes == null
+                || _previousTokenLexemes.Count == 0)
+                return;
+
+            for (var a = 0; a < _triviaAccumulator.Count; a++)
+                for (var l = 0; l < _previousTokenLexemes.Count; l++)
+                    _previousTokenLexemes[l].AddTrailingTrivia(_triviaAccumulator[a]);
+
+            _triviaLexemes.Clear();
+            _triviaAccumulator.Clear();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void UpdatePositionMetrics(char character)
+        {
+            Position++;
+            if (IsEndOfLineCharacter(character))
+            {
+                Column = 0;
+                Line++;
+            }
+            else
+            {
+                Column++;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsEndOfLineCharacter(char character)
+        {
+            switch (character)
+            {
+                case '\n':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public bool EndOfStream()
+        {
+            return _reader.Peek() == -1;
+        }
+
+        public bool RunToEnd()
+        {
+            while (!EndOfStream())
+                if (!Read())
+                    return false;
+            return ParseEngine.IsAccepted();
+        }
+
+        private char ReadCharacter()
+        {
+            var character = (char)_reader.Read();
+            return character;
+        }
+
+        private bool MatchesNewTriviaLexemes(char character)
+        {
+            return MatchLexerRules(character, ParseEngine.Grammar.Trivia, _triviaLexemes);
+        }
+
+        private bool MatchesExistingIncompleteTriviaLexemes(char character)
+        {
+            return MatchesExistingIncompleteLexemes(character, _triviaLexemes);
+        }
+
+        private bool MatchesExistingTriviaLexemes(char character)
+        {
+            return MatchesExistingLexemes(character, _triviaLexemes);
+        }
+
+        private void AccumulateAcceptedTrivia()
+        {
+            for (var i = 0; i < _triviaLexemes.Count; i++)
+            {
+                var trivia = _triviaLexemes[i];
+                if (trivia.IsAccepted())
+                    _triviaAccumulator.Add(trivia);
+            }
+            _triviaLexemes.Clear();
+        }
+
+        private bool MatchesExistingIncompleteIgnoreLexemes(char character)
+        {
+            return MatchesExistingIncompleteLexemes(character, _ignoreLexemes);
+        }
+
+        private bool MatchExistingTokenLexemes(char character)
+        {
+            return MatchesExistingLexemes(character, _tokenLexemes);
+        }
+
+        private bool TryParseExistingToken()
+        {
+            var anyLexemes = _tokenLexemes.Count > 0;
+            if (!anyLexemes)
+                return false;
+
+            var i = 0;
+            var size = _tokenLexemes.Count;
+
+            while (i < size)
+            {
+                var lexeme = _tokenLexemes[i];
+                if (lexeme.IsAccepted())
+                    i++;
+                else
+                {
+                    if (i < size - 1)
+                    {
+                        _tokenLexemes[i] = _tokenLexemes[size - 1];
+                        _tokenLexemes[size - 1] = lexeme;
+                    }
+                    size--;
+                }
+            }
+
+            var anyMatches = size > 0;
+            if (!anyMatches)
+                return false;
+
+            i = _tokenLexemes.Count - 1;
+            while (i >= size)
+            {
+                FreeLexeme(_tokenLexemes[i]);
+                _tokenLexemes.RemoveAt(i);
+                i--;
+            }
+
+            if (!ParseEngine.Pulse(_tokenLexemes))
+                return false;
+
+            for (i = 0; i < _triviaAccumulator.Count; i++)
+                for (var j = 0; j < _tokenLexemes.Count; j++)
+                    _tokenLexemes[j].AddLeadingTrivia(_triviaAccumulator[i]);
+
+            _triviaAccumulator.Clear();
+            if (_previousTokenLexemes != null)
+            {
+                _previousTokenLexemes.Clear();
+                _previousTokenLexemes.AddRange(_tokenLexemes);
+            }
+            else
+                _previousTokenLexemes = new List<ILexeme>(_tokenLexemes);
+
+            _tokenLexemes.Clear();
+
+            return true;
+        }
+
+        private bool MatchesNewTokenLexemes(char character)
+        {
+            return MatchLexerRules(character, ParseEngine.GetExpectedLexerRules(), _tokenLexemes);
+        }
+
+        private bool MatchesExistingIgnoreLexemes(char character)
+        {
+            return MatchesExistingLexemes(character, _ignoreLexemes);
+        }
+
+        private void ClearExistingIgnoreLexemes()
+        {
+            ClearLexemes(_ignoreLexemes);
+        }
+
+        private bool MatchesNewIgnoreLexemes(char character)
+        {
+            return MatchLexerRules(character, ParseEngine.Grammar.Ignores, _ignoreLexemes);
+        }
+
+        private bool MatchLexerRules(char character, IReadOnlyList<ILexerRule> lexerRules, List<ILexeme> lexemes)
+        {
+            var anyMatches = false;
+            for (var i = 0; i < lexerRules.Count; i++)
+            {
+                var lexerRule = lexerRules[i];
+                if (!lexerRule.CanApply(character))
+                    continue;
+                var factory = _lexemeFactoryRegistry.Get(lexerRule.LexerRuleType);
+                var lexeme = factory.Create(lexerRule, Position);
+
+                if (!lexeme.Scan(character))
+                {
+                    FreeLexeme(lexeme);
+                    continue;
+                }
+
+                if (!anyMatches)
+                {
+                    anyMatches = true;
+                    lexemes.Clear();
+                }
+
+                lexemes.Add(lexeme);
+            }
+
+            return anyMatches;
+        }
+
+        private bool MatchesExistingLexemes(char character, List<ILexeme> lexemes)
+        {
+            var anyLexemes = lexemes != null && lexemes.Count > 0;
+            if (!anyLexemes)
+                return false;
+
+            var i = 0;
+            var size = lexemes.Count;
+
+            while (i < size)
+            {
+                var lexeme = lexemes[i];
+                if (lexeme.Scan(character))
+                    i++;
+                else
+                {
+                    if (i < size - 1)
+                    {
+                        lexemes[i] = lexemes[size - 1];
+                        lexemes[size - 1] = lexeme;
+                    }
+                    size--;
+                }
+            }
+
+            var anyMatches = size > 0;
+            if (!anyMatches)
+                return false;
+
+            i = lexemes.Count - 1;
+            while (i >= size)
+            {
+                FreeLexeme(lexemes[i]);
+                lexemes.RemoveAt(i);
+                i--;
+            }
+            return true;
+        }
+
+        private bool MatchesExistingIncompleteLexemes(char character, List<ILexeme> lexemes)
+        {
+            var anyLexemes = lexemes != null && lexemes.Count > 0;
+            if (!anyLexemes)
+                return false;
+
+            var i = 0;
+            var size = lexemes.Count;
+
+            while (i < size)
+            {
+                var lexeme = lexemes[i];
+                if (!lexeme.IsAccepted() && lexeme.Scan(character))
+                    i++;
+                else
+                {
+                    if (i < size - 1)
+                    {
+                        lexemes[i] = lexemes[size - 1];
+                        lexemes[size - 1] = lexeme;
+                    }
+                    size--;
+                }
+            }
+
+            var anyMatches = size > 0;
+            if (!anyMatches)
+                return false;
+
+            i = lexemes.Count - 1;
+            while (i >= size)
+            {
+                FreeLexeme(lexemes[i]);
+                lexemes.RemoveAt(i);
+                i--;
+            }
+            return true;
+        }
+
+        private void ClearLexemes(List<ILexeme> lexemes)
+        {
+            for (var i = 0; i < lexemes.Count; i++)
+                FreeLexeme(lexemes[i]);
+            lexemes.Clear();
+        }
+
+        private void FreeLexeme(ILexeme lexeme)
+        {
+            var lexemeFactory = _lexemeFactoryRegistry.Get(lexeme.LexerRule.LexerRuleType);
+            lexemeFactory.Free(lexeme);
+        }
+
+        private bool AnyExistingTokenLexemes()
+        {
+            return _tokenLexemes.Count > 0;
         }
 
         private static void RegisterDefaultLexemeFactories(ILexemeFactoryRegistry lexemeFactoryRegistry)
@@ -88,209 +421,6 @@ namespace Pliant.Runtime
             lexemeFactoryRegistry.Register(new StringLiteralLexemeFactory());
             lexemeFactoryRegistry.Register(new DfaLexemeFactory());
         }
-        private bool AnyExistingLexemes()
-        {
-            return _existingLexemes.Count > 0;
-        }
 
-        private void ClearExistingIngoreLexemes()
-        {
-            _ignoreLexemes.Clear();
-        }
-        
-        private ILexemeFactory GetLexemeFactory(ILexerRule lexerRule)
-        {
-            return _lexemeFactoryRegistry
-                .Get(lexerRule.LexerRuleType);
-        }
-
-        private bool MatchesExistingIgnoreLexemes(char character)
-        {
-            if (!AnyExistingIngoreLexemes())
-                return false;
-
-            var anyMatchedIgnoreLexemes = false;
-            foreach (var existingLexeme in _ignoreLexemes)
-            {
-                if (existingLexeme.Scan(character))
-                {
-                    anyMatchedIgnoreLexemes = true;
-                }
-            }
-            return anyMatchedIgnoreLexemes;
-        }
-
-        private bool AnyExistingIngoreLexemes()
-        {
-            return _ignoreLexemes.Count != 0;
-        }
-
-        private bool MatchesExistingIncompleteIgnoreLexemes(char character)
-        {
-            if (!AnyExistingIngoreLexemes())
-                return false;
-
-            var anyMatchedIgnoreLexemes = false;
-            foreach (var existingLexeme in _ignoreLexemes)
-            {
-                if (!existingLexeme.IsAccepted() && existingLexeme.Scan(character))
-                {
-                    anyMatchedIgnoreLexemes = true;
-                }
-            }
-            return anyMatchedIgnoreLexemes;
-        }
-
-        private bool MatchesExistingLexemes(char character)
-        {
-            if (!AnyExistingLexemes())
-                return false;
-            var matchedLexemes = SharedPools.Default<List<ILexeme>>().AllocateAndClear();
-            var anyMatchedLexemes = false;
-            foreach (var existingLexeme in _existingLexemes)
-            {
-                if (!existingLexeme.Scan(character))
-                {
-                    var factory = GetLexemeFactory(existingLexeme.LexerRule);
-                    factory.Free(existingLexeme);
-                    continue;
-                }
-                
-                matchedLexemes.Add(existingLexeme);
-                anyMatchedLexemes = true;                
-            }
-            if (!anyMatchedLexemes)
-            {
-                SharedPools.Default<List<ILexeme>>().Free(matchedLexemes);
-                return false;
-            }
-            SharedPools.Default<List<ILexeme>>().Free(_existingLexemes);
-            _existingLexemes = matchedLexemes;
-            return true;
-        }
-        
-        private bool MatchesNewIgnoreLexemes(char character)
-        {
-            if (ParseEngine.Grammar.Ignores.Count == 0)
-                return false;
-
-            var ignoreLexerRules = SharedPools.Default<List<ILexerRule>>().AllocateAndClear();
-            // PERF: Avoid IEnumerable<T> boxing by calling AddRange
-            // PERF: Avoid foreach loop due to non struct boxing
-            for (int i = 0; i < ParseEngine.Grammar.Ignores.Count; i++)
-            {
-                var ignore = ParseEngine.Grammar.Ignores[i];
-                ignoreLexerRules.Add(ignore);
-            }
-
-            var matchingIgnoreLexemes = SharedPools.Default<List<ILexeme>>().AllocateAndClear();
-            var anyMatchingIgnoreLexemes = false;
-            foreach (var ignoreLexerRule in ignoreLexerRules)
-            {
-                var lexemeFactory = GetLexemeFactory(ignoreLexerRule);
-                var lexeme = lexemeFactory.Create(ignoreLexerRule);
-                if (!lexeme.Scan(character))
-                {
-                    lexemeFactory.Free(lexeme);
-                    continue;
-                }
-                matchingIgnoreLexemes.Add(lexeme);
-                anyMatchingIgnoreLexemes = true;                
-            }
-            SharedPools.Default<List<ILexerRule>>().Free(ignoreLexerRules);
-
-            if (anyMatchingIgnoreLexemes)
-            {
-                SharedPools.Default<List<ILexeme>>().Free(_ignoreLexemes);
-                _ignoreLexemes = matchingIgnoreLexemes;
-                return true;
-            }
-
-            SharedPools.Default<List<ILexeme>>().Free(matchingIgnoreLexemes);
-            return false;
-        }
-
-        private bool MatchesNewLexemes(char character)
-        {
-            var newLexemes = SharedPools.Default<List<ILexeme>>().AllocateAndClear();
-            var anyLexemeScanned = false;
-            
-            var expectedLexerRules = ParseEngine.GetExpectedLexerRules();
-            // PERF: Avoid foreach due to boxing IEnumerable<T>
-
-            for (var l = 0; l< expectedLexerRules.Count; l++)
-            {
-                var lexerRule = expectedLexerRules[l];
-                var lexemeFactory = GetLexemeFactory(lexerRule);
-                var lexeme = lexemeFactory.Create(lexerRule);
-                if (!lexeme.Scan(character))
-                {
-                    lexemeFactory.Free(lexeme);
-                    continue;
-                }
-                anyLexemeScanned = true;
-                newLexemes.Add(lexeme);                
-            }
-
-            SharedPools.Default<List<ILexerRule>>().Free(expectedLexerRules);
-            expectedLexerRules = null;
-
-            if (!anyLexemeScanned)
-            {
-                SharedPools.Default<List<ILexeme>>().Free(newLexemes);
-                return false;
-            }
-
-            SharedPools.Default<List<ILexeme>>().Free(_existingLexemes);
-            _existingLexemes = newLexemes;
-
-            return true;
-        }
-
-        private char ReadCharacter()
-        {
-            var character = (char)_textReader.Read();
-            Position++;
-            return character;
-        }
-
-        private bool TryParseExistingToken()
-        {
-            // PERF: Avoid Linq FirstOrDefault due to lambda allocation
-            ILexeme longestAcceptedMatch = null;
-            foreach (var lexeme in _existingLexemes)
-                if (lexeme.IsAccepted())
-                {
-                    longestAcceptedMatch = lexeme;
-                    break;
-                }
-
-            if (longestAcceptedMatch == null)
-                return false;
-
-            var token = CreateTokenFromLexeme(longestAcceptedMatch);
-            if (token == null)
-                return false;
-
-            if (!ParseEngine.Pulse(token))
-                return false;
-
-            ClearExistingLexemes();
-            return true;
-        }
-        
-        private IToken CreateTokenFromLexeme(ILexeme lexeme)
-        {
-            var capture = lexeme.Capture;
-            return new Token(
-                capture,
-                Position - capture.Length - 1,
-                lexeme.TokenType);
-        }
-        
-        private void ClearExistingLexemes()
-        {
-            _existingLexemes.Clear();
-        }
     }
 }

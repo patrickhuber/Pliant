@@ -10,7 +10,8 @@ using Pliant.Runtime;
 using Pliant.Tree;
 using Pliant.Tests.Common.Forest;
 using Pliant.Tests.Common;
-using Pliant.Tests.Common.Expressions;
+using Pliant.Tests.Common.Grammars;
+using Testable;
 
 namespace Pliant.Tests.Unit.Runtime
 {
@@ -521,7 +522,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var grammar = new GrammarExpression(A, new[] { A })
                 .ToGrammar();
-
+            
             var input = Tokenize("aaaaa");
             var recognizer = new ParseEngine(grammar);
             ParseInput(recognizer, input);
@@ -545,6 +546,25 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.AreEqual(1, lastEarleySet.Transitions.Count);
             Assert.AreEqual(1, lastEarleySet.Predictions.Count);
             Assert.AreEqual(1, lastEarleySet.Scans.Count);
+        }
+
+
+        [TestMethod]
+        public void ParseEngineShouldHandleCyclesInGrammar()
+        {
+            const string input = "a";
+            var tokens = Tokenize(input);
+            var recognizer = new ParseEngine(new CycleGrammar());
+            ParseInput(recognizer, tokens);
+        }
+
+        [TestMethod]
+        public void ParseEngineShouldHandleHiddenRightRecursionsInSubCubicTime()
+        {
+            const string input = "abcabcabcabcabcabca";
+            var tokens = Tokenize(input);
+            var recognizer = new ParseEngine(new HiddenRightRecursionGrammar());
+            ParseInput(recognizer, tokens);
         }
 
         [TestMethod]
@@ -680,8 +700,7 @@ namespace Pliant.Tests.Unit.Runtime
                 .ToGrammar();
 
             var input = "aba";
-            var tokens = Tokenize(input, "[ab]");
-            AssertLeoAndClassicParseAlgorithmsCreateSameForest(tokens, grammar);
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
         }
 
         [TestMethod]
@@ -789,19 +808,18 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        public void ParseEngineShouldProduceSameLeoAndClassicForestWhenGivenAmbiuousNonTerminal()
+        public void ParseEngineShouldProduceSameLeoAndClassicForestWhenGivenAmbiguousNonTerminal()
         {
             var input = "1+2+3";
-            var tokens = TokenizeNumericExpression(input);
             var grammar = new SimpleExpressionGrammar();
-            AssertLeoAndClassicParseAlgorithmsCreateSameForest(tokens, grammar);
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
         }
 
         [TestMethod]
         public void ParseEngineShouldDisambiguateFollowingOperatorPresidence()
         {
             var input = "2*3+5*7";
-            var parseTester = new ParseTester(new SimpleExpressionGrammar());
+            var parseTester = new ParseTester(new ExpressionGrammar());
             parseTester.RunParse(input);
             var forest = parseTester.ParseEngine.GetParseForestRootNode();
             var tree = new InternalTreeNode(forest);
@@ -816,22 +834,24 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.Inconclusive();
         }
 
-        private static IEnumerable<IToken> TokenizeNumericExpression(string input)
+        [TestMethod]
+        public void ParseEngineCanParseNullableGrammar()
         {
-            return input
-                .Select((x, i) =>
-                    new Token(x.ToString(),
-                    i,
-                    new TokenType(char.IsDigit(x) ? "[0-9]" : x.ToString())));
+            new ParseTester(
+                new NullableGrammar())
+                .RunParse("aaaa");
         }
-
-        private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(IEnumerable<IToken> tokens, IGrammar grammar)
+                        
+        private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(string input, IGrammar grammar)
         {
             var leoEngine = new ParseEngine(grammar);
             var classicEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
 
-            Assert.IsTrue(RunParse(leoEngine, tokens), "Leo Parse Failed");
-            Assert.IsTrue(RunParse(classicEngine, tokens), "Classic Parse Failed");
+            var leoTester = new ParseTester(leoEngine);
+            var classicTester = new ParseTester(classicEngine);
+
+            leoTester.RunParse(input);
+            classicTester.RunParse(input);
 
             var nodeComparer = new StatefulForestNodeComparer();
             var leoParseForestRoot = leoEngine.GetParseForestRootNode();
@@ -842,38 +862,12 @@ namespace Pliant.Tests.Unit.Runtime
                 "Leo and Classic Parse Forest mismatch");
         }
 
-        private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(string input, IGrammar grammar)
-        {
-            var tokens = Tokenize(input);
-            AssertLeoAndClassicParseAlgorithmsCreateSameForest(tokens, grammar);
-        }
-
         static void AssertForestsAreEqual(IForestNode expected, IForestNode actual)
         {
             var comparer = new StatefulForestNodeComparer();
             Assert.IsTrue(comparer.Equals(expected, actual));
         }
-        
-        private static bool RunParse(IParseRunner lexer)
-        {
-            while (!lexer.EndOfStream())
-            {
-                if (!lexer.Read())
-                    return false;
-            }
-            return lexer.ParseEngine.IsAccepted();
-        }
-
-        private static bool RunParse(IParseEngine parseEngine, IEnumerable<IToken> tokens)
-        {
-            foreach (var token in tokens)
-            {
-                if (!parseEngine.Pulse(token))
-                    return false;
-            }
-            return parseEngine.IsAccepted();
-        }
-
+                
         private static IGrammar CreateRegularExpressionStubGrammar()
         {
             ProductionExpression R = "R", E = "E", T = "T", F = "F", A = "A", I = "I";
@@ -963,28 +957,17 @@ namespace Pliant.Tests.Unit.Runtime
             return new Token(character.ToString(), position, new TokenType(character.ToString()));
         }
 
-        private static IEnumerable<IToken> Tokenize(string input)
+        private static IReadOnlyList<IToken> Tokenize(string input)
         {
             return input.Select((x, i) =>
-                new Token(x.ToString(), i, new TokenType(x.ToString())));
+                new Token(x.ToString(), i, new TokenType(x.ToString())))
+                .ToArray();
         }
-
-        private static IEnumerable<IToken> Tokenize(string input, string tokenType)
+        
+        private static void ParseInput(IParseEngine parseEngine, IReadOnlyList<IToken> tokens)
         {
-            return Tokenize(input, new TokenType(tokenType));
-        }
-
-        private static IEnumerable<IToken> Tokenize(string input, TokenType tokenType)
-        {
-            return input.Select((x, i) =>
-                new Token(x.ToString(), i, tokenType));
-        }
-
-        private static void ParseInput(IParseEngine parseEngine, IEnumerable<IToken> tokens)
-        {
-            foreach (var token in tokens)
-                Assert.IsTrue(parseEngine.Pulse(token));
-            Assert.IsTrue(parseEngine.IsAccepted());
+            var parseTester = new ParseTester(parseEngine);
+            parseTester.RunParse(tokens);
         }
     }
 }

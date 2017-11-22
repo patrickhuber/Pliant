@@ -1,4 +1,6 @@
-﻿using Pliant.Utilities;
+﻿using System;
+using Pliant.Utilities;
+using System.Collections.Generic;
 
 namespace Pliant.Grammars
 {
@@ -6,9 +8,11 @@ namespace Pliant.Grammars
     {
         public char Character { get; private set; }
 
+        private Interval[] _intervals;
+
         public CharacterTerminal(char character)
         {
-            Character = character;
+            Character = character;            
         }
 
         public override int GetHashCode()
@@ -35,6 +39,13 @@ namespace Pliant.Grammars
         public override string ToString()
         {
             return Character.ToString();
+        }
+
+        public override IReadOnlyList<Interval> GetIntervals()
+        {
+            if(_intervals == null)
+                _intervals = new[] { new Interval(Character, Character) };
+            return _intervals;
         }
     }
 }

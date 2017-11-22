@@ -11,7 +11,7 @@ namespace Pliant.Builders
             Value = value;
         }
 
-        public override  ISymbol Symbol { get { return Value; } }
+        public override ISymbol Symbol { get { return Value; } }
 
         public ILexerRule Value { get; set; }
 

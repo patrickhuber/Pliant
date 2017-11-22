@@ -194,3 +194,7 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+/.vs
+
+# benchmark dotnet artifacts
+/hosts/Pliant.Benchmarks/BenchmarkDotNet.Artifacts/results

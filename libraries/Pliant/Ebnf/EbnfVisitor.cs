@@ -1,6 +1,7 @@
 ﻿using System;
 using Pliant.Tree;
 using Pliant.RegularExpressions;
+using Pliant.LexerRules;
 
 namespace Pliant.Ebnf
 {
@@ -112,7 +113,7 @@ namespace Pliant.Ebnf
                     case TreeNodeType.Token:
                         var tokenNode = child as ITokenTreeNode;
                         var token = tokenNode.Token;
-                        if (token.TokenType.Id == "identifier")
+                        if (token.TokenType.Equals(EbnfGrammar.TokenTypes.Identifier))
                             identifier = token.Value;
                         break;
                 }
@@ -291,9 +292,18 @@ namespace Pliant.Ebnf
                 {
                     case TreeNodeType.Token:
                         var tokenNode = child as ITokenTreeNode;
+                        var token = tokenNode.Token;
+                        var tokenType = token.TokenType;
+
+                        // if token type is string token type remove surrounding quotes
+                        if (tokenType.Equals(SingleQuoteStringLexerRule.TokenTypeDescriptor)
+                            || tokenType.Equals(DoubleQuoteStringLexerRule.TokenTypeDescriptor))
+                            return token.Value.Substring(1, token.Value.Length - 2);
+
                         // TODO: Find a better solution for identifing the lexer rule based on id
                         if (tokenNode.Token.TokenType.Id.Length > 5)
-                            return tokenNode.Token.Value;
+                            return token.Value;
+
                         break;
 
                     case TreeNodeType.Internal:
@@ -316,7 +326,7 @@ namespace Pliant.Ebnf
                     case TreeNodeType.Token:
                         var tokenNode = child as ITokenTreeNode;
                         var token = tokenNode.Token;
-                        if (token.TokenType.Id == nameof(settingIdentifier))
+                        if (token.TokenType.Equals(EbnfGrammar.TokenTypes.SettingIdentifier))
                             settingIdentifier = new EbnfSettingIdentifier(token.Value);
                         break;
 

@@ -201,11 +201,12 @@ namespace Pliant.RegularExpressions
                     continue;
                 var childTokenNode = child as ITokenTreeNode;
 
-                var value = childTokenNode.Token.Value.StartsWith(@"\")
+                var isEscaped = childTokenNode.Token.Value.StartsWith(@"\", StringComparison.CurrentCulture);
+                var value = isEscaped
                     ? childTokenNode.Token.Value[1]
                     : childTokenNode.Token.Value[0];
 
-                return new RegexCharacter(value);
+                return new RegexCharacter(value, isEscaped);
             }
             throw new Exception("Invalid character detected.");
         }
@@ -312,10 +313,15 @@ namespace Pliant.RegularExpressions
                     continue;
 
                 var childTokenNode = child as ITokenTreeNode;
-                var value = childTokenNode.Token.Value.StartsWith(@"\")
-                    ? childTokenNode.Token.Value[1]
-                    : childTokenNode.Token.Value[0];
-                return new RegexCharacterClassCharacter(value);
+
+                var tokenValue = childTokenNode.Token.Value;
+                var isEscaped = tokenValue.StartsWith(@"\", StringComparison.CurrentCulture);
+                
+                var value = isEscaped 
+                    ? tokenValue[1]
+                    : tokenValue[0];
+                
+                return new RegexCharacterClassCharacter(value, isEscaped);
             }
             throw new Exception("Invalid Regex Character Class Character.");
         }

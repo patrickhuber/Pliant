@@ -72,7 +72,7 @@ namespace Pliant.Tests.Unit.Bnf
         [DeploymentItem(@"Bnf\AnsiC.bnf", "Bnf")]
         public void BnfShouldParseLargeGrammarInFile()
         {
-            var bnf = File.ReadAllText(Path.Combine(TestContext.TestDeploymentDir, "Bnf", "AnsiC.bnf"));
+            var bnf = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "Bnf", "AnsiC.bnf"));
             Assert.IsFalse(string.IsNullOrEmpty(bnf));
 
             var grammar = new BnfGrammar();

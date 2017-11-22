@@ -8,7 +8,7 @@ namespace Pliant.Automata
 
         public ITerminal Terminal { get; private set; }
 
-        public NfaTransitionType TransitionType { get { return NfaTransitionType.Terminal; } }
+        public NfaTransitionType TransitionType { get { return NfaTransitionType.Edge; } }
 
         public TerminalNfaTransition(ITerminal terminal, INfaState target)
         {

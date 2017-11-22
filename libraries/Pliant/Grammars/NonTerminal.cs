@@ -1,41 +1,37 @@
-﻿namespace Pliant.Grammars
+﻿using System;
+
+namespace Pliant.Grammars
 {
     public class NonTerminal : Symbol, INonTerminal
     {
-        public string Value { get; private set; }
+        public FullyQualifiedName FullyQualifiedName { get; private set; }
 
-        public string Namespace { get; private set; }
+        public string Value { get { return FullyQualifiedName.FullName; } }
+        
+        private readonly int _hashCode;
 
-        public string Name { get; private set; }
+        public NonTerminal(string @namespace, string name)
+            : this(new FullyQualifiedName(@namespace, name))
+        {
+        }
 
         public NonTerminal(string name)
             : this(string.Empty, name)
         {
-            Name = name;
         }
-
-        public NonTerminal(string @namespace, string name)
+        
+        public NonTerminal(FullyQualifiedName fullyQualifiedName)
             : base(SymbolType.NonTerminal)
         {
-            Namespace = @namespace;
-            Name = name;
+            FullyQualifiedName = fullyQualifiedName;
 
-            // precompute to same time on property execution
-            if(string.IsNullOrEmpty(@namespace))
-                Value = Name;
-            else 
-                Value = $"{Namespace}.{Name}";
-        }
-
-        public NonTerminal(FullyQualifiedName fullyQualifiedName)
-            : this(fullyQualifiedName.Namespace, fullyQualifiedName.Name)
-        {
-
+            // precompute to same time on property execution            
+            _hashCode = ComputeHashCode(Value);
         }
 
         public override int GetHashCode()
         {
-            return Value.GetHashCode();
+            return _hashCode;
         }
 
         public override bool Equals(object obj)
@@ -48,6 +44,11 @@
                 return false;
 
             return Value.Equals(nonTerminal.Value);
+        }
+
+        private static int ComputeHashCode(string value)
+        {
+            return value.GetHashCode();
         }
 
         public override string ToString()

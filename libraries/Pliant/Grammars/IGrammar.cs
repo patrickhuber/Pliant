@@ -10,10 +10,24 @@ namespace Pliant.Grammars
 
         IReadOnlyList<ILexerRule> Ignores { get; }
 
+        IReadOnlyList<ILexerRule> Trivia { get; }
+
+        IReadOnlyDottedRuleRegistry DottedRules { get; }
+
+        IReadOnlyList<ILexerRule> LexerRules { get; }
+
+        int GetLexerRuleIndex(ILexerRule lexerRule);
+
         IReadOnlyList<IProduction> RulesFor(INonTerminal nonTerminal);
 
-        IEnumerable<IProduction> StartProductions();
+        IReadOnlyList<IProduction> RulesContainingSymbol(INonTerminal nonTerminal);
+
+        IReadOnlyList<IProduction> StartProductions();
 
         bool IsNullable(INonTerminal nonTerminal);
+
+        bool IsTransativeNullable(INonTerminal nonTerminal);
+
+        bool IsRightRecursive(ISymbol symbol);
     }
 }

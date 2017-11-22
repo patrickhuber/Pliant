@@ -1,24 +1,25 @@
 ﻿using Pliant.Charts;
+using Pliant.Grammars;
 using Pliant.Utilities;
 
 namespace Pliant.Forest
 {
     public class IntermediateForestNode : InternalForestNode, IIntermediateForestNode
     {
-        public IState State { get; private set; }
+        public IDottedRule DottedRule { get; private set; }
 
         public override ForestNodeType NodeType { get { return ForestNodeType.Intermediate; } }
 
-        public IntermediateForestNode(IState state, int origin, int location)
+        public IntermediateForestNode(IDottedRule dottedRule, int origin, int location)
             : base(origin, location)
         {
-            State = state;
+            DottedRule = dottedRule;
             _hashCode = ComputeHashCode();
         }
 
         public override string ToString()
         {
-            return $"({State}, {Origin}, {Location})";
+            return $"({DottedRule}, {Origin}, {Location})";
         }
 
         public override void Accept(IForestNodeVisitor visitor)
@@ -38,7 +39,7 @@ namespace Pliant.Forest
             return Location == intermediateNode.Location
                 && NodeType == intermediateNode.NodeType
                 && Origin == intermediateNode.Origin
-                && State.Equals(intermediateNode.State);
+                && DottedRule.Equals(intermediateNode.DottedRule);
         }
 
         private readonly int _hashCode;
@@ -49,7 +50,7 @@ namespace Pliant.Forest
                 ((int)NodeType).GetHashCode(),
                 Location.GetHashCode(),
                 Origin.GetHashCode(),
-                State.GetHashCode());
+                DottedRule.GetHashCode());
         }
 
         public override int GetHashCode()

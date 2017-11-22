@@ -56,7 +56,7 @@ namespace Pliant.Tests.Unit.RegularExpressions
         }
 
         [TestMethod]
-        public void RegexParseRangeCharacterClass()
+        public void RegexShouldParseRangeCharacterClass()
         {
             var input = @"[a-z]";
             ParseAndAcceptInput(input);
@@ -138,8 +138,8 @@ namespace Pliant.Tests.Unit.RegularExpressions
         {
             var parseRunner = new ParseRunner(_parseEngine, input);
             for (int i = 0; i < input.Length; i++)
-                Assert.IsTrue(parseRunner.Read(),
-                        $"Line 0, Column {_parseEngine.Location} : Invalid Character {input[i]}");
+                if(!parseRunner.Read())
+                    Assert.Fail($"Line 0, Column {_parseEngine.Location} : Invalid Character {input[i]}");
         }
 
         private void Accept()

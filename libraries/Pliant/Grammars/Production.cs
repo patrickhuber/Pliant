@@ -11,7 +11,7 @@ namespace Pliant.Grammars
     {
         public INonTerminal LeftHandSide { get; private set; }
 
-        private ReadWriteList<ISymbol> _rightHandSide;
+        private List<ISymbol> _rightHandSide;
 
         public IReadOnlyList<ISymbol> RightHandSide { get { return _rightHandSide; } }
 
@@ -22,7 +22,7 @@ namespace Pliant.Grammars
             Assert.IsNotNull(leftHandSide, nameof(leftHandSide));
             Assert.IsNotNull(rightHandSide, nameof(rightHandSide));
             LeftHandSide = leftHandSide;
-            _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
+            _rightHandSide = new List<ISymbol>(new List<ISymbol>(rightHandSide));
             _hashCode = ComputeHashCode();
         }
 
@@ -31,7 +31,7 @@ namespace Pliant.Grammars
             Assert.IsNotNull(leftHandSide, nameof(leftHandSide));
             Assert.IsNotNull(rightHandSide, nameof(rightHandSide));
             LeftHandSide = leftHandSide;
-            _rightHandSide = new ReadWriteList<ISymbol>(new List<ISymbol>(rightHandSide));
+            _rightHandSide = new List<ISymbol>(new List<ISymbol>(rightHandSide));
             _hashCode = ComputeHashCode();
         }
                 
@@ -44,9 +44,10 @@ namespace Pliant.Grammars
                 return false;
             if (!LeftHandSide.Equals(production.LeftHandSide))
                 return false;
-            if (RightHandSide.Count != production.RightHandSide.Count)
+            var rightHandSideCount = RightHandSide.Count;
+            if (rightHandSideCount != production.RightHandSide.Count)
                 return false;
-            for (int i = 0; i < RightHandSide.Count; i++)
+            for (int i = 0; i < rightHandSideCount; i++)
                 if (!RightHandSide[i].Equals(production.RightHandSide[i]))
                     return false;
             return true;

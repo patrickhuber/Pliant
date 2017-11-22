@@ -24,5 +24,7 @@ namespace Pliant.Grammars
         {
             get { return _tokenType; }
         }
+
+        public abstract bool CanApply(char c);
     }
 }

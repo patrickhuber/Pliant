@@ -116,8 +116,8 @@ namespace Pliant.RegularExpressions
                 new Production(iterator, question),
                 new Production(set, positiveSet),
                 new Production(set, negativeSet),
-                new Production(positiveSet, openBracket, characterClass, closeBracket),
                 new Production(negativeSet, openBracket, caret, characterClass, closeBracket),
+                new Production(positiveSet, openBracket, characterClass, closeBracket),                
                 new Production(characterClass, characterRange),
                 new Production(characterClass, characterRange, characterClass),
                 new Production(characterRange, characterClassCharacter),
@@ -128,14 +128,14 @@ namespace Pliant.RegularExpressions
                 new Production(characterClassCharacter, escape)
             };
 
-            _regexGrammar = new Grammar(regex, productions, null);
+            _regexGrammar = new Grammar(regex, productions, null, null);
         }
         
         private static BaseLexerRule CreateNotMetaLexerRule()
         {
             return new TerminalLexerRule(
                 new NegationTerminal(
-                       new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\')),
+                       new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\', '/')),
                 "NotMeta");
         }
 
@@ -156,6 +156,7 @@ namespace Pliant.RegularExpressions
             escape.AddTransition(new DfaTransition(new AnyTerminal(), final));
             return new DfaLexerRule(start, "escape");
         }
+
         public RegexGrammar()
             : base(_regexGrammar)
         {

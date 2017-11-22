@@ -1,4 +1,6 @@
-﻿namespace Pliant.Grammars
+﻿using System.Collections.Generic;
+
+namespace Pliant.Grammars
 {
     public abstract class BaseTerminal : Symbol, ITerminal
     {
@@ -7,5 +9,7 @@
         }
 
         public abstract bool IsMatch(char character);
+
+        public abstract IReadOnlyList<Interval> GetIntervals();
     }
 }

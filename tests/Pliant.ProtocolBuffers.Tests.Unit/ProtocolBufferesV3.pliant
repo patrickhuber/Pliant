@@ -1,0 +1,106 @@
+﻿/* letters and digits */
+letter			~ /[a-zA-Z]/;
+capitalLetter	~ /[A-Z]/; 
+decimalDigit	~ /[0-9/;
+octalDigit		~ /[0-7]/;
+hexDigit		~ /[a-fA-F0-9]/;
+
+/* identifiers */
+ident		~ letter { letter | unicodeDigit | '_' };
+fullIndet	~ ident { '.' ident } ;
+messageName	~ ident ;
+enumName	~ ident ;
+fieldName	~ ident ;
+oneofName	~ ident ;
+mapName		~ ident ;
+serviceName	~ ident ;
+rpcName		~ ident ;
+messageType ~ ['.'] {ident '.'} messageName ;
+enumType	~ ['.'] {ident '.'} enumName;
+
+/* integer literals */
+intLit	= decimalLit | octalLit | hexLit ;
+decimalLit	~ ( /[1..9]/ ) { decimalDigit } ;
+octalLit	~ '0' { octalDigit };
+hexLit		~ '0' ('x' | 'X' ) hexDigit { hexDigit } ;
+
+/* floating point literals */
+floatLit ~ decimals '.' [decimals] [exponent] | decimals exponent ;
+decimals ~ decimalDigit { decimalDigit } ;
+exponent ~ ( 'e' | 'E' ) [ '+' | '-' ] decimals ;
+
+/* boolean literals */
+boolLit ~ "true" | "false" ;
+
+/* string literals */
+strLit		~ ("'" { charValue } "'" ) | ('"' { charValue } '"' );
+charValue	~ hexEscape | octEscape | charEscape | /[^\0\n\\]/ ;
+hexEscape	~ '\' ('x' | 'X') hexDigit hexDigit ;
+octEscape	~ '\' octalDigit octalDigit octalDigit ;
+charEscape	~ '\' /[abfnrtv\\'"]/; 
+quote		~ "'" | '"' ;
+
+/* empty statement */
+emptyStatement ~ ';';
+
+/* syntax */
+syntax = "syntax" '=' quote "proto3" quote ';' ;
+
+/* import */
+import = "import" [ "weak" | "public" ] strList ';' ;
+
+/* package */
+package = "package" fullIdent ';' ;
+
+/* option */
+option = "option" optionName '=' constant ';';
+optionName = (ident | '('  fullIdent ')' ) { '.' ident } ;
+
+/* fields */
+type =	"double"	| "float"		| "int32"		| "int64" 
+		| "uint32"  | "uint64"		| "sint32"		| "sint64"		
+		| "fixed32" | "fixed64"		| "sfixed32"	| "sfixed64"	
+		| "bool"	| "string"		| "bytes"		| "messageType" 
+		| "enumType" ;
+
+/* normal field */
+field = ["repeated"] type fieldName '=' fieldNumber [ '[' fieldOptions ']' ] ';' ;
+fieldOptions = fieldOption { ',' fieldOption } ;
+fieldOption = optionName '=' constant;
+
+/* Oneof and oneof field */
+oneof = "oneof" oneofName '{' { oneofField | emptyStatement} '}' ;
+oneofField = type fieldName '=' fieldNumber ['[' fieldOptions ']' ] ';' ;
+
+/* map field */
+mapField = "map" '<' keyType ',' type '>' mapName '=' fieldNumber ';' ;
+keyType = "int32"	| "int64"	| "uint32"	| "uint64"		| "sint32"
+		| "sint64"	| "fixed32"	| "fixed64"	| "sfixed32"	| "sfixed64" 
+		| "bool"	| "string" ;
+
+/* reserved */
+reserved = "reserved" (ranges | fieldNames ) ';' ;
+fieldNames = fieldName { ',' fieldName } ;
+
+/* enum */
+enum = "enum" enumName enumBody ;
+enumBody = '{' { option | enumField | emptyStatement } '}';
+enumField = ident '=' identLit [ '[' enumValueOption { ',' enumValueOption } ']' ] ';' ;
+
+/* message */
+message = "message" messageName messageBody ;
+messageBody = '{' { field | enum | message | option | oneof | mapField | reserved | emptyStatement } '}' ;
+
+/* service definition */
+service = "service" serviceName "{" {option | rpc | stream | emptyStatement } '}';
+rpcName = '(' ["stream"] messageType ')' "returns" '(' ["stream"] ')' (('{' { option | emptyStatement } '}' ) | ';' );
+
+/* proto file */
+proto = syntax { import | package | option | topLevelDef | emptyStatement } ;
+topLevelDef = message | enum | service ;
+
+/* whitespace */
+whitespace = /\w+/ ;
+
+:ignore whitespace ;
+:start proto ;

@@ -6,7 +6,5 @@ namespace Pliant.Charts
     public interface INormalState : IState
     {
         bool IsSource(ISymbol searchSymbol);
-
-        IState NextState();
     }
 }

@@ -42,15 +42,25 @@ namespace Pliant.Forest
                 location.GetHashCode());
         }
 
-        public IIntermediateForestNode AddOrGetExistingIntermediateNode(IState trigger, int origin, int location)
+        public IIntermediateForestNode AddOrGetExistingIntermediateNode(IDottedRule dottedRule, int origin, int location)
         {
-            var hash = trigger.GetHashCode();
+            int hash = ComputeHashCode(dottedRule, origin, location);
+
             IIntermediateForestNode intermediateNode = null;
             if (_intermediateNodes.TryGetValue(hash, out intermediateNode))
                 return intermediateNode;
-            intermediateNode = new IntermediateForestNode(trigger, origin, location);
+
+            intermediateNode = new IntermediateForestNode(dottedRule, origin, location);
             _intermediateNodes.Add(hash, intermediateNode);
             return intermediateNode;
+        }
+
+        private static int ComputeHashCode(IDottedRule dottedRule, int origin, int location)
+        {
+            return HashCode.Compute(
+                dottedRule.GetHashCode(),
+                origin.GetHashCode(),
+                location.GetHashCode());
         }
 
         public ITokenForestNode AddOrGetExistingTokenNode(IToken token)
@@ -58,7 +68,7 @@ namespace Pliant.Forest
             ITokenForestNode tokenNode = null;
             if (_tokenNodes.TryGetValue(token, out tokenNode))
                 return tokenNode;
-            tokenNode = new TokenForestNode(token, token.Origin, token.Value.Length);
+            tokenNode = new TokenForestNode(token, token.Position, token.Value.Length);
             _tokenNodes.Add(token, tokenNode);
             return tokenNode;
         }
@@ -79,7 +89,7 @@ namespace Pliant.Forest
             out VirtualForestNode node)
         {
             var targetState = transitionState.GetTargetState();
-            var hash = ComputeHashCode(targetState.Production.LeftHandSide, targetState.Origin, location);
+            var hash = ComputeHashCode(targetState.DottedRule.Production.LeftHandSide, targetState.Origin, location);
             return _virtualNodes.TryGetValue(hash, out node);
         }
 

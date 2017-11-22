@@ -6,5 +6,6 @@ namespace Pliant.Grammars
     {
         LexerRuleType LexerRuleType { get; }
         TokenType TokenType { get; }
+        bool CanApply(char c);
     }
 }
