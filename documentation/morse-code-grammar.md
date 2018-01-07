@@ -1,6 +1,9 @@
 # Simple Morse Code Grammar
 
+For definitions of symbols in this grammar see [the grammar](grammars.md) documentation.
+
 ```
+/* start the grammar with the MorseCode production see grammars.md for details */
 :start = MorseCode ;
 
 MorseCode = Character
@@ -8,7 +11,8 @@ MorseCode = Character
 
 Character = Letter | Number | Punctuation | Prosign ;
 
-Letter = A | B | C | D | E | F | G | H | I | J | K | L | M | N | O | P | Q | R | S | T | U | V | W | X | Y | Z ;
+Letter = A | B | C | D | E | F | G | H | I | J | K | L | M 
+       | N | O | P | Q | R | S | T | U | V | W | X | Y | Z ;
 
 Number = Zero 
         | One
