@@ -8,48 +8,74 @@ Regular expressions follow a simplified subset of the regular expressions provid
 
 The supported language for regular expressions in Pliant is defined by the following grammar. 
 
-```
-Regex                      ->   Expression |
-                                '^' Expression |
-                                Expression '$' |
-                                '^' Expression '$'
- 
-Expresion                  ->   Term |
-                                Term '|' Expression
-                                λ
+```ebnf
+regex =   
+        expression 
+    |   "^", expression 
+    |   expression, "$"
+    |   "^", expression, "$";
 
-Term                       ->   Factor |
-                                Factor Term
+(* an empty rule, or lambda rule is denoted by alteration with no body *)
+expression =  
+        term 
+    |   term, '|', expression
+    | ;
 
-Factor                     ->   Atom |
-                                Atom Iterator
+term = 
+        factor
+    |   factor, term ;
 
-Iterator                   ->   '*' | '+' | '?'
+factor = 
+        atom 
+    |   atom, iterator;
 
-Atom                       ->   . |
-                                Character |
-                                '(' Expression ')' |
-                                Set
+iterator = 
+    '*' | '+' | '?';
 
-Set                        ->   PositiveSet |
-                                NegativeSet
+atom =
+        . 
+    |   character
+    |   "(", expression, ")"
+    |   set ;
 
-PositiveSet                ->   '[' CharacterClass ']'
+set =
+        positive set
+    |   negative set ;
 
-NegativeSet                ->   "[^" CharacterClass ']'
+positive set =
+        "[", character class, "]";
 
-CharacterClass             ->   CharacterRange |
-                                CharacterRange CharacterClass
+negative set = 
+        "[^", character class, "]";
 
-CharacterRange             ->   CharacterClassCharacter |
-                                CharacterClassCharacter '-'
-                                CharacterClassCharacter
+character class = 
+        character range 
+    |   character range, character class ;
 
-Character                  ->   NotMetaCharacter |
-                                EscapeSequence
+character range =
+        character class character 
+    |   character class character, "-", character class character ;
 
-CharacterClassCharacter    ->   NotCloseBracketCharacter |
-                                EscapeSequence
+character =
+        not meta character 
+    |   escape sequence ;
+
+character class character =
+        not close bracket character
+    |   escape sequence ;
+
+(* 
+    https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form#Extensibility 
+    Defining "? /{regular expression}/ ?" where {regular expression} is a POSIX compliant regular expression.
+*)
+not meta character =
+    ? /[^.^$()[\]+*?\\\/]/ ?;
+
+not close bracket character = 
+    ? /[^\]]/ ?;
+
+escape sequence = 
+    ? /[\\]./ ?;
 ```
 
 ## Character Classes
@@ -73,7 +99,7 @@ The following character escapes are translated into Terminal objects upon recogn
 | Assertion | Description | Pattern | Matches |
 | --------- | ----------- | ------- | ------- |
 | ```^``` | (parses but not implemented) The match must start at the beginning of a string. | | |
-| ```$``` | (parses but not implemented) The match must occur at the end of the string or before ```\n``` at teh eend of the line or string. | | |
+| ```$``` | (parses but not implemented) The match must occur at the end of the string or before ```\n``` at the end of the line or string. | | |
 
 ## Grouping Constructs
 

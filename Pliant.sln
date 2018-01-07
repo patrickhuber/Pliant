@@ -1,12 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".documentation", ".documentation", "{026B4A97-0C94-4C41-A869-433989C12BE7}"
 	ProjectSection(SolutionItems) = preProject
+		documentation\grammars.md = documentation\grammars.md
 		LICENSE.md = LICENSE.md
+		documentation\morse-code-grammar.md = documentation\morse-code-grammar.md
 		README.md = README.md
+		documentation\regex.md = documentation\regex.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6A7B3028-8B58-4134-9809-9462EC68FBC6}"
@@ -17,17 +20,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hosts", "hosts", "{E3C2A6DF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.ProtocolBuffers", "libraries\Pliant.ProtocolBuffers\Pliant.ProtocolBuffers.csproj", "{6FCB3236-9D19-4B61-9A54-246EE6AD686A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.CodeGen", "libraries\Pliant.CodeGen\Pliant.CodeGen.csproj", "{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.CodeGen", "libraries\Pliant.CodeGen\Pliant.CodeGen.csproj", "{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.PerfViewApp", "hosts\Pliant.PerfViewApp\Pliant.PerfViewApp.csproj", "{4FC6B08A-1054-4E01-98F1-6FEAD12E54D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.PerfViewApp", "hosts\Pliant.PerfViewApp\Pliant.PerfViewApp.csproj", "{4FC6B08A-1054-4E01-98F1-6FEAD12E54D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.Benchmarks", "hosts\Pliant.Benchmarks\Pliant.Benchmarks.csproj", "{F1E451B1-52B6-4C3E-B1E1-FF0DDA3F3A3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.Benchmarks", "hosts\Pliant.Benchmarks\Pliant.Benchmarks.csproj", "{F1E451B1-52B6-4C3E-B1E1-FF0DDA3F3A3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.Tests.Integration", "tests\Pliant.Tests.Integration\Pliant.Tests.Integration.csproj", "{CF2238F2-D59F-46CA-9354-209C7D91F2E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.Tests.Integration", "tests\Pliant.Tests.Integration\Pliant.Tests.Integration.csproj", "{CF2238F2-D59F-46CA-9354-209C7D91F2E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.ProtocolBuffers.Tests.Unit", "tests\Pliant.ProtocolBuffers.Tests.Unit\Pliant.ProtocolBuffers.Tests.Unit.csproj", "{96D2A9B3-D85D-4F2E-88DE-E3C9F91CBF39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.ProtocolBuffers.Tests.Unit", "tests\Pliant.ProtocolBuffers.Tests.Unit\Pliant.ProtocolBuffers.Tests.Unit.csproj", "{96D2A9B3-D85D-4F2E-88DE-E3C9F91CBF39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.Json", "libraries\Pliant.Json\Pliant.Json.csproj", "{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.Json", "libraries\Pliant.Json\Pliant.Json.csproj", "{DDC33E1B-CA04-4C28-8F5B-A5F8F55DBA10}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant", "libraries\Pliant\Pliant.csproj", "{BCABDEC3-1B03-4EAE-B7B6-BF4839678EC9}"
 EndProject
