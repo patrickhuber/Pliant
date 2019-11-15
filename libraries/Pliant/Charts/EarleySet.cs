@@ -109,15 +109,14 @@ namespace Pliant.Charts
         private bool EnqueueNormal(IState state, INormalState normalState)
         {
             var dottedRule = state.DottedRule;
-            if (!dottedRule.IsComplete)
-            {
-                var currentSymbol = dottedRule.PostDotSymbol;
-                if (currentSymbol.SymbolType == SymbolType.NonTerminal)
-                    return AddUniquePrediction(normalState);
-                return AddUniqueScan(normalState);
-            }
+            if (dottedRule.IsComplete)
+                return AddUniqueCompletion(normalState);
+            
+            var currentSymbol = dottedRule.PostDotSymbol;
+            if (currentSymbol.SymbolType == SymbolType.NonTerminal)
+                return AddUniquePrediction(normalState);
 
-            return AddUniqueCompletion(normalState);
+            return AddUniqueScan(normalState);
         }
 
         private bool AddUniqueCompletion(INormalState normalState)

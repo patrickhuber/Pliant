@@ -1,7 +1,7 @@
 ﻿using Pliant.Utilities;
 using System;
 
-namespace Pliant.Tokens
+namespace Pliant.Grammars
 {
     public class TokenType
     {

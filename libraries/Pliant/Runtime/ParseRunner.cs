@@ -97,17 +97,16 @@ namespace Pliant.Runtime
 
             ClearExistingIgnoreLexemes();
 
-            if (MatchesNewTriviaLexemes(character))
-            {
-                if (IsEndOfLineCharacter(character))
-                {
-                    AccumulateAcceptedTrivia();
-                    AddTrailingTriviaToPreviousToken();
-                }
-                return true;
-            }
+            if (!MatchesNewTriviaLexemes(character))
+                return MatchesNewIgnoreLexemes(character);
 
-            return MatchesNewIgnoreLexemes(character);
+            if (!IsEndOfLineCharacter(character))            
+                return true;
+            
+            AccumulateAcceptedTrivia();
+            AddTrailingTriviaToPreviousToken();
+
+            return true;
         }
 
         private bool AnyExistingTriviaLexemes()
