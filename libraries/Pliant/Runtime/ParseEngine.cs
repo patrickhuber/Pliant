@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Pliant.Utilities;
 using Pliant.Diagnostics;
-using Pliant.Collections;
-using System.Linq;
 using System.Collections;
 
 namespace Pliant.Runtime
@@ -69,7 +67,7 @@ namespace Pliant.Runtime
             if (_expectedLexerRuleIndicies == null)
                 _expectedLexerRuleIndicies = new BitArray(Grammar.LexerRules.Count);
             else
-                _expectedLexerRuleIndicies.SetAll(false); 
+                _expectedLexerRuleIndicies.SetAll(false);
 
             // compute the lexer rule hash for caching the list of lexer rules
             // compute the unique lexer rule count 
@@ -92,7 +90,7 @@ namespace Pliant.Runtime
 
                 count++;
                 _expectedLexerRuleIndicies[index] = true;
-                hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, hashCode == 0);                                    
+                hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, hashCode == 0);
             }
 
             if (_expectedLexerRuleCache == null)
@@ -114,7 +112,7 @@ namespace Pliant.Runtime
                     array[returnItemIndex] = Grammar.LexerRules[i];
                     returnItemIndex++;
                 }
-            
+
             _expectedLexerRuleCache.Add(hashCode, array);
 
             return array;
@@ -204,7 +202,7 @@ namespace Pliant.Runtime
 
             _nodeSet.Clear();
             return true;
-        }        
+        }
 
         private void ScanPass(int location, IToken token)
         {
@@ -222,25 +220,26 @@ namespace Pliant.Runtime
             var currentSymbol = scan.DottedRule.PostDotSymbol;
             var lexerRule = currentSymbol as ILexerRule;
 
-            if (token.TokenType == lexerRule.TokenType)
-            {
-                var dottedRule = _dottedRuleRegistry.GetNext(scan.DottedRule);
-                if (_chart.Contains(j + 1, StateType.Normal, dottedRule, i))
-                {
-                    return;
-                }
-                var tokenNode = _nodeSet.AddOrGetExistingTokenNode(token);
-                var parseNode = CreateParseNode(
-                    dottedRule,
-                    scan.Origin,
-                    scan.ParseNode,
-                    tokenNode,
-                    j + 1);
-                var nextState = StateFactory.NewState(dottedRule, scan.Origin, parseNode);
+            if (token.TokenType != lexerRule.TokenType)
+                return;
 
-                if (_chart.Enqueue(j + 1, nextState))
-                    LogScan(j + 1, nextState, token);
+            var dottedRule = _dottedRuleRegistry.GetNext(scan.DottedRule);
+            if (_chart.Contains(j + 1, StateType.Normal, dottedRule, i))
+            {
+                return;
             }
+            var tokenNode = _nodeSet.AddOrGetExistingTokenNode(token);
+            var parseNode = CreateParseNode(
+                dottedRule,
+                scan.Origin,
+                scan.ParseNode,
+                tokenNode,
+                j + 1);
+            var nextState = StateFactory.NewState(dottedRule, scan.Origin, parseNode);
+
+            if (_chart.Enqueue(j + 1, nextState))
+                LogScan(j + 1, nextState, token);
+
         }
 
         private void ReductionPass(int location)
