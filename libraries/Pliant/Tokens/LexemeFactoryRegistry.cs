@@ -1,5 +1,4 @@
-﻿using Pliant.Collections;
-using Pliant.Grammars;
+﻿using Pliant.Grammars;
 using Pliant.Utilities;
 using System.Collections.Generic;
 
@@ -17,8 +16,7 @@ namespace Pliant.Tokens
 
         public ILexemeFactory Get(LexerRuleType lexerRuleType)
         {
-            ILexemeFactory lexemeFactory = null;
-            if (!_registry.TryGetValue(lexerRuleType, out lexemeFactory))
+            if (!_registry.TryGetValue(lexerRuleType, out ILexemeFactory lexemeFactory))
                 return null;
             return lexemeFactory;
         }

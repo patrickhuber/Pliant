@@ -4,11 +4,15 @@ using System.Runtime.CompilerServices;
 using Pliant.Automata;
 using Pliant.Tokens;
 using Pliant.Grammars;
+using System.Text;
 
 namespace Pliant.Runtime
 {
     public class ParseRunner : IParseRunner
     {
+        private StringBuilderSegment _segment;
+        private StringBuilder _builder;
+
         private TextReader _reader;
         private readonly ILexemeFactoryRegistry _lexemeFactoryRegistry;
         private List<ILexeme> _tokenLexemes;
@@ -18,9 +22,9 @@ namespace Pliant.Runtime
         private List<ILexeme> _triviaLexemes;
 
         public int Position { get; private set; }
-
+                
         public int Line { get; private set; }
-
+                
         public int Column { get; private set; }
 
         public IParseEngine ParseEngine { get; private set; }
@@ -39,6 +43,9 @@ namespace Pliant.Runtime
             _triviaLexemes = new List<ILexeme>();
             _triviaAccumulator = new List<ILexeme>();
             _lexemeFactoryRegistry = new LexemeFactoryRegistry();
+            _builder = new StringBuilder();
+            _segment = new StringBuilderSegment(_builder);
+
             RegisterDefaultLexemeFactories(_lexemeFactoryRegistry);
             Position = 0;
         }
@@ -146,13 +153,7 @@ namespace Pliant.Runtime
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsEndOfLineCharacter(char character)
         {
-            switch (character)
-            {
-                case '\n':
-                    return true;
-                default:
-                    return false;
-            }
+            return character == '\n';
         }
 
         public bool EndOfStream()
@@ -171,6 +172,7 @@ namespace Pliant.Runtime
         private char ReadCharacter()
         {
             var character = (char)_reader.Read();
+            _builder.Append(character);
             return character;
         }
 

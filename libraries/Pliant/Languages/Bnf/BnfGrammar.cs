@@ -1,31 +1,49 @@
 ﻿using Pliant.Automata;
 using Pliant.Grammars;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Pliant.Bnf
+namespace Pliant.Languages.Bnf
 {
-    [Obsolete("Use Pliant.Languages.Bnf instead")]
+
     public class BnfGrammar : GrammarWrapper
     {
         private static readonly IGrammar _bnfGrammar;
 
+        public static readonly string Namespace = "bnf";
+        public static readonly FullyQualifiedName Grammar = new FullyQualifiedName(Namespace, nameof(Grammar));
+        public static readonly FullyQualifiedName Rule = new FullyQualifiedName(Namespace, nameof(Rule));
+        public static readonly FullyQualifiedName Expression = new FullyQualifiedName(Namespace, nameof(Expression));
+
+
+        /// <summary>
+        /// <code>
+        /// grammar = 
+        ///     rule | rule syntax ;
+        /// rule = 
+        ///     "&lt;" rule-name "&gt;" "::=" expresion line-end ;
+        /// expression = 
+        ///     list | list "|" expression;
+        /// line-end   = 
+        ///     EOL | line-end line-end;
+        /// list       = 
+        ///     term | term list;
+        /// literal = 
+        ///     single_quote_string | double_quote_string ;
+        /// single_quote_string ~ /['][^']*[']/;
+        /// double_quote_string ~ /["][^"]*["]/;
+        /// </code>
+        /// </summary>
         static BnfGrammar()
         {
-            /*
-             *  <grammar>        ::= <rule> | <rule> <grammar>
-             *  <rule>           ::= "<" <rule-name> ">" "::=" <expression>
-             *  <expression>     ::= <list> | <list> "|" <expression>
-             *  <line-end>       ::= <EOL> | <line-end> <line-end>
-             *  <list>           ::= <term> | <term> <list>
-             *  <term>           ::= <literal> | "<" <rule-name> ">"
-             *  <literal>        ::= '"' <text> '"' | "'" <text> "'"
-             */
-            var whitespace = CreateWhitespaceLexerRule();
-            var ruleName = CreateRuleNameLexerRule();
-            var implements = CreateImplementsLexerRule();
-            var eol = CreateEndOfLineLexerRule();
-            var notDoubleQuote = CreateNotDoubleQuoteLexerRule();
-            var notSingleQuuote = CreateNotSingleQuoteLexerRule();
+
+            var whitespace = Whitespace();
+            var ruleName = RuleName();
+            var implements = Implements();
+            var eol = EndOfLine();
+            var doubleQuoteString = DoubleQuoteString();
+            var singleQuoteString = SingleQuoteString();
 
             var grammar = new NonTerminal("grammar");
             var rule = new NonTerminal("rule");
@@ -35,13 +53,9 @@ namespace Pliant.Bnf
             var list = new NonTerminal("list");
             var term = new NonTerminal("term");
             var literal = new NonTerminal("literal");
-            var doubleQuoteText = new NonTerminal("doubleQuoteText");
-            var singleQuoteText = new NonTerminal("singleQuoteText");
 
             var lessThan = new TerminalLexerRule('<');
             var greaterThan = new TerminalLexerRule('>');
-            var doubleQuote = new TerminalLexerRule('"');
-            var slash = new TerminalLexerRule('\'');
             var pipe = new TerminalLexerRule('|');
 
             var productions = new[]
@@ -58,8 +72,8 @@ namespace Pliant.Bnf
                 new Production(term, literal),
                 new Production(term, identifier),
                 new Production(identifier, lessThan, ruleName, greaterThan),
-                new Production(literal, doubleQuote, notDoubleQuote, doubleQuote),
-                new Production(literal, slash, notSingleQuuote, slash)
+                new Production(literal, doubleQuoteString),
+                new Production(literal, singleQuoteString),
             };
 
             var ignore = new[]
@@ -70,54 +84,17 @@ namespace Pliant.Bnf
             _bnfGrammar = new Grammar(grammar, productions, ignore, null);
         }
 
-        private static ILexerRule CreateNotSingleQuoteLexerRule()
-        {
-            var start = new DfaState();
-            var final = new DfaState(true);
-            var terminal = new NegationTerminal(new CharacterTerminal('\''));
-            var edge = new DfaTransition(terminal, final);
-            start.AddTransition(edge);
-            final.AddTransition(edge);
-            return new DfaLexerRule(start, new TokenType("not-single-quote"));
-        }
-
-        private static ILexerRule CreateNotDoubleQuoteLexerRule()
-        {
-            // ( [^"\\] | (\\ .) ) +
-            var start = new DfaState();
-            var escape = new DfaState();
-            var final = new DfaState(true);
-
-            var notQuoteTerminal = new NegationTerminal(
-                new SetTerminal('"', '\\'));
-            var escapeTerminal = new CharacterTerminal('\\');
-            var anyTerminal = new AnyTerminal();
-
-            var notQuoteEdge = new DfaTransition(notQuoteTerminal, final);
-            start.AddTransition(notQuoteEdge);
-            final.AddTransition(notQuoteEdge);
-
-            var escapeEdge = new DfaTransition(escapeTerminal, escape);
-            start.AddTransition(escapeEdge);
-            final.AddTransition(escapeEdge);
-
-            var anyEdge = new DfaTransition(anyTerminal, final);
-            escape.AddTransition(anyEdge);
-
-            return new DfaLexerRule(start, new TokenType("not-double-quote"));
-        }
-
-        private static ILexerRule CreateEndOfLineLexerRule()
+        private static ILexerRule EndOfLine()
         {
             return new StringLiteralLexerRule("\r\n", new TokenType("eol"));
         }
 
-        private static ILexerRule CreateImplementsLexerRule()
+        private static ILexerRule Implements()
         {
             return new StringLiteralLexerRule("::=", new TokenType("implements"));
         }
 
-        private static ILexerRule CreateRuleNameLexerRule()
+        private static ILexerRule RuleName()
         {
             var ruleNameState = new DfaState();
             var zeroOrMoreLetterOrDigit = new DfaState(true);
@@ -139,7 +116,7 @@ namespace Pliant.Bnf
             return ruleName;
         }
 
-        private static BaseLexerRule CreateWhitespaceLexerRule()
+        private static BaseLexerRule Whitespace()
         {
             var whitespaceTerminal = new WhitespaceTerminal();
             var startState = new DfaState();
@@ -150,7 +127,39 @@ namespace Pliant.Bnf
             return new DfaLexerRule(startState, new TokenType("[\\s]+"));
         }
 
-        public BnfGrammar() 
+        private static ILexerRule SingleQuoteString()
+        {
+            var start = new DfaState();
+            var middle = new DfaState();
+            var end = new DfaState(isFinal: true);
+
+            var singleQuote = new CharacterTerminal('\'');
+            var notSingleQuote = new NegationTerminal(singleQuote);
+
+            start.AddTransition(singleQuote, middle);
+            middle.AddTransition(notSingleQuote, middle);
+            middle.AddTransition(singleQuote, end);
+
+            return new DfaLexerRule(start, "single-quote-string");
+        }
+
+        private static ILexerRule DoubleQuoteString()
+        {
+            var start = new DfaState();
+            var middle = new DfaState();
+            var end = new DfaState(isFinal: true);
+
+            var singleQuote = new CharacterTerminal('"');
+            var notSingleQuote = new NegationTerminal(singleQuote);
+
+            start.AddTransition(singleQuote, middle);
+            middle.AddTransition(notSingleQuote, middle);
+            middle.AddTransition(singleQuote, end);
+
+            return new DfaLexerRule(start, "double-quote-string");
+        }
+
+        public BnfGrammar()
             : base(_bnfGrammar)
         { }
     }

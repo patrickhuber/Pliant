@@ -1,0 +1,55 @@
+﻿:namespace ebnf;
+:start definition;
+:ignore whitespace;
+:import regex;
+
+grammar = 
+    grammar rule
+    | ;
+
+rule = 
+    lhs "=" rhs ";" ;
+
+lhs = 
+    identifier ;
+
+expression = 
+    identifier
+    | terminal
+    | group 
+    | repetition
+    | group
+    | alteration 
+    | concatenation ;
+
+optional = 
+    "[" expression "]";
+
+repetition = 
+    "{" expression "}";
+
+group = 
+    "(" expression ")";
+
+alteration = 
+    expression "|" expression;
+
+concatenation = 
+    expression "," expression;
+
+identifier ~ 
+    letter { letter | digit | "_" } ;
+
+terminal ~ 
+    "'" character {character} "'" 
+    | '"' character {character} '"' ; 
+        
+character ~ 
+    letter 
+    | digit 
+    | symbol 
+    | "_" ; 
+
+letter  ~ /[a-zA-Z]/ ;
+digit   ~ /\d/ ;
+symbol  ~ /[[\]{}()<>'"=|.,;]/ ;

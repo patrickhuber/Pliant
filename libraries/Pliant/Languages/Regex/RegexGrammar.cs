@@ -1,55 +1,13 @@
 ﻿using Pliant.Automata;
 using Pliant.Grammars;
-using System;
 
-namespace Pliant.RegularExpressions
+namespace Pliant.Languages.Regex
 {
-    [Obsolete("use Pliant.Languages.Regex instead")]
     public class RegexGrammar : GrammarWrapper
     {
         private readonly static IGrammar _regexGrammar;
 
-        /*  Regex                      ->   Expression |
-         *                                  '^' Expression |
-         *                                  Expression '$' |
-         *                                  '^' Expression '$'
-         *
-         *  Expresion                  ->   Term |
-         *                                  Term '|' Expression
-         *                                  λ
-         *
-         *  Term                       ->   Factor |
-         *                                  Factor Term
-         *
-         *  Factor                     ->   Atom |
-         *                                  Atom Iterator
-         *
-         *  Atom                       ->   . |
-         *                                  Character |
-         *                                  '(' Expression ')' |
-         *                                  Set
-         *
-         *  Set                        ->   PositiveSet |
-         *                                  NegativeSet
-         *
-         *  PositiveSet                ->   '[' CharacterClass ']'
-         *
-         *  NegativeSet                ->   "[^" CharacterClass ']'
-         *
-         *  CharacterClass             ->   CharacterRange |
-         *                                  CharacterRange CharacterClass
-         *
-         *  CharacterRange             ->   CharacterClassCharacter |
-         *                                  CharacterClassCharacter '-' CharacterClassCharacter
-         *
-         *  Character                  ->   NotMetaCharacter |
-         *                                  EscapeSequence
-         *
-         *  CharacterClassCharacter    ->   NotCloseBracketCharacter |
-         *                                  EscapeSequence
-         */
-
-        public static readonly string Namespace = nameof(RegularExpressions);
+        public static string Namespace = "regex";
         public static readonly FullyQualifiedName Regex = new FullyQualifiedName(Namespace, nameof(Regex));
         public static readonly FullyQualifiedName Expression = new FullyQualifiedName(Namespace, nameof(Expression));
         public static readonly FullyQualifiedName Term = new FullyQualifiedName(Namespace, nameof(Term));
@@ -63,12 +21,12 @@ namespace Pliant.RegularExpressions
         public static readonly FullyQualifiedName CharacterRange = new FullyQualifiedName(Namespace, nameof(CharacterRange));
         public static readonly FullyQualifiedName Character = new FullyQualifiedName(Namespace, nameof(Character));
         public static readonly FullyQualifiedName CharacterClassCharacter = new FullyQualifiedName(Namespace, nameof(CharacterClassCharacter));
-        
+
         static RegexGrammar()
         {
-            var notMeta = CreateNotMetaLexerRule();
-            var notCloseBracket = CreateNotCloseBracketLexerRule();
-            var escape = CreateEscapeCharacterLexerRule();
+            var notMeta = NotMeta();
+            var notCloseBracket = NotCloseBracket();
+            var escape = EscapeCharacter();
 
             var regex = new NonTerminal(Regex);
             var expression = new NonTerminal(Expression);
@@ -119,7 +77,7 @@ namespace Pliant.RegularExpressions
                 new Production(set, positiveSet),
                 new Production(set, negativeSet),
                 new Production(negativeSet, openBracket, caret, characterClass, closeBracket),
-                new Production(positiveSet, openBracket, characterClass, closeBracket),                
+                new Production(positiveSet, openBracket, characterClass, closeBracket),
                 new Production(characterClass, characterRange),
                 new Production(characterClass, characterRange, characterClass),
                 new Production(characterRange, characterClassCharacter),
@@ -132,16 +90,16 @@ namespace Pliant.RegularExpressions
 
             _regexGrammar = new Grammar(regex, productions, null, null);
         }
-        
-        private static BaseLexerRule CreateNotMetaLexerRule()
+
+        private static BaseLexerRule NotMeta()
         {
             return new TerminalLexerRule(
                 new NegationTerminal(
-                       new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\', '/')),
+                    new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\', '/')),
                 "NotMeta");
         }
 
-        private static BaseLexerRule CreateNotCloseBracketLexerRule()
+        private static BaseLexerRule NotCloseBracket() 
         {
             return new TerminalLexerRule(
                 new NegationTerminal(
@@ -149,7 +107,7 @@ namespace Pliant.RegularExpressions
                 "NotCloseBracket");
         }
 
-        private static BaseLexerRule CreateEscapeCharacterLexerRule()
+        private static BaseLexerRule EscapeCharacter()
         {
             var start = new DfaState();
             var escape = new DfaState();
@@ -159,9 +117,6 @@ namespace Pliant.RegularExpressions
             return new DfaLexerRule(start, "escape");
         }
 
-        public RegexGrammar()
-            : base(_regexGrammar)
-        {
-        }
+        public RegexGrammar() : base(_regexGrammar) { }
     }
 }

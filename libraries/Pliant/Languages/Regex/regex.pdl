@@ -1,0 +1,66 @@
+﻿:namespace  regex
+:start      regex
+
+regex =   
+        expression 
+    |   "^" expression 
+    |   expression "$"
+    |   "^" expression "$";
+
+(* an empty rule, or lambda rule is denoted by alteration with no body *)
+expression =  
+        term 
+    |   term '|' expression
+    | ;
+
+term = 
+        factor
+    |   factor term ;
+
+factor = 
+        atom 
+    |   atom iterator;
+
+iterator = 
+    '*' | '+' | '?';
+
+atom =         
+    character
+    |   "(" expression ")"
+    |   set 
+    | ;
+
+set =
+        positive_set
+    |   negative_set ;
+
+positive_set =
+        "[" character_class "]";
+
+negative_set = 
+        "[^" character_class "]";
+
+character_class = 
+        character range 
+    |   character range character_class ;
+
+character range =
+        character_class_character 
+    |   character_class_character "-" character_class_character ;
+
+character =
+        not_meta_character 
+    |   escape_sequence ;
+
+character_class_character =
+        not_close_bracket_character
+    |   escape_sequence ;
+
+not_meta_character =
+    ? /[^.^$()[\]+*?\\\/]/ ?;
+
+not_close_bracket_character = 
+    ? /[^\]]/ ?;
+
+escape_sequence = 
+    ? /[\\]./ ?;

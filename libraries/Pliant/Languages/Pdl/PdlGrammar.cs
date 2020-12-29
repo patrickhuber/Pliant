@@ -1,19 +1,17 @@
 ﻿using Pliant.Automata;
-using Pliant.Builders.Expressions;
 using Pliant.Builders;
+using Pliant.Builders.Expressions;
 using Pliant.Grammars;
-using Pliant.RegularExpressions;
+using Pliant.Languages.Regex;
 using Pliant.LexerRules;
-using System;
 
-namespace Pliant.Ebnf
+namespace Pliant.Languages.Pdl
 {
-    [Obsolete("Use Pliant.Languages.Pdl instead")]
-    public class EbnfGrammar : GrammarWrapper
+    public class PdlGrammar : GrammarWrapper
     {
-        private static readonly IGrammar _ebnfGrammar;
+        private static readonly IGrammar _pdlGrammar;
 
-        public static readonly string Namespace = "Ebnf";
+        public static readonly string Namespace = "pdl";
         public static readonly FullyQualifiedName Definition = new FullyQualifiedName(Namespace, nameof(Definition));
         public static readonly FullyQualifiedName Block = new FullyQualifiedName(Namespace, nameof(Block));
         public static readonly FullyQualifiedName Rule = new FullyQualifiedName(Namespace, nameof(Rule));
@@ -31,19 +29,19 @@ namespace Pliant.Ebnf
         public static readonly FullyQualifiedName LexerRuleTerm = new FullyQualifiedName(Namespace, nameof(LexerRuleTerm));
         public static readonly FullyQualifiedName LexerRuleFactor = new FullyQualifiedName(Namespace, nameof(LexerRuleFactor));
 
-        static EbnfGrammar()
+        static PdlGrammar()
         {
             BaseLexerRule
-                settingIdentifier = CreateSettingIdentifierLexerRule(),
-                notDoubleQuote = CreateNotDoubleQuoteLexerRule(),
-                notSingleQuote = CreateNotSingleQuoteLexerRule(),
-                identifier = CreateIdentifierLexerRule(),
+                settingIdentifier = SettingIdentifier(),
+                notDoubleQuote = NotDoubleQuote(),
+                notSingleQuote = NotSingleQuote(),
+                identifier = Identifier(),
                 any = new TerminalLexerRule(new AnyTerminal(), "."),
                 notCloseBracket = new TerminalLexerRule(
                     new NegationTerminal(new CharacterTerminal(']')), "[^\\]]"),
-                escapeCharacter = CreateEscapeCharacterLexerRule(),
-                whitespace = CreateWhitespaceLexerRule(),
-                multiLineComment = CreateMultiLineCommentLexerRule();
+                escapeCharacter = EscapeCharacter(),
+                whitespace = Whitespace(),
+                multiLineComment = MultiLineComment();
 
             ProductionExpression
                 definition = Definition,
@@ -65,7 +63,7 @@ namespace Pliant.Ebnf
 
             var regexGrammar = new RegexGrammar();
             var regexProductionReference = new ProductionReferenceExpression(regexGrammar);
-                        
+
             definition.Rule =
                 block
                 | block + definition;
@@ -117,8 +115,8 @@ namespace Pliant.Ebnf
                 identifier
                 | (Expr)identifier + '.' + qualifiedIdentifier;
 
-            lexerRuleExpression.Rule = 
-                lexerRuleTerm 
+            lexerRuleExpression.Rule =
+                lexerRuleTerm
                 | lexerRuleTerm + '|' + lexerRuleExpression;
 
             lexerRuleTerm.Rule =
@@ -130,8 +128,8 @@ namespace Pliant.Ebnf
                 | '/' + regexProductionReference + '/';
 
             var grammarExpression = new GrammarExpression(
-                definition, 
-                new[] 
+                definition,
+                new[]
                 {
                     definition,
                     block,
@@ -145,17 +143,16 @@ namespace Pliant.Ebnf
                     repetition,
                     optional,
                     grouping,
-                    qualifiedIdentifier, 
+                    qualifiedIdentifier,
                     lexerRuleExpression,
                     lexerRuleTerm,
                     lexerRuleFactor
-                }, 
+                },
                 new[] { new LexerRuleModel(whitespace), new LexerRuleModel(multiLineComment) });
-            _ebnfGrammar = grammarExpression.ToGrammar();
+            _pdlGrammar = grammarExpression.ToGrammar();
         }
 
-        public EbnfGrammar() 
-            : base(_ebnfGrammar)
+        public PdlGrammar() : base(_pdlGrammar)
         {
         }
 
@@ -170,7 +167,7 @@ namespace Pliant.Ebnf
             public static readonly TokenType MultiLineComment = new TokenType(@"\/[*]([*][^\/]|[^*])*[*][\/]");
         }
 
-        private static BaseLexerRule CreateEscapeCharacterLexerRule()
+        private static BaseLexerRule EscapeCharacter()
         {
             var start = new DfaState();
             var escape = new DfaState();
@@ -180,7 +177,7 @@ namespace Pliant.Ebnf
             return new DfaLexerRule(start, TokenTypes.Escape);
         }
 
-        private static BaseLexerRule CreateNotSingleQuoteLexerRule()
+        private static BaseLexerRule NotSingleQuote()
         {
             // ([^']|(\\.))*
             var start = new DfaState();
@@ -192,7 +189,7 @@ namespace Pliant.Ebnf
             return new DfaLexerRule(start, TokenTypes.NotSingleQuote);
         }
 
-        private static BaseLexerRule CreateNotDoubleQuoteLexerRule()
+        private static BaseLexerRule NotDoubleQuote()
         {
             // ([^"]|(\\.))*
             var start = new DfaState();
@@ -218,7 +215,7 @@ namespace Pliant.Ebnf
             return new DfaLexerRule(start, TokenTypes.NotDoubleQuote);
         }
 
-        private static BaseLexerRule CreateSettingIdentifierLexerRule()
+        private static BaseLexerRule SettingIdentifier()
         {
             // /:[a-zA-Z][a-zA-Z0-9]*/
             var start = new DfaState();
@@ -243,8 +240,8 @@ namespace Pliant.Ebnf
                     zeroOrMoreLetterOrDigit));
             return new DfaLexerRule(start, TokenTypes.SettingIdentifier);
         }
-        
-        private static BaseLexerRule CreateIdentifierLexerRule()
+
+        private static BaseLexerRule Identifier()
         {
             // /[a-zA-Z][a-zA-Z0-9-_]*/
             var identifierState = new DfaState();
@@ -267,7 +264,7 @@ namespace Pliant.Ebnf
             return identifier;
         }
 
-        private static BaseLexerRule CreateWhitespaceLexerRule()
+        private static BaseLexerRule Whitespace()
         {
             var whitespaceTerminal = new WhitespaceTerminal();
             var startWhitespace = new DfaState();
@@ -277,8 +274,8 @@ namespace Pliant.Ebnf
             var whitespace = new DfaLexerRule(startWhitespace, TokenTypes.Whitespace);
             return whitespace;
         }
-        
-        private static BaseLexerRule CreateMultiLineCommentLexerRule()
+
+        private static BaseLexerRule MultiLineComment()
         {
             var states = new DfaState[5];
             for (int i = 0; i < states.Length; i++)
@@ -302,7 +299,7 @@ namespace Pliant.Ebnf
             states[2].AddTransition(lastStar);
             states[3].AddTransition(goBackNotSlash);
             states[3].AddTransition(lastSlash);
-            
+
             return new DfaLexerRule(states[0], TokenTypes.MultiLineComment);
         }
     }

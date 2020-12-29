@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Pliant.Grammars;
+using System.Collections.Generic;
 
 namespace Pliant.Automata
 {
@@ -9,5 +10,6 @@ namespace Pliant.Automata
         IReadOnlyList<IDfaTransition> Transitions { get; }
 
         void AddTransition(IDfaTransition edge);
+        void AddTransition(ITerminal terminal, IDfaState node);
     }
 }

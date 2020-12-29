@@ -97,8 +97,7 @@ namespace Pliant.Runtime
                 _expectedLexerRuleCache = new Dictionary<int, ILexerRule[]>();
 
             // if the hash is found in the cached lexer rule lists, return the cached array
-            ILexerRule[] cachedLexerRules = null;
-            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
+            if (_expectedLexerRuleCache.TryGetValue(hashCode, out ILexerRule[] cachedLexerRules))
             {
                 return cachedLexerRules;
             }

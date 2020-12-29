@@ -1,0 +1,83 @@
+﻿:namespace  pdl;
+:start      definition;
+:ignore     whitespace;
+:import     regex;
+
+definition = 
+	block
+	| block definition ; 
+
+block = 
+	rule
+	| setting
+	| lexer_rule ;
+	
+setting =
+      setting_identifier '=' qualified_identifier ';' ;
+
+lexer_rule =   
+      qualified_identifier '~' lexer_rule_expression ';' ;
+
+expression =   
+      term
+    | term '|' expression;
+
+term =   
+      factor
+    | factor term;
+
+factor =   
+      qualified_identifier
+    | literal
+    | regular_expression
+    | repetition
+    | optional
+    | grouping;
+
+literal =   
+      single_quote_string
+    | double_quote_string;
+
+repetition =   
+      '{', expression '}';
+
+optional =   
+      '[' expression ']';
+
+grouping =   
+      '(' expression ')';
+
+qualified_identifier =   
+      identifier
+    | identifier '.' qualified_identifier;
+
+setting_identifier  ~
+      ':' letter { letter_or_digit } ;
+
+lexer_rule_expression =  
+      lexer_rule_term
+    | lexer_rule_term '|' lexer_rule_expression ;
+
+lexer_rule_term       =   
+      lexer_rule_factor
+    | lexer_rule_factor lexer_rule_term ;
+
+lexer_rule_factor     =   
+      literal
+    | regular_expression ;
+
+regular_expresion ~ '/' regex.regex '/' ;
+
+letter ~ /[a-zA-Z]/ ;
+       
+digit ~ /[0-9]/ ;
+
+letter_or_digit ~
+    letter 
+    | digit ;
+
+single_quote_string ~ /['][^']*[']/;
+
+double_quote_string ~ /["][^"]*["]/;
+
+whitespace ~ /[\\s]+/;
