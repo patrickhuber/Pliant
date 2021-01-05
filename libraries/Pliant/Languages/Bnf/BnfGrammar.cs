@@ -130,31 +130,56 @@ namespace Pliant.Languages.Bnf
         private static ILexerRule SingleQuoteString()
         {
             var start = new DfaState();
-            var middle = new DfaState();
+            var loop = new DfaState();
+            var esc = new DfaState();
             var end = new DfaState(isFinal: true);
 
             var singleQuote = new CharacterTerminal('\'');
             var notSingleQuote = new NegationTerminal(singleQuote);
+            var escape = new CharacterTerminal('\\');
+            var any = new AnyTerminal();
 
-            start.AddTransition(singleQuote, middle);
-            middle.AddTransition(notSingleQuote, middle);
-            middle.AddTransition(singleQuote, end);
+            // (start) - '   -> (loop)
+            start.AddTransition(singleQuote, loop);
+
+            // (loop) - [^'] -> (loop)
+            //        - \    -> (esc)
+            //        - '    -> (end)
+            loop.AddTransition(notSingleQuote, loop);
+            loop.AddTransition(escape, esc);
+            loop.AddTransition(singleQuote, end);
+
+            // (esc)  - .    -> (loop)
+            esc.AddTransition(any, loop);
 
             return new DfaLexerRule(start, "single-quote-string");
         }
 
+
         private static ILexerRule DoubleQuoteString()
         {
             var start = new DfaState();
-            var middle = new DfaState();
+            var loop = new DfaState();
+            var esc = new DfaState();
             var end = new DfaState(isFinal: true);
 
-            var singleQuote = new CharacterTerminal('"');
-            var notSingleQuote = new NegationTerminal(singleQuote);
+            var doubleQuote = new CharacterTerminal('"');
+            var notDoubleQuote = new NegationTerminal(doubleQuote);
+            var escape = new CharacterTerminal('\\');
+            var any = new AnyTerminal();
 
-            start.AddTransition(singleQuote, middle);
-            middle.AddTransition(notSingleQuote, middle);
-            middle.AddTransition(singleQuote, end);
+            // (start) - "   -> (loop)
+            start.AddTransition(doubleQuote, loop);
+
+            // (loop) - [^"] -> (loop)
+            //        - \    -> (esc)
+            //        - "    -> (end)
+            loop.AddTransition(notDoubleQuote, loop);
+            loop.AddTransition(escape, esc);
+            loop.AddTransition(doubleQuote, end);
+
+            // (esc)  - .    -> (loop)
+            esc.AddTransition(any, loop);
 
             return new DfaLexerRule(start, "double-quote-string");
         }

@@ -2,7 +2,7 @@
 using Pliant.Automata;
 using Pliant.Grammars;
 using Pliant.Json;
-using Pliant.RegularExpressions;
+using Pliant.Languages.Regex;
 using Pliant.Runtime;
 using Pliant.Tests.Common;
 using System.IO;

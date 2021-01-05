@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders.Expressions;
 using Pliant.LexerRules;
-using Pliant.RegularExpressions;
+using Pliant.Languages.Regex;
 using System.Linq;
 
 namespace Pliant.Tests.Unit

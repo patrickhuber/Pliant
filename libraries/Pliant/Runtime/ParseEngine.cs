@@ -652,13 +652,13 @@ namespace Pliant.Runtime
 
         private static string GetOriginStateOperationString(string operation, int origin, IState state)
         {
-            return $"{origin.ToString().PadRight(9)}{state.ToString().PadRight(100)}{operation}";
+            return $"{origin,-9}{state,-100}{operation}";
         }
 
         private void LogScan(int origin, IState state, IToken token)
         {
             if (Options.LoggingEnabled)
-                Debug.WriteLine($"{GetOriginStateOperationString("Scan", origin, state)} \"{token.Value}\"");
+                Debug.WriteLine($"{GetOriginStateOperationString("Scan", origin, state)} \"{token.Capture}\"");
         }
     }
 }

@@ -2,13 +2,11 @@
 using Pliant.Forest;
 using Pliant.Automata;
 using Pliant.Grammars;
-using Pliant.RegularExpressions;
-using Pliant.Tokens;
+using Pliant.Languages.Regex;
 using Pliant.Builders.Expressions;
 using Pliant.Builders;
 using Pliant.Runtime;
 using Pliant.Tests.Unit.Runtime;
-using System.Linq;
 
 namespace Pliant.Tests.Common.Forest
 {

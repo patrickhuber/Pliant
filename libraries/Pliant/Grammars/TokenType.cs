@@ -20,10 +20,9 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            if ((object)obj == null)
+            if (obj is null)
                 return false;
-            var other = obj as TokenType;
-            if ((object)other == null)
+            if (!(obj is TokenType other))
                 return false;
             return other.Id.Equals(Id);
         }

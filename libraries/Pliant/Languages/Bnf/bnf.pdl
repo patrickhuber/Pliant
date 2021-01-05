@@ -7,7 +7,7 @@ syntax =
 	| rule syntax ;
 
 rule= 
-	"<" rule-name ">" "::=" expression line-end ;
+	rule-identifier "::=" expression line-end ;
 
 expression	= 
 	list 
@@ -23,7 +23,7 @@ list =
 
 term = 
 	literal 
-	| "<" rule-name ">" ; 
+	| rule-identifier; 
 
 literal	= 
 	double-quote-string
@@ -39,6 +39,7 @@ single-quote-string ~ /['][^']*[']/;
 letter				~ /[a-zA-Z]/ ;
 digit				~ /\d/ ;
 symbol				~ /[[\]{}()<>'"=|.,;]/ ; 
+rule-identifier		~ "<" rule-name ">";
 rule-name			~ letter | rule-name rule-char ;
 rule-char			~ letter | digit | "-" ;
 EOL					~ "\n" | "\r\n" ;

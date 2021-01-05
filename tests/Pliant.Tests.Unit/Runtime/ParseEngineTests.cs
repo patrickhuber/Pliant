@@ -83,7 +83,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var a_0_1 = S_0_4_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(a_0_1);
-            Assert.AreEqual("a", a_0_1.Token.Value);
+            Assert.AreEqual("a", a_0_1.Token.Capture.ToString());
 
             var T_1_4 = S_0_4_1.Children[1] as ISymbolForestNode;
             Assert.IsNotNull(T_1_4);
@@ -122,7 +122,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var nullToken = B_0_0_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(nullToken);
-            Assert.AreEqual(string.Empty, nullToken.Token.Value);
+            Assert.AreEqual(string.Empty, nullToken.Token.Capture.ToString());
 
             var T_1_4_1 = T_1_4.Children[0] as IAndForestNode;
             Assert.IsNotNull(T_1_4_1);
@@ -134,7 +134,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var b_3_4 = T_1_4_1.Children[1] as ITokenForestNode;
             Assert.IsNotNull(b_3_4);
-            Assert.AreEqual("b", b_3_4.Token.Value);
+            Assert.AreEqual("b", b_3_4.Token.Capture.ToString());
 
             var T_1_3_1 = T_1_3.Children[0] as IAndForestNode;
             Assert.IsNotNull(T_1_3_1);
@@ -142,11 +142,11 @@ namespace Pliant.Tests.Unit.Runtime
 
             var b_1_2 = T_1_3_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(b_1_2);
-            Assert.AreEqual("b", b_1_2.Token.Value);
+            Assert.AreEqual("b", b_1_2.Token.Capture.ToString());
 
             var b_2_3 = T_1_3_1.Children[1] as ITokenForestNode;
             Assert.IsNotNull(b_2_3);
-            Assert.AreEqual("b", b_2_3.Token.Value);
+            Assert.AreEqual("b", b_2_3.Token.Capture.ToString());
         }
 
         [TestMethod]
@@ -175,7 +175,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var a_0_1 = S_0_1_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(a_0_1);
-            Assert.AreEqual("a", a_0_1.Token.Value);
+            Assert.AreEqual("a", a_0_1.Token.Capture.ToString());
         }
 
         [TestMethod]
@@ -212,7 +212,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var a_0_1 = A_0_1_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(a_0_1);
-            Assert.AreEqual("a", a_0_1.Token.Value);
+            Assert.AreEqual("a", a_0_1.Token.Capture.ToString());
         }
 
         [TestMethod]
@@ -254,7 +254,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var a_0_1 = A_0_2_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(a_0_1);
-            Assert.AreEqual("a", a_0_1.Token.Value);
+            Assert.AreEqual("a", a_0_1.Token.Capture.ToString());
 
             var A_1_2 = A_0_2_1.Children[1] as ISymbolForestNode;
             Assert.IsNotNull(A_1_2);
@@ -266,7 +266,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var b_1_2 = A_1_2_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(b_1_2);
-            Assert.AreEqual("b", b_1_2.Token.Value);
+            Assert.AreEqual("b", b_1_2.Token.Capture.ToString());
         }
 
         [TestMethod]
@@ -312,7 +312,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var a_0_1 = A_0_4_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(a_0_1);
-            Assert.AreEqual("a", a_0_1.Token.Value);
+            Assert.AreEqual("a", a_0_1.Token.Capture.ToString());
 
             var B_1_4 = A_0_4_1.Children[1] as ISymbolForestNode;
             Assert.IsNotNull(B_1_4);
@@ -332,7 +332,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var a_1_2 = A_1_4_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(a_1_2);
-            Assert.AreEqual("a", a_1_2.Token.Value);
+            Assert.AreEqual("a", a_1_2.Token.Capture.ToString());
 
             var B_2_4 = A_1_4_1.Children[1] as ISymbolForestNode;
             Assert.IsNotNull(B_2_4);
@@ -352,7 +352,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var a_2_3 = A_2_4_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(a_2_3);
-            Assert.AreEqual("a", a_2_3.Token.Value);
+            Assert.AreEqual("a", a_2_3.Token.Capture.ToString());
 
             var B_3_4 = A_2_4_1.Children[1] as ISymbolForestNode;
             Assert.IsNotNull(B_3_4);
@@ -364,7 +364,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var b_3_4 = B_3_4_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(b_3_4);
-            Assert.AreEqual("b", b_3_4.Token.Value);
+            Assert.AreEqual("b", b_3_4.Token.Capture.ToString());
         }
 
         [TestMethod]
@@ -415,7 +415,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var dot_0_1 = B_0_1_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(dot_0_1);
-            Assert.AreEqual(".", dot_0_1.Token.Value);
+            Assert.AreEqual(".", dot_0_1.Token.Capture.ToString());
 
             var C_1_2 = A_0_2_1.Children[1] as ISymbolForestNode;
             Assert.IsNotNull(C_1_2);
@@ -426,7 +426,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var plus_1_2 = C_1_2_1.Children[0] as ITokenForestNode;
             Assert.IsNotNull(plus_1_2);
-            Assert.AreEqual("+", plus_1_2.Token.Value);
+            Assert.AreEqual("+", plus_1_2.Token.Capture.ToString());
         }
 
         [TestMethod]

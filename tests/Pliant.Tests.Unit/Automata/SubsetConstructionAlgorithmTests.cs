@@ -137,7 +137,7 @@ namespace Pliant.Tests.Unit.Automata
 
             public override bool Equals(object obj)
             {
-                if ((object)obj == null)
+                if (obj is null)
                     return false;
                 var entityNfaState = obj as EntityNfaState;
                 if ((object)entityNfaState == null)

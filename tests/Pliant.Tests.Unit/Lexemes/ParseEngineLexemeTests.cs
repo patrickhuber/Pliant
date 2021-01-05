@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders.Expressions;
+using Pliant.Captures;
 using Pliant.Grammars;
 using Pliant.Runtime;
-using Pliant.Tokens;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,10 +27,10 @@ namespace Pliant.Tests.Unit
                 "whitespace",
                 grammar);
 
-            var lexeme = new ParseEngineLexeme(lexerRule);
             var input = "\t\r\n\v\f ";
+            var lexeme = new ParseEngineLexeme(lexerRule, input.AsCapture(), 0);            
             for (int i = 0; i < input.Length; i++)
-                Assert.IsTrue(lexeme.Scan(input[i]), $"Unable to recognize input[{i}]");
+                Assert.IsTrue(lexeme.Scan(), $"Unable to recognize input[{i}]");
             Assert.IsTrue(lexeme.IsAccepted());
         }
 
@@ -42,10 +42,10 @@ namespace Pliant.Tests.Unit
 
             var grammar = new GrammarExpression(sequence, new[] { sequence }).ToGrammar();
             var lexerRule = new GrammarLexerRule(new TokenType("sequence"), grammar);
-            var lexeme = new ParseEngineLexeme(lexerRule);
             var input = "abc123";
+            var lexeme = new ParseEngineLexeme(lexerRule, input.AsCapture(), 0);
             for (int i = 0; i < input.Length; i++)
-                Assert.IsTrue(lexeme.Scan(input[i]));
+                Assert.IsTrue(lexeme.Scan());
             Assert.IsTrue(lexeme.IsAccepted());
         }
 
@@ -59,23 +59,27 @@ namespace Pliant.Tests.Unit
             var thereGrammar = new GrammarExpression(There, new[] { There })
                 .ToGrammar();
             var thereLexerRule = new GrammarLexerRule(new TokenType(There.ProductionModel.LeftHandSide.NonTerminal.Value), thereGrammar);
-            var thereLexeme = new ParseEngineLexeme(thereLexerRule);
-            lexemeList.Add(thereLexeme);
-
+            
             ProductionExpression Therefore = "therefore";
             Therefore.Rule = (Expr)'t' + 'h' + 'e' + 'r' + 'e' + 'f' + 'o' + 'r' + 'e';
             var thereforeGrammar = new GrammarExpression(Therefore, new[] { Therefore })
                 .ToGrammar();
             var thereforeLexerRule = new GrammarLexerRule(new TokenType(Therefore.ProductionModel.LeftHandSide.NonTerminal.Value), thereforeGrammar);
-            var thereforeLexeme = new ParseEngineLexeme(thereforeLexerRule);
-            lexemeList.Add(thereforeLexeme);
+            
 
             var input = "therefore";
+
+            var thereLexeme = new ParseEngineLexeme(thereLexerRule, input.AsCapture(), 0);
+            lexemeList.Add(thereLexeme);
+
+            var thereforeLexeme = new ParseEngineLexeme(thereforeLexerRule, input.AsCapture(), 0);
+            lexemeList.Add(thereforeLexeme);
+
             var i = 0;
             for (; i < input.Length; i++)
             {
                 var passedLexemes = lexemeList
-                    .Where(l => l.Scan(input[i]))
+                    .Where(l => l.Scan())
                     .ToList();
 
                 // all existing lexemes have failed

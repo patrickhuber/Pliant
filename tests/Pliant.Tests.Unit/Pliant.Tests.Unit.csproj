@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Bnf\AnsiC.bnf">
+    <None Update="Languages\Bnf\AnsiC.bnf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Languages\Bnf\bnf.txt">
@@ -28,10 +28,6 @@
     <None Update="Languages\Ebnf\ebnf.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Languages\Pdl\" />
   </ItemGroup>
 
 </Project>

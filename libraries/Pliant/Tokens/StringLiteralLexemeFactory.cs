@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Captures;
+using Pliant.Grammars;
 using System;
 using System.Collections.Generic;
 
@@ -18,7 +19,7 @@ namespace Pliant.Tokens
             _queue = new Queue<StringLiteralLexeme>();
         }
 
-        public ILexeme Create(ILexerRule lexerRule, int position)
+        public ILexeme Create(ILexerRule lexerRule, ICapture<char> segment, int offset)
         {
             if (lexerRule.LexerRuleType != LexerRuleType)
                 throw new Exception(
@@ -26,10 +27,10 @@ namespace Pliant.Tokens
             var stringLiteralLexerRule = lexerRule as IStringLiteralLexerRule;
 
             if (_queue.Count == 0)
-                return new StringLiteralLexeme(stringLiteralLexerRule, position);
+                return new StringLiteralLexeme(stringLiteralLexerRule, segment, offset);
             
             var reusedLexeme = _queue.Dequeue();
-            reusedLexeme.Reset(stringLiteralLexerRule, position);
+            reusedLexeme.Reset(stringLiteralLexerRule, offset);
             return reusedLexeme;
         }
 
@@ -40,6 +41,5 @@ namespace Pliant.Tokens
                 throw new Exception($"Unable to free lexeme of type {lexeme.GetType()} from StringLiteralLexemeFactory.");
             _queue.Enqueue(stringLiteralLexeme);
         }
-        
     }
 }

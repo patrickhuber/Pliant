@@ -1,9 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders.Expressions;
-using Pliant.Charts;
 using Pliant.Grammars;
 using Pliant.LexerRules;
-using Pliant.RegularExpressions;
+using Pliant.Languages.Regex;
 using Pliant.Runtime;
 using Pliant.Tests.Common.Grammars;
 using Pliant.Tokens;

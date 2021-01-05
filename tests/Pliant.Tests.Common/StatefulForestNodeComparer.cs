@@ -94,15 +94,14 @@ namespace Pliant.Tests.Common
 
         static bool AreTerminalNodesEqual(ITerminalForestNode firstTerminalForestNode, ITerminalForestNode secondTerminalForestNode)
         {
-            return firstTerminalForestNode.Capture == secondTerminalForestNode.Capture;
+            return firstTerminalForestNode.Capture.Equals(secondTerminalForestNode.Capture);
         }
 
         static bool AreTokenNodesEqual(ITokenForestNode firstTokenForestNode, ITokenForestNode secondForestTokenNode)
         {
             return firstTokenForestNode.Token.TokenType.Id ==
                 secondForestTokenNode.Token.TokenType.Id
-                && firstTokenForestNode.Token.Value ==
-                secondForestTokenNode.Token.Value;
+                && firstTokenForestNode.Token.Capture.Equals(secondForestTokenNode.Token.Capture);
         }
 
         public int GetHashCode(IForestNode obj)

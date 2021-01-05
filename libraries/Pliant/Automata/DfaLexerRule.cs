@@ -38,10 +38,9 @@ namespace Pliant.Automata
 
         public override bool Equals(object obj)
         {
-            if (((object)obj) == null)
+            if (obj is null)
                 return false;
-            var dfaLexerRule = obj as DfaLexerRule;
-            if (((object)dfaLexerRule) == null)
+            if (!(obj is DfaLexerRule dfaLexerRule))
                 return false;
             return TokenType.Equals(dfaLexerRule.TokenType);
         }

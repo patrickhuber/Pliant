@@ -4,9 +4,8 @@ using Pliant.Builders.Expressions;
 using Pliant.Collections;
 using Pliant.Grammars;
 using Pliant.LexerRules;
-using Pliant.RegularExpressions;
+using Pliant.Languages.Regex;
 using Pliant.Tests.Common.Grammars;
-using Pliant.Tokens;
 
 namespace Pliant.Tests.Unit.Grammars
 {

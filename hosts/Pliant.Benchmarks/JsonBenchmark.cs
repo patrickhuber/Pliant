@@ -1,5 +1,4 @@
 ﻿using BenchmarkDotNet.Attributes;
-using Pliant.Bnf;
 using Pliant.Grammars;
 using Pliant.Json;
 using Pliant.Runtime;

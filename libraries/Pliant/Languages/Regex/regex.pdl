@@ -1,7 +1,7 @@
 ﻿:namespace  regex
-:start      regex
+:start      definition
 
-regex =   
+definition =   
         expression 
     |   "^" expression 
     |   expression "$"
