@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Pliant.Captures
 {
-    public struct StringBuilderCapture : ICapture<char>
+    public class StringBuilderCapture : ICapture<char>
     {
         private StringBuilder _stringBuilder;
 

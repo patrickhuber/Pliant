@@ -46,11 +46,14 @@ namespace Pliant.Runtime
             Grammar = grammar;
             Initialize();
         }
+                
+        private static readonly ILexerRule[] EmptyLexerRules = { };        
+        private List<ILexerRule> _expectedLexerRules;
 
-        private Dictionary<int, ILexerRule[]> _expectedLexerRuleCache;
-        private static readonly ILexerRule[] EmptyLexerRules = { };
-        private BitArray _expectedLexerRuleIndicies;
-
+        /// <summary>
+        /// Gets the expected list of lexer rules. The list returned will be mutated on subsequent calls for caching performance purposes.
+        /// </summary>
+        /// <returns></returns>
         public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
             var earleySets = _chart.EarleySets;
@@ -61,17 +64,13 @@ namespace Pliant.Runtime
             if (scanStates.Count == 0)
                 return EmptyLexerRules;
 
-            var hashCode = 0;
-            var count = 0;
-
-            if (_expectedLexerRuleIndicies == null)
-                _expectedLexerRuleIndicies = new BitArray(Grammar.LexerRules.Count);
+            if (_expectedLexerRules is null)
+                _expectedLexerRules = new List<ILexerRule>();
             else
-                _expectedLexerRuleIndicies.SetAll(false);
+                _expectedLexerRules.Clear();
 
-            // compute the lexer rule hash for caching the list of lexer rules
-            // compute the unique lexer rule count 
-            // set bits in the rule index bit array corresponding to the position of the lexer rule in the list of rules
+            // loop over scan states and find lexer rules
+            // add to reusable list
             for (int s = 0; s < scanStates.Count; s++)
             {
                 var scanState = scanStates[s];
@@ -80,41 +79,10 @@ namespace Pliant.Runtime
                     continue;
 
                 var lexerRule = postDotSymbol as ILexerRule;
-                var index = Grammar.GetLexerRuleIndex(lexerRule);
-
-                if (index < 0)
-                    continue;
-
-                if (_expectedLexerRuleIndicies[index])
-                    continue;
-
-                count++;
-                _expectedLexerRuleIndicies[index] = true;
-                hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, hashCode == 0);
+                _expectedLexerRules.Add(lexerRule);
             }
 
-            if (_expectedLexerRuleCache == null)
-                _expectedLexerRuleCache = new Dictionary<int, ILexerRule[]>();
-
-            // if the hash is found in the cached lexer rule lists, return the cached array
-            if (_expectedLexerRuleCache.TryGetValue(hashCode, out ILexerRule[] cachedLexerRules))
-            {
-                return cachedLexerRules;
-            }
-
-            // compute the new lexer rule array and add it to the cache
-            var array = new ILexerRule[count];
-            var returnItemIndex = 0;
-            for (var i = 0; i < Grammar.LexerRules.Count; i++)
-                if (_expectedLexerRuleIndicies[i])
-                {
-                    array[returnItemIndex] = Grammar.LexerRules[i];
-                    returnItemIndex++;
-                }
-
-            _expectedLexerRuleCache.Add(hashCode, array);
-
-            return array;
+            return _expectedLexerRules;
         }
 
         public IInternalForestNode GetParseForestRootNode()
@@ -158,8 +126,6 @@ namespace Pliant.Runtime
         {
             Location = 0;
             _chart = new Chart();
-            _expectedLexerRuleCache = null;
-            _expectedLexerRuleIndicies = null;
             var startProductions = Grammar.StartProductions();
             for (var s = 0; s < startProductions.Count; s++)
             {
@@ -290,12 +256,13 @@ namespace Pliant.Runtime
             if (isNullable)
                 PredictAycockHorspool(evidence, j);
         }
-
+                
         private void PredictProduction(int j, IProduction production)
         {
             var dottedRule = _dottedRuleRegistry.Get(production, 0);
-            if (_chart.Contains(j, StateType.Normal, dottedRule, 0))
+            if (_chart.Contains(j, StateType.Normal, dottedRule, j))
                 return;
+
             // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
             var predictedState = StateFactory.NewState(dottedRule, j);
             if (_chart.Enqueue(j, predictedState))

@@ -11,7 +11,7 @@ namespace Pliant.Runtime
 {
     public class ParseRunner : IParseRunner
     {
-        private ICapture<char> _segment;
+        private ICapture<char> _capture;
         private StringBuilder _builder;
 
         private TextReader _reader;
@@ -45,7 +45,7 @@ namespace Pliant.Runtime
             _triviaAccumulator = new List<ILexeme>();
             _lexemeFactoryRegistry = new LexemeFactoryRegistry();
             _builder = new StringBuilder();
-            _segment = new StringBuilderCapture(_builder);
+            _capture = new StringBuilderCapture(_builder);
 
             RegisterDefaultLexemeFactories(_lexemeFactoryRegistry);
             Position = -1;
@@ -292,13 +292,14 @@ namespace Pliant.Runtime
         private bool MatchLexerRules(IReadOnlyList<ILexerRule> lexerRules, List<ILexeme> lexemes)
         {
             var anyMatches = false;
+            var character = _capture[Position];
             for (var i = 0; i < lexerRules.Count; i++)
             {
                 var lexerRule = lexerRules[i];
-                if (!lexerRule.CanApply(_segment[Position]))
+                if (!lexerRule.CanApply(character))
                     continue;
                 var factory = _lexemeFactoryRegistry.Get(lexerRule.LexerRuleType);
-                var lexeme = factory.Create(lexerRule, _segment, Position);
+                var lexeme = factory.Create(lexerRule, _capture, Position);
                 if (!lexeme.Scan())
                 {
                     FreeLexeme(lexeme);

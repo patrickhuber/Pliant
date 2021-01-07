@@ -33,7 +33,7 @@ namespace Pliant.Languages.Pdl
         private int ComputeHashCode()
         {
             return HashCode.Compute(
-                NodeType.GetHashCode(),
+                ((int)NodeType).GetHashCode(),
                 QualifiedIdentifier.GetHashCode(),
                 Expression.GetHashCode());
         }

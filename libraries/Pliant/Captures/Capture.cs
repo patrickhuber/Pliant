@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Pliant.Captures
@@ -69,7 +70,7 @@ namespace Pliant.Captures
             if (obj.Count != Count)
                 return false;
             for (var i = 0; i < Count; i++)
-                if (!this[i].Equals(obj[i]))
+                if (!EqualityComparer<T>.Default.Equals(this[i], obj[i]))
                     return false;
             return true;
         }

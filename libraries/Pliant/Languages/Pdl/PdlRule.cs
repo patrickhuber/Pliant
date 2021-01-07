@@ -23,7 +23,7 @@ namespace Pliant.Languages.Pdl
             return HashCode.Compute(
                 QualifiedIdentifier.GetHashCode(),
                 Expression.GetHashCode(),
-                NodeType.GetHashCode());
+                ((int)NodeType).GetHashCode());
         }
 
         public override int GetHashCode() => _hashCode;

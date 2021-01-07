@@ -34,7 +34,7 @@ namespace Pliant.Languages.Pdl
         {
             return HashCode.Compute(
                 Block.GetHashCode(),
-                NodeType.GetHashCode());
+                ((int)NodeType).GetHashCode());
         }
 
         public override int GetHashCode()
@@ -76,7 +76,7 @@ namespace Pliant.Languages.Pdl
             return HashCode.Compute(
                 Block.GetHashCode(),
                 Definition.GetHashCode(),
-                NodeType.GetHashCode());
+                ((int)NodeType).GetHashCode());
         }
 
         public override int GetHashCode()

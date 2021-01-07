@@ -44,9 +44,8 @@ namespace Pliant.Charts
         private int ComputeHashCode()
         {
             return HashCode.Compute(
-                DottedRule.Position.GetHashCode(),
+                DottedRule.GetHashCode(),
                 Origin.GetHashCode(),
-                DottedRule.Production.GetHashCode(),
                 Recognized.GetHashCode(),
                 Reduction.GetHashCode(),
                 Index.GetHashCode());

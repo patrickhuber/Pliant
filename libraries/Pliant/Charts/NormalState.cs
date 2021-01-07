@@ -33,10 +33,9 @@ namespace Pliant.Charts
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
-            var state = obj as NormalState;
-            if (state == null)
+            if (!(obj is NormalState state))
                 return false;
             // PERF: Hash Codes are Cached, so equality performance is cached as well
             return GetHashCode() == state.GetHashCode();
@@ -44,10 +43,9 @@ namespace Pliant.Charts
 
         private int ComputeHashCode()
         {
-            return HashCode.Compute(
-                DottedRule.Position.GetHashCode(),
-                Origin.GetHashCode(),
-                DottedRule.Production.GetHashCode());
+            return NormalStateHashCodeAlgorithm.Compute(
+                DottedRule,
+                Origin);
         }
 
         public override int GetHashCode()

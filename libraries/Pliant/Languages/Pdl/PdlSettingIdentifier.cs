@@ -25,7 +25,7 @@ namespace Pliant.Languages.Pdl
         int ComputeHashCode()
         {
             return HashCode.Compute(
-                NodeType.GetHashCode(),
+                ((int)NodeType).GetHashCode(),
                 Value.GetHashCode());
         }
 

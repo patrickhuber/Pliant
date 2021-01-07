@@ -26,7 +26,7 @@ namespace Pliant.Languages.Pdl
         int ComputeHashCode()
         {
             return HashCode.Compute(
-                NodeType.GetHashCode(),
+                ((int)NodeType).GetHashCode(),
                 QualifiedIdentifier.GetHashCode());
         }
 
@@ -67,7 +67,7 @@ namespace Pliant.Languages.Pdl
         int ComputeHashCode()
         {
             return HashCode.Compute(
-                NodeType.GetHashCode(),
+                ((int)NodeType).GetHashCode(),
                 Value.GetHashCode());
         }
 
@@ -103,7 +103,7 @@ namespace Pliant.Languages.Pdl
         int ComputeHashCode()
         {
             return HashCode.Compute(
-                NodeType.GetHashCode(),
+                ((int)NodeType).GetHashCode(),
                 Regex.GetHashCode());
         }
 
@@ -151,7 +151,7 @@ namespace Pliant.Languages.Pdl
         int ComputeHashCode()
         {
             return HashCode.Compute(
-                NodeType.GetHashCode(),
+                ((int)NodeType).GetHashCode(),
                 Expression.GetHashCode());
         }
 
@@ -175,7 +175,7 @@ namespace Pliant.Languages.Pdl
         int ComputeHashCode()
         {
             return HashCode.Compute(
-                NodeType.GetHashCode(),
+                ((int)NodeType).GetHashCode(),
                 Expression.GetHashCode());
         }
 
@@ -211,7 +211,7 @@ namespace Pliant.Languages.Pdl
         int ComputeHashCode()
         {
             return HashCode.Compute(
-                NodeType.GetHashCode(),
+                ((int)NodeType).GetHashCode(),
                 Expression.GetHashCode());
         }
 

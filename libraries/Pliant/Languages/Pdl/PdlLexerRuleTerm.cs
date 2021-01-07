@@ -18,7 +18,7 @@ namespace Pliant.Languages.Pdl
 
         int ComputeHashCode()
         {
-            return HashCode.Compute(NodeType.GetHashCode(), Factor.GetHashCode());
+            return HashCode.Compute(((int)NodeType).GetHashCode(), Factor.GetHashCode());
         }
 
         public override int GetHashCode() => _hashCode;
@@ -52,7 +52,7 @@ namespace Pliant.Languages.Pdl
 
         int ComputeHashCode()
         {
-            return HashCode.Compute(NodeType.GetHashCode(), Factor.GetHashCode(), Term.GetHashCode());
+            return HashCode.Compute(((int)NodeType).GetHashCode(), Factor.GetHashCode(), Term.GetHashCode());
         }
 
         public override int GetHashCode() => _hashCode;
