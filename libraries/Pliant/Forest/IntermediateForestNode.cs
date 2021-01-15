@@ -29,16 +29,15 @@ namespace Pliant.Forest
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
 
-            var intermediateNode = obj as IIntermediateForestNode;
-            if (intermediateNode == null)
+            if (!(obj is IIntermediateForestNode intermediateNode))
                 return false;
 
-            return Location == intermediateNode.Location
-                && NodeType == intermediateNode.NodeType
+            return Location == intermediateNode.Location                
                 && Origin == intermediateNode.Origin
+                && NodeType == intermediateNode.NodeType
                 && DottedRule.Equals(intermediateNode.DottedRule);
         }
 

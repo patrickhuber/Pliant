@@ -11,16 +11,16 @@ namespace Pliant.Runtime
 {
     public class ParseRunner : IParseRunner
     {
-        private ICapture<char> _capture;
-        private StringBuilder _builder;
-
-        private TextReader _reader;
+        private readonly ICapture<char> _capture;
+        private readonly StringBuilder _builder;
+        private readonly TextReader _reader;
         private readonly ILexemeFactoryRegistry _lexemeFactoryRegistry;
-        private List<ILexeme> _tokenLexemes;
-        private List<ILexeme> _ignoreLexemes;
+        private readonly List<ILexeme> _tokenLexemes;
+        private readonly List<ILexeme> _ignoreLexemes;        
+        private readonly List<ILexeme> _triviaAccumulator;
+        private readonly List<ILexeme> _triviaLexemes;
+
         private List<ILexeme> _previousTokenLexemes;
-        private List<ILexeme> _triviaAccumulator;
-        private List<ILexeme> _triviaLexemes;
 
         public int Position { get; private set; }
                 
@@ -124,7 +124,7 @@ namespace Pliant.Runtime
 
         private void AddTrailingTriviaToPreviousToken()
         {
-            if (_previousTokenLexemes == null
+            if (_previousTokenLexemes is null
                 || _previousTokenLexemes.Count == 0)
                 return;
 
@@ -256,13 +256,13 @@ namespace Pliant.Runtime
                     _tokenLexemes[j].AddLeadingTrivia(_triviaAccumulator[i]);
 
             _triviaAccumulator.Clear();
-            if (_previousTokenLexemes != null)
+            if (_previousTokenLexemes is null)
+                _previousTokenLexemes = new List<ILexeme>(_tokenLexemes);
+            else
             {
                 _previousTokenLexemes.Clear();
                 _previousTokenLexemes.AddRange(_tokenLexemes);
-            }
-            else
-                _previousTokenLexemes = new List<ILexeme>(_tokenLexemes);
+            }                
 
             _tokenLexemes.Clear();
 

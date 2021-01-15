@@ -114,9 +114,9 @@ namespace Pliant.Utilities
 
         internal static void ClearAndFree<T>(this ObjectPool<List<T>> pool, List<T> list)
         {
-            if (list == null)
+            if (list is null)
                 return;
-            if (pool == null)
+            if (pool is null)
                 return;
             list.Clear();
             pool.Free(list);
@@ -135,9 +135,9 @@ namespace Pliant.Utilities
 
         internal static void ClearAndFree(this ObjectPool<StringBuilder> pool, StringBuilder builder)
         {
-            if (pool == null)
+            if (pool is null)
                 return;
-            if (builder == null)
+            if (builder is null)
                 return;
             builder.Clear();
             pool.Free(builder);

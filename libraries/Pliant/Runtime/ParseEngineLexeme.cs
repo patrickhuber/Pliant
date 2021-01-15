@@ -44,7 +44,7 @@ namespace Pliant.Runtime
             SharedPools.Default<List<TerminalLexeme>>()
                 .ClearAndFree(expectedLexemes);
 
-            if (firstPassingRule == null)
+            if (firstPassingRule is null)
                 return false;
 
             var result = _parseEngine.Pulse(firstPassingRule);

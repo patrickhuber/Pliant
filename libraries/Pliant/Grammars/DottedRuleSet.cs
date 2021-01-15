@@ -7,12 +7,12 @@ namespace Pliant.Grammars
 {
     public class DottedRuleSet
     {
-        private IDottedRule[] _cachedData;        
-        private SortedSet<IDottedRule> _set;
-        private Dictionary<ISymbol, DottedRuleSet> _reductions;
-        private Dictionary<TokenType, DottedRuleSet> _tokenTransitions;
-        private Dictionary<ILexerRule, DottedRuleSet> _scans;
-        private List<ILexerRule> _scanKeys;
+        private readonly IDottedRule[] _cachedData;        
+        private readonly SortedSet<IDottedRule> _set;
+        private readonly Dictionary<ISymbol, DottedRuleSet> _reductions;
+        private readonly Dictionary<TokenType, DottedRuleSet> _tokenTransitions;
+        private readonly Dictionary<ILexerRule, DottedRuleSet> _scans;
+        private readonly List<ILexerRule> _scanKeys;
 
         public IReadOnlyList<IDottedRule> Data { get { return _cachedData; } }
                 
@@ -76,11 +76,10 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            if (((object)obj) == null)
+            if (obj is null)
                 return false;
 
-            var dottedRuleSet = obj as DottedRuleSet;
-            if (((object)dottedRuleSet) == null)
+            if (!(obj is DottedRuleSet dottedRuleSet))
                 return false;
 
             foreach (var item in _cachedData)

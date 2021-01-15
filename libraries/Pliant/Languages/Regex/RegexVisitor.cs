@@ -97,7 +97,7 @@ namespace Pliant.Languages.Regex
                 else if (RegexGrammar.Term == childInternalNodeSymbolValue)
                     term = VisitRegexTermNode(childInternalNode);
             }
-            if (term == null)
+            if (term is null)
                 return new RegexTerm(factor);
 
             return new RegexTermFactor(factor, term);
@@ -288,7 +288,7 @@ namespace Pliant.Languages.Regex
                 var childInternalNodeSymbolValue = childInternalNode.Symbol.Value;
                 if (RegexGrammar.CharacterClassCharacter == childInternalNodeSymbolValue)
                 {
-                    if (start == null)
+                    if (start is null)
                         start = VisitCharacterClassCharacterNode(childInternalNode);
                     else
                         end = VisitCharacterClassCharacterNode(childInternalNode);

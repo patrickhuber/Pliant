@@ -54,7 +54,7 @@ namespace Pliant.Forest
         }
 
         private static int ComputeHashCode(IDottedRule dottedRule, int origin, int location)
-        {
+        {            
             return HashCode.Compute(
                 dottedRule.GetHashCode(),
                 origin.GetHashCode(),

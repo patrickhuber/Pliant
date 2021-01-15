@@ -19,7 +19,7 @@ namespace Pliant.Charts
             var dottedRule = DottedRuleRegistry.Get(
                 state.DottedRule.Production, 
                 state.DottedRule.Position + 1);
-            return parseNode == null 
+            return parseNode is null 
                 ? new NormalState(dottedRule, state.Origin)
                 : new NormalState(dottedRule, state.Origin, parseNode);
         }
@@ -32,7 +32,7 @@ namespace Pliant.Charts
 
         public IState NewState(IDottedRule dottedRule, int origin, IForestNode forestNode = null)
         {
-            return forestNode == null
+            return forestNode is null
                 ? new NormalState(dottedRule, origin)
                 : new NormalState(dottedRule, origin, forestNode);
         }

@@ -38,7 +38,7 @@ namespace Pliant.Grammars
 
         public override IReadOnlyList<Interval> GetIntervals()
         {
-            if(_intervals == null)
+            if(_intervals is null)
                 _intervals = CreateIntervals(InnerTerminal);
             return _intervals;
         }
@@ -50,11 +50,10 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            if (((object)obj) == null)
+            if (obj is null)
                 return false;
 
-            var negationTerminal = obj as NegationTerminal;
-            if (((object)negationTerminal) == null)
+            if (!(obj is NegationTerminal negationTerminal))
                 return false;
 
             return negationTerminal.InnerTerminal.Equals(InnerTerminal);

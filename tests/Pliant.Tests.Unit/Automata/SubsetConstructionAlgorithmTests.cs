@@ -138,11 +138,10 @@ namespace Pliant.Tests.Unit.Automata
             public override bool Equals(object obj)
             {
                 if (obj is null)
-                    return false;
-                var entityNfaState = obj as EntityNfaState;
-                if ((object)entityNfaState == null)
-                    return false;
-                return entityNfaState.Id.Equals(this.Id);
+                    return false;                
+                if (obj is EntityNfaState entityNfaState)
+                    return entityNfaState.Id.Equals(Id);
+                return false;                
             }
             
             public override string ToString()

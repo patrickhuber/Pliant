@@ -102,10 +102,9 @@ namespace Pliant.Automata
 
             public int CompareTo(object obj)
             {
-                if (obj == null)
+                if (obj is null)
                     throw new ArgumentNullException();
-                var nfaClosure = obj as NfaClosure;
-                if (nfaClosure == null)
+                if (!(obj is NfaClosure nfaClosure))
                     throw new ArgumentException("instance of NfaClosure expected.", nameof(obj));
                 return CompareTo(nfaClosure);
             }
@@ -117,10 +116,9 @@ namespace Pliant.Automata
 
             public override bool Equals(object obj)
             {
-                if (obj == null)
+                if (obj is null)
                     return false;
-                var nfaClosure = obj as NfaClosure;
-                if (nfaClosure == null)
+                if (!(obj is NfaClosure nfaClosure))
                     return false;
                 return nfaClosure._hashCode.Equals(_hashCode);
             }

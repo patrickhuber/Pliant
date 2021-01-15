@@ -77,10 +77,9 @@ namespace Pliant.Collections
 
         public override bool Equals(object obj)
         {
-            if (((object)obj) == null)
+            if (obj is null)
                 return false;
-            var bitMatrix = obj as BitMatrix;
-            if (((object)bitMatrix) == null)
+            if (!(obj is BitMatrix bitMatrix))
                 return false;
             if (bitMatrix.Length != Length)
                 return false;

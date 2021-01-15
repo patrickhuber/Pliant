@@ -119,7 +119,7 @@ namespace Pliant.Languages.Pdl
                         break;
                 }
             }
-            if (repetitionIdentifier == null)
+            if (repetitionIdentifier is null)
                 return new PdlQualifiedIdentifier(identifier);
 
             return new PdlQualifiedIdentifierConcatenation(identifier, repetitionIdentifier);         
@@ -148,7 +148,7 @@ namespace Pliant.Languages.Pdl
                         break;
                 }
             }
-            if (expression == null)
+            if (expression is null)
                 return new PdlExpression(term);
             return new PdlExpressionAlteration(term, expression);
         }
@@ -176,7 +176,7 @@ namespace Pliant.Languages.Pdl
                         break;
                 }
             }
-            if (term == null)
+            if (term is null)
                 return new PdlTerm(factor);
             return new PdlTermConcatenation(factor, term);
         }
@@ -383,7 +383,7 @@ namespace Pliant.Languages.Pdl
                     expression = VisitLexerRuleExpressionNode(internalNode);
             }
 
-            if (expression == null)
+            if (expression is null)
                 return new PdlLexerRuleExpression(term);
             return new PdlLexerRuleExpressionAlteration(term, expression);
         }
@@ -406,7 +406,7 @@ namespace Pliant.Languages.Pdl
                     term = VisitLexerRuleTermNode(internalNode);
             }
 
-            if (term == null)
+            if (term is null)
                 return new PdlLexerRuleTerm(factor);
 
             return new PdlLexerRuleTermConcatenation(factor, term);

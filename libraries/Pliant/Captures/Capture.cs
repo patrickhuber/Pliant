@@ -12,8 +12,8 @@ namespace Pliant.Captures
 
         public Capture(ICapture<T> parent, int offset, int count)
         {
-            if (parent == null)
-                throw new ArgumentNullException("parent");
+            if (parent is null)
+                throw new ArgumentNullException(nameof(parent));
             if (parent.Count - offset < count)
                 throw new ArgumentException("offset and length must be within the bounds of the original segment");
 

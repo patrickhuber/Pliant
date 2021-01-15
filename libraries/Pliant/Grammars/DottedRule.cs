@@ -5,7 +5,7 @@ using Pliant.Diagnostics;
 
 namespace Pliant.Grammars
 {
-    public class DottedRule : IComparable<DottedRule>, IDottedRule
+    public class DottedRule : IComparable<IDottedRule>, IDottedRule
     {
         private readonly int _hashCode;
         
@@ -44,10 +44,9 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            if (((object)obj) == null)
+            if (obj is null)
                 return false;
-            var preComputedState = obj as DottedRule;
-            if (((object)preComputedState) == null)
+            if (!(obj is DottedRule preComputedState))
                 return false;
             return preComputedState.Production.Equals(Production)
                 && preComputedState.Position == Position;
@@ -78,11 +77,6 @@ namespace Pliant.Grammars
             return position == production.RightHandSide.Count;
         }
 
-        public int CompareTo(DottedRule other)
-        {
-            return GetHashCode().CompareTo(other.GetHashCode());
-        }
-
         public int CompareTo(IDottedRule other)
         {
             return GetHashCode().CompareTo(other.GetHashCode());
@@ -101,6 +95,42 @@ namespace Pliant.Grammars
             if (position >= productionRighHandSide.Count)
                 return null;
             return productionRighHandSide[position];
-        }        
+        }
+
+        public static bool operator ==(DottedRule left, IDottedRule right)
+        {
+            return left is null 
+                ? right is null 
+                : left.Equals(right);
+        }
+
+        public static bool operator !=(DottedRule left, IDottedRule right)
+        {
+            return !(left == right);
+        }
+
+        public static bool operator <(DottedRule left, IDottedRule right)
+        {
+            return left is null 
+                ? right is object
+                : left.CompareTo(right) < 0;
+        }
+
+        public static bool operator <=(DottedRule left, IDottedRule right)
+        {
+            return left is null || left.CompareTo(right) <= 0;
+        }
+
+        public static bool operator >(DottedRule left, IDottedRule right)
+        {
+            return left is object && left.CompareTo(right) > 0;
+        }
+
+        public static bool operator >=(DottedRule left, IDottedRule right)
+        {
+            return left is null 
+                ? right is null 
+                : left.CompareTo(right) >= 0;
+        }
     }
 }

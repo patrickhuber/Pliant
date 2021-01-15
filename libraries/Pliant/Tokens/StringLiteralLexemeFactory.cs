@@ -36,8 +36,7 @@ namespace Pliant.Tokens
 
         public void Free(ILexeme lexeme)
         {
-            var stringLiteralLexeme = lexeme as StringLiteralLexeme;
-            if (stringLiteralLexeme == null)
+            if (!(lexeme is StringLiteralLexeme stringLiteralLexeme))
                 throw new Exception($"Unable to free lexeme of type {lexeme.GetType()} from StringLiteralLexemeFactory.");
             _queue.Enqueue(stringLiteralLexeme);
         }

@@ -22,8 +22,7 @@ namespace Pliant.Languages.Regex
         {
             if (obj is null)
                 return false;
-            var term = obj as RegexTerm;
-            if ((object)term == null)
+            if (!(obj is RegexTerm term))
                 return false;
             return term.Factor.Equals(Factor);
         }
@@ -61,8 +60,7 @@ namespace Pliant.Languages.Regex
         {
             if (obj is null)
                 return false;
-            var termFactor = obj as RegexTermFactor;
-            if ((object)termFactor == null)
+            if (!(obj is RegexTermFactor termFactor))
                 return false;
             return termFactor.Factor.Equals(Factor)
                 && termFactor.Term.Equals(Term);

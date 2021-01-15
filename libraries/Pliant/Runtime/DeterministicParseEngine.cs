@@ -50,7 +50,7 @@ namespace Pliant.Runtime
             if (!_chart.Enqueue(location, deterministicState))
                 return false;
 
-            if (deterministicState.DottedRuleSet.NullTransition == null)
+            if (deterministicState.DottedRuleSet.NullTransition is null)
                 return true;
 
             var nullTransitionDeterministicState = new DeterministicState(
@@ -166,14 +166,13 @@ namespace Pliant.Runtime
                     var pState = parentSetDeterministicStates[p];
                     var pParent = pState.Origin;
 
-                    DottedRuleSet target = null;
-                    if (!pState.DottedRuleSet.Reductions.TryGetValue(leftHandSide, out target))
+                    if (!pState.DottedRuleSet.Reductions.TryGetValue(leftHandSide, out DottedRuleSet target))
                         continue;
 
                     if (!_chart.Enqueue(i, new DeterministicState(target, pParent)))
                         continue;
 
-                    if (target.NullTransition == null)
+                    if (target.NullTransition is null)
                         continue;
 
                     _chart.Enqueue(i, new DeterministicState(target.NullTransition, i));
@@ -199,16 +198,14 @@ namespace Pliant.Runtime
 
         private void ScanDottedRuleSet(int location, IToken token, int parent, DottedRuleSet dottedRuleSet)
         {
-            DottedRuleSet target;
-
             //PERF: This could perhaps be improved with an int array and direct index lookup based on "token.TokenType.Id"?...
-            if (!dottedRuleSet.TokenTransitions.TryGetValue(token.TokenType, out target))
+            if (!dottedRuleSet.TokenTransitions.TryGetValue(token.TokenType, out DottedRuleSet target))
                 return;
 
             if (!_chart.Enqueue(location + 1, new DeterministicState(target, parent)))
                 return;
 
-            if (target.NullTransition == null)
+            if (target.NullTransition is null)
                 return;
 
             _chart.Enqueue(location + 1, new DeterministicState(target.NullTransition, location + 1));
@@ -223,10 +220,9 @@ namespace Pliant.Runtime
         {
             throw new NotImplementedException();
         }
-
-        private Dictionary<int, ILexerRule[]> _expectedLexerRuleCache;
+                
         private static readonly ILexerRule[] EmptyLexerRules = { };
-        private BitArray _expectedLexerRuleIndicies;
+        private List<ILexerRule> _expectedLexerRules;
 
         public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
@@ -236,13 +232,10 @@ namespace Pliant.Runtime
             if (frameSetCount == 0)
                 return EmptyLexerRules;
 
-            var hashCode = 0;
-            var count = 0;
-
-            if (_expectedLexerRuleIndicies == null)
-                _expectedLexerRuleIndicies = new BitArray(Grammar.LexerRules.Count);
+            if (_expectedLexerRules is null)
+                _expectedLexerRules = new List<ILexerRule>();
             else
-                _expectedLexerRuleIndicies.SetAll(false);
+                _expectedLexerRules.Clear();
 
             var frameSet = frameSets[frameSets.Count - 1];
             for (var i = 0; i < frameSet.States.Count; i++)
@@ -254,38 +247,12 @@ namespace Pliant.Runtime
                     var index = Grammar.GetLexerRuleIndex(lexerRule);
                     if (index < 0)
                         continue;
-                    if (_expectedLexerRuleIndicies[index])
-                        continue;
 
-                    _expectedLexerRuleIndicies[index] = true;
-                    hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, count == 0);
-                    count++;
+                    _expectedLexerRules.Add(lexerRule);
                 }
             }
 
-            if (_expectedLexerRuleCache == null)
-                _expectedLexerRuleCache = new Dictionary<int, ILexerRule[]>();
-
-            // if the hash is found in the cached lexer rule lists, return the cached array
-            ILexerRule[] cachedLexerRules = null;
-            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
-            {
-                return cachedLexerRules;
-            }
-
-            // compute the new lexer rule array and add it to the cache
-            var array = new ILexerRule[count];
-            var returnItemIndex = 0;
-            for (var i = 0; i < Grammar.LexerRules.Count; i++)
-                if (_expectedLexerRuleIndicies[i])
-                {
-                    array[returnItemIndex] = Grammar.LexerRules[i];
-                    returnItemIndex++;
-                }
-
-            _expectedLexerRuleCache.Add(hashCode, array);
-
-            return array;
+            return _expectedLexerRules;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -299,12 +266,6 @@ namespace Pliant.Runtime
         private static bool IsComplete(IDottedRule preComputedState)
         {
             return preComputedState.Position == preComputedState.Production.RightHandSide.Count;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static ISymbol GetPostDotSymbol(IDottedRule preComputedState)
-        {
-            return preComputedState.Production.RightHandSide[preComputedState.Position];
         }
     }
 }

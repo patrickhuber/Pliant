@@ -33,7 +33,7 @@ namespace Pliant.Forest
 
         private void AddUniqueAndNode(IForestNode firstChild, IForestNode secondChild)
         {
-            var childCount = 1 + ((secondChild == null) ? 0 : 1);
+            var childCount = 1 + ((secondChild is null) ? 0 : 1);
 
             for (var c = 0; c < _children.Count; c++)
             {
@@ -64,7 +64,7 @@ namespace Pliant.Forest
             if (!firstChild.Equals(firstCompareNode))
                 return false;
 
-            if (secondChild == null)
+            if (secondChild is null)
                 return true;
 
             var secondCompareNode = andNode.Children[1];

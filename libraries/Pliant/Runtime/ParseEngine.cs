@@ -75,7 +75,7 @@ namespace Pliant.Runtime
             {
                 var scanState = scanStates[s];
                 var postDotSymbol = scanState.DottedRule.PostDotSymbol;
-                if (postDotSymbol == null || postDotSymbol.SymbolType != SymbolType.LexerRule)
+                if (postDotSymbol is null || postDotSymbol.SymbolType != SymbolType.LexerRule)
                     continue;
 
                 var lexerRule = postDotSymbol as ILexerRule;
@@ -276,7 +276,8 @@ namespace Pliant.Runtime
 
             var evidenceParseNode = evidence.ParseNode as IInternalForestNode;
             IForestNode parseNode = null;
-            if (evidenceParseNode == null)
+
+            if (evidenceParseNode is null)
             {
                 parseNode = CreateParseNode(
                     dottedRule,
@@ -306,7 +307,7 @@ namespace Pliant.Runtime
 
         private void Complete(INormalState completed, int k)
         {
-            if (completed.ParseNode == null)
+            if (completed.ParseNode is null)
                 completed.ParseNode = CreateNullParseNode(completed.DottedRule.Production.LeftHandSide, k);
 
             var earleySet = _chart.EarleySets[completed.Origin];
@@ -332,7 +333,7 @@ namespace Pliant.Runtime
             var rootTransitionState = earleySet.FindTransitionState(
                 transitionState.DottedRule.PreDotSymbol);
 
-            if (rootTransitionState == null)
+            if (rootTransitionState is null)
                 rootTransitionState = transitionState;
 
             var virtualParseNode = CreateVirtualParseNode(completed, k, rootTransitionState);
@@ -410,7 +411,7 @@ namespace Pliant.Runtime
 
             // else if Ii contains exactly one item of the form [B -> a.Ab, k]
             var sourceState = earleySet.FindSourceState(searchSymbol);
-            if (sourceState == null)
+            if (sourceState is null)
                 return;
 
             if (!visited.Add(sourceState))
@@ -434,10 +435,10 @@ namespace Pliant.Runtime
                 ref previousTransitionState,
                 visited);
 
-            if (t_rule == null)
+            if (t_rule is null)
                 return;
 
-            ITransitionState currentTransitionState = null;
+            ITransitionState currentTransitionState;
             if (previousTransitionState != null)
             {
                 currentTransitionState = new TransitionState(
@@ -536,7 +537,7 @@ namespace Pliant.Runtime
             if (anyPreDotRuleNull && !anyPostDotRuleNull)
                 return v;
 
-            IInternalForestNode internalNode = null;
+            IInternalForestNode internalNode;
             if (anyPostDotRuleNull)
             {
                 internalNode = _nodeSet
@@ -556,7 +557,7 @@ namespace Pliant.Runtime
             }
 
             // if w = null and y doesn't have a family of children (v)
-            if (w == null)
+            if (w is null)
                 internalNode.AddUniqueFamily(v);
 
             // if w != null and y doesn't have a family of children (w, v)            
@@ -567,20 +568,19 @@ namespace Pliant.Runtime
         }
 
         private VirtualForestNode CreateVirtualParseNode(IState completed, int k, ITransitionState rootTransitionState)
-        {
-            VirtualForestNode virtualParseNode = null;
-            if (!_nodeSet.TryGetExistingVirtualNode(
+        {            
+            if (_nodeSet.TryGetExistingVirtualNode(
                 k,
                 rootTransitionState,
-                out virtualParseNode))
+                out VirtualForestNode virtualParseNode))
             {
-                virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
-                _nodeSet.AddNewVirtualNode(virtualParseNode);
+                virtualParseNode.AddUniquePath(
+                    new VirtualForestNodePath(rootTransitionState, completed.ParseNode));                
             }
             else
             {
-                virtualParseNode.AddUniquePath(
-                    new VirtualForestNodePath(rootTransitionState, completed.ParseNode));
+                virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
+                _nodeSet.AddNewVirtualNode(virtualParseNode);
             }
 
             return virtualParseNode;
@@ -588,7 +588,7 @@ namespace Pliant.Runtime
 
         private bool IsSymbolNullable(ISymbol symbol)
         {
-            if (symbol == null)
+            if (symbol is null)
                 return true;
             if (symbol.SymbolType != SymbolType.NonTerminal)
                 return false;
@@ -598,7 +598,7 @@ namespace Pliant.Runtime
 
         private bool IsSymbolTransativeNullable(ISymbol symbol)
         {
-            if (symbol == null)
+            if (symbol is null)
                 return true;
             if (symbol.SymbolType != SymbolType.NonTerminal)
                 return false;

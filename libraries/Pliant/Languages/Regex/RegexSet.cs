@@ -26,8 +26,7 @@ namespace Pliant.Languages.Regex
             if (obj is null)
                 return false;
 
-            var set = obj as RegexSet;
-            if ((object)set == null)
+            if (!(obj is RegexSet set))
                 return false;
 
             return CharacterClass.Equals(set.CharacterClass)

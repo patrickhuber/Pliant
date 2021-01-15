@@ -45,16 +45,15 @@ namespace Pliant.Collections
         }
 
         private TValue GetValueFromDictionary(TKey key)
-        {
-            var value = default(TValue);
-            if (_innerDictionary.TryGetValue(key, out value))
+        {            
+            if (_innerDictionary.TryGetValue(key, out TValue value))
                 return value;
-            return default(TValue);
+            return default;
         }
 
         private bool TryGetValueFromList(TKey key, out TValue value)
         {
-            value = default(TValue);
+            value = default;
             var hashCode = key.GetHashCode();
             for (int i = 0; i < _innerList.Count; i++)
             {
@@ -76,7 +75,7 @@ namespace Pliant.Collections
                 if (keyHashCode == keyValuePair.Key.GetHashCode())
                     return keyValuePair.Value;
             }
-            return default(TValue);
+            return default;
         }
 
         private void Set(TKey key, TValue value)

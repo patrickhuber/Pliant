@@ -41,7 +41,7 @@ namespace Pliant.Tests.Unit.Automata
             {
                 var character = input[i];
                 var target = tableDfa.Transition(state, character);
-                if (target == null)
+                if (target is null)
                     Assert.Fail($"Unable to transition from state {state} with character {character}.");
                 state = target.Value;
             }

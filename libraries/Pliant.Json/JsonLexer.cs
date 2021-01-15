@@ -158,7 +158,7 @@ namespace Pliant.Json
         
         private static bool Accept(TextReader textReader, Func<char, bool> predicate, ref char c)
         {
-            if (predicate == null)
+            if (predicate is null)
                 return false;
             var i = textReader.Peek();
             if (i == -1)

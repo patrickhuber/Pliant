@@ -38,7 +38,7 @@ namespace Pliant.Grammars
 
         public override IReadOnlyList<Interval> GetIntervals()
         {
-            if(_intervals == null)
+            if(_intervals is null)
                 _intervals = CreateIntervals(_terminals);
             return _intervals;
         }

@@ -19,8 +19,7 @@ namespace Pliant.Runtime
 
         public void Free(ILexeme lexeme)
         {
-            var parseEngineLexeme = lexeme as ParseEngineLexeme;
-            if(parseEngineLexeme == null)
+            if (!(lexeme is ParseEngineLexeme parseEngineLexeme))
                 throw new Exception($"Unable to free lexeme of type {lexeme.GetType()} from ParseEngineLexeme.");
             _queue.Enqueue(parseEngineLexeme);
         }

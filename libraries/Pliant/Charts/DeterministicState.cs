@@ -21,10 +21,9 @@ namespace Pliant.Charts
         
         public override bool Equals(object obj)
         {
-            if (((object)obj) == null)
+            if (obj is null)
                 return false;
-            var deterministicState = obj as DeterministicState;
-            if (((object)deterministicState) == null)
+            if (!(obj is DeterministicState deterministicState))
                 return false;
             return deterministicState.Origin == Origin && DottedRuleSet.Equals(deterministicState.DottedRuleSet);
         }
@@ -32,11 +31,6 @@ namespace Pliant.Charts
         public override int GetHashCode()
         {
             return _hashCode;
-        }
-        
-        private static int ComputeHashCode(DottedRuleSet dottedRuleSet)
-        {
-            return dottedRuleSet.GetHashCode();
         }
 
         private static int ComputeHashCode(DottedRuleSet dottedRuleSet, int origin)

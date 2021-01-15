@@ -17,9 +17,8 @@ namespace Pliant.Tokens
 
         public void Free(ILexeme lexeme)
         {
-            var terminalLexeme = lexeme as TerminalLexeme;
-            if (terminalLexeme == null)
-                throw new Exception($"Unable to free lexeme of type {lexeme.GetType()} from TerminalLexemeFactory");
+            if (!(lexeme is TerminalLexeme terminalLexeme))
+                throw new Exception($"Unable to free lexeme of type { lexeme.GetType()} from TerminalLexemeFactory");
             
             _queue.Enqueue(terminalLexeme);
         }

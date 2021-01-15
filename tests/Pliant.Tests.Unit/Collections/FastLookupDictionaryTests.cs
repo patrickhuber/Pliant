@@ -18,7 +18,7 @@ namespace Pliant.Tests.Unit.Collections
 
             public override bool Equals(object obj)
             {
-                if (obj == null)
+                if (obj is null)
                     return false;
                 var element = obj as Element;
                 return Value.Equals(element.Value);
@@ -37,11 +37,12 @@ namespace Pliant.Tests.Unit.Collections
             var first = new Element(1);
             var second = new Element(1);
 
-            var fastLookupDictionary = new FastLookupDictionary<Element, Element>();
-            fastLookupDictionary[first] = second;
+            var fastLookupDictionary = new FastLookupDictionary<Element, Element>
+            {
+                [first] = second
+            };
 
-            Element third = null;
-            Assert.IsTrue(fastLookupDictionary.TryGetValue(second, out third));
+            Assert.IsTrue(fastLookupDictionary.TryGetValue(second, out Element third));
             Assert.IsTrue(ReferenceEquals(third, second));
         }
 
@@ -52,8 +53,7 @@ namespace Pliant.Tests.Unit.Collections
             for (int i = 0; i < 50; i++)
             {
                 fastLookupDictionary.Add(i, i);
-                int value;
-                Assert.IsTrue(fastLookupDictionary.TryGetValue(i, out value));            
+                Assert.IsTrue(fastLookupDictionary.TryGetValue(i, out _));
             }
         }
 

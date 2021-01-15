@@ -23,10 +23,9 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
-            var terminal = obj as CharacterTerminal;
-            if (terminal == null)
+            if (!(obj is CharacterTerminal terminal))
                 return false;
             return terminal.Character == Character;
         }
@@ -43,7 +42,7 @@ namespace Pliant.Grammars
 
         public override IReadOnlyList<Interval> GetIntervals()
         {
-            if(_intervals == null)
+            if(_intervals is null)
                 _intervals = new[] { new Interval(Character, Character) };
             return _intervals;
         }

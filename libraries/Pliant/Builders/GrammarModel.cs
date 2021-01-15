@@ -111,10 +111,10 @@ namespace Pliant.Builders
             var ignoreRules = GetIgnoreRulesFromIgnoreRulesModel();
             var triviaRules = GetTriviaRulesFromTriviaRulesModel();
 
-            if (Start == null)
+            if (Start is null)
                 throw new Exception("Unable to generate Grammar. The grammar definition is missing a Start production");
 
-            if (Start.LeftHandSide == null)
+            if (Start.LeftHandSide is null)
                 throw new Exception("Unable to generate Grammar. The grammar definition is missing a Left Hand Symbol to the Start production.");
 
             return new Grammar(
@@ -179,7 +179,7 @@ namespace Pliant.Builders
             {
                 var setting = settings[i];
                 var lexerRule = GetLexerRuleByName(setting.Value);
-                if (lexerRule == null)
+                if (lexerRule is null)
                     throw new Exception($"lexer rule {setting.Value} not found.");
                 lexerRules.Add(lexerRule);
             }

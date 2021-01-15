@@ -47,10 +47,9 @@ namespace Pliant.Runtime
         {
             throw new NotImplementedException();
         }
-        
-        private Dictionary<int, ILexerRule[]> _expectedLexerRuleCache;
+                
         private static readonly ILexerRule[] EmptyLexerRules = { };
-        private BitArray _expectedLexerRuleIndicies;
+        private List<ILexerRule> _expectedLexerRules = new List<ILexerRule>();
 
         public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
@@ -60,13 +59,7 @@ namespace Pliant.Runtime
             if (frameSetCount == 0)
                 return EmptyLexerRules;
 
-            var hashCode = 0;
-            var count = 0;
-
-            if (_expectedLexerRuleIndicies == null)
-                _expectedLexerRuleIndicies = new BitArray(Grammar.LexerRules.Count);
-            else
-                _expectedLexerRuleIndicies.SetAll(false);
+            _expectedLexerRules.Clear();
 
             var frameSet = frameSets[frameSets.Count - 1];
             for (var i = 0; i < frameSet.States.Count; i++)
@@ -78,38 +71,10 @@ namespace Pliant.Runtime
                     var index = Grammar.GetLexerRuleIndex(lexerRule);
                     if (index < 0)
                         continue;
-                    if (_expectedLexerRuleIndicies[index])
-                        continue;
-
-                    _expectedLexerRuleIndicies[index] = true;
-                    hashCode = HashCode.ComputeIncrementalHash(lexerRule.GetHashCode(), hashCode, count == 0);
-                    count++;
+                    _expectedLexerRules.Add(lexerRule);
                 }
             }
-
-            if (_expectedLexerRuleCache == null)
-                _expectedLexerRuleCache = new Dictionary<int, ILexerRule[]>();
-
-            // if the hash is found in the cached lexer rule lists, return the cached array
-            ILexerRule[] cachedLexerRules = null;
-            if (_expectedLexerRuleCache.TryGetValue(hashCode, out cachedLexerRules))
-            {
-                return cachedLexerRules;
-            }
-
-            // compute the new lexer rule array and add it to the cache
-            var array = new ILexerRule[count];
-            var returnItemIndex = 0;
-            for (var i = 0; i < Grammar.LexerRules.Count; i++)
-                if (_expectedLexerRuleIndicies[i])
-                {
-                    array[returnItemIndex] = Grammar.LexerRules[i];
-                    returnItemIndex++;
-                }
-            
-            _expectedLexerRuleCache.Add(hashCode, array);
-
-            return array;
+            return _expectedLexerRules;
         }
         
         public bool Pulse(IToken token)
@@ -168,8 +133,7 @@ namespace Pliant.Runtime
         {
             for (var j = 0; j < states.Count; j++)
             {
-                var preComputedState = states[j];
-                var isCompleted = preComputedState.Position == preComputedState.Production.RightHandSide.Count;
+                var preComputedState = states[j];                
                 if (!preComputedState.IsComplete)
                     continue;
 
@@ -191,7 +155,7 @@ namespace Pliant.Runtime
                 var origLoc = workEIM.Origin;
 
                 var toAH = Goto(fromAH, token);
-                if (toAH == null)
+                if (toAH is null)
                     continue;
                 AddEimPair(iLoc + 1, toAH, origLoc);
             }
@@ -274,8 +238,7 @@ namespace Pliant.Runtime
                         continue;
 
                     // to determine if the item is leo unique, cache it here
-                    var count = 0;
-                    if (!cachedCount.TryGetValue(postDotSymbol, out count))
+                    if (!cachedCount.TryGetValue(postDotSymbol, out int count))
                     {
                         cachedCount[postDotSymbol] = 1;
                         cachedTransitions[postDotSymbol] = CreateTopCachedItem(stateFrame, postDotSymbol);
@@ -311,7 +274,7 @@ namespace Pliant.Runtime
             {
                 var originFrameSet = Chart.Sets[stateFrame.Origin];
                 var nextCachedItem = originFrameSet.FindCachedDottedRuleSetTransition(postDotSymbol);
-                if (nextCachedItem == null)
+                if (nextCachedItem is null)
                     break;
                 topCacheItem = nextCachedItem;
                 if (origin == nextCachedItem.Origin)
@@ -322,7 +285,7 @@ namespace Pliant.Runtime
             return new CachedDottedRuleSetTransition(
                 postDotSymbol,
                 stateFrame.DottedRuleSet,
-                topCacheItem == null ? stateFrame.Origin : origin);
+                topCacheItem is null ? stateFrame.Origin : origin);
         }
 
         private void EarleyReductionOperation(int iLoc, DeterministicState fromEim, ISymbol transSym)
@@ -331,7 +294,7 @@ namespace Pliant.Runtime
             var originLoc = fromEim.Origin;
 
             var toAH = Goto(fromAH, transSym);
-            if (toAH == null)
+            if (toAH is null)
                 return;
 
             AddEimPair(iLoc, toAH, originLoc);
@@ -344,7 +307,7 @@ namespace Pliant.Runtime
             var originLoc = fromLim.Origin;
 
             var toAH = Goto(fromAH, transSym);
-            if (toAH == null)
+            if (toAH is null)
                 return;
 
             AddEimPair(iLoc, toAH, originLoc);
@@ -355,7 +318,7 @@ namespace Pliant.Runtime
             var confirmedEIM = new DeterministicState(confirmedAH, origLoc);
             var predictedAH = Goto(confirmedAH);
             Chart.Enqueue(iLoc, confirmedEIM);
-            if (predictedAH == null)
+            if (predictedAH is null)
                 return;
             var predictedEIM = new DeterministicState(predictedAH, iLoc);
             Chart.Enqueue(iLoc, predictedEIM);

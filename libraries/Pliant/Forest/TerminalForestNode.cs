@@ -30,11 +30,10 @@ namespace Pliant.Forest
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
 
-            var terminalNode = obj as TerminalForestNode;
-            if (terminalNode == null)
+            if (!(obj is TerminalForestNode terminalNode))
                 return false;
 
             return Location == terminalNode.Location

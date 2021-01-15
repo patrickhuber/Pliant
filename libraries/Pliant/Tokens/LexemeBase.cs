@@ -18,7 +18,7 @@ namespace Pliant.Tokens
         {
             get
             {
-                if (_leadingTrivia == null)
+                if (_leadingTrivia is null)
                     return EmptyTriviaArray;
                 return _leadingTrivia;
             }
@@ -28,7 +28,7 @@ namespace Pliant.Tokens
         {
             get
             {
-                if (_trailingTrivia == null)
+                if (_trailingTrivia is null)
                     return EmptyTriviaArray;
                 return _trailingTrivia;
             }
@@ -57,7 +57,7 @@ namespace Pliant.Tokens
 
         public void AddTrailingTrivia(ITrivia trivia)
         {
-            if (_trailingTrivia == null)
+            if (_trailingTrivia is null)
             {
                 var pool = SharedPools.Default<List<ITrivia>>();
                 _trailingTrivia = pool.AllocateAndClear();
@@ -68,7 +68,7 @@ namespace Pliant.Tokens
 
         public void AddLeadingTrivia(ITrivia trivia)
         {
-            if (_leadingTrivia == null)
+            if (_leadingTrivia is null)
             {
                 var pool = SharedPools.Default<List<ITrivia>>();
                 _leadingTrivia = pool.AllocateAndClear();

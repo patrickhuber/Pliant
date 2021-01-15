@@ -30,10 +30,9 @@ namespace Pliant.Forest
 
         public override bool Equals(object obj)
         {
-            if (((object)obj) == null)
+            if (obj is null)
                 return false;
-            var virtualForestNodePath = obj as VirtualForestNodePath;
-            if (((object)virtualForestNodePath) == null)
+            if (!(obj is VirtualForestNodePath virtualForestNodePath))
                 return false;
             return TransitionState.Equals(virtualForestNodePath.TransitionState)
                 && ForestNode.Equals(virtualForestNodePath.ForestNode);
