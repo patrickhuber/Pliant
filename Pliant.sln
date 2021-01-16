@@ -36,6 +36,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.Tests.Common", "test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.ProtocolBuffers", "libraries\Pliant.ProtocolBuffers\Pliant.ProtocolBuffers.csproj", "{F7CE9C6C-B253-4ABA-8242-AAA1FB234198}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{034801F2-BCA7-4C40-B371-4C32E78BE815}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{C35E655F-35E2-4014-9909-4E471602AF87}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\pipeline.yml = .github\workflows\pipeline.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,6 +99,7 @@ Global
 		{F8C61B4E-A6DB-4C11-8397-82EE14E3047F} = {6A7B3028-8B58-4134-9809-9462EC68FBC6}
 		{A7CDB69D-6BE9-42DB-87C7-889DAD71BDDE} = {6A7B3028-8B58-4134-9809-9462EC68FBC6}
 		{F7CE9C6C-B253-4ABA-8242-AAA1FB234198} = {6AF43B18-EF28-4486-8C5C-E4AFD659F8D8}
+		{C35E655F-35E2-4014-9909-4E471602AF87} = {034801F2-BCA7-4C40-B371-4C32E78BE815}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6C38722D-9FD5-40A1-B019-FB91EB3D719B}

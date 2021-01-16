@@ -78,7 +78,7 @@ a = c;";
         [DeploymentItem("ebnf.txt")]
         public void CanParseSelf()
         {
-            var input = File.ReadAllText(@"Languages\Ebnf\ebnf.txt");
+            var input = File.ReadAllText(Path.Combine("Languages", "Ebnf", "ebnf.txt"));
             ParseAndAcceptInput(input);
         }
     }

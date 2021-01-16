@@ -63,15 +63,15 @@ namespace Pliant.Tests.Unit.Languages.Bnf
         [DeploymentItem("bnf.txt")]
         public void CanParseSelf()
         {
-            var input = File.ReadAllText(@"Languages\Bnf\bnf.txt");
+            var input = File.ReadAllText(Path.Combine("Languages","Bnf", "bnf.txt"));
             ParseAndAcceptInput(input);
         }
 
         [TestMethod]
         [DeploymentItem(@"AnsiC.bnf")]
         public void BnfShouldParseLargeGrammarInFile()
-        {
-            var bnf = File.ReadAllText(@"Languages\Bnf\AnsiC.bnf");
+        {            
+            var bnf = File.ReadAllText(Path.Combine("Languages", "Bnf", "AnsiC.bnf"));
             Assert.IsFalse(string.IsNullOrEmpty(bnf));
             ParseAndAcceptInput(bnf);
         }
