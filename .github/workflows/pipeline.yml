@@ -14,3 +14,9 @@ jobs:
       uses: actions/setup-dotnet@v1.7.2
       with:
         dotnet-version: ${{ matrix.dotnet-version }}
+    - name: Install Dependencies
+      run: dotnet restore
+    - name: build
+      run: dotnet build --configuration Release --no-restore
+    - name: Test with the dotnet CLI
+      run: dotnet test --no-restore --verbosity normal
