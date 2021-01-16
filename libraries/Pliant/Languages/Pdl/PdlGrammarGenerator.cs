@@ -154,6 +154,8 @@ namespace Pliant.Languages.Pdl
             return nfa;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "ToString is not called in the critical section of code")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0502:Explicit new reference type allocation", Justification = "Exceptions are not part of control flow")]
         INfa LexerRuleFactor(PdlLexerRuleFactor factor)
         {
             switch (factor.NodeType)
@@ -163,6 +165,7 @@ namespace Pliant.Languages.Pdl
 
                 case PdlNodeType.PdlLexerRuleFactorRegex:
                     return LexerRuleFactorRegex(factor as PdlLexerRuleFactorRegex);
+
 
                 default:
                     throw new InvalidOperationException(

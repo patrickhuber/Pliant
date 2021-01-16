@@ -617,6 +617,7 @@ namespace Pliant.Runtime
                 Debug.WriteLine(GetOriginStateOperationString(operation, origin, state));
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "ToString is not called in the critical path.")]
         private static string GetOriginStateOperationString(string operation, int origin, IState state)
         {
             return $"{origin,-9}{state,-100}{operation}";

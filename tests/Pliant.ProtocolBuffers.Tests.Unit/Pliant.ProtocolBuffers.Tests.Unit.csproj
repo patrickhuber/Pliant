@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\libraries\Pliant.ProtocolBuffers\Pliant.ProtocolBuffers.csproj" />
     <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj" />
   </ItemGroup>
 

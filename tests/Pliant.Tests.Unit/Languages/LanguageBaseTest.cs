@@ -27,6 +27,7 @@ namespace Pliant.Tests.Unit.Languages
             NotAccept();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "unit test is not critical code")]
         protected void FailParseAtPosition(string input, int position)
         {
             var parseRunner = new ParseRunner(_parseEngine, input);
@@ -38,6 +39,7 @@ namespace Pliant.Tests.Unit.Languages
                     Assert.IsFalse(parseRunner.Read());
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "unit test is not critical code")]
         protected void ParseInput(string input)
         {
             var parseRunner = new ParseRunner(_parseEngine, input);

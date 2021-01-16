@@ -54,6 +54,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "Unit test is not performance critical code")]
         public void ParseEngineGivenAmbiguousGrammarShouldCreateMulipleParsePaths()
         {
             // example 3 section 4, Elizabeth Scott
@@ -150,6 +151,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "Unit test is not performance critical code")]
         public void ParseEngineWhenScanCompletedShouldCreateInternalAndTerminalNodes()
         {
             ProductionExpression S = "S";
@@ -179,6 +181,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "Unit test is not performance critical code")]
         public void ParseEnginePredicationShouldCreateInternalNode()
         {
             ProductionExpression S = "S", A = "A";
@@ -368,6 +371,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "Unit test is not performance critical code")]
         public void ParseEngineShouldParseMidGrammarRightRecursionAndHandleNullRootTransitionItem()
         {
             ProductionExpression S = "S", A = "A", B = "B", C = "C";
@@ -430,6 +434,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "unit test is not critical code")]
         public void ParseEngineShouldParseSimpleSubstitutionGrammar()
         {
             ProductionExpression A = "A", B = "B", C = "C";
@@ -445,6 +450,7 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0504:Implicit new array creation allocation", Justification = "unit test is not critical code")]
         public void ParseEngineShouldParseExpressionGrammar()
         {
             var expressionGrammar = CreateExpressionGrammar();
@@ -867,7 +873,8 @@ namespace Pliant.Tests.Unit.Runtime
             var comparer = new StatefulForestNodeComparer();
             Assert.IsTrue(comparer.Equals(expected, actual));
         }
-                
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "Unit test is not performance critical code")]
         private static IGrammar CreateRegularExpressionStubGrammar()
         {
             ProductionExpression R = "R", E = "E", T = "T", F = "F", A = "A", I = "I";

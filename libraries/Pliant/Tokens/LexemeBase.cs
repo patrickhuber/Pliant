@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Pliant.Tokens
 {
     public abstract class LexemeBase<TLexerRule> : ILexeme
-        where TLexerRule : ILexerRule
+        where TLexerRule : ILexerRule        
     {
         private static readonly ITrivia[] EmptyTriviaArray = { };
         private List<ITrivia> _leadingTrivia;
@@ -34,7 +34,7 @@ namespace Pliant.Tokens
             }
         }
 
-        public ILexerRule LexerRule => ConcreteLexerRule;
+        public ILexerRule LexerRule => (ILexerRule)ConcreteLexerRule;
                 
         public ICapture<char> Capture { get; private set; }
         

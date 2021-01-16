@@ -72,7 +72,7 @@ namespace Pliant.Languages.Regex
         {
             return HashCode.Compute(
                 Atom.GetHashCode(),
-                Iterator.GetHashCode());
+                ((int)Iterator).GetHashCode());
         }
 
         public override int GetHashCode()

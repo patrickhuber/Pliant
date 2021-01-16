@@ -53,6 +53,9 @@ namespace Pliant.Charts
             return _hashCode;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0101:Array allocation for params parameter", Justification = "ToString is not called in performance critical code")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0502:Explicit new reference type allocation", Justification = "ToString is not called in performance critical code")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "ToString is not called in performance critical code")]
         public override string ToString()
         {
             var stringBuilder = new StringBuilder()

@@ -203,6 +203,7 @@ namespace Pliant.Collections
             throw new NotImplementedException();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "GetEnumerator is not called in performance critical code")]
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             if (DictionaryIsMoreEfficient())
@@ -227,6 +228,7 @@ namespace Pliant.Collections
             return TryGetValueFromList(key, out value);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "GetEnumerator is not called in performance critical code")]
         IEnumerator IEnumerable.GetEnumerator()
         {
             if (DictionaryIsMoreEfficient())

@@ -17,6 +17,7 @@ namespace Pliant.Forest
             _hashCode = ComputeHashCode();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "ToString is not called in performance critical code")]
         public override string ToString()
         {
             return $"({DottedRule}, {Origin}, {Location})";
