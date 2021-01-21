@@ -23,7 +23,7 @@ jobs:
       # read the package version and append the GITHUB_ENV var to set for next step
     - name: Read Package Version      
       run: |
-        export VERSION=$(cat packaging/version.txt)
+        export VERSION=$(cat .packaging/version.txt)
         echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
     # no need to run `dotnet pack` as the auto package flag is set
