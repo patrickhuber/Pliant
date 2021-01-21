@@ -2,7 +2,7 @@
 
 namespace Pliant.Forest
 {
-    public interface IForestNode : IForestNodeVisitable, IParseNode
+    public interface IForestNode : IForestNodeVisitable
     {
         int Origin { get; }
 

@@ -161,10 +161,12 @@ namespace Pliant.Runtime
             }
         }
 
+        private HashSet<ISymbol> _reductionPassHashSet;
+
         private void ReductionPass(int iLoc)
         {
             var iES = Chart.Sets[iLoc];
-            var processed = SharedPools.Default<HashSet<ISymbol>>().AllocateAndClear();
+            _reductionPassHashSet ??= new HashSet<ISymbol>();            
             for (var i = 0; i < iES.States.Count; i++)
             {
                 var workEIM = iES.States[i];
@@ -178,14 +180,13 @@ namespace Pliant.Runtime
                         continue;
 
                     var lhsSym = dottedRule.Production.LeftHandSide;
-                    if (!processed.Add(lhsSym))
+                    if (!_reductionPassHashSet.Add(lhsSym))
                         continue;
 
                     ReduceOneLeftHandSide(iLoc, origLoc, lhsSym);
                 }
-                processed.Clear();
+                _reductionPassHashSet.Clear();
             }
-            SharedPools.Default<HashSet<ISymbol>>().ClearAndFree(processed);
             MemoizeTransitions(iLoc);
         }
 
@@ -204,16 +205,17 @@ namespace Pliant.Runtime
                 }
             }
         }
-        
+
+        private Dictionary<ISymbol, int> _cachedCount;
+        private Dictionary<ISymbol, CachedDottedRuleSetTransition> _cachedTransitions;
+
         private void MemoizeTransitions(int iLoc)
         {
             var frameSet = Chart.Sets[iLoc];
             // leo eligibility needs to be cached before creating the cached transition
             // if the size of the list is != 1, do not enter the cached frame transition
-            var cachedTransitionsPool = SharedPools.Default<Dictionary<ISymbol, CachedDottedRuleSetTransition>>();
-            var cachedTransitions = cachedTransitionsPool.AllocateAndClear();
-            var cachedCountPool = SharedPools.Default<Dictionary<ISymbol, int>>();
-            var cachedCount = cachedCountPool.AllocateAndClear();
+            _cachedCount ??= new Dictionary<ISymbol, int>();
+            _cachedTransitions ??= new Dictionary<ISymbol, CachedDottedRuleSetTransition>();
 
             for (var i = 0; i < frameSet.States.Count; i++)
             {
@@ -238,29 +240,29 @@ namespace Pliant.Runtime
                         continue;
 
                     // to determine if the item is leo unique, cache it here
-                    if (!cachedCount.TryGetValue(postDotSymbol, out int count))
+                    if (!_cachedCount.TryGetValue(postDotSymbol, out int count))
                     {
-                        cachedCount[postDotSymbol] = 1;
-                        cachedTransitions[postDotSymbol] = CreateTopCachedItem(stateFrame, postDotSymbol);
+                        _cachedCount[postDotSymbol] = 1;
+                        _cachedTransitions[postDotSymbol] = CreateTopCachedItem(stateFrame, postDotSymbol);
                     }
                     else
                     {
-                        cachedCount[postDotSymbol] = count + 1;
+                        _cachedCount[postDotSymbol] = count + 1;
                     }
                 }
             }
 
             // add all memoized leo items to the frameSet
-            foreach (var symbol in cachedCount.Keys)
+            foreach (var symbol in _cachedCount.Keys)
             {
-                var count = cachedCount[symbol];
+                var count = _cachedCount[symbol];
                 if (count != 1)
                     continue;
-                frameSet.AddCachedTransition(cachedTransitions[symbol]);
+                frameSet.AddCachedTransition(_cachedTransitions[symbol]);
             }
 
-            cachedTransitionsPool.ClearAndFree(cachedTransitions);
-            cachedCountPool.ClearAndFree(cachedCount);
+            _cachedTransitions.Clear();
+            _cachedCount.Clear();
         }
 
         private CachedDottedRuleSetTransition CreateTopCachedItem(
