@@ -35,6 +35,6 @@ jobs:
       
     # package is generated on build so just push it if newer
     - name: Publish to NuGet      
-      if: ${{github.ref == 'refs/heads/main'}}
+      if: ${{github.ref == 'refs/heads/master'}}
       run: dotnet nuget push libraries/Pliant/bin/Release/Pliant.$VERSION.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
         
