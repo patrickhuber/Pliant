@@ -1,42 +1,18 @@
-﻿using Pliant.Grammars;
-using Pliant.Tokens;
+﻿using Pliant.Captures;
+using Pliant.Grammars;
 
 namespace Pliant.Tokens
 {
     public class StringLiteralLexeme : LexemeBase<IStringLiteralLexerRule>, ILexeme
     {
-        private string _capture;
         private int _index;
         
         public string Literal { get { return ConcreteLexerRule.Literal; } }
 
-        public override string Value
-        {
-            get
-            {
-                if (!IsSubStringAllocated())
-                    _capture = AllocateSubString();
-                return _capture;
-            }
-        }        
-        
-        public StringLiteralLexeme(IStringLiteralLexerRule lexerRule, int position)
-            : base(lexerRule, position)
+        public StringLiteralLexeme(IStringLiteralLexerRule lexerRule, ICapture<char> segment, int offset)
+            : base(lexerRule, segment, offset)
         {
             _index = 0;
-            _capture = null;
-        }
-
-        private bool IsSubStringAllocated()
-        {
-            if (_capture == null)
-                return false;
-            return _index == _capture.Length;
-        }
-
-        private string AllocateSubString()
-        {
-            return Literal.Substring(0, _index);
         }
 
         public override bool IsAccepted()
@@ -44,20 +20,29 @@ namespace Pliant.Tokens
             return _index >= Literal.Length;
         }
 
-        public override bool Scan(char c)
+        public override bool Scan()
         {
             if (_index >= Literal.Length)
                 return false;
-            if (Literal[_index] != c)
+
+            // TODO: verify that the segment is passed in at the correct position. it should be Count == 0 
+            if (!Capture.Peek(out char value))
                 return false;
+
+            if (Literal[_index] != value)
+                return false;
+            
             _index++;
+
+            if (!Capture.Grow())
+                return false;
+
             return true;
         }
 
         public override void Reset()
         {
             _index = 0;
-            _capture = null;
         }      
     }
 }

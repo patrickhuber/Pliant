@@ -4,23 +4,28 @@ using System.Runtime.CompilerServices;
 using Pliant.Automata;
 using Pliant.Tokens;
 using Pliant.Grammars;
+using System.Text;
+using Pliant.Captures;
 
 namespace Pliant.Runtime
 {
     public class ParseRunner : IParseRunner
     {
-        private TextReader _reader;
+        private readonly ICapture<char> _capture;
+        private readonly StringBuilder _builder;
+        private readonly TextReader _reader;
         private readonly ILexemeFactoryRegistry _lexemeFactoryRegistry;
-        private List<ILexeme> _tokenLexemes;
-        private List<ILexeme> _ignoreLexemes;
+        private readonly List<ILexeme> _tokenLexemes;
+        private readonly List<ILexeme> _ignoreLexemes;        
+        private readonly List<ILexeme> _triviaAccumulator;
+        private readonly List<ILexeme> _triviaLexemes;
+
         private List<ILexeme> _previousTokenLexemes;
-        private List<ILexeme> _triviaAccumulator;
-        private List<ILexeme> _triviaLexemes;
 
         public int Position { get; private set; }
-
+                
         public int Line { get; private set; }
-
+                
         public int Column { get; private set; }
 
         public IParseEngine ParseEngine { get; private set; }
@@ -39,8 +44,11 @@ namespace Pliant.Runtime
             _triviaLexemes = new List<ILexeme>();
             _triviaAccumulator = new List<ILexeme>();
             _lexemeFactoryRegistry = new LexemeFactoryRegistry();
+            _builder = new StringBuilder();
+            _capture = new StringBuilderCapture(_builder);
+
             RegisterDefaultLexemeFactories(_lexemeFactoryRegistry);
-            Position = 0;
+            Position = -1;
         }
 
         public bool Read()
@@ -51,13 +59,13 @@ namespace Pliant.Runtime
             var character = ReadCharacter();
             UpdatePositionMetrics(character);
 
-            if (MatchesExistingIncompleteIgnoreLexemes(character))
+            if (MatchesExistingIncompleteIgnoreLexemes())
                 return true;
 
-            if (MatchesExistingIncompleteTriviaLexemes(character))
+            if (MatchesExistingIncompleteTriviaLexemes())
                 return true;
 
-            if (MatchExistingTokenLexemes(character))
+            if (MatchExistingTokenLexemes())
             {
                 if (EndOfStream())
                     return TryParseExistingToken();
@@ -68,7 +76,7 @@ namespace Pliant.Runtime
                 if (!TryParseExistingToken())
                     return false;
 
-            if (MatchesNewTokenLexemes(character))
+            if (MatchesNewTokenLexemes())
             {
                 if (!EndOfStream())
                 {
@@ -79,7 +87,7 @@ namespace Pliant.Runtime
                 return TryParseExistingToken();
             }
 
-            if (MatchesExistingTriviaLexemes(character))
+            if (MatchesExistingTriviaLexemes())
             {
                 if (EndOfStream() || IsEndOfLineCharacter(character))
                 {
@@ -92,13 +100,13 @@ namespace Pliant.Runtime
             if (AnyExistingTriviaLexemes())
                 AccumulateAcceptedTrivia();
 
-            if (MatchesExistingIgnoreLexemes(character))
+            if (MatchesExistingIgnoreLexemes())
                 return true;
 
             ClearExistingIgnoreLexemes();
 
-            if (!MatchesNewTriviaLexemes(character))
-                return MatchesNewIgnoreLexemes(character);
+            if (!MatchesNewTriviaLexemes())
+                return MatchesNewIgnoreLexemes();
 
             if (!IsEndOfLineCharacter(character))            
                 return true;
@@ -116,7 +124,7 @@ namespace Pliant.Runtime
 
         private void AddTrailingTriviaToPreviousToken()
         {
-            if (_previousTokenLexemes == null
+            if (_previousTokenLexemes is null
                 || _previousTokenLexemes.Count == 0)
                 return;
 
@@ -131,28 +139,20 @@ namespace Pliant.Runtime
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void UpdatePositionMetrics(char character)
         {
-            Position++;
             if (IsEndOfLineCharacter(character))
             {
                 Column = 0;
                 Line++;
             }
-            else
-            {
+            else            
                 Column++;
-            }
+
+            Position++;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsEndOfLineCharacter(char character)
-        {
-            switch (character)
-            {
-                case '\n':
-                    return true;
-                default:
-                    return false;
-            }
+        private static bool IsEndOfLineCharacter(char c)
+        {            
+            return c == '\n';
         }
 
         public bool EndOfStream()
@@ -171,22 +171,23 @@ namespace Pliant.Runtime
         private char ReadCharacter()
         {
             var character = (char)_reader.Read();
+            _builder.Append(character);
             return character;
         }
 
-        private bool MatchesNewTriviaLexemes(char character)
+        private bool MatchesNewTriviaLexemes()
         {
-            return MatchLexerRules(character, ParseEngine.Grammar.Trivia, _triviaLexemes);
+            return MatchLexerRules(ParseEngine.Grammar.Trivia, _triviaLexemes);
         }
 
-        private bool MatchesExistingIncompleteTriviaLexemes(char character)
+        private bool MatchesExistingIncompleteTriviaLexemes()
         {
-            return MatchesExistingIncompleteLexemes(character, _triviaLexemes);
+            return MatchesExistingIncompleteLexemes(_triviaLexemes);
         }
 
-        private bool MatchesExistingTriviaLexemes(char character)
+        private bool MatchesExistingTriviaLexemes()
         {
-            return MatchesExistingLexemes(character, _triviaLexemes);
+            return MatchesExistingLexemes(_triviaLexemes);
         }
 
         private void AccumulateAcceptedTrivia()
@@ -200,14 +201,14 @@ namespace Pliant.Runtime
             _triviaLexemes.Clear();
         }
 
-        private bool MatchesExistingIncompleteIgnoreLexemes(char character)
+        private bool MatchesExistingIncompleteIgnoreLexemes()
         {
-            return MatchesExistingIncompleteLexemes(character, _ignoreLexemes);
+            return MatchesExistingIncompleteLexemes(_ignoreLexemes);
         }
 
-        private bool MatchExistingTokenLexemes(char character)
+        private bool MatchExistingTokenLexemes()
         {
-            return MatchesExistingLexemes(character, _tokenLexemes);
+            return MatchesExistingLexemes(_tokenLexemes);
         }
 
         private bool TryParseExistingToken()
@@ -255,27 +256,27 @@ namespace Pliant.Runtime
                     _tokenLexemes[j].AddLeadingTrivia(_triviaAccumulator[i]);
 
             _triviaAccumulator.Clear();
-            if (_previousTokenLexemes != null)
+            if (_previousTokenLexemes is null)
+                _previousTokenLexemes = new List<ILexeme>(_tokenLexemes);
+            else
             {
                 _previousTokenLexemes.Clear();
                 _previousTokenLexemes.AddRange(_tokenLexemes);
-            }
-            else
-                _previousTokenLexemes = new List<ILexeme>(_tokenLexemes);
+            }                
 
             _tokenLexemes.Clear();
 
             return true;
         }
 
-        private bool MatchesNewTokenLexemes(char character)
+        private bool MatchesNewTokenLexemes()
         {
-            return MatchLexerRules(character, ParseEngine.GetExpectedLexerRules(), _tokenLexemes);
+            return MatchLexerRules(ParseEngine.GetExpectedLexerRules(), _tokenLexemes);
         }
 
-        private bool MatchesExistingIgnoreLexemes(char character)
+        private bool MatchesExistingIgnoreLexemes()
         {
-            return MatchesExistingLexemes(character, _ignoreLexemes);
+            return MatchesExistingLexemes(_ignoreLexemes);
         }
 
         private void ClearExistingIgnoreLexemes()
@@ -283,29 +284,29 @@ namespace Pliant.Runtime
             ClearLexemes(_ignoreLexemes);
         }
 
-        private bool MatchesNewIgnoreLexemes(char character)
+        private bool MatchesNewIgnoreLexemes()
         {
-            return MatchLexerRules(character, ParseEngine.Grammar.Ignores, _ignoreLexemes);
+            return MatchLexerRules(ParseEngine.Grammar.Ignores, _ignoreLexemes);
         }
 
-        private bool MatchLexerRules(char character, IReadOnlyList<ILexerRule> lexerRules, List<ILexeme> lexemes)
+        private bool MatchLexerRules(IReadOnlyList<ILexerRule> lexerRules, List<ILexeme> lexemes)
         {
             var anyMatches = false;
+            var character = _capture[Position];
             for (var i = 0; i < lexerRules.Count; i++)
             {
                 var lexerRule = lexerRules[i];
                 if (!lexerRule.CanApply(character))
                     continue;
                 var factory = _lexemeFactoryRegistry.Get(lexerRule.LexerRuleType);
-                var lexeme = factory.Create(lexerRule, Position);
-
-                if (!lexeme.Scan(character))
+                var lexeme = factory.Create(lexerRule, _capture, Position);
+                if (!lexeme.Scan())
                 {
                     FreeLexeme(lexeme);
                     continue;
                 }
 
-                if (!anyMatches)
+                if(!anyMatches)
                 {
                     anyMatches = true;
                     lexemes.Clear();
@@ -313,11 +314,10 @@ namespace Pliant.Runtime
 
                 lexemes.Add(lexeme);
             }
-
             return anyMatches;
         }
 
-        private bool MatchesExistingLexemes(char character, List<ILexeme> lexemes)
+        private bool MatchesExistingLexemes(List<ILexeme> lexemes)
         {
             var anyLexemes = lexemes != null && lexemes.Count > 0;
             if (!anyLexemes)
@@ -329,7 +329,7 @@ namespace Pliant.Runtime
             while (i < size)
             {
                 var lexeme = lexemes[i];
-                if (lexeme.Scan(character))
+                if (lexeme.Scan())
                     i++;
                 else
                 {
@@ -356,7 +356,7 @@ namespace Pliant.Runtime
             return true;
         }
 
-        private bool MatchesExistingIncompleteLexemes(char character, List<ILexeme> lexemes)
+        private bool MatchesExistingIncompleteLexemes(List<ILexeme> lexemes)
         {
             var anyLexemes = lexemes != null && lexemes.Count > 0;
             if (!anyLexemes)
@@ -368,7 +368,7 @@ namespace Pliant.Runtime
             while (i < size)
             {
                 var lexeme = lexemes[i];
-                if (!lexeme.IsAccepted() && lexeme.Scan(character))
+                if (!lexeme.IsAccepted() && lexeme.Scan())
                     i++;
                 else
                 {

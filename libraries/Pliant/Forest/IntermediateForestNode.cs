@@ -17,6 +17,7 @@ namespace Pliant.Forest
             _hashCode = ComputeHashCode();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "ToString is not called in performance critical code")]
         public override string ToString()
         {
             return $"({DottedRule}, {Origin}, {Location})";
@@ -29,16 +30,15 @@ namespace Pliant.Forest
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
 
-            var intermediateNode = obj as IIntermediateForestNode;
-            if (intermediateNode == null)
+            if (!(obj is IIntermediateForestNode intermediateNode))
                 return false;
 
-            return Location == intermediateNode.Location
-                && NodeType == intermediateNode.NodeType
+            return Location == intermediateNode.Location                
                 && Origin == intermediateNode.Origin
+                && NodeType == intermediateNode.NodeType
                 && DottedRule.Equals(intermediateNode.DottedRule);
         }
 

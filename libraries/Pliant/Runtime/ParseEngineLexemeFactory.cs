@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Captures;
+using Pliant.Grammars;
 using Pliant.Tokens;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,14 @@ namespace Pliant.Runtime
             _queue = new Queue<ParseEngineLexeme>();
         }
 
-        public ILexeme Create(ILexerRule lexerRule, int position)
+        public void Free(ILexeme lexeme)
+        {
+            if (!(lexeme is ParseEngineLexeme parseEngineLexeme))
+                throw new Exception($"Unable to free lexeme of type {lexeme.GetType()} from ParseEngineLexeme.");
+            _queue.Enqueue(parseEngineLexeme);
+        }
+
+        public ILexeme Create(ILexerRule lexerRule, ICapture<char> segment, int offset)
         {
             if (lexerRule.LexerRuleType != LexerRuleType)
                 throw new Exception(
@@ -25,19 +33,11 @@ namespace Pliant.Runtime
             var grammarLexerRule = lexerRule as IGrammarLexerRule;
 
             if (_queue.Count == 0)
-                return new ParseEngineLexeme(grammarLexerRule);
-            
-            var reusedLexeme = _queue.Dequeue();
-            reusedLexeme.Reset(grammarLexerRule, position);
-            return reusedLexeme;
-        }
+                return new ParseEngineLexeme(grammarLexerRule, segment, offset);
 
-        public void Free(ILexeme lexeme)
-        {
-            var parseEngineLexeme = lexeme as ParseEngineLexeme;
-            if(parseEngineLexeme == null)
-                throw new Exception($"Unable to free lexeme of type {lexeme.GetType()} from ParseEngineLexeme.");
-            _queue.Enqueue(parseEngineLexeme);
+            var reusedLexeme = _queue.Dequeue();
+            reusedLexeme.Reset(grammarLexerRule, offset);
+            return reusedLexeme;
         }
     }
 }

@@ -137,7 +137,7 @@ namespace Pliant.Tests.Common.Forest
 
         private static string GetTokenNodeString(ITokenForestNode node)
         {
-            return $"('{node.Token.Value}', {node.Origin}, {node.Location})";
+            return $"('{node.Token.Capture}', {node.Origin}, {node.Location})";
         }
         
         public void Visit(ITerminalForestNode node)

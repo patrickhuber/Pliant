@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Pliant.Captures;
 using Pliant.Grammars;
 using Pliant.Tokens;
 
@@ -12,36 +13,36 @@ namespace Pliant.Tests.Unit
         [TestMethod]
         public void TerminalLexemShouldWhileAcceptedContinuesToMatch()
         {
+            var input = "c";
+            var segment = input.AsCapture();
             var terminalLexeme = new TerminalLexeme(
                 new CharacterTerminal('c'),
                 new TokenType("c"),
+                segment, 
                 0);
             Assert.IsFalse(terminalLexeme.IsAccepted());
-            Assert.IsTrue(terminalLexeme.Scan('c'));
+            Assert.IsTrue(terminalLexeme.Scan());
             Assert.IsTrue(terminalLexeme.IsAccepted());
-            Assert.IsFalse(terminalLexeme.Scan('c'));
-        }
-
-        [TestMethod]
-        public void TerminalLexemeShouldInitializeCatpureToEmptyString()
-        {
-            var terminalLexeme = new TerminalLexeme(new CharacterTerminal('c'), new TokenType("c"), 0);
-            Assert.AreEqual(string.Empty, terminalLexeme.Value);
+            Assert.IsFalse(terminalLexeme.Scan());
         }
 
         [TestMethod]
         public void TerminalLexemeResetShouldClearPreExistingValues()
         {
+            var input = "c";
+            var segment = input.AsCapture();
             var terminalLexeme = new TerminalLexeme(
                 new CharacterTerminal('c'),
                 new TokenType("c"),
+                segment,
                 0);
-            Assert.IsTrue(terminalLexeme.Scan('c'));
-            terminalLexeme.Reset(
-                new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a")),
-                10);
 
-            Assert.AreEqual(10, terminalLexeme.Position);            
+            Assert.IsTrue(terminalLexeme.Scan());
+            terminalLexeme.Reset(
+                new TerminalLexerRule(new CharacterTerminal('a'), new TokenType("a")),                
+                0);
+
+            Assert.AreEqual(0, terminalLexeme.Position);            
         }
     }
 }

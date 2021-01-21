@@ -34,7 +34,7 @@ namespace Pliant.Charts
 
         private EarleySet GetEarleySet(int index)
         {
-            EarleySet earleySet = null;
+            EarleySet earleySet;
             if (_earleySets.Count <= index)
             {
                 earleySet = new EarleySet(index);

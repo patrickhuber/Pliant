@@ -82,11 +82,26 @@ namespace Pliant.Utilities
             }
         }
 
+        public static int Compute<T>(SortedSet<T> items)
+        {
+            unchecked
+            {
+                var hash = (int)SEED;
+
+                foreach (var item in items)
+                {
+                    hash = hash * INCREMENTAL ^ item.GetHashCode();
+                }
+                return hash;
+            }
+        }
+
         public static int Compute(IEnumerable<object> items)
         {
             unchecked
             {
                 var hash = (int)SEED;
+                
                 foreach (var item in items)
                 {
                     hash = hash * INCREMENTAL ^ item.GetHashCode();

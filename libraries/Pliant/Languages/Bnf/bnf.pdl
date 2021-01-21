@@ -1,0 +1,45 @@
+﻿:namespace bnf;
+:start syntax;
+:ignore whitespace;
+
+syntax = 
+	rule 
+	| rule syntax ;
+
+rule= 
+	rule-identifier "::=" expression line-end ;
+
+expression	= 
+	list 
+	| list  "|"  expression ;
+
+line-end =  
+	EOL 
+	| line-end line-end ;
+
+list = 
+	term 
+	| term  list ;
+
+term = 
+	literal 
+	| rule-identifier; 
+
+literal	= 
+	double-quote-string
+	| single-quote-string ;
+
+character
+	~ letter 
+	| digit 
+	| symbol ;
+
+double-quote-string ~ /["][^"]*["]/;
+single-quote-string ~ /['][^']*[']/;
+letter				~ /[a-zA-Z]/ ;
+digit				~ /\d/ ;
+symbol				~ /[[\]{}()<>'"=|.,;]/ ; 
+rule-identifier		~ "<" rule-name ">";
+rule-name			~ letter | rule-name rule-char ;
+rule-char			~ letter | digit | "-" ;
+EOL					~ "\n" | "\r\n" ;

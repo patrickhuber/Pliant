@@ -1,5 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
-using Pliant.Bnf;
+using Pliant.Languages.Bnf;
 using Pliant.Grammars;
 using Pliant.Runtime;
 using System;

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;net45</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.8.0</Version>
     <Authors>Patrick Huber</Authors>
@@ -11,6 +11,11 @@
     <PackageLicenseUrl>https://raw.githubusercontent.com/patrickhuber/Pliant/master/LICENSE.md</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/patrickhuber/Pliant</PackageProjectUrl>
     <RepositoryUrl>https://github.com/patrickhuber/Pliant</RepositoryUrl>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="3.0.0" />
+  </ItemGroup>
 
 </Project>

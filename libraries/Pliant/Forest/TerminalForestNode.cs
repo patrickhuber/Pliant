@@ -18,6 +18,7 @@ namespace Pliant.Forest
             get { return ForestNodeType.Terminal; }
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "ToString is not called in performance critical code")]
         public override string ToString()
         {
             return $"({(Capture == '\0' ? "null" : Capture.ToString())}, {Origin}, {Location})";
@@ -30,11 +31,10 @@ namespace Pliant.Forest
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
 
-            var terminalNode = obj as TerminalForestNode;
-            if (terminalNode == null)
+            if (!(obj is TerminalForestNode terminalNode))
                 return false;
 
             return Location == terminalNode.Location
@@ -48,7 +48,7 @@ namespace Pliant.Forest
         private int ComputeHashCode()
         {
             return HashCode.Compute(
-                NodeType.GetHashCode(),
+                ((int)NodeType).GetHashCode(),
                 Location.GetHashCode(),
                 Origin.GetHashCode(),
                 Capture.GetHashCode());

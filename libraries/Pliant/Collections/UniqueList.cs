@@ -138,7 +138,7 @@ namespace Pliant.Collections
 
         private void AllocateAndPopulateHashSet()
         {
-            if (_index == null)
+            if (_index is null)
                 _index = new HashSet<int>();
 
             if (_index.Count == _innerList.Count)
@@ -151,7 +151,7 @@ namespace Pliant.Collections
         public void Clear()
         {
             _innerList.Clear();
-            if(_index != null)
+            if(!(_index is null))
                 _index.Clear();
         }
 
@@ -211,10 +211,9 @@ namespace Pliant.Collections
 
         public override bool Equals(object obj)
         {
-            if (((object)obj) == null)
+            if (obj is null)
                 return false;
-            var uniqueList = obj as UniqueList<T>;
-            if (((object)uniqueList) == null)
+            if (!(obj is UniqueList<T> uniqueList))
                 return false;
             return _innerList.Equals(uniqueList._innerList);
         }

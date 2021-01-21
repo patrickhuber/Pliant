@@ -17,14 +17,12 @@ namespace Pliant.Automata
 
         public bool Add(char min, char max)
         {
-            if (_root == null)
-            {
-                _root = new IntervalNode();
-                return true;
-            }
-            return false;
+            if (!(_root is null))
+                return false;            
+            _root = new IntervalNode();
+            return true;
         }
-        
+
         public bool Contains(char character)
         {
             return false;

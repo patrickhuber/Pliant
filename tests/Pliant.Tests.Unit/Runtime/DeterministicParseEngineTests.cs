@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders.Expressions;
 using Pliant.Grammars;
-using Pliant.RegularExpressions;
+using Pliant.Languages.Regex;
 using Pliant.Runtime;
 using Pliant.Tests.Common;
 using Pliant.Tokens;

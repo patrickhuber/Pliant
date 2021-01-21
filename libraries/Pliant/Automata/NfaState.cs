@@ -6,7 +6,7 @@ namespace Pliant.Automata
 {
     public class NfaState : INfaState, IComparable<INfaState>, IComparable
     {
-        private List<INfaTransition> _transitions;
+        private readonly List<INfaTransition> _transitions;
 
         public NfaState()
         {
@@ -49,10 +49,9 @@ namespace Pliant.Automata
 
         public int CompareTo(object obj)
         {
-            if (((object)obj) == null)
+            if (obj is null)
                 throw new NullReferenceException();
-            var nfaState = obj as INfaState;
-            if (((object)nfaState) == null)
+            if (!(obj is INfaState nfaState))
                 throw new ArgumentException("parameter must be a INfaState", nameof(obj));
             return CompareTo(nfaState);
         }

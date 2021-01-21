@@ -126,12 +126,12 @@ namespace Pliant.Forest
             {
                 var virtualNode = new VirtualForestNode(Location, transitionState.NextTransition, completedParseNode);
 
-                if (transitionState.Reduction.ParseNode == null)
+                if (transitionState.Reduction.ParseNode is null)
                     AddUniqueFamily(virtualNode);
                 else
                     AddUniqueFamily(transitionState.Reduction.ParseNode, virtualNode);
             }
-            else if (transitionState.Reduction.ParseNode != null)
+            else if (!(transitionState.Reduction.ParseNode is null))
             {
                 AddUniqueFamily(transitionState.Reduction.ParseNode, completedParseNode);
             }
@@ -143,11 +143,9 @@ namespace Pliant.Forest
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
-
-            var symbolNode = obj as ISymbolForestNode;
-            if (symbolNode == null)
+            if (!(obj is ISymbolForestNode symbolNode))
                 return false;
 
             return Location == symbolNode.Location
@@ -170,6 +168,7 @@ namespace Pliant.Forest
             return _hashCode;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "ToString is not called in performance critical code")]
         public override string ToString()
         {
             return $"({Symbol}, {Origin}, {Location})";

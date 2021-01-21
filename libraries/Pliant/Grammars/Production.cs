@@ -37,10 +37,9 @@ namespace Pliant.Grammars
                 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
-            var production = obj as Production;
-            if (production == null)
+            if (!(obj is Production production))
                 return false;
             if (!LeftHandSide.Equals(production.LeftHandSide))
                 return false;

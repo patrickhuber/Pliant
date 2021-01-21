@@ -1,20 +1,24 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Captures;
+using Pliant.Grammars;
 using Pliant.Utilities;
 using System.Collections.Generic;
 
 namespace Pliant.Tokens
 {
     public abstract class LexemeBase<TLexerRule> : ILexeme
+        where TLexerRule : ILexerRule        
     {
         private static readonly ITrivia[] EmptyTriviaArray = { };
         private List<ITrivia> _leadingTrivia;
         private List<ITrivia> _trailingTrivia;
 
+        protected TLexerRule ConcreteLexerRule { get; private set; }
+
         public IReadOnlyList<ITrivia> LeadingTrivia
         {
             get
             {
-                if (_leadingTrivia == null)
+                if (_leadingTrivia is null)
                     return EmptyTriviaArray;
                 return _leadingTrivia;
             }
@@ -24,39 +28,36 @@ namespace Pliant.Tokens
         {
             get
             {
-                if (_trailingTrivia == null)
+                if (_trailingTrivia is null)
                     return EmptyTriviaArray;
                 return _trailingTrivia;
             }
         }
 
-        public ILexerRule LexerRule { get; private set; }
-
-        protected TLexerRule ConcreteLexerRule { get; private set; }
-
-        public abstract string Value { get; }
-
-        public int Position { get; private set; }
+        public ILexerRule LexerRule => (ILexerRule)ConcreteLexerRule;
+                
+        public ICapture<char> Capture { get; private set; }
+        
+        public int Position => Capture.Offset;
 
         public TokenType TokenType
         {
             get { return LexerRule.TokenType; }
         }
 
-        protected LexemeBase(TLexerRule lexerRule, int position)
+        protected LexemeBase(TLexerRule lexerRule, ICapture<char> parentSegment, int offset)
         {
-            LexerRule = lexerRule as ILexerRule;
             ConcreteLexerRule = lexerRule;
-            Position = position;
+            Capture = parentSegment.Slice(offset, 0);
         }
         
         public abstract bool IsAccepted();
 
-        public abstract bool Scan(char c);
+        public abstract bool Scan();
 
         public void AddTrailingTrivia(ITrivia trivia)
         {
-            if (_trailingTrivia == null)
+            if (_trailingTrivia is null)
             {
                 var pool = SharedPools.Default<List<ITrivia>>();
                 _trailingTrivia = pool.AllocateAndClear();
@@ -67,7 +68,7 @@ namespace Pliant.Tokens
 
         public void AddLeadingTrivia(ITrivia trivia)
         {
-            if (_leadingTrivia == null)
+            if (_leadingTrivia is null)
             {
                 var pool = SharedPools.Default<List<ITrivia>>();
                 _leadingTrivia = pool.AllocateAndClear();
@@ -77,22 +78,22 @@ namespace Pliant.Tokens
         
         public abstract void Reset();
 
-        public virtual void Reset(TLexerRule lexerRule, int position)
+        public virtual void Reset(TLexerRule lexerRule, int offset)
         {
-            ResetInternal(lexerRule, position);
+            ResetInternal(lexerRule, offset);
             Reset();
         }
 
-        protected void ResetInternal(TLexerRule lexerRule, int position)
+        protected void ResetInternal(TLexerRule lexerRule, int offset)
         {
             var pool = SharedPools.Default<List<ITrivia>>();
-            if(_leadingTrivia != null)
+            if (_leadingTrivia != null)
                 pool.ClearAndFree(_leadingTrivia);
-            if(_trailingTrivia != null)
+            if (_trailingTrivia != null)
                 pool.ClearAndFree(_trailingTrivia);
-            LexerRule = lexerRule as ILexerRule;
             ConcreteLexerRule = lexerRule;
-            Position = position;
+            Capture.Offset = offset;
+            Capture.Count = 0;
         }
     }
 }

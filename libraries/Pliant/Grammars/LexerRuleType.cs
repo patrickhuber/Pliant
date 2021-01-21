@@ -20,15 +20,13 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            if (((object)obj) == null)
+            if (obj is null)
                 return false;
 
-            var other = obj as LexerRuleType;
-
-            if (((object)other) == null)
+            if (!(obj is LexerRuleType other))
                 return false;
 
-            return other.Id == Id;
+            return other.Id.Equals(Id, StringComparison.Ordinal);
         }
 
         public override int GetHashCode()

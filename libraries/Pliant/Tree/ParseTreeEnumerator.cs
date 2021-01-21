@@ -69,7 +69,7 @@ namespace Pliant.Tree
             else if (_forestRoot.NodeType == ForestNodeType.Symbol)
                 _visitor.Visit(_forestRoot as ISymbolForestNode);
             
-            if (_visitor.Root == null)
+            if (_visitor.Root is null)
             {    _status = ParseTreeEnumeratorState.Done;
                 return false;
             }
@@ -144,7 +144,7 @@ namespace Pliant.Tree
                             
                 if (isRoot)
                 {
-                    if (_count > 0 && _lock == null)
+                    if (_count > 0 && _lock is null)
                         Root = null;
                     else
                         Root = top;
@@ -155,18 +155,17 @@ namespace Pliant.Tree
 
             private int GetOrSetChildIndex(IInternalForestNode symbolNode)
             {
-                var childIndex = 0;
-                if (!_paths.TryGetValue(symbolNode, out childIndex))
+                if (!_paths.TryGetValue(symbolNode, out int childIndex))
                 {
                     _paths.Add(symbolNode, 0);
                     return childIndex;
                 }
 
-                var isLocked = !object.ReferenceEquals(null, _lock);
+                var isLocked = _lock is object;
                 if (!isLocked)
                     _lock = symbolNode;
 
-                var isCurrentNodeLocked = object.ReferenceEquals(_lock, symbolNode);
+                var isCurrentNodeLocked = ReferenceEquals(_lock, symbolNode);
                 if(!isCurrentNodeLocked)
                     return childIndex;
 

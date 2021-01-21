@@ -1,7 +1,6 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Pliant.Languages.Pdl;
 using Pliant.Runtime;
-using Pliant.Ebnf;
 using System.IO;
 
 namespace Pliant.ProtocolBuffers.Tests.Unit
@@ -23,8 +22,8 @@ namespace Pliant.ProtocolBuffers.Tests.Unit
             var testDirectory = Directory.GetCurrentDirectory();
             var ebnfPath = Path.Combine(testDirectory, "Runtime", GrammarFile);
             var ebnf = File.ReadAllText(ebnfPath);
-            var ebnfGenerator = new EbnfGrammarGenerator();
-            var ebnfParser = new EbnfParser();
+            var ebnfGenerator = new PdlGrammarGenerator();
+            var ebnfParser = new PdlParser();
             var ebnfDefintion = ebnfParser.Parse(ebnf);
 
             var parseEngine = new ParseEngine(ebnfGenerator.Generate(ebnfDefintion));

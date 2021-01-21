@@ -48,7 +48,7 @@ namespace Pliant.Builders
 
         public IEnumerable<IProduction> ToProductions()
         {
-            if (Alterations == null || Alterations.Count == 0)
+            if (Alterations is null || Alterations.Count == 0)
                 yield return new Production(LeftHandSide.NonTerminal);
 
             foreach (var alteration in Alterations)

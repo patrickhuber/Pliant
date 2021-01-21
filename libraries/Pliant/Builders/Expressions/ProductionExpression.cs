@@ -33,7 +33,7 @@ namespace Pliant.Builders.Expressions
             set
             {
                 ProductionModel.Alterations.Clear();
-                if (((object)value) == null)
+                if (value is null)
                     return;
                 foreach (var alteration in value.Alterations)
                     ProductionModel.Alterations.Add(

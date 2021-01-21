@@ -1,4 +1,5 @@
-﻿using Pliant.Diagnostics;
+﻿using Pliant.Captures;
+using Pliant.Diagnostics;
 using Pliant.Grammars;
 using Pliant.Utilities;
 using System.Collections.Generic;
@@ -9,8 +10,6 @@ namespace Pliant.Tokens
     {
         private static readonly ITrivia[] EmptyTriviaArray = { };
         
-        public string Value { get; private set; }
-
         public int Position { get; private set; }
 
         public TokenType TokenType { get; private set; }
@@ -19,9 +18,11 @@ namespace Pliant.Tokens
 
         public IReadOnlyList<ITrivia> TrailingTrivia { get; private set; }
 
+        public ICapture<char> Capture { get; private set; }
+
         public Token(string value, int position, TokenType tokenType)
         {
-            Value = value;
+            Capture = value.AsCapture();
             Position = position;
             TokenType = tokenType;
             _hashCode = ComputeHashCode();
@@ -44,7 +45,7 @@ namespace Pliant.Tokens
             return HashCode.Compute(
                 TokenType.GetHashCode(), 
                 Position.GetHashCode(), 
-                Value.GetHashCode());
+                Capture.GetHashCode());
         }
 
         private readonly int _hashCode;
@@ -56,12 +57,11 @@ namespace Pliant.Tokens
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
-            var token = obj as Token;
-            if (token == null)
+            if (!(obj is Token token))
                 return false;
-            return Value == token.Value
+            return Capture.Equals(token.Capture)
                 && Position == token.Position
                 && TokenType.Equals(token.TokenType);
         }

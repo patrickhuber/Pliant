@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".documentation", ".documentation", "{026B4A97-0C94-4C41-A869-433989C12BE7}"
 	ProjectSection(SolutionItems) = preProject
@@ -17,10 +17,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{6AF43B18-EF28-4486-8C5C-E4AFD659F8D8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hosts", "hosts", "{E3C2A6DF-5436-4BC8-AAB1-C3B524B0FBAB}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.ProtocolBuffers", "libraries\Pliant.ProtocolBuffers\Pliant.ProtocolBuffers.csproj", "{6FCB3236-9D19-4B61-9A54-246EE6AD686A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.CodeGen", "libraries\Pliant.CodeGen\Pliant.CodeGen.csproj", "{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.PerfViewApp", "hosts\Pliant.PerfViewApp\Pliant.PerfViewApp.csproj", "{4FC6B08A-1054-4E01-98F1-6FEAD12E54D3}"
 EndProject
@@ -38,20 +34,26 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.Tests.Unit", "tests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.Tests.Common", "tests\Pliant.Tests.Common\Pliant.Tests.Common.csproj", "{A7CDB69D-6BE9-42DB-87C7-889DAD71BDDE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.ProtocolBuffers", "libraries\Pliant.ProtocolBuffers\Pliant.ProtocolBuffers.csproj", "{F7CE9C6C-B253-4ABA-8242-AAA1FB234198}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{034801F2-BCA7-4C40-B371-4C32E78BE815}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{C35E655F-35E2-4014-9909-4E471602AF87}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\pipeline.yml = .github\workflows\pipeline.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".packaging", ".packaging", "{64538997-3869-423E-8CD1-933D1195E7D8}"
+	ProjectSection(SolutionItems) = preProject
+		.packaging\version.txt = .packaging\version.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6FCB3236-9D19-4B61-9A54-246EE6AD686A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6FCB3236-9D19-4B61-9A54-246EE6AD686A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6FCB3236-9D19-4B61-9A54-246EE6AD686A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6FCB3236-9D19-4B61-9A54-246EE6AD686A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4FC6B08A-1054-4E01-98F1-6FEAD12E54D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4FC6B08A-1054-4E01-98F1-6FEAD12E54D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FC6B08A-1054-4E01-98F1-6FEAD12E54D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -84,13 +86,15 @@ Global
 		{A7CDB69D-6BE9-42DB-87C7-889DAD71BDDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7CDB69D-6BE9-42DB-87C7-889DAD71BDDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7CDB69D-6BE9-42DB-87C7-889DAD71BDDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7CE9C6C-B253-4ABA-8242-AAA1FB234198}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7CE9C6C-B253-4ABA-8242-AAA1FB234198}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7CE9C6C-B253-4ABA-8242-AAA1FB234198}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7CE9C6C-B253-4ABA-8242-AAA1FB234198}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{6FCB3236-9D19-4B61-9A54-246EE6AD686A} = {6AF43B18-EF28-4486-8C5C-E4AFD659F8D8}
-		{CE77B81E-7278-4E99-80A0-D82FD6C2AF3C} = {6AF43B18-EF28-4486-8C5C-E4AFD659F8D8}
 		{4FC6B08A-1054-4E01-98F1-6FEAD12E54D3} = {E3C2A6DF-5436-4BC8-AAB1-C3B524B0FBAB}
 		{F1E451B1-52B6-4C3E-B1E1-FF0DDA3F3A3B} = {E3C2A6DF-5436-4BC8-AAB1-C3B524B0FBAB}
 		{CF2238F2-D59F-46CA-9354-209C7D91F2E8} = {6A7B3028-8B58-4134-9809-9462EC68FBC6}
@@ -99,6 +103,8 @@ Global
 		{BCABDEC3-1B03-4EAE-B7B6-BF4839678EC9} = {6AF43B18-EF28-4486-8C5C-E4AFD659F8D8}
 		{F8C61B4E-A6DB-4C11-8397-82EE14E3047F} = {6A7B3028-8B58-4134-9809-9462EC68FBC6}
 		{A7CDB69D-6BE9-42DB-87C7-889DAD71BDDE} = {6A7B3028-8B58-4134-9809-9462EC68FBC6}
+		{F7CE9C6C-B253-4ABA-8242-AAA1FB234198} = {6AF43B18-EF28-4486-8C5C-E4AFD659F8D8}
+		{C35E655F-35E2-4014-9909-4E471602AF87} = {034801F2-BCA7-4C40-B371-4C32E78BE815}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6C38722D-9FD5-40A1-B019-FB91EB3D719B}

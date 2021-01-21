@@ -32,7 +32,7 @@ namespace Pliant.Collections
 
         private AvlNode Insert(AvlNode node, T key)
         {
-            var isLeaf = node == null;
+            var isLeaf = node is null;
             if (isLeaf)
                 return new AvlNode(key);
 
@@ -114,14 +114,14 @@ namespace Pliant.Collections
 
         private static int Height(AvlNode node)
         {
-            if (node == null)
+            if (node is null)
                 return 0;
             return node.Height;
         }
 
         private static int GetBalanceFactor(AvlNode node)
         {
-            if (node == null)
+            if (node is null)
                 return 0;
             return Height(node.Left) - Height(node.Right);
         }
@@ -133,7 +133,7 @@ namespace Pliant.Collections
 
         private IEnumerator<T> GetEnumerator(AvlNode node)
         {
-            if (node == null)
+            if (node is null)
                 yield break;
 
             var leftTree = GetEnumerator(node.Left);

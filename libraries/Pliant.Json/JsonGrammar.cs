@@ -2,7 +2,7 @@
 using Pliant.Builders.Expressions;
 using Pliant.Grammars;
 using Pliant.LexerRules;
-using Pliant.RegularExpressions;
+using Pliant.Languages.Regex;
 
 namespace Pliant.Json
 {

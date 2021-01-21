@@ -1,4 +1,5 @@
 ﻿using Pliant.Collections;
+using Pliant.Grammars;
 using System.Collections.Generic;
 
 namespace Pliant.Automata
@@ -25,6 +26,11 @@ namespace Pliant.Automata
         public void AddTransition(IDfaTransition edge)
         {
             _transitions.Add(edge);
+        }
+
+        public void AddTransition(ITerminal terminal, IDfaState node)
+        {
+            AddTransition(new DfaTransition(terminal, node));
         }
     }
 }

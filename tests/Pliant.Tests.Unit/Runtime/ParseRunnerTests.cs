@@ -2,9 +2,9 @@
 using Pliant.Automata;
 using Pliant.Builders.Expressions;
 using Pliant.Charts;
-using Pliant.Ebnf;
 using Pliant.Forest;
 using Pliant.Grammars;
+using Pliant.Languages.Pdl;
 using Pliant.LexerRules;
 using Pliant.Runtime;
 using Pliant.Tests.Common;
@@ -293,8 +293,8 @@ namespace Pliant.Tests.Unit.Runtime
         [TestMethod]
         public void ParseRunnerShouldRunInCompleteIgnoreRulesBeforeMovingToGrammarLexerRules()
         {
-            var ebnfGrammar = new EbnfGrammar();
-            var parseEngine = new ParseEngine(ebnfGrammar);
+            var grammar = new PdlGrammar();
+            var parseEngine = new ParseEngine(grammar);
 
             var input = @"
             /* letters and digits */
@@ -305,8 +305,8 @@ namespace Pliant.Tests.Unit.Runtime
         [TestMethod]
         public void ParseRunnerShouldHandleCleanupOfUnUsedIgnoreLexemes()
         {
-            var ebnfGrammar = new EbnfGrammar();
-            var parseEngine = new ParseEngine(ebnfGrammar);
+            var grammar = new PdlGrammar();
+            var parseEngine = new ParseEngine(grammar);
 
             var stringBuilder = new StringBuilder()
             .AppendLine("ws = [ ows ] ; /* white space */")
@@ -327,8 +327,8 @@ namespace Pliant.Tests.Unit.Runtime
             var parseNodeAndNode = parseNode.Children[0];
             var tokenParseNode = parseNodeAndNode.Children[0] as ITokenForestNode;
             var token = tokenParseNode.Token;
-            Assert.AreEqual(EbnfGrammar.TokenTypes.Identifier, token.TokenType);
-            Assert.AreEqual("ows", token.Value);
+            Assert.AreEqual(PdlGrammar.TokenTypes.Identifier, token.TokenType);
+            Assert.AreEqual("ows", token.Capture.ToString());
         }
 
 

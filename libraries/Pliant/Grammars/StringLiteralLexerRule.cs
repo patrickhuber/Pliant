@@ -28,10 +28,9 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            if (((object)obj) == null)
+            if (obj is null)
                 return false;
-            var terminalLexerRule = obj as StringLiteralLexerRule;
-            if (((object)terminalLexerRule) == null)
+            if (!(obj is StringLiteralLexerRule terminalLexerRule))
                 return false;
             return LexerRuleType.Equals(terminalLexerRule.LexerRuleType)
                 && Literal.Equals(terminalLexerRule.Literal);

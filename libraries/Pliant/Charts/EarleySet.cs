@@ -18,7 +18,7 @@ namespace Pliant.Charts
         {
             get
             {
-                if (_predictions == null)
+                if (_predictions is null)
                     return EmptyNormalStates;
                 return _predictions;
             } 
@@ -28,7 +28,7 @@ namespace Pliant.Charts
         {
             get
             {
-                if (_scans == null)
+                if (_scans is null)
                     return EmptyNormalStates;
                 return _scans;
             }
@@ -38,7 +38,7 @@ namespace Pliant.Charts
         {
             get
             {
-                if (_completions == null)
+                if (_completions is null)
                     return EmptyNormalStates;
                 return _completions;
             }
@@ -48,7 +48,7 @@ namespace Pliant.Charts
         {
             get
             {
-                if (_transitions == null)
+                if (_transitions is null)
                     return EmptyTransitionStates;
                 return _transitions;
             }
@@ -79,21 +79,21 @@ namespace Pliant.Charts
 
         private bool CompletionsContainsHash(int hashCode)
         {
-            if (_completions == null)
+            if (_completions is null)
                 return false;
             return _completions.ContainsHash(hashCode);
         }
 
         private bool PredictionsContainsHash(int hashCode)
         {
-            if (_predictions == null)
+            if (_predictions is null)
                 return false;
             return _predictions.ContainsHash(hashCode);
         }
 
         private bool ScansContainsHash(int hashCode)
         {
-            if (_scans == null)
+            if (_scans is null)
                 return false;
             return _scans.ContainsHash(hashCode);
         }
@@ -121,28 +121,28 @@ namespace Pliant.Charts
 
         private bool AddUniqueCompletion(INormalState normalState)
         {
-            if (_completions == null)
+            if (_completions is null)
                 _completions = new UniqueList<INormalState>();
             return _completions.AddUnique(normalState);
         }
 
         private bool AddUniqueScan(INormalState normalState)
         {
-            if (_scans == null)
+            if (_scans is null)
                 _scans = new UniqueList<INormalState>();
             return _scans.AddUnique(normalState);
         }
 
         private bool AddUniquePrediction(INormalState normalState)
         {
-            if (_predictions == null)
+            if (_predictions is null)
                 _predictions = new UniqueList<INormalState>();
             return _predictions.AddUnique(normalState);
         }
 
         private bool EnqueueTransition(ITransitionState transitionState)
         {
-            if (_transitions == null)
+            if (_transitions is null)
                 _transitions = new UniqueList<ITransitionState>();
             return _transitions.AddUnique(transitionState);
         }

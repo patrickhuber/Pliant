@@ -2,7 +2,7 @@
 using Pliant.Automata;
 using Pliant.Grammars;
 using Pliant.Json;
-using Pliant.RegularExpressions;
+using Pliant.Languages.Regex;
 using Pliant.Runtime;
 using Pliant.Tests.Common;
 using System.IO;
@@ -65,11 +65,9 @@ namespace Pliant.Tests.Integration.Runtime
         public void TestCanParseLargeJsonFile()
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), "10000.json");
-            using (var stream = File.OpenRead(path))
-            using (var reader = new StreamReader(stream))
-            {
-                _parseTester.RunParse(reader);
-            }
+            using var stream = File.OpenRead(path);
+            using var reader = new StreamReader(stream);
+            _parseTester.RunParse(reader);
         }
 
         [TestMethod]
@@ -77,11 +75,9 @@ namespace Pliant.Tests.Integration.Runtime
         public void TestCanParseLargeJsonFileWithCompression()
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), "10000.json");
-            using (var stream = File.OpenRead(path))
-            using (var reader = new StreamReader(stream))
-            {
-                _compressedParseTester.RunParse(reader);
-            }
+            using var stream = File.OpenRead(path);
+            using var reader = new StreamReader(stream);
+            _compressedParseTester.RunParse(reader);
         }
 
         [TestMethod]
@@ -89,11 +85,9 @@ namespace Pliant.Tests.Integration.Runtime
         public void TestCanParseLargeJsonFileWithMarpa()
         {
             var path = Path.Combine(Directory.GetCurrentDirectory(), "10000.json");
-            using (var stream = File.OpenRead(path))
-            using (var reader = new StreamReader(stream))
-            {
-                _marpaParseTester.RunParse(reader);
-            }
+            using var stream = File.OpenRead(path);
+            using var reader = new StreamReader(stream);
+            _marpaParseTester.RunParse(reader);
         }
 
         [TestMethod]
@@ -152,25 +146,6 @@ namespace Pliant.Tests.Integration.Runtime
                 ""id"": 12345
             }";
             _compressedParseTester.RunParse(json);
-        }
-
-        private static ILexerRule Whitespace()
-        {
-            var start = new DfaState();
-            var end = new DfaState(isFinal: true);
-            var transition = new DfaTransition(
-                new WhitespaceTerminal(),
-                end);
-            start.AddTransition(transition);
-            end.AddTransition(transition);
-            return new DfaLexerRule(start, "\\w+");
-        }
-
-        private static BaseLexerRule String()
-        {
-            // ["][^"]+["]
-            const string pattern = "[\"][^\"]+[\"]";
-            return CreateRegexDfa(pattern);
         }
 
         private static BaseLexerRule CreateRegexDfa(string pattern)

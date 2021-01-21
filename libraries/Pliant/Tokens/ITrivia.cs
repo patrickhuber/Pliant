@@ -1,16 +1,12 @@
-﻿using Pliant.Grammars;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Pliant.Captures;
+using Pliant.Grammars;
 
 namespace Pliant.Tokens
 {
     public interface ITrivia
     {
         int Position { get; }
-        string Value { get; }
+        ICapture<char> Capture { get; }
         TokenType TokenType { get; }
     }
 }

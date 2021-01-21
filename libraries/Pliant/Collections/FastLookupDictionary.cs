@@ -45,16 +45,15 @@ namespace Pliant.Collections
         }
 
         private TValue GetValueFromDictionary(TKey key)
-        {
-            var value = default(TValue);
-            if (_innerDictionary.TryGetValue(key, out value))
+        {            
+            if (_innerDictionary.TryGetValue(key, out TValue value))
                 return value;
-            return default(TValue);
+            return default;
         }
 
         private bool TryGetValueFromList(TKey key, out TValue value)
         {
-            value = default(TValue);
+            value = default;
             var hashCode = key.GetHashCode();
             for (int i = 0; i < _innerList.Count; i++)
             {
@@ -76,7 +75,7 @@ namespace Pliant.Collections
                 if (keyHashCode == keyValuePair.Key.GetHashCode())
                     return keyValuePair.Value;
             }
-            return default(TValue);
+            return default;
         }
 
         private void Set(TKey key, TValue value)
@@ -204,6 +203,7 @@ namespace Pliant.Collections
             throw new NotImplementedException();
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "GetEnumerator is not called in performance critical code")]
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             if (DictionaryIsMoreEfficient())
@@ -228,6 +228,7 @@ namespace Pliant.Collections
             return TryGetValueFromList(key, out value);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "GetEnumerator is not called in performance critical code")]
         IEnumerator IEnumerable.GetEnumerator()
         {
             if (DictionaryIsMoreEfficient())

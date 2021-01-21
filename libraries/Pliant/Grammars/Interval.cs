@@ -184,7 +184,7 @@ namespace Pliant.Grammars
             for (var i = 0; i < sortedIntervals.Count; i++)
             {
                 var interval = sortedIntervals[i];
-                if (accumulator == null)
+                if (accumulator is null)
                 {
                     accumulator = interval;
                     continue;

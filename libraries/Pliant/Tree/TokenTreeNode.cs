@@ -29,7 +29,7 @@ namespace Pliant.Tree
 
         public override string ToString()
         {
-            return $"{Token.TokenType.Id}({Origin}, {Location}) = {Token.Value}";
+            return $"{Token.TokenType.Id}({Origin}, {Location}) = {Token.Capture}";
         }
     }
 }

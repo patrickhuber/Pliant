@@ -7,27 +7,30 @@ namespace Pliant.Grammars
 {
     public class DottedRuleRegistry : IDottedRuleRegistry
     {
-        private Dictionary<IProduction, Dictionary<int, IDottedRule>> _dottedRuleIndex;
+        private Dictionary<int, Dictionary<int, IDottedRule>> _dottedRuleIndex;
 
         public DottedRuleRegistry()
         {
-            _dottedRuleIndex = new Dictionary<IProduction, Dictionary<int, IDottedRule>>(
-                new HashCodeEqualityComparer<IProduction>());
+            _dottedRuleIndex = new Dictionary<int, Dictionary<int, IDottedRule>>();
         }
 
         public void Register(IDottedRule dottedRule)
         {
-            var positionIndex = _dottedRuleIndex.AddOrGetExisting(dottedRule.Production);
+            var hashCode = dottedRule.Production.GetHashCode();
+            if (!_dottedRuleIndex.TryGetValue(hashCode, out Dictionary<int, IDottedRule> positionIndex))
+            {
+                positionIndex = new Dictionary<int, IDottedRule>();
+                _dottedRuleIndex[hashCode] = positionIndex;
+            }            
             positionIndex[dottedRule.Position] = dottedRule;
         }
 
         public IDottedRule Get(IProduction production, int position)
         {
-            Dictionary<int, IDottedRule> positionIndex;
-            if (!_dottedRuleIndex.TryGetValue(production, out positionIndex))
+            var hashCode = production.GetHashCode();            
+            if (!_dottedRuleIndex.TryGetValue(hashCode, out Dictionary<int, IDottedRule> positionIndex))
                 return null;
-            IDottedRule dottedRule;
-            if (!positionIndex.TryGetValue(position, out dottedRule))
+            if (!positionIndex.TryGetValue(position, out IDottedRule dottedRule))
                 return null;
             return dottedRule;
         }

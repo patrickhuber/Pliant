@@ -1,9 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders.Expressions;
-using Pliant.Charts;
 using Pliant.Grammars;
 using Pliant.LexerRules;
-using Pliant.RegularExpressions;
+using Pliant.Languages.Regex;
 using Pliant.Runtime;
 using Pliant.Tests.Common.Grammars;
 using Pliant.Tokens;
@@ -58,28 +57,15 @@ namespace Pliant.Tests.Unit.Runtime
 
             for (int i = 0; i < pattern.Length; i++)
             {
-                TokenType tokenType = null;
-                switch (pattern[i])
+                TokenType tokenType = (pattern[i]) switch
                 {
-                    case '[':
-                        tokenType = openBracket;
-                        break;
-
-                    case ']':
-                        tokenType = closeBracket;
-                        break;
-
-                    case '-':
-                        tokenType = dash;
-                        break;
-
-                    default:
-                        if (i < 10)
-                            tokenType = notCloseBracket;
-                        else
-                            tokenType = notMeta;
-                        break;
-                }
+                    '[' => openBracket,
+                    ']' => closeBracket,
+                    '-' => dash,
+                    _ => i < 10
+                          ? notCloseBracket
+                          : notMeta,
+                };
                 var token = new Token(pattern[i].ToString(), i, tokenType);
                 var result = parseEngine.Pulse(token);
                 Assert.IsTrue(result, $"Error at position {i}");

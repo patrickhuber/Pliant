@@ -28,10 +28,9 @@ namespace Pliant.Charts
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
-            var transitionState = obj as TransitionState;
-            if (transitionState == null)
+            if (!(obj is TransitionState transitionState))
                 return false;
 
             return GetHashCode() == transitionState.GetHashCode()
@@ -44,9 +43,8 @@ namespace Pliant.Charts
         private int ComputeHashCode()
         {
             return HashCode.Compute(
-                DottedRule.Position.GetHashCode(),
+                DottedRule.GetHashCode(),
                 Origin.GetHashCode(),
-                DottedRule.Production.GetHashCode(),
                 Recognized.GetHashCode(),
                 Reduction.GetHashCode(),
                 Index.GetHashCode());
@@ -66,7 +64,7 @@ namespace Pliant.Charts
 
         public IState GetTargetState()
         {
-            var parameterTransitionStateHasNoParseNode = ParseNode == null;
+            var parameterTransitionStateHasNoParseNode = ParseNode is null;
             if (parameterTransitionStateHasNoParseNode)
                 return Reduction;
             return this;

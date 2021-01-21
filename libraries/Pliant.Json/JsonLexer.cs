@@ -30,6 +30,9 @@ namespace Pliant.Json
                     yield return token;
         }
 
+        private static Func<char, bool> _isDigit = new Func<char, bool>(char.IsDigit);
+        private static Func<char, bool> _isWhitespace = new Func<char, bool>(char.IsWhiteSpace);
+
         public IEnumerable<IToken> Lex(TextReader input)
         {
             var position = 0;
@@ -48,12 +51,12 @@ namespace Pliant.Json
                     do
                     {
                         builder.Append(c);
-                    }while (Accept(input, char.IsDigit, ref c));
+                    }while (Accept(input, _isDigit, ref c));
 
                     if (Accept(input, '.'))
                         builder.Append('.');
 
-                    while (Accept(input, char.IsDigit, ref c))
+                    while (Accept(input, _isDigit, ref c))
                     {
                         builder.Append(c);
                     }
@@ -99,7 +102,7 @@ namespace Pliant.Json
                     case '\r':
                     case '\t':
                         builder.Append(c);
-                        while (Accept(input, char.IsWhiteSpace, ref c))
+                        while (Accept(input, _isWhitespace, ref c))
                             builder.Append(c);
                         yield return new Token(builder.ToString(), position, Whitespace);
                         position += builder.Length;
@@ -158,7 +161,7 @@ namespace Pliant.Json
         
         private static bool Accept(TextReader textReader, Func<char, bool> predicate, ref char c)
         {
-            if (predicate == null)
+            if (predicate is null)
                 return false;
             var i = textReader.Peek();
             if (i == -1)

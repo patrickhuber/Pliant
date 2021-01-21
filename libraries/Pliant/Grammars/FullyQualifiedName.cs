@@ -42,10 +42,9 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
-            var otherFullyQualifiedName = obj as FullyQualifiedName;
-            if (otherFullyQualifiedName == null)
+            if (!(obj is FullyQualifiedName otherFullyQualifiedName))
                 return false;
             return otherFullyQualifiedName.FullName == FullName;
         }

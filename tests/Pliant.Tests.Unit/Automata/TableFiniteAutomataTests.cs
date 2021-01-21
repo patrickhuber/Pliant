@@ -33,6 +33,7 @@ namespace Pliant.Tests.Unit.Automata
             AssertTableDfaCanRecognizeInput(tableDfa, input);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "unit test is not critical code")]
         private static void AssertTableDfaCanRecognizeInput(TableDfa tableDfa, string input)
         {
             var state = tableDfa.Start;
@@ -41,7 +42,7 @@ namespace Pliant.Tests.Unit.Automata
             {
                 var character = input[i];
                 var target = tableDfa.Transition(state, character);
-                if (target == null)
+                if (target is null)
                     Assert.Fail($"Unable to transition from state {state} with character {character}.");
                 state = target.Value;
             }

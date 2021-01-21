@@ -22,11 +22,10 @@ namespace Pliant.Forest
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
-
-            var nodeBase = obj as ForestNodeBase;
-            if (nodeBase == null)
+                        
+            if (!(obj is ForestNodeBase nodeBase))
                 return false;
 
             return Location == nodeBase.Location

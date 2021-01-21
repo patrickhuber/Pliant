@@ -25,8 +25,7 @@ namespace Pliant.Forest
         {
             var hash = ComputeHashCode(symbol, origin, location);
 
-            ISymbolForestNode symbolNode = null;
-            if (_symbolNodes.TryGetValue(hash, out symbolNode))
+            if (_symbolNodes.TryGetValue(hash, out ISymbolForestNode symbolNode))
                 return symbolNode;
 
             symbolNode = new SymbolForestNode(symbol, origin, location);
@@ -46,8 +45,7 @@ namespace Pliant.Forest
         {
             int hash = ComputeHashCode(dottedRule, origin, location);
 
-            IIntermediateForestNode intermediateNode = null;
-            if (_intermediateNodes.TryGetValue(hash, out intermediateNode))
+            if (_intermediateNodes.TryGetValue(hash, out IIntermediateForestNode intermediateNode))
                 return intermediateNode;
 
             intermediateNode = new IntermediateForestNode(dottedRule, origin, location);
@@ -56,7 +54,7 @@ namespace Pliant.Forest
         }
 
         private static int ComputeHashCode(IDottedRule dottedRule, int origin, int location)
-        {
+        {            
             return HashCode.Compute(
                 dottedRule.GetHashCode(),
                 origin.GetHashCode(),
@@ -65,10 +63,9 @@ namespace Pliant.Forest
 
         public ITokenForestNode AddOrGetExistingTokenNode(IToken token)
         {
-            ITokenForestNode tokenNode = null;
-            if (_tokenNodes.TryGetValue(token, out tokenNode))
+            if (_tokenNodes.TryGetValue(token, out ITokenForestNode tokenNode))
                 return tokenNode;
-            tokenNode = new TokenForestNode(token, token.Position, token.Value.Length);
+            tokenNode = new TokenForestNode(token, token.Position, token.Capture.Count);
             _tokenNodes.Add(token, tokenNode);
             return tokenNode;
         }

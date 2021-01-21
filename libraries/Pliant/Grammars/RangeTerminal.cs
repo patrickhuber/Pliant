@@ -37,16 +37,19 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            var rangeTerminal = obj as RangeTerminal;
-            if (rangeTerminal == null)
+            if (obj is null)
                 return false;
+
+            if (!(obj is RangeTerminal rangeTerminal))
+                return false;
+
             return rangeTerminal.End == End
                 && rangeTerminal.Start == Start;
         }
 
         public override IReadOnlyList<Interval> GetIntervals()
         {
-            if(_intervals == null)
+            if(_intervals is null)
                 _intervals = new[] { new Interval(Start, End) };
             return _intervals;
         }

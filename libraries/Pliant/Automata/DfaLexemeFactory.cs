@@ -1,4 +1,5 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Captures;
+using Pliant.Grammars;
 using Pliant.Tokens;
 using System;
 using System.Collections.Generic;
@@ -9,14 +10,21 @@ namespace Pliant.Automata
     {
         public LexerRuleType LexerRuleType { get { return DfaLexerRule.DfaLexerRuleType; } }
 
-        private Queue<DfaLexeme> _queue;
+        private readonly Queue<DfaLexeme> _queue;
 
         public DfaLexemeFactory()
         {
             _queue = new Queue<DfaLexeme>();
         }
 
-        public ILexeme Create(ILexerRule lexerRule, int position)
+        public void Free(ILexeme lexeme)
+        {
+            if (!(lexeme is DfaLexeme dfaLexeme))
+                throw new Exception($"Unable to free lexeme of type {lexeme.GetType()} with DfaLexemeFactory");
+            _queue.Enqueue(dfaLexeme);
+        }
+
+        public ILexeme Create(ILexerRule lexerRule, ICapture<char> segment, int offset)
         {
             if (lexerRule.LexerRuleType != LexerRuleType)
                 throw new Exception(
@@ -25,19 +33,11 @@ namespace Pliant.Automata
             if (_queue.Count > 0)
             {
                 var reusedLexeme = _queue.Dequeue();
-                reusedLexeme.Reset(dfaLexerRule, position);
+                reusedLexeme.Reset(dfaLexerRule, offset);
                 return reusedLexeme;
             }
-            var dfaLexeme = new DfaLexeme(dfaLexerRule, position);
+            var dfaLexeme = new DfaLexeme(dfaLexerRule, segment, offset);
             return dfaLexeme;
-        }
-
-        public void Free(ILexeme lexeme)
-        {
-            var dfaLexeme = lexeme as DfaLexeme;
-            if (dfaLexeme == null)
-                throw new Exception($"Unable to free lexeme of type {lexeme.GetType()} with DfaLexemeFactory");
-            _queue.Enqueue(dfaLexeme);
         }
     }
 }

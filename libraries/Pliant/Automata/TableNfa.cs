@@ -7,9 +7,9 @@ namespace Pliant.Automata
 {
     public class TableNfa
     {
-        private Dictionary<int, Dictionary<char, int>> _table;
-        private HashSet<int> _finalStates;
-        private Dictionary<int, UniqueList<int>> _nullTransitions;
+        private readonly Dictionary<int, Dictionary<char, int>> _table;
+        private readonly HashSet<int> _finalStates;
+        private readonly Dictionary<int, UniqueList<int>> _nullTransitions;
 
         public TableNfa(int start)
         {
@@ -72,14 +72,12 @@ namespace Pliant.Automata
                 for (int i = 0; i < nfaClosure.States.Length; i++)
                 {
                     var state = nfaClosure.States[i];
-                    Dictionary<char, int> characterTransitions = null;
-                    if (!_table.TryGetValue(state, out characterTransitions))
+                    if (!_table.TryGetValue(state, out Dictionary<char, int> characterTransitions))
                         continue;
 
                     foreach (var characterTransition in characterTransitions)
                     {
-                        SortedSet<int> targets = null;
-                        if (!transitions.TryGetValue(characterTransition.Key, out targets))
+                        if (!transitions.TryGetValue(characterTransition.Key, out SortedSet<int> targets))
                         {
                             targets = SharedPools.Default<SortedSet<int>>().AllocateAndClear();
                             transitions.Add(characterTransition.Key, targets);
@@ -112,7 +110,7 @@ namespace Pliant.Automata
 
         private class Closure
         {
-            private SortedSet<int> _set;
+            private readonly SortedSet<int> _set;
 
             private readonly int _hashCode;
 
@@ -154,8 +152,7 @@ namespace Pliant.Automata
                     if (finalStates.Contains(state))
                         IsFinal = true;
 
-                    UniqueList<int> targetStates = null;
-                    if (!nullTransitions.TryGetValue(state, out targetStates))
+                    if (!nullTransitions.TryGetValue(state, out UniqueList<int> targetStates))
                         continue;
 
                     for (int i = 0; i < targetStates.Count; i++)
@@ -181,11 +178,10 @@ namespace Pliant.Automata
 
             public override bool Equals(object obj)
             {
-                if (((object)obj) == null)
+                if (obj is null)
                     return false;
 
-                var closure = obj as Closure;
-                if (((object)closure) == null)
+                if (!(obj is Closure closure))
                     return false;
 
                 for (int i = 0; i < States.Length; i++)

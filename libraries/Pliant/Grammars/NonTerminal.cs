@@ -36,11 +36,10 @@ namespace Pliant.Grammars
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj is null)
                 return false;
-            
-            var nonTerminal = obj as INonTerminal;
-            if (nonTerminal == null)
+
+            if (!(obj is INonTerminal nonTerminal))
                 return false;
 
             return Value.Equals(nonTerminal.Value);
