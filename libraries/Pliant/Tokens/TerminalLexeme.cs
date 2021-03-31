@@ -1,5 +1,4 @@
-﻿using System;
-using Pliant.Captures;
+﻿using Pliant.Captures;
 using Pliant.Grammars;
 
 namespace Pliant.Tokens

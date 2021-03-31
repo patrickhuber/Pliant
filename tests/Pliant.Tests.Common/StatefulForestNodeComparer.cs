@@ -1,9 +1,8 @@
 ﻿using Pliant.Forest;
-using System;
 using System.Collections.Generic;
 
 namespace Pliant.Tests.Common
-{    
+{
     public class StatefulForestNodeComparer : IEqualityComparer<IForestNode>
     {
         HashSet<IForestNode> _traversed;

@@ -1,5 +1,4 @@
-﻿using Pliant.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Pliant.Forest
 {

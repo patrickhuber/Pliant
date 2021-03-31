@@ -1,8 +1,6 @@
 ﻿
 using Pliant.Captures;
 using Pliant.Tokens;
-using Pliant.Utilities;
-using System.Text;
 
 namespace Pliant.Automata
 {

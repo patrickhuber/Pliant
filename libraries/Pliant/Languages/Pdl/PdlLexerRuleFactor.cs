@@ -1,7 +1,6 @@
 ﻿using Pliant.Captures;
 using Pliant.Languages.Regex;
 using Pliant.Utilities;
-using System;
 
 namespace Pliant.Languages.Pdl
 {

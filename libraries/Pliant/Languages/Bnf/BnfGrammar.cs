@@ -1,8 +1,5 @@
 ﻿using Pliant.Automata;
 using Pliant.Grammars;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Pliant.Languages.Bnf
 {

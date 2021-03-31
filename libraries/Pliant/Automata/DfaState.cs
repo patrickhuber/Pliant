@@ -1,5 +1,4 @@
-﻿using Pliant.Collections;
-using Pliant.Grammars;
+﻿using Pliant.Grammars;
 using System.Collections.Generic;
 
 namespace Pliant.Automata

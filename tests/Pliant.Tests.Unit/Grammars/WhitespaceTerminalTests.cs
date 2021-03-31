@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Grammars;
-using System;
 
 namespace Pliant.Tests.Unit
 {

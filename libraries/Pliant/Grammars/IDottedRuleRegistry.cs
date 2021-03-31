@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Pliant.Grammars
+﻿namespace Pliant.Grammars
 {
     public interface IDottedRuleRegistry : IReadOnlyDottedRuleRegistry
     {

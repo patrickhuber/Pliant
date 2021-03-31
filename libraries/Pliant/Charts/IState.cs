@@ -1,6 +1,5 @@
 ﻿using Pliant.Forest;
 using Pliant.Grammars;
-using System.Collections.Generic;
 
 namespace Pliant.Charts
 {

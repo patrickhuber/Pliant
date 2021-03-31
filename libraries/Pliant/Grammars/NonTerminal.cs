@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Pliant.Grammars
+﻿namespace Pliant.Grammars
 {
     public class NonTerminal : Symbol, INonTerminal
     {

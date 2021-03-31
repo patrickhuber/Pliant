@@ -1,6 +1,4 @@
-﻿using System;
-using Pliant.Grammars;
-using Pliant.Tokens;
+﻿using Pliant.Grammars;
 using Pliant.Utilities;
 
 namespace Pliant.Automata

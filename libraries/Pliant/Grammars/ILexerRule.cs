@@ -1,6 +1,4 @@
-﻿using Pliant.Tokens;
-
-namespace Pliant.Grammars
+﻿namespace Pliant.Grammars
 {
     public interface ILexerRule : ISymbol
     {

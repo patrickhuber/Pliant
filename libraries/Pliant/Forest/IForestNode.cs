@@ -1,6 +1,4 @@
-﻿using Pliant.Charts;
-
-namespace Pliant.Forest
+﻿namespace Pliant.Forest
 {
     public interface IForestNode : IForestNodeVisitable
     {
