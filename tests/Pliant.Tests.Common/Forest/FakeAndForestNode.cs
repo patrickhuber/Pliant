@@ -1,5 +1,4 @@
-﻿using Pliant.Collections;
-using Pliant.Forest;
+﻿using Pliant.Forest;
 using System.Collections.Generic;
 
 namespace Pliant.Tests.Common.Forest

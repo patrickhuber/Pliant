@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Automata;
 using Pliant.Grammars;
-using Pliant.Tokens;
 
 namespace Pliant.Tests.Unit.Automata
 {

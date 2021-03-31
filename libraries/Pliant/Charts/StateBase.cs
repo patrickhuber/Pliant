@@ -1,5 +1,4 @@
-﻿using System;
-using Pliant.Diagnostics;
+﻿using Pliant.Diagnostics;
 using Pliant.Forest;
 using Pliant.Grammars;
 

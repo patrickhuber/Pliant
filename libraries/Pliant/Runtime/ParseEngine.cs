@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Pliant.Utilities;
 using Pliant.Diagnostics;
-using System.Collections;
 
 namespace Pliant.Runtime
 {

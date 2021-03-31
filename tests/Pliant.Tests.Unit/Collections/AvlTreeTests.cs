@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Collections;
-using System;
 
 namespace Pliant.Tests.Unit.Collections
 {

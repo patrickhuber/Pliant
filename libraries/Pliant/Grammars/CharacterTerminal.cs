@@ -1,5 +1,4 @@
-﻿using System;
-using Pliant.Utilities;
+﻿using Pliant.Utilities;
 using System.Collections.Generic;
 
 namespace Pliant.Grammars

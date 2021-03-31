@@ -1,8 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Captures;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Pliant.Tests.Unit.Captures
 {

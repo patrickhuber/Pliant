@@ -1,8 +1,5 @@
 ﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Pliant.Benchmarks
 {

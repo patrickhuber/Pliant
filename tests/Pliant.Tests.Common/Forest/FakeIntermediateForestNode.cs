@@ -1,5 +1,4 @@
-﻿using Pliant.Charts;
-using Pliant.Forest;
+﻿using Pliant.Forest;
 using Pliant.Grammars;
 
 namespace Pliant.Tests.Common.Forest

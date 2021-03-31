@@ -1,0 +1,15 @@
+﻿@startuml marpa
+class           MarpaParseEngine
+class           DeterministicChart
+class           PreComputedGrammar
+class           DottedRuleSet {
+    reductions : DottedRuleSet
+    tokenTransitions: DottedRuleSet
+}
+class           DottedRule
+
+MarpaParseEngine "1" *-- "1" DeterministicChart : contains
+MarpaParseEngine "1" *-- "1" PreComputedGrammar : contains
+PreComputedGrammar "1" *-- "1" DottedRuleSet : contains
+DottedRuleSet "1" o-- "n" DottedRule : aggregation
+@enduml

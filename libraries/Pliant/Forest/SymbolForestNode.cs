@@ -1,5 +1,4 @@
-﻿using System;
-using Pliant.Grammars;
+﻿using Pliant.Grammars;
 using Pliant.Utilities;
 
 namespace Pliant.Forest

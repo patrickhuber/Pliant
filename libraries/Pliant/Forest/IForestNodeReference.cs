@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pliant.Forest
+﻿namespace Pliant.Forest
 {
     /// <summary>
     /// IForestNodeReference is used as a observable refernce to a IForestNode. 

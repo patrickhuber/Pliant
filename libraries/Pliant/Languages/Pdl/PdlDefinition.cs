@@ -1,6 +1,5 @@
 ﻿using Pliant.Diagnostics;
 using Pliant.Utilities;
-using System;
 
 namespace Pliant.Languages.Pdl
 {

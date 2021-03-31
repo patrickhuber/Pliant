@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Grammars;
 using Pliant.Languages.Regex;
-using Pliant.Runtime;
 
 namespace Pliant.Tests.Unit.Languages.Regex
 {

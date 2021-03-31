@@ -1,7 +1,6 @@
 ﻿using Pliant.Collections;
 using System.Collections.Generic;
 using Pliant.Utilities;
-using System;
 
 namespace Pliant.Grammars
 {
@@ -44,8 +43,7 @@ namespace Pliant.Grammars
 
                 // assign the null transition
                 // only process symbols on the null frame if it is new
-                DottedRuleSet nullDottedRuleSet;
-                if (!TryGetOrCreateDottedRuleSet(predictedStates, out nullDottedRuleSet))
+                if (!TryGetOrCreateDottedRuleSet(predictedStates, out DottedRuleSet nullDottedRuleSet))
                     ProcessSymbolTransitions(nullDottedRuleSet);
 
                 frame.NullTransition = nullDottedRuleSet;
