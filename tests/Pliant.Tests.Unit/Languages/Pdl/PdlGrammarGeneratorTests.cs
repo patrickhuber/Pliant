@@ -355,6 +355,34 @@ namespace Pliant.Tests.Unit.Languages.Pdl
             Assert.AreEqual(grammar.Start.FullyQualifiedName.Name, "S");
         }
 
+        [TestMethod]
+        public void PdlGrammarGeneratorShouldUseLexerRuleWhenSpecified()
+        {
+            // R = B ;
+            // B ~ 'b';
+            var definition = new PdlDefinitionConcatenation(
+                new PdlBlockRule(
+                    new PdlRule(
+                        new PdlQualifiedIdentifier("R"),
+                        new PdlExpression(
+                            new PdlTerm(
+                                new PdlFactorIdentifier(
+                                    new PdlQualifiedIdentifier("B")))))),
+                new PdlDefinition(
+                    new PdlBlockLexerRule(
+                        new PdlLexerRule(
+                            new PdlQualifiedIdentifier("B"),
+                            new PdlLexerRuleExpression(
+                                new PdlLexerRuleTerm(
+                                    new PdlLexerRuleFactorLiteral("b")))))));
+
+            var grammar = GenerateGrammar(definition);
+            Assert.IsNotNull(grammar);
+            Assert.IsNotNull(grammar.Start);
+            Assert.AreEqual(1, grammar.Productions.Count);
+            Assert.AreEqual(1, grammar.LexerRules.Count);
+        }
+
         private static IGrammar GenerateGrammar(PdlDefinition definition)
         {
             var generator = new PdlGrammarGenerator();

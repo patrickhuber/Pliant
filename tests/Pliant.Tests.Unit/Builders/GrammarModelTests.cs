@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Builders;
 using Pliant.Grammars;
+using Pliant.LexerRules;
 
 namespace Pliant.Tests.Unit.Builders
 {
@@ -171,6 +172,22 @@ namespace Pliant.Tests.Unit.Builders
             var grammar = grammarModel.ToGrammar();
             Assert.AreEqual(3, grammar.Productions.Count);
             Assert.IsNotNull(grammar.Start);
+        }
+
+        [TestMethod]
+        public void GrammarModelToGrammarShouldAddLexerRules()
+        {
+            var S = new ProductionModel("S");
+            var B = new LexerRuleModel(new WhitespaceLexerRule());
+            S.AddWithAnd(B);
+
+            var grammarModel = new GrammarModel();
+            grammarModel.Productions.Add(S);
+            grammarModel.LexerRules.Add(B);
+
+            var grammar = grammarModel.ToGrammar();
+            Assert.AreEqual(1, grammar.Productions.Count);
+            Assert.AreEqual(1, grammar.LexerRules.Count);
         }
     }
 }

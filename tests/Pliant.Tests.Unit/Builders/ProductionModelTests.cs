@@ -13,5 +13,14 @@ namespace Pliant.Tests.Unit.Builders
             var E = new ProductionModel("E");
             Assert.AreEqual(1, E.ToProductions().Count());
         }
+
+        [TestMethod]
+        public void ProductionModelToProductionsShouldContainTwoProductionsWhenGivenNullTerminator()
+        {
+            var A = new ProductionModel("A");
+            var B = new ProductionModel("B");
+            A.AddWithAnd(B);
+            A.AddWithOr(null);
+        }
     }
 }
