@@ -12,6 +12,12 @@ block =
 	| setting
 	| lexer_rule ;
 	
+rule =
+    qualified_identifier '=' expression ';' ;
+
+ruleName = 
+    identifier ;
+
 setting =
       setting_identifier '=' qualified_identifier ';' ;
 

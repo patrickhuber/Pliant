@@ -106,7 +106,7 @@ namespace Pliant.Builders
         public IGrammar ToGrammar()
         {
             SetStartProduction();
-
+            ReplaceSymbolsWithLexerRules();
             var productions = GetProductionsFromProductionsModel();
             var ignoreRules = GetIgnoreRulesFromIgnoreRulesModel();
             var triviaRules = GetTriviaRulesFromTriviaRulesModel();
@@ -122,6 +122,39 @@ namespace Pliant.Builders
                 productions,
                 ignoreRules,
                 triviaRules);
+        }
+
+        private void ReplaceSymbolsWithLexerRules()
+        {
+            // Create a lookup table for lexer rules
+            var lexerRuleLookup = new Dictionary<string, LexerRuleModel>();
+            for (var l = 0; l < _lexerRules.Count; l++)
+            {
+                var lexerRuleModel = _lexerRules[l];
+                var lexerRule = lexerRuleModel.Value;
+                lexerRuleLookup[lexerRule.TokenType.Id] = lexerRuleModel;
+            }
+
+            // loop through all productions replacing references to lexer rules with the actual lexer rule
+            for (var p = 0; p < _productions.Count; p++)
+            {
+                var productionModel = _productions[p];
+                for (var a = 0; a < productionModel.Alterations.Count; a++)
+                {
+                    var alterationModel = productionModel.Alterations[a];
+                    for (var s = 0; s < alterationModel.Symbols.Count; s++)
+                    {
+                        var symbolModel = alterationModel.Symbols[s];
+                        if (symbolModel.Symbol.SymbolType != SymbolType.NonTerminal)
+                            continue;
+                        var nonTerminal = symbolModel.Symbol as INonTerminal;
+                        if (lexerRuleLookup.TryGetValue(nonTerminal.Value, out LexerRuleModel lexerRuleModel))
+                        {
+                            alterationModel.Symbols[s] = lexerRuleModel;
+                        }
+                    }
+                }
+            }
         }
 
         private void SetStartProduction()

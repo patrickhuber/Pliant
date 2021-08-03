@@ -58,7 +58,7 @@ namespace Pliant.Tests.Unit.Languages.Pdl
         Letter
             ~ /[a-zA-Z]/;
         Whitespace
-            ~ /\w+/;
+            ~ /\s+/;
         Regex
             = ['^'] Regex.Expression ['$'] ;
         Regex.Expression
@@ -235,6 +235,16 @@ namespace Pliant.Tests.Unit.Languages.Pdl
             Regex.CharacterClassCharacter
                 = /[^\]]/
                 | /[\\]./;");
+        }
+
+
+        [TestMethod]
+        [Ignore]
+        public void PdlShouldParseNullRule()
+        {
+            // Still need to determine the syntax for this or if it should be supported
+            ParseInput(@"
+            Rule = ;");
         }
 
         [TestMethod]
