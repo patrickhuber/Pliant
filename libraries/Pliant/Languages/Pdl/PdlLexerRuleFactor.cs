@@ -76,7 +76,7 @@ namespace Pliant.Languages.Pdl
         {
             if (obj is null)
                 return false;
-            if (!(obj is PdlFactorRegex factor))
+            if (!(obj is PdlLexerRuleFactorRegex factor))
                 return false;
             return factor.NodeType == NodeType
                 && factor.Regex.Equals(Regex);

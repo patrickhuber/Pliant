@@ -93,39 +93,74 @@ private static ILexerRule CreateWhitespaceLexerRule()
 }		
 ```
 
-#### Using the Ebnf Text Interface ( *work in progress* )
+#### Using Pliant Definition Language (PDL)
+
+> calculator.pdl
+
+```pdl
+Calculator 
+	= Expression;
+		
+Expression 
+	= Expression '+' Term
+	| Term;
+		
+Term 
+	= Term '*' Factor
+	| Factor;
+		
+Factor 
+	= Number ;
+	
+Number 
+	= Digits;
+		
+Digits ~ /[0-9]+/ ;
+Whitespace ~ /[\\s]+/ ;
+	
+:start = Calculator;
+:ignore = Whitespace;
+```
+
+> Program.cs
 
 ```CSharp
-public static int Main (string[] args)
+
+using Pliant.Languages.Pdl;
+using Pliant.Runtime;
+using System;
+using System.IO;
+
+namespace PdlExample
 {
-	var grammarText = @"
-	Calculator 
-		= Expression;
-		
-	Expression 
-		= Expression '+' Term
-		| Term;
-		
-	Term 
-		= Term '*' Factor
-		| Factor;
-		
-	Factor 
-		= Number ;
-	
-	Number 
-		= Digits;
-		
-	Digits ~ /[0-9]+/ ;
-	Whitespace ~ /[\\s]+/ ;
-	
-	:start = Calculator;
-	:ignore = Whitespace;";
-	
-	var definition = new EbnfParser().Parse(grammarText);
-	var grammar = new EbnfGrammarGenerator().Generate(definition);
-	
-	// TODO: use the grammar in a parse.
+	public static int Main (string[] args)
+	{
+		// load the grammar definition file (make sure to copy it to output directory if debugging)
+		var path = Path.Combine(Directory.GetCurrentDirectory(), "calculator.pdl");
+		var content = File.ReadAllText(path);
+
+		// parse the grammar definition file
+		var pdlParser = new PdlParser();
+		var definition = pdlParser.Parse(content);
+
+		// create the grammar, parser and scanner for our calculator language
+		var grammar = new PdlGrammarGenerator().Generate(definition);
+		var parser = new ParseEngine(grammar);
+
+		var calculatorInput = "5+30 * 2 + 1";
+		var scanner = new ParseRunner(parser, calculatorInput);
+
+		// run the scanner
+		if(!scanner.RunToEnd())
+		{
+			Console.WriteLine($"error parsing at line {scanner.Line + 1} column {scanner.Column}");
+		}
+
+		// parse the calculator input
+		var rootNode = parser.GetParseForestRootNode();
+
+		// TODO: use the parse node in the calculator interpreter
+	}
 }
 ```
 ## Recognizing and Parse Trees

@@ -58,7 +58,7 @@ namespace Pliant.Tests.Unit.Languages.Pdl
         Letter
             ~ /[a-zA-Z]/;
         Whitespace
-            ~ /\s+/;
+            ~ /[\s]+/;
         Regex
             = ['^'] Regex.Expression ['$'] ;
         Regex.Expression
@@ -160,7 +160,7 @@ namespace Pliant.Tests.Unit.Languages.Pdl
         public void PdlShouldParseLexerRuleFollowedBySetting()
         {
             ParseInput(@"
-            Whitespace ~ /\s+/;
+            Whitespace ~ /[\s]+/;
             :ignore = Whitespace;");
         }
 
