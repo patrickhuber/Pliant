@@ -33,7 +33,7 @@ namespace Pliant.Languages.Pdl
                     parseForest as IInternalForestNode,
                     new SelectFirstChildDisambiguationAlgorithm());
 
-            var ebnfVisitor = new PdlVisitor();
+            var ebnfVisitor = new PdlParseTreeVisitor();
             parseTree.Accept(ebnfVisitor);
             return ebnfVisitor.Definition;            
         }

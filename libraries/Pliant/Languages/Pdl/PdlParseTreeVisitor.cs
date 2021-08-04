@@ -6,7 +6,7 @@ using Pliant.Captures;
 
 namespace Pliant.Languages.Pdl
 {
-    public class PdlVisitor : TreeNodeVisitorBase
+    public class PdlParseTreeVisitor : TreeNodeVisitorBase
     {
         public PdlDefinition Definition { get; private set; }
         
@@ -328,7 +328,7 @@ namespace Pliant.Languages.Pdl
                         var tokenNode = child as ITokenTreeNode;
                         var token = tokenNode.Token;
                         if (token.TokenType.Equals(PdlGrammar.TokenTypes.SettingIdentifier))
-                            settingIdentifier = new PdlSettingIdentifier(token.Capture);
+                            settingIdentifier = new PdlSettingIdentifier(token.Capture.Slice(1));
                         break;
 
                     case TreeNodeType.Internal:

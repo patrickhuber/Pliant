@@ -1,0 +1,22 @@
+﻿Calculator 
+	= Expression;
+		
+Expression 
+	= Expression '+' Term
+	| Term;
+		
+Term 
+	= Term '*' Factor
+	| Factor;
+		
+Factor 
+	= Number ;
+	
+Number 
+	= Digits;
+		
+Digits ~ /[0-9]+/ ;
+Whitespace ~ /[\s]+/ ;
+	
+:start = Calculator;
+:ignore = Whitespace;

@@ -48,7 +48,7 @@ namespace Pliant.Tests.Unit.Languages.Pdl
                                 new PdlTerm(
                                     new PdlFactorLiteral("b")))))));
 
-            var actual =  Parse(@"Rule = 'a' 'b';");
+            var actual = Parse(@"Rule = 'a' 'b';");
 
             Assert.AreEqual(expected, actual);
         }
@@ -66,7 +66,7 @@ namespace Pliant.Tests.Unit.Languages.Pdl
                             new PdlExpression(
                                 new PdlTerm(
                                     new PdlFactorLiteral("b")))))));
-            var actual =  Parse(@"Rule = 'a' | 'b';");
+            var actual = Parse(@"Rule = 'a' | 'b';");
             Assert.AreEqual(expected, actual);
 
         }
@@ -86,7 +86,7 @@ namespace Pliant.Tests.Unit.Languages.Pdl
                             new PdlExpression(
                                 new PdlTerm(
                                     new PdlFactorLiteral("c")))))));
-            var actual =  Parse(@"Rule = 'a' 'b' | 'c';");
+            var actual = Parse(@"Rule = 'a' 'b' | 'c';");
             Assert.AreEqual(expected, actual);
         }
 
@@ -101,16 +101,16 @@ namespace Pliant.Tests.Unit.Languages.Pdl
                                 new PdlTerm(
                                     new PdlFactorRegex(
                                         new RegexDefinition(
-                                            startsWith: false, 
+                                            startsWith: false,
                                             expression: new RegexExpressionTerm(
                                                 new RegexTerm(
                                                     new RegexFactor(
                                                         new RegexAtomSet(
-                                                            new RegexSet(false, 
+                                                            new RegexSet(false,
                                                                 new RegexCharacterClass(
                                                                     new RegexCharacterRange(
                                                                         new RegexCharacterClassCharacter('a'),
-                                                                        new RegexCharacterClassCharacter('z')))))))), 
+                                                                        new RegexCharacterClassCharacter('z')))))))),
                                             endsWith: false)))))));
 
             var actual = Parse(@"Rule = /[a-z]/;");
@@ -121,7 +121,7 @@ namespace Pliant.Tests.Unit.Languages.Pdl
         [TestMethod]
         public void PdlParserShouldParseRepetition()
         {
-            var actual =  Parse(@"Rule = { 'a' };");
+            var actual = Parse(@"Rule = { 'a' };");
 
             var expected = new PdlDefinition(
                     new PdlBlockRule(
@@ -140,7 +140,7 @@ namespace Pliant.Tests.Unit.Languages.Pdl
         [TestMethod]
         public void PdlParserShouldParseOptional()
         {
-            var actual =  Parse(@"Rule = [ 'a' ];");
+            var actual = Parse(@"Rule = [ 'a' ];");
 
             var expected = new PdlDefinition(
                     new PdlBlockRule(
@@ -159,7 +159,7 @@ namespace Pliant.Tests.Unit.Languages.Pdl
         [TestMethod]
         public void PdlParserShouldParseGrouping()
         {
-            var actual =  Parse(@"Rule = ('a');");
+            var actual = Parse(@"Rule = ('a');");
 
             var expected = new PdlDefinition(
                     new PdlBlockRule(
@@ -241,16 +241,55 @@ namespace Pliant.Tests.Unit.Languages.Pdl
             var expected = new PdlDefinition(
                 new PdlBlockSetting(
                     new PdlSetting(
-                        new PdlSettingIdentifier(":ignore"),
+                        new PdlSettingIdentifier("ignore"),
                         new PdlQualifiedIdentifier("whitespace"))));
 
             Assert.AreEqual(expected, actual);
         }
 
         [TestMethod]
+        public void PdlParserShouldParseSettingAndRule()
+        {
+            var actual = Parse(@"
+                whitespace ~ /[\s]+/;
+                :ignore = whitespace;");
+
+            Assert.IsNotNull(actual);
+
+            var whiteSpaceRegex = new RegexDefinition(
+                false,
+                new RegexExpressionTerm(
+                    new RegexTerm(
+                        new RegexFactorIterator(
+                            new RegexAtomSet(
+                                new RegexSet(
+                                    false,
+                                    new RegexCharacterClass(
+                                        new RegexCharacterUnitRange(
+                                            new RegexCharacterClassCharacter('s', true))))),
+                            RegexIterator.OneOrMany))),
+                false);
+            var expected =
+                new PdlDefinitionConcatenation(
+                    new PdlBlockLexerRule(
+                        new PdlLexerRule(
+                            new PdlQualifiedIdentifier("whitespace"),
+                            new PdlLexerRuleExpression(
+                                new PdlLexerRuleTerm(
+                                    new PdlLexerRuleFactorRegex(
+                                        whiteSpaceRegex))))),
+                    new PdlDefinition(
+                        new PdlBlockSetting(
+                            new PdlSetting(
+                                new PdlSettingIdentifier("ignore"),
+                                new PdlQualifiedIdentifier("whitespace")))));
+            Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
         public void PdlParserShouldParseLexerRule()
         {
-            
+
             var actual = Parse(@"
                 b ~ 'b' ;");
             Assert.IsNotNull(actual);
@@ -259,13 +298,13 @@ namespace Pliant.Tests.Unit.Languages.Pdl
                 block: new PdlBlockLexerRule(
                    lexerRule: new PdlLexerRule(
                        qualifiedIdentifier: new PdlQualifiedIdentifier("b"),
-                       expression:  new PdlLexerRuleExpression(
+                       expression: new PdlLexerRuleExpression(
                             term: new PdlLexerRuleTerm(
                                 factor: new PdlLexerRuleFactorLiteral("b"))))));
 
             Assert.AreEqual(expected, actual);
         }
-        
+
         [TestMethod]
         public void PdlParserShouldParseComplexGrammarWithRepeat()
         {
