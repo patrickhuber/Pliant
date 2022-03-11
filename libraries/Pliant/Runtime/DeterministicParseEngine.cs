@@ -81,6 +81,11 @@ namespace Pliant.Runtime
             return true;
         }
 
+        public bool Errors(IReadOnlyList<IToken> tokens)
+        {
+            throw new NotSupportedException("Error recovery is not supported");
+        }
+
         public bool IsAccepted()
         {
             var anyEarleySets = _chart.Sets.Count > 0;

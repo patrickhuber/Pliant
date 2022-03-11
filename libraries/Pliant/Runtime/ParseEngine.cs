@@ -168,6 +168,50 @@ namespace Pliant.Runtime
             return true;
         }
 
+        public bool Errors(IReadOnlyList<IToken> tokens)
+        {
+            for (var e = 0; e < tokens.Count; e++)
+                ErrorPass(Location, tokens[e]);
+
+            var tokenRecognized = _chart.EarleySets.Count > Location + 1;
+
+            if (!tokenRecognized)
+                return false;
+
+            Location++;
+            ReductionPass(Location);
+
+            _nodeSet.Clear();
+            return true;
+        }
+
+        private void ErrorPass(int location, IToken token)
+        {
+            var earleySet = _chart.EarleySets[location];
+            for (int s = 0; s < earleySet.Scans.Count; s++)
+            {
+                var scanState = earleySet.Scans[s];
+                Error(scanState, location, token);
+            }
+        }
+
+        private void Error(INormalState scan, int j, IToken token)
+        {
+            // to support missing tokens, add the expected token to the next state by scanning
+            Scan(scan, j, token);
+
+            if (_chart.Contains(j + 1, StateType.Normal, scan.DottedRule, scan.Origin))
+                return;
+
+            // to support error tokens, add the rule for the expected token to the next state
+            var skipState = StateFactory.NewState(scan.DottedRule, scan.Origin);
+
+            if (!_chart.Enqueue(j + 1, skipState))
+                return;
+
+            LogError(j + 1, skipState, token);
+        }
+
         private void ScanPass(int location, IToken token)
         {
             var earleySet = _chart.EarleySets[location];
@@ -188,10 +232,9 @@ namespace Pliant.Runtime
                 return;
 
             var dottedRule = _dottedRuleRegistry.GetNext(scan.DottedRule);
-            if (_chart.Contains(j + 1, StateType.Normal, dottedRule, i))
-            {
+            if (_chart.Contains(j + 1, StateType.Normal, dottedRule, i))            
                 return;
-            }
+            
             var tokenNode = _nodeSet.AddOrGetExistingTokenNode(token);
             var parseNode = CreateParseNode(
                 dottedRule,
@@ -201,9 +244,10 @@ namespace Pliant.Runtime
                 j + 1);
             var nextState = StateFactory.NewState(dottedRule, scan.Origin, parseNode);
 
-            if (_chart.Enqueue(j + 1, nextState))
-                LogScan(j + 1, nextState, token);
+            if (!_chart.Enqueue(j + 1, nextState))
+                return;
 
+            LogScan(j + 1, nextState, token);
         }
 
         private void ReductionPass(int location)
@@ -245,7 +289,8 @@ namespace Pliant.Runtime
             var rulesForNonTerminal = Grammar.RulesFor(nonTerminal);
 
             // PERF: Avoid boxing enumerable
-            for (int p = 0; p < rulesForNonTerminal.Count; p++)
+            var rulesForNonTerminalCount = rulesForNonTerminal.Count;
+            for (int p = 0; p < rulesForNonTerminalCount; p++)
             {
                 var production = rulesForNonTerminal[p];
                 PredictProduction(j, production);
@@ -352,7 +397,8 @@ namespace Pliant.Runtime
             var j = completed.Origin;
             var sourceEarleySet = _chart.EarleySets[j];
 
-            for (int p = 0; p < sourceEarleySet.Predictions.Count; p++)
+            var predictionCount = sourceEarleySet.Predictions.Count;
+            for (int p = 0; p < predictionCount; p++)
             {
                 var prediction = sourceEarleySet.Predictions[p];
                 if (!prediction.IsSource(completed.DottedRule.Production.LeftHandSide))
@@ -626,6 +672,12 @@ namespace Pliant.Runtime
         {
             if (Options.LoggingEnabled)
                 Debug.WriteLine($"{GetOriginStateOperationString("Scan", origin, state)} \"{token.Capture}\"");
+        }
+
+        private void LogError(int origin, IState state, IToken token)
+        {
+            if (Options.LoggingEnabled)
+                Debug.WriteLine($"{GetOriginStateOperationString("Error", origin, state)} \"{token.Capture}\"");
         }
     }
 }

@@ -31,8 +31,8 @@ namespace Pliant.Tests.Unit.Runtime
 
         private static GrammarLexerRule CreateWhitespaceRule()
         {
-            ProductionExpression 
-                S = "S", 
+            ProductionExpression
+                S = "S",
                 whitespace = "whitespace";
 
             S.Rule =
@@ -47,8 +47,8 @@ namespace Pliant.Tests.Unit.Runtime
 
         private static GrammarLexerRule CreateWordRule()
         {
-            ProductionExpression 
-                W = "W", 
+            ProductionExpression
+                W = "W",
                 word = "word";
 
             W.Rule =
@@ -62,7 +62,7 @@ namespace Pliant.Tests.Unit.Runtime
             var wordGrammar = new GrammarExpression(W, new[] { W, word }).ToGrammar();
             return new GrammarLexerRule(nameof(word), wordGrammar);
         }
-        
+
         private static IGrammar CreateRepeatingWordGrammar()
         {
             var word = new WordLexerRule();
@@ -105,7 +105,7 @@ namespace Pliant.Tests.Unit.Runtime
             states[2].AddTransition(lastStar);
             states[3].AddTransition(goBackNotSlash);
             states[3].AddTransition(lastSlash);
-            
+
             return new DfaLexerRule(states[0], new TokenType(@"\/[*]([*][^\/]|[^*])*[*][\/]"));
         }
 
@@ -136,7 +136,7 @@ namespace Pliant.Tests.Unit.Runtime
             var grammar = new GrammarExpression(
                 A,
                 new[] { A },
-                new[] {_whitespaceRule },
+                new[] { _whitespaceRule },
                 null)
                 .ToGrammar();
 
@@ -331,6 +331,117 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.AreEqual("ows", token.Capture.ToString());
         }
 
+        [TestMethod]
+        public void ParseRunnerShouldHandleMissingToken()
+        {
+            ProductionExpression
+                S = nameof(S);
+            S.Rule
+                = "(" + S + ")"
+                | S + S
+                | (Expr)null;
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
+            var parser = new ParseEngine(grammar);
+            /* S -> * "(" S ")", 0
+             * S -> * S S, 0
+             * S -> *
+             * S -> S * S, 0
+             * S -> S S *, 0
+             * 
+             * SCAN "("
+             * 
+             * S -> "(" * S ")", 0
+             * S -> * "(" S ")", 1
+             * S -> * S S, 1
+             * S -> S * S, 1
+             * S -> S S *, 1
+             * S -> *, 1
+             * S -> "(" S * ")", 0
+             * 
+             * SCAN Error("")
+             * 
+             * S -> Error("") * S ")", 1
+             * S -> "(" S Error("") *, 0
+             * S -> * "(" S ")", 2
+             * S -> * S S, 2
+             * S -> S * S, 2
+             * S -> S S *, 2
+             * S -> *, 2
+             * S -> S * S, 0
+             * S -> S S *, 0             
+             */
+            RunParse(parser, "(", 2, new ParseRunnerOptions(enableErrorRecovery: true));
+        }
+
+        [TestMethod]
+        public void ParseRunnerShouldHandleSkippedToken()
+        {
+            ProductionExpression
+                S = nameof(S);
+            S.Rule
+                = "(" + S + ")"
+                | S + S
+                | (Expr)null;
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
+            var parser = new ParseEngine(grammar, new ParseEngineOptions(true, true));
+            var input = "(&)";
+            /* 0, INITIALIZE 
+             * 
+             * S -> * "(" S ")", 0
+             * S -> * S S, 0
+             * S -> *
+             * S -> S * S, 0
+             * S -> S S *, 0
+             * 
+             * 1, SCAN "("
+             * 
+             * S -> "(" * S ")", 0
+             * S -> * "(" S ")", 1
+             * S -> * S S, 1
+             * S -> S * S, 1
+             * S -> S S *, 1
+             * S -> *, 1
+             * S -> "(" S * ")", 0
+             * 
+             * 2, SCAN Error("&")
+             * 
+             * S -> Error("&") * S ")", 1
+             * S -> "(" S Error("&") *, 0
+             * S -> * "(" S ")", 2
+             * S -> * S S, 2
+             * S -> S * S, 2
+             * S -> S S *, 2
+             * S -> *, 2
+             * S -> S * S, 0
+             * S -> S S *, 0
+             * S -> * "(" S ")", 1
+             * S -> "(" S * ")", 0
+             *              
+             * 3, SCAN ")"
+             * 
+             * S -> "(" S ")" *, 0             
+             * S -> S * S, 0
+             * S -> S S *, 0             
+             * S -> * S S, 3
+             * S -> S * S, 3
+             * S -> S S *, 3
+             */
+            RunParse(parser,input, 2, new ParseRunnerOptions(enableErrorRecovery: true));
+        }
+
+        [TestMethod]
+        public void ParseRunnerShouldHandleSkipAndMissingTokens()
+        {
+            ProductionExpression
+                S = nameof(S);
+            S.Rule
+                = "(" + S + ")"
+                | S + S
+                | (Expr)null;
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
+            var parser = new ParseEngine(grammar);
+            RunParse(parser, "(&", 2, new ParseRunnerOptions(enableErrorRecovery: true));
+        }
 
         [TestMethod]
         public void ParseRunnerShouldAddLeadingTriviaToCurrentToken()
@@ -430,12 +541,19 @@ namespace Pliant.Tests.Unit.Runtime
             return new PrivateObject(parseEngine).GetField("_chart") as Chart;
         }
 
-        private static void RunParse(ParseEngine parseEngine, string input)
+        private static void RunParse(ParseEngine parseEngine, string input, int errorCount = 0, ParseRunnerOptions options = null)
         {
-            var parseRunner = new ParseRunner(parseEngine, input);
-            for (int i = 0; i < input.Length; i++)
-                Assert.IsTrue(parseRunner.Read(), $"Error parsing at position {i}");
-            Assert.IsTrue(parseRunner.ParseEngine.IsAccepted());
+            if (options is null)
+                options = new ParseRunnerOptions();
+
+            var parseRunner = new ParseRunner(parseEngine, input, options);
+            while (!parseRunner.EndOfStream())
+            {
+                var readStatus = parseRunner.Read();
+                Assert.IsTrue(readStatus, $"Error parsing at position {parseRunner.Position}");
+            }
+            Assert.IsTrue(parseRunner.ParseEngine.IsAccepted(), "Parse ended prematurely");
+            Assert.AreEqual(errorCount, parseRunner.Errors.Count);
         }
     }
 }

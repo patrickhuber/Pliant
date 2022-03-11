@@ -51,15 +51,15 @@ namespace Pliant.Runtime
 
         public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
-            var frameSets = Chart.Sets;
-            var frameSetCount = frameSets.Count;
+            var deterministicSets = Chart.Sets;
+            var deterministicSetCount = deterministicSets.Count;
 
-            if (frameSetCount == 0)
+            if (deterministicSetCount == 0)
                 return EmptyLexerRules;
 
             _expectedLexerRules.Clear();
 
-            var frameSet = frameSets[frameSets.Count - 1];
+            var frameSet = deterministicSets[deterministicSets.Count - 1];
             for (var i = 0; i < frameSet.States.Count; i++)
             {
                 var stateFrame = frameSet.States[i];
@@ -96,6 +96,11 @@ namespace Pliant.Runtime
             Location++;
             ReductionPass(Location);
             return true;
+        }
+
+        public bool Errors(IReadOnlyList<IToken> tokens)
+        {
+            throw new NotSupportedException("Error recovery is not supported");
         }
 
         public bool IsAccepted()
@@ -190,15 +195,15 @@ namespace Pliant.Runtime
 
         private void ReduceOneLeftHandSide(int iLoc, int origLoc, INonTerminal lhsSym)
         {
-            var frameSet = Chart.Sets[origLoc];
-            var transitionItem = frameSet.FindCachedDottedRuleSetTransition(lhsSym);
+            var deterministicSet = Chart.Sets[origLoc];
+            var transitionItem = deterministicSet.FindCachedDottedRuleSetTransition(lhsSym);
             if (transitionItem != null)
                 LeoReductionOperation(iLoc, transitionItem);
             else
             {
-                for (var i = 0; i < frameSet.States.Count; i++)
+                for (var i = 0; i < deterministicSet.States.Count; i++)
                 {
-                    var stateFrame = frameSet.States[i];
+                    var stateFrame = deterministicSet.States[i];
                     EarleyReductionOperation(iLoc, stateFrame, lhsSym);
                 }
             }
@@ -209,22 +214,22 @@ namespace Pliant.Runtime
 
         private void MemoizeTransitions(int iLoc)
         {
-            var frameSet = Chart.Sets[iLoc];
+            var deterministicSet = Chart.Sets[iLoc];
             // leo eligibility needs to be cached before creating the cached transition
             // if the size of the list is != 1, do not enter the cached frame transition
             _cachedCount ??= new Dictionary<ISymbol, int>();
             _cachedTransitions ??= new Dictionary<ISymbol, CachedDottedRuleSetTransition>();
 
-            for (var i = 0; i < frameSet.States.Count; i++)
+            for (var i = 0; i < deterministicSet.States.Count; i++)
             {
-                var stateFrame = frameSet.States[i];
-                var frame = stateFrame.DottedRuleSet;
-                var frameData = frame.Data;
-                var stateFrameDataCount = frameData.Count;
+                var deterministicState = deterministicSet.States[i];
+                var dottedRuleSet = deterministicState.DottedRuleSet;
+                var dottedRuleSetData = dottedRuleSet.Data;
+                var dottedRuleSetDataCount = dottedRuleSetData.Count;
 
-                for (var j = 0; j < stateFrameDataCount; j++)
+                for (var j = 0; j < dottedRuleSetDataCount; j++)
                 {
-                    var preComputedState = frameData[j];
+                    var preComputedState = dottedRuleSetData[j];
                     if (preComputedState.IsComplete)
                         continue;
 
@@ -241,7 +246,7 @@ namespace Pliant.Runtime
                     if (!_cachedCount.TryGetValue(postDotSymbol, out int count))
                     {
                         _cachedCount[postDotSymbol] = 1;
-                        _cachedTransitions[postDotSymbol] = CreateTopCachedItem(stateFrame, postDotSymbol);
+                        _cachedTransitions[postDotSymbol] = CreateTopCachedItem(deterministicState, postDotSymbol);
                     }
                     else
                     {
@@ -256,7 +261,7 @@ namespace Pliant.Runtime
                 var count = _cachedCount[symbol];
                 if (count != 1)
                     continue;
-                frameSet.AddCachedTransition(_cachedTransitions[symbol]);
+                deterministicSet.AddCachedTransition(_cachedTransitions[symbol]);
             }
 
             _cachedTransitions.Clear();

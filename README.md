@@ -116,7 +116,7 @@ Number
 	= Digits;
 		
 Digits ~ /[0-9]+/ ;
-Whitespace ~ /[\\s]+/ ;
+Whitespace ~ /[\s]+/ ;
 	
 :start = Calculator;
 :ignore = Whitespace;
@@ -252,3 +252,5 @@ var parseTree = new InternalTreeNode(
 * [Finding nullable productions in a grammar](http://cstheory.stackexchange.com/a/2493/32787)
 * [Directly-Executable Earley Parsing (Aycock and Horspool, 2001)](http://link.springer.com/chapter/10.1007%2F3-540-45306-7_16#)
 * [Context Senitive Earley Parsing](https://web.archive.org/web/20110708224600/https://danielmattosroberts.com/earley/context-sensitive-earley.pdf)
+* [stack overflow question on parse forests](https://stackoverflow.com/a/41008891/516419)
+* [stack overflow question on nullable non terminals](https://stackoverflow.com/a/37929474/516419)

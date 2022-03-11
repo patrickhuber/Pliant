@@ -48,6 +48,13 @@ namespace Pliant.Runtime
         bool Pulse(IReadOnlyList<IToken> tokens);
 
         /// <summary>
+        /// Accepts multiple tokens as errors into the current earley set and propigates the original scan rule to the next earley set as well.
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <returns></returns>
+        bool Errors(IReadOnlyList<IToken> tokens);
+
+        /// <summary>
         /// Gets the grammar used by the parse engine.
         /// </summary>
         IGrammar Grammar { get; }

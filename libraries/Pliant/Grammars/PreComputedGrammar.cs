@@ -31,11 +31,11 @@ namespace Pliant.Grammars
             while (_dottedRuleSetQueue.Count > 0)
             {
                 // assume the closure has already been captured
-                var frame = _dottedRuleSetQueue.Dequeue();
-                ProcessSymbolTransitions(frame);
+                var dottedRuleSet = _dottedRuleSetQueue.Dequeue();
+                ProcessSymbolTransitions(dottedRuleSet);
 
-                // capture the predictions for the frame
-                var predictedStates = GetPredictedStates(frame);
+                // capture the predictions for the dotted rule set
+                var predictedStates = GetPredictedStates(dottedRuleSet);
 
                 // if no predictions, continue
                 if (predictedStates.Count == 0)
@@ -46,7 +46,7 @@ namespace Pliant.Grammars
                 if (!TryGetOrCreateDottedRuleSet(predictedStates, out DottedRuleSet nullDottedRuleSet))
                     ProcessSymbolTransitions(nullDottedRuleSet);
 
-                frame.NullTransition = nullDottedRuleSet;
+                dottedRuleSet.NullTransition = nullDottedRuleSet;
             }
         }
 
@@ -187,14 +187,14 @@ namespace Pliant.Grammars
             return false;
         }
 
-        private void ProcessSymbolTransitions(DottedRuleSet frame)
+        private void ProcessSymbolTransitions(DottedRuleSet dottedRuleSet)
         {
             var pool = SharedPools.Default<Dictionary<ISymbol, SortedSet<IDottedRule>>>();
             var transitions = pool.AllocateAndClear();
 
-            for (int i = 0; i < frame.Data.Count; i++)
+            for (int i = 0; i < dottedRuleSet.Data.Count; i++)
             {
-                var nfaState = frame.Data[i];                
+                var nfaState = dottedRuleSet.Data[i];                
                 if (IsComplete(nfaState))
                     continue;
                 
@@ -209,7 +209,7 @@ namespace Pliant.Grammars
             {
                 var confirmedStates = GetConfirmedStates(transitions[symbol]);
                 var valueDottedRuleSet = AddNewOrGetExistingDottedRuleSet(confirmedStates);
-                frame.AddTransistion(symbol, valueDottedRuleSet);
+                dottedRuleSet.AddTransistion(symbol, valueDottedRuleSet);
             }
 
             pool.ClearAndFree(transitions);

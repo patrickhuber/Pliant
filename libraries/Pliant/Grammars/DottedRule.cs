@@ -55,15 +55,19 @@ namespace Pliant.Grammars
         public override string ToString()
         {
             var stringBuilder = new StringBuilder()
-                .AppendFormat("{0} ->", Production.LeftHandSide.Value);
-            const string Dot = "\u25CF";
+                .Append($"{Production.LeftHandSide.Value} ->");
+            
+            const string Dot = "\u25CF";                        
+            const string Space = " ";
 
             for (var p = 0; p < Production.RightHandSide.Count; p++)
             {
-                stringBuilder.AppendFormat(
-                    "{0}{1}",
-                    p == Position ? Dot : " ",
-                    Production.RightHandSide[p]);
+                if (p == Position)
+                    stringBuilder.Append(Dot);
+                else
+                    stringBuilder.Append(Space);
+                
+                stringBuilder.Append(Production.RightHandSide[p]);
             }
 
             if (Position == Production.RightHandSide.Count)

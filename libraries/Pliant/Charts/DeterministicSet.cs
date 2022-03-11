@@ -35,10 +35,7 @@ namespace Pliant.Charts
 
         public CachedDottedRuleSetTransition FindCachedDottedRuleSetTransition(ISymbol searchSymbol)
         {
-            CachedDottedRuleSetTransition transition = null;
-            if (_transitions.TryGetValue(searchSymbol, out transition))
-                return transition;
-            return null;
+            return _transitions.TryGetValue(searchSymbol, out CachedDottedRuleSetTransition transition) ? transition : null;
         }
 
         public void AddCachedTransition(CachedDottedRuleSetTransition cachedDottedRuleSetTransition)

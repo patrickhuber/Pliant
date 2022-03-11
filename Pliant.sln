@@ -1,13 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29509.3
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".documentation", ".documentation", "{026B4A97-0C94-4C41-A869-433989C12BE7}"
 	ProjectSection(SolutionItems) = preProject
 		documentation\grammars.md = documentation\grammars.md
 		LICENSE.md = LICENSE.md
 		documentation\morse-code-grammar.md = documentation\morse-code-grammar.md
+		documentation\pdl.md = documentation\pdl.md
 		README.md = README.md
 		documentation\regex.md = documentation\regex.md
 	EndProjectSection
@@ -50,7 +51,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".packaging", ".packaging", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{92A687DC-3A14-4C93-8F73-2ACD6DE8710D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pliant.Samples.WithPdl", "samples\Pliant.Samples.WithPdl\Pliant.Samples.WithPdl.csproj", "{7F572D7A-9107-4667-A4EF-9D16120A3568}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.Samples.WithPdl", "samples\Pliant.Samples.WithPdl\Pliant.Samples.WithPdl.csproj", "{7F572D7A-9107-4667-A4EF-9D16120A3568}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pliant.ConsoleApp", "hosts\Pliant.ConsoleApp\Pliant.ConsoleApp.csproj", "{0A1DC947-33D5-499B-9F09-F03C0D445B6F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".scripts", ".scripts", "{C8E8BC5A-5E24-4DD2-BD25-91532FE0D444}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -98,6 +103,10 @@ Global
 		{7F572D7A-9107-4667-A4EF-9D16120A3568}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7F572D7A-9107-4667-A4EF-9D16120A3568}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7F572D7A-9107-4667-A4EF-9D16120A3568}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A1DC947-33D5-499B-9F09-F03C0D445B6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A1DC947-33D5-499B-9F09-F03C0D445B6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A1DC947-33D5-499B-9F09-F03C0D445B6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A1DC947-33D5-499B-9F09-F03C0D445B6F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,6 +123,7 @@ Global
 		{F7CE9C6C-B253-4ABA-8242-AAA1FB234198} = {6AF43B18-EF28-4486-8C5C-E4AFD659F8D8}
 		{C35E655F-35E2-4014-9909-4E471602AF87} = {034801F2-BCA7-4C40-B371-4C32E78BE815}
 		{7F572D7A-9107-4667-A4EF-9D16120A3568} = {92A687DC-3A14-4C93-8F73-2ACD6DE8710D}
+		{0A1DC947-33D5-499B-9F09-F03C0D445B6F} = {E3C2A6DF-5436-4BC8-AAB1-C3B524B0FBAB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6C38722D-9FD5-40A1-B019-FB91EB3D719B}

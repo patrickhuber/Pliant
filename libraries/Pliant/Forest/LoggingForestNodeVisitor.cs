@@ -3,7 +3,7 @@ using Pliant.Forest;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Pliant.Tests.Common.Forest
+namespace Pliant.Forest
 {
     public class LoggingForestNodeVisitor : IForestNodeVisitor
     {
@@ -66,6 +66,11 @@ namespace Pliant.Tests.Common.Forest
                 var child = node.Children[i];
                 Visit(child);
             }
+        }
+
+        public void Visit(ITerminalForestNode node)
+        {
+            PrintNode(node);
         }
 
         private void PrintNode(IForestNode node)
@@ -140,9 +145,5 @@ namespace Pliant.Tests.Common.Forest
             return $"('{node.Token.Capture}', {node.Origin}, {node.Location})";
         }
         
-        public void Visit(ITerminalForestNode node)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

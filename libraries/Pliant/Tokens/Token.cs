@@ -19,7 +19,7 @@ namespace Pliant.Tokens
         public IReadOnlyList<ITrivia> TrailingTrivia { get; private set; }
 
         public ICapture<char> Capture { get; private set; }
-
+        
         public Token(string value, int position, TokenType tokenType)
         {
             Capture = value.AsCapture();

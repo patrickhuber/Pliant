@@ -847,6 +847,36 @@ namespace Pliant.Tests.Unit.Runtime
                 new NullableGrammar())
                 .RunParse("aaaa");
         }
+
+        [TestMethod]
+        public void ParseEngineProducesSkipTokenInParseForest()
+        {
+            ProductionExpression
+               S = nameof(S);
+            S.Rule
+                = "(" + S + ")"
+                | S + S
+                | (Expr)null;
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
+            var parseTester = new ParseTester(grammar);
+            var input = "(&)";
+            parseTester.RunParse(input);
+        }
+
+        [TestMethod]
+        public void ParseEngineProducesSkipTokenAndMissingTokenInParseForest()
+        {
+            ProductionExpression
+               S = nameof(S);
+            S.Rule
+                = "(" + S + ")"
+                | S + S
+                | (Expr)null;
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
+            var parseTester = new ParseTester(grammar);
+            var input = "(&)";
+            parseTester.RunParse(input);
+        }
                         
         private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(string input, IGrammar grammar)
         {

@@ -34,10 +34,7 @@ namespace Pliant.Tokens
             
             _index++;
 
-            if (!Capture.Grow())
-                return false;
-
-            return true;
+            return Capture.Grow();
         }
 
         public override void Reset()

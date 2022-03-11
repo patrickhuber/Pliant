@@ -1,19 +1,23 @@
 name: build
 
+# only publish builds with a tag
+#on: 
+#  push:
+#    tags:
+#    - '**'
 on: [push]
-
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: ['3.1.x']
+        dotnet-version: ['6.0.x']
     steps:
 
     - uses: actions/checkout@v2
 
-    - name: Setup .NET Core SDK ${{ matrix.dotnet }}
-      uses: actions/setup-dotnet@v1.7.2
+    - name: Setup .NET SDK ${{ matrix.dotnet }}
+      uses: actions/setup-dotnet@v1
       with:
         dotnet-version: ${{ matrix.dotnet-version }}
 
@@ -23,7 +27,14 @@ jobs:
       # read the package version and append the GITHUB_ENV var to set for next step
     - name: Read Package Version      
       run: |
-        export VERSION=$(cat .packaging/version.txt)
+        export VERSION=1.0.0
+        if [ $GITHUB_REF_TYPE == "tag" ]; then
+            if [[ $GITHUB_REF_NAME = v* ]]; then
+                export VERSION=${GITHUB_REF_NAME#?}
+            else
+                export VERSION=${GITHUB_REF_NAME}
+            fi            
+        fi
         echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
     # no need to run `dotnet pack` as the auto package flag is set
@@ -32,9 +43,20 @@ jobs:
 
     - name: Test with the dotnet CLI
       run: dotnet test --configuration Release --no-restore --verbosity normal
-      
+
+  release:
+    runs-on: ubuntu-latest
+    needs:
+    - build
+    if: ${{ github.ref_type == 'tag' }}
+    steps:
+    - name: "download build artifacts"
+      uses: actions/download-artifact@v2
+      with:
+        name: build
+        path: build
+
     # package is generated on build so just push it if newer
-    - name: Publish to NuGet      
-      if: ${{github.ref == 'refs/heads/master'}}
+    - name: Publish to NuGet
       run: dotnet nuget push libraries/Pliant/bin/Release/Pliant.$VERSION.nupkg --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
-        
+ 

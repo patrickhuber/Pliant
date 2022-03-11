@@ -6,11 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.21308.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\libraries\Pliant\Pliant.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Update="calculator.pdl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="expression.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

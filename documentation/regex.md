@@ -18,8 +18,7 @@ regex =
 (* an empty rule, or lambda rule is denoted by alteration with no body *)
 expression =  
         term 
-    |   term, '|', expression
-    | ;
+    |   term, '|', expression ;
 
 term = 
         factor

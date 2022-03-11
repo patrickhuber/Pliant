@@ -80,10 +80,10 @@ namespace Pliant.Tests.Unit.Languages.Regex
         }
 
         [TestMethod]
-        public void RegexShouldFailEmptyGroup()
+        public void RegexShouldFailOnEmptyGroup()
         {
             var input = "()";
-            FailParseAtPosition(input, 1);
+            ParseAndNotAcceptInput(input);
         }
 
         [TestMethod]

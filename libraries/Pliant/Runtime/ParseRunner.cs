@@ -6,6 +6,7 @@ using Pliant.Tokens;
 using Pliant.Grammars;
 using System.Text;
 using Pliant.Captures;
+using System.Linq;
 
 namespace Pliant.Runtime
 {
@@ -19,6 +20,9 @@ namespace Pliant.Runtime
         private readonly List<ILexeme> _ignoreLexemes;        
         private readonly List<ILexeme> _triviaAccumulator;
         private readonly List<ILexeme> _triviaLexemes;
+        private readonly List<ErrorToken> _currentErrorTokens;
+        private readonly List<ErrorToken> _errors;
+        public IReadOnlyList<ErrorToken> Errors => _errors;
 
         private List<ILexeme> _previousTokenLexemes;
 
@@ -30,28 +34,186 @@ namespace Pliant.Runtime
 
         public IParseEngine ParseEngine { get; private set; }
 
+        public ParseRunnerOptions Options { get; private set; }
+
         public ParseRunner(IParseEngine parseEngine, string input)
             : this(parseEngine, new StringReader(input))
         {
         }
 
+        public ParseRunner(IParseEngine parseEngine, string input, ParseRunnerOptions options)
+            : this(parseEngine, new StringReader(input), options)
+        {
+        }
+
         public ParseRunner(IParseEngine parseEngine, TextReader reader)
+            : this(parseEngine, reader, new ParseRunnerOptions())
+        { 
+        }
+
+        public ParseRunner(IParseEngine parseEngine, TextReader reader, ParseRunnerOptions options)
         {
             ParseEngine = parseEngine;
+            Options = options;
+
             _reader = reader;
             _tokenLexemes = new List<ILexeme>();
             _ignoreLexemes = new List<ILexeme>();
             _triviaLexemes = new List<ILexeme>();
             _triviaAccumulator = new List<ILexeme>();
+            _currentErrorTokens = new List<ErrorToken>();
+            _errors = new List<ErrorToken>();
             _lexemeFactoryRegistry = new LexemeFactoryRegistry();
             _builder = new StringBuilder();
-            _capture = new StringBuilderCapture(_builder);
+            _capture = new StringBuilderCapture(_builder);            
 
             RegisterDefaultLexemeFactories(_lexemeFactoryRegistry);
             Position = -1;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>
+        /// <see cref="ReadStatus.Success"/> if the operation succeeds
+        /// <see cref="ReadStatus.Failure"/> if trying to read past the end of the stream or the operation could not recover
+        /// <see cref="ReadStatus.Recovery"/> if the operation failed but was recovered
+        /// </returns>
         public bool Read()
+        {
+            if (EndOfStream())
+                return false;
+
+            var character = ReadCharacter();
+            UpdatePositionMetrics(character);
+
+            if (MatchesExistingIncompleteIgnoreLexemes())
+                return true;
+
+            if (MatchesExistingIncompleteTriviaLexemes())
+                return true;
+
+            if (MatchExistingTokenLexemes())
+            {
+                if (EndOfStream())
+                    return CleanUp();
+
+                return true;
+            }
+
+            if (AnyExistingTokenLexemes())
+                if (!TryParseExistingToken())
+                    return HandleError();
+
+            if (MatchesNewTokenLexemes())
+            {
+                Recover();
+
+                if (EndOfStream())
+                    return CleanUp();
+                
+                if (AnyExistingTriviaLexemes())
+                    AccumulateAcceptedTrivia();
+                return true;
+            }
+
+            if (MatchesExistingTriviaLexemes())
+            {
+                if (EndOfStream() || IsEndOfLineCharacter(character))
+                {
+                    AccumulateAcceptedTrivia();
+                    AddTrailingTriviaToPreviousToken();
+                }
+                return true;
+            }
+
+            if (AnyExistingTriviaLexemes())
+                AccumulateAcceptedTrivia();
+
+            if (MatchesExistingIgnoreLexemes())
+                return true;
+
+            ClearExistingIgnoreLexemes();
+
+            if (MatchesNewTriviaLexemes() || MatchesNewIgnoreLexemes() || HandleError())
+                Recover();
+
+            if (!IsEndOfLineCharacter(character))
+                return true;
+
+            AccumulateAcceptedTrivia();
+            AddTrailingTriviaToPreviousToken();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Cleanup adjusts the state of the parser if there are hanging tokens or the parse engine is in an unaccepted state.
+        /// </summary>
+        /// <returns></returns>
+        private bool CleanUp()
+        {            
+            if (!TryParseExistingToken())
+                return false;
+                        
+            if (ParseEngine.IsAccepted())                
+                return true;
+
+            if (!HandleError())
+                return false;
+
+            Recover();
+            return true;
+        }
+                
+
+        /// <summary>
+        /// HandleError puts the current expected lexer rules in the parser as error tokens. 
+        /// </summary>
+        /// <returns></returns>
+        private bool HandleError()
+        {
+            if (!Options.EnableErrorRecovery)
+                return true;
+
+            if (_currentErrorTokens.Count != 0)
+            {
+                AdvanceErrors();
+                return true;
+            }
+
+            var expectedLexerRules = ParseEngine.GetExpectedLexerRules();
+            for (var r = 0; r < expectedLexerRules.Count; r++)
+            {
+                var expectedLexerRule = expectedLexerRules[r];
+                var errorToken = new ErrorToken(expectedLexerRule.TokenType, _capture, Position);
+                _currentErrorTokens.Add(errorToken);
+            }
+                        
+            // advance the parse if these are missing tokens
+            return ParseEngine.Errors(_currentErrorTokens);
+        }
+
+        private void Recover()
+        {
+            if (!Options.EnableErrorRecovery)
+                return;
+            _errors.AddRange(_currentErrorTokens);
+            _currentErrorTokens.Clear();
+        }
+
+        private void AdvanceErrors()
+        {
+            if (!Options.EnableErrorRecovery)
+                return;
+            for (var e = 0; e < _currentErrorTokens.Count; e++)
+            {
+                var error = _currentErrorTokens[e];
+                error.Scan();
+            }
+        }
+
+        public bool ReadV0()
         {
             if (EndOfStream())
                 return false;
