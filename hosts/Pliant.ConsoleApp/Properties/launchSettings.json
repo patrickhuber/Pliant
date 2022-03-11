@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Pliant.ConsoleApp": {
+      "commandName": "Project",
+      "commandLineArgs": "-g calculator.pdl -f expression.txt"
+    }
+  }
+}

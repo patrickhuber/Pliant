@@ -1,4 +1,7 @@
-﻿namespace Pliant.Runtime
+﻿using Pliant.Tokens;
+using System.Collections.Generic;
+
+namespace Pliant.Runtime
 {
     public interface IParseRunner
     {
@@ -39,5 +42,15 @@
         /// </summary>
         /// <returns>true if end of stream, false if error is encountered.</returns>
         bool RunToEnd();
+
+        /// <summary>
+        /// Errors returns the list of error tokens the parse runner injected into the parse
+        /// </summary>
+        IReadOnlyList<ErrorToken> Errors { get; }
+
+        /// <summary>
+        /// Options provide configuration options for running the parse
+        /// </summary>
+        ParseRunnerOptions Options { get; }
     }
 }

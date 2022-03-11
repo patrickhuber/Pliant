@@ -45,7 +45,7 @@ literal =
     | double_quote_string;
 
 repetition =   
-      '{', expression '}';
+      '{' expression '}';
 
 optional =   
       '[' expression ']';

@@ -33,13 +33,7 @@ namespace Pliant.Languages.Pdl
         {
             BaseLexerRule
                 settingIdentifier = SettingIdentifier(),
-                notDoubleQuote = NotDoubleQuote(),
-                notSingleQuote = NotSingleQuote(),
                 identifier = Identifier(),
-                any = new TerminalLexerRule(new AnyTerminal(), "."),
-                notCloseBracket = new TerminalLexerRule(
-                    new NegationTerminal(new CharacterTerminal(']')), "[^\\]]"),
-                escapeCharacter = EscapeCharacter(),
                 whitespace = Whitespace(),
                 multiLineComment = MultiLineComment();
 
@@ -165,54 +159,6 @@ namespace Pliant.Languages.Pdl
             public static readonly TokenType Identifier = new TokenType("identifier");
             public static readonly TokenType Whitespace = new TokenType("whitespace");
             public static readonly TokenType MultiLineComment = new TokenType(@"\/[*]([*][^\/]|[^*])*[*][\/]");
-        }
-
-        private static BaseLexerRule EscapeCharacter()
-        {
-            var start = new DfaState();
-            var escape = new DfaState();
-            var final = new DfaState(true);
-            start.AddTransition(new DfaTransition(new CharacterTerminal('\\'), escape));
-            escape.AddTransition(new DfaTransition(new AnyTerminal(), final));
-            return new DfaLexerRule(start, TokenTypes.Escape);
-        }
-
-        private static BaseLexerRule NotSingleQuote()
-        {
-            // ([^']|(\\.))*
-            var start = new DfaState();
-            var final = new DfaState(true);
-            var terminal = new NegationTerminal(new CharacterTerminal('\''));
-            var edge = new DfaTransition(terminal, final);
-            start.AddTransition(edge);
-            final.AddTransition(edge);
-            return new DfaLexerRule(start, TokenTypes.NotSingleQuote);
-        }
-
-        private static BaseLexerRule NotDoubleQuote()
-        {
-            // ([^"]|(\\.))*
-            var start = new DfaState();
-            var escape = new DfaState();
-            var final = new DfaState(true);
-
-            var notDoubleQuoteTerminal = new NegationTerminal(
-                new CharacterTerminal('"'));
-            var escapeTerminal = new CharacterTerminal('\\');
-            var anyTerminal = new AnyTerminal();
-
-            var notDoubleQuoteEdge = new DfaTransition(notDoubleQuoteTerminal, final);
-            start.AddTransition(notDoubleQuoteEdge);
-            final.AddTransition(notDoubleQuoteEdge);
-
-            var escapeEdge = new DfaTransition(escapeTerminal, escape);
-            start.AddTransition(escapeEdge);
-            final.AddTransition(escapeEdge);
-
-            var anyEdge = new DfaTransition(anyTerminal, final);
-            escape.AddTransition(anyEdge);
-
-            return new DfaLexerRule(start, TokenTypes.NotDoubleQuote);
         }
 
         private static BaseLexerRule SettingIdentifier()

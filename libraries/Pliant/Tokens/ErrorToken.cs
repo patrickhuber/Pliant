@@ -1,19 +1,33 @@
-﻿using Pliant.Captures;
+﻿using Pliant.Automata;
+using Pliant.Captures;
 using Pliant.Grammars;
 using Pliant.Utilities;
 using System.Collections.Generic;
 
 namespace Pliant.Tokens
 {
-    public abstract class LexemeBase<TLexerRule> : ILexeme
-        where TLexerRule : ILexerRule        
+    public class ErrorToken : ILexeme
     {
+        private static readonly AnyLexerRule AnyLexerRule = new AnyLexerRule("Pliant.Tokens.Error");
+
         private static readonly ITrivia[] EmptyTriviaArray = { };
         private List<ITrivia> _leadingTrivia;
         private List<ITrivia> _trailingTrivia;
 
-        protected TLexerRule ConcreteLexerRule { get; private set; }
+        public ILexerRule LexerRule => AnyLexerRule;
 
+        public ICapture<char> Capture { get; private set; }
+
+        public int Position => Capture.Offset;
+
+        public TokenType TokenType { get; private set; }
+
+        public ErrorToken(TokenType tokenType, ICapture<char> parentCapture, int offset)
+        {
+            TokenType = tokenType;
+            Capture = parentCapture.Slice(offset, 0);
+        }
+        
         public IReadOnlyList<ITrivia> LeadingTrivia
         {
             get
@@ -33,27 +47,6 @@ namespace Pliant.Tokens
                 return _trailingTrivia;
             }
         }
-
-        public ILexerRule LexerRule => (ILexerRule)ConcreteLexerRule;
-                
-        public ICapture<char> Capture { get; private set; }
-        
-        public int Position => Capture.Offset;
-
-        public TokenType TokenType
-        {
-            get { return LexerRule.TokenType; }
-        }
-
-        protected LexemeBase(TLexerRule lexerRule, ICapture<char> parentSegment, int offset)
-        {
-            ConcreteLexerRule = lexerRule;
-            Capture = parentSegment.Slice(offset, 0);
-        }
-        
-        public abstract bool IsAccepted();
-
-        public abstract bool Scan();
 
         public void AddTrailingTrivia(ITrivia trivia)
         {
@@ -75,16 +68,13 @@ namespace Pliant.Tokens
             }
             _leadingTrivia.Add(trivia);
         }
-        
-        public abstract void Reset();
 
-        public virtual void Reset(TLexerRule lexerRule, int offset)
+        public bool IsAccepted()
         {
-            ResetInternal(lexerRule, offset);
-            Reset();
+            return true;
         }
 
-        protected void ResetInternal(TLexerRule lexerRule, int offset)
+        public void Reset()
         {
             var pool = SharedPools.Default<List<ITrivia>>();
             if (_leadingTrivia != null)
@@ -97,9 +87,19 @@ namespace Pliant.Tokens
                 pool.ClearAndFree(_trailingTrivia);
                 _trailingTrivia = null;
             }
-            ConcreteLexerRule = lexerRule;
+            Capture.Count = 0;
+        }
+
+        public virtual void Reset(TokenType tokenType, int offset)
+        {
+            TokenType = tokenType;
             Capture.Offset = offset;
             Capture.Count = 0;
+        }
+
+        public bool Scan()
+        {
+            return Capture.Grow();
         }
     }
 }

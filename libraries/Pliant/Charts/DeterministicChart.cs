@@ -15,7 +15,7 @@ namespace Pliant.Charts
 
         public bool Enqueue(int index, DeterministicState state)
         {
-            DeterministicSet preComputedSet = null;
+            DeterministicSet preComputedSet;
             if (_preComputedSets.Count <= index)
             {
                 preComputedSet = new DeterministicSet(index);
