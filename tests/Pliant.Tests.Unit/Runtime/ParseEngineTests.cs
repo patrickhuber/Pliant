@@ -78,7 +78,7 @@ namespace Pliant.Tests.Unit.Runtime
             AssertNodeProperties(S_0_4, nameof(S), 0, 4);
             Assert.AreEqual(2, S_0_4.Children.Count);
 
-            var S_0_4_1 = S_0_4.Children[0] as IAndForestNode;
+            var S_0_4_1 = S_0_4.Children[0] as IPackedForestNode;
             Assert.IsNotNull(S_0_4_1);
             Assert.AreEqual(2, S_0_4_1.Children.Count);
 
@@ -91,7 +91,7 @@ namespace Pliant.Tests.Unit.Runtime
             AssertNodeProperties(T_1_4, nameof(T), 1, 4);
             Assert.AreEqual(1, T_1_4.Children.Count);
 
-            var S_0_4_2 = S_0_4.Children[1] as IAndForestNode;
+            var S_0_4_2 = S_0_4.Children[1] as IPackedForestNode;
             Assert.IsNotNull(S_0_4_2);
             Assert.AreEqual(2, S_0_4_2.Children.Count);
 
@@ -100,13 +100,13 @@ namespace Pliant.Tests.Unit.Runtime
             AssertNodeProperties(A_0_1, nameof(A), 0, 1);
             Assert.AreEqual(2, A_0_1.Children.Count);
 
-            var A_0_1_1 = A_0_1.Children[0] as IAndForestNode;
+            var A_0_1_1 = A_0_1.Children[0] as IPackedForestNode;
             Assert.IsNotNull(A_0_1_1);
             Assert.AreEqual(1, A_0_1_1.Children.Count);
 
             Assert.AreSame(a_0_1, A_0_1_1.Children[0]);
 
-            var A_0_1_2 = A_0_1.Children[1] as IAndForestNode;
+            var A_0_1_2 = A_0_1.Children[1] as IPackedForestNode;
             Assert.IsNotNull(A_0_1_1);
             Assert.AreEqual(2, A_0_1_2.Children.Count);
 
@@ -117,7 +117,7 @@ namespace Pliant.Tests.Unit.Runtime
             AssertNodeProperties(B_0_0, nameof(B), 0, 0);
             Assert.AreEqual(1, B_0_0.Children.Count);
 
-            var B_0_0_1 = B_0_0.Children[0] as IAndForestNode;
+            var B_0_0_1 = B_0_0.Children[0] as IPackedForestNode;
             Assert.IsNotNull(B_0_0_1);
             Assert.AreEqual(1, B_0_0_1.Children.Count);
 
@@ -125,7 +125,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(nullToken);
             Assert.AreEqual(string.Empty, nullToken.Token.Capture.ToString());
 
-            var T_1_4_1 = T_1_4.Children[0] as IAndForestNode;
+            var T_1_4_1 = T_1_4.Children[0] as IPackedForestNode;
             Assert.IsNotNull(T_1_4_1);
             Assert.AreEqual(2, T_1_4_1.Children.Count);
 
@@ -137,7 +137,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(b_3_4);
             Assert.AreEqual("b", b_3_4.Token.Capture.ToString());
 
-            var T_1_3_1 = T_1_3.Children[0] as IAndForestNode;
+            var T_1_3_1 = T_1_3.Children[0] as IPackedForestNode;
             Assert.IsNotNull(T_1_3_1);
             Assert.AreEqual(2, T_1_3_1.Children.Count);
 
@@ -171,7 +171,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(S_0_1);
             Assert.AreEqual(1, S_0_1.Children.Count);
 
-            var S_0_1_1 = S_0_1.Children[0] as IAndForestNode;
+            var S_0_1_1 = S_0_1.Children[0] as IPackedForestNode;
             Assert.IsNotNull(S_0_1_1);
             Assert.AreEqual(1, S_0_1_1.Children.Count);
 
@@ -201,7 +201,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(S_0_1);
             Assert.AreEqual(1, S_0_1.Children.Count);
 
-            var S_0_1_1 = S_0_1.Children[0] as IAndForestNode;
+            var S_0_1_1 = S_0_1.Children[0] as IPackedForestNode;
             Assert.IsNotNull(S_0_1_1);
             Assert.AreEqual(1, S_0_1_1.Children.Count);
 
@@ -209,7 +209,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(A_0_1);
             Assert.AreEqual(1, A_0_1.Children.Count);
 
-            var A_0_1_1 = A_0_1.Children[0] as IAndForestNode;
+            var A_0_1_1 = A_0_1.Children[0] as IPackedForestNode;
             Assert.IsNotNull(A_0_1_1);
             Assert.AreEqual(1, A_0_1_1.Children.Count);
 
@@ -243,7 +243,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(S_0_2);
             Assert.AreEqual(1, S_0_2.Children.Count);
 
-            var S_0_2_1 = S_0_2.Children[0] as IAndForestNode;
+            var S_0_2_1 = S_0_2.Children[0] as IPackedForestNode;
             Assert.IsNotNull(S_0_2_1);
             Assert.AreEqual(1, S_0_2_1.Children.Count);
 
@@ -251,7 +251,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(A_0_2);
             Assert.AreEqual(1, A_0_2.Children.Count);
 
-            var A_0_2_1 = A_0_2.Children[0] as IAndForestNode;
+            var A_0_2_1 = A_0_2.Children[0] as IPackedForestNode;
             Assert.IsNotNull(A_0_2_1);
             Assert.AreEqual(2, A_0_2_1.Children.Count);
 
@@ -263,7 +263,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(A_1_2);
             Assert.AreEqual(1, A_1_2.Children.Count);
 
-            var A_1_2_1 = A_1_2.Children[0] as IAndForestNode;
+            var A_1_2_1 = A_1_2.Children[0] as IPackedForestNode;
             Assert.IsNotNull(A_1_2_1);
             Assert.AreEqual(1, A_1_2_1.Children.Count);
 
@@ -301,7 +301,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(S_0_4);
             Assert.AreEqual(1, S_0_4.Children.Count);
 
-            var S_0_4_1 = S_0_4.Children[0] as IAndForestNode;
+            var S_0_4_1 = S_0_4.Children[0] as IPackedForestNode;
             Assert.IsNotNull(S_0_4_1);
             Assert.AreEqual(1, S_0_4_1.Children.Count);
 
@@ -309,7 +309,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(A_0_4);
             Assert.AreEqual(1, A_0_4.Children.Count);
 
-            var A_0_4_1 = A_0_4.Children[0] as IAndForestNode;
+            var A_0_4_1 = A_0_4.Children[0] as IPackedForestNode;
             Assert.IsNotNull(A_0_4_1);
             Assert.AreEqual(2, A_0_4_1.Children.Count);
 
@@ -321,7 +321,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(B_1_4);
             Assert.AreEqual(1, B_1_4.Children.Count);
 
-            var B_1_4_1 = B_1_4.Children[0] as IAndForestNode;
+            var B_1_4_1 = B_1_4.Children[0] as IPackedForestNode;
             Assert.IsNotNull(B_1_4_1);
             Assert.AreEqual(1, B_1_4_1.Children.Count);
 
@@ -329,7 +329,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(A_1_4);
             Assert.AreEqual(1, A_1_4.Children.Count);
 
-            var A_1_4_1 = A_1_4.Children[0] as IAndForestNode;
+            var A_1_4_1 = A_1_4.Children[0] as IPackedForestNode;
             Assert.IsNotNull(A_1_4_1);
             Assert.AreEqual(2, A_1_4_1.Children.Count);
 
@@ -341,7 +341,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(B_2_4);
             Assert.AreEqual(1, B_2_4.Children.Count);
 
-            var B_2_4_1 = B_2_4.Children[0] as IAndForestNode;
+            var B_2_4_1 = B_2_4.Children[0] as IPackedForestNode;
             Assert.IsNotNull(B_2_4_1);
             Assert.AreEqual(1, B_2_4_1.Children.Count);
 
@@ -349,7 +349,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(A_2_4);
             Assert.AreEqual(1, A_2_4.Children.Count);
 
-            var A_2_4_1 = A_2_4.Children[0] as IAndForestNode;
+            var A_2_4_1 = A_2_4.Children[0] as IPackedForestNode;
             Assert.IsNotNull(A_2_4_1);
             Assert.AreEqual(2, A_2_4_1.Children.Count);
 
@@ -361,7 +361,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(B_3_4);
             Assert.AreEqual(1, B_3_4.Children.Count);
 
-            var B_3_4_1 = B_3_4.Children[0] as IAndForestNode;
+            var B_3_4_1 = B_3_4.Children[0] as IPackedForestNode;
             Assert.IsNotNull(B_3_4_1);
             Assert.AreEqual(1, B_3_4_1.Children.Count);
 
@@ -397,7 +397,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(S_0_2);
             Assert.AreEqual(1, S_0_2.Children.Count);
 
-            var S_0_2_1 = S_0_2.Children[0] as IAndForestNode;
+            var S_0_2_1 = S_0_2.Children[0] as IPackedForestNode;
             Assert.IsNotNull(S_0_2_1);
             Assert.AreEqual(1, S_0_2_1.Children.Count);
 
@@ -405,7 +405,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(A_0_2);
             Assert.AreEqual(1, A_0_2.Children.Count);
 
-            var A_0_2_1 = A_0_2.Children[0] as IAndForestNode;
+            var A_0_2_1 = A_0_2.Children[0] as IPackedForestNode;
             Assert.IsNotNull(A_0_2_1);
             Assert.AreEqual(2, A_0_2_1.Children.Count);
 
@@ -413,7 +413,7 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(B_0_1);
             Assert.AreEqual(1, B_0_1.Children.Count);
 
-            var B_0_1_1 = B_0_1.Children[0] as IAndForestNode;
+            var B_0_1_1 = B_0_1.Children[0] as IPackedForestNode;
             Assert.IsNotNull(B_0_1_1);
             Assert.AreEqual(1, B_0_1_1.Children.Count);
 
@@ -424,7 +424,7 @@ namespace Pliant.Tests.Unit.Runtime
             var C_1_2 = A_0_2_1.Children[1] as ISymbolForestNode;
             Assert.IsNotNull(C_1_2);
 
-            var C_1_2_1 = C_1_2.Children[0] as IAndForestNode;
+            var C_1_2_1 = C_1_2.Children[0] as IPackedForestNode;
             Assert.IsNotNull(C_1_2_1);
             Assert.AreEqual(1, C_1_2_1.Children.Count);
 
@@ -947,19 +947,19 @@ namespace Pliant.Tests.Unit.Runtime
             var tNode = node as T;
             Assert.IsNotNull(node);
             Assert.AreEqual(1, tNode.Children.Count);
-            var firstAndNode = tNode.Children[0];
-            Assert.IsNotNull(firstAndNode);
-            Assert.AreEqual(childCount, firstAndNode.Children.Count);
+            var firstPackedNode = tNode.Children[0];
+            Assert.IsNotNull(firstPackedNode);
+            Assert.AreEqual(childCount, firstPackedNode.Children.Count);
             return tNode;
         }
 
         private static T GetAndCastChildAtIndex<T>(IInternalForestNode node, int index)
             where T : class, IForestNode
         {
-            var firstAndNode = node.Children[0];
-            Assert.IsNotNull(firstAndNode);
-            Assert.IsFalse(index > firstAndNode.Children.Count);
-            var child = firstAndNode.Children[index] as T;
+            var firstPackedNode = node.Children[0];
+            Assert.IsNotNull(firstPackedNode);
+            Assert.IsFalse(index > firstPackedNode.Children.Count);
+            var child = firstPackedNode.Children[index] as T;
             Assert.IsNotNull(child);
             return child;
         }

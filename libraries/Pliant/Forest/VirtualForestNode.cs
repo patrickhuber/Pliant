@@ -11,7 +11,7 @@ namespace Pliant.Forest
 
         private readonly int _hashCode;
 
-        public override IReadOnlyList<IAndForestNode> Children
+        public override IReadOnlyList<IPackedForestNode> Children
         {
             get
             {
@@ -96,14 +96,14 @@ namespace Pliant.Forest
         {
             for (var a = 0; a < internalCompletedParseNode.Children.Count; a++)
             {
-                var andNode = internalCompletedParseNode.Children[a];
-                var newAndNode = new AndForestNode();
-                for (var c = 0; c < andNode.Children.Count; c++)
+                var packedNode = internalCompletedParseNode.Children[a];
+                var newPackedNode = new PackedForestNode();
+                for (var c = 0; c < packedNode.Children.Count; c++)
                 {
-                    var child = andNode.Children[c];
-                    newAndNode.AddChild(child);
+                    var child = packedNode.Children[c];
+                    newPackedNode.AddChild(child);
                 }
-                _children.Add(newAndNode);
+                _children.Add(newPackedNode);
             }
         }
 

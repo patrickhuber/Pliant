@@ -59,13 +59,13 @@ namespace Pliant.Runtime
 
             _expectedLexerRules.Clear();
 
-            var frameSet = deterministicSets[deterministicSets.Count - 1];
-            for (var i = 0; i < frameSet.States.Count; i++)
+            var deterministicSet = deterministicSets[deterministicSets.Count - 1];
+            for (var i = 0; i < deterministicSet.States.Count; i++)
             {
-                var stateFrame = frameSet.States[i];
-                for (int j = 0; j < stateFrame.DottedRuleSet.ScanKeys.Count; j++)
+                var deterministicState = deterministicSet.States[i];
+                for (int j = 0; j < deterministicState.DottedRuleSet.ScanKeys.Count; j++)
                 {
-                    var lexerRule = stateFrame.DottedRuleSet.ScanKeys[j];
+                    var lexerRule = deterministicState.DottedRuleSet.ScanKeys[j];
                     var index = Grammar.GetLexerRuleIndex(lexerRule);
                     if (index < 0)
                         continue;
@@ -115,12 +115,12 @@ namespace Pliant.Runtime
             return AnyDeterministicStateAccepted(lastDeterministicSet);
         }
 
-        private bool AnyDeterministicStateAccepted(DeterministicSet lastFrameSet)
+        private bool AnyDeterministicStateAccepted(DeterministicSet lastDeterministicSet)
         {
-            var lastDeterministicStateCount = lastFrameSet.States.Count;
+            var lastDeterministicStateCount = lastDeterministicSet.States.Count;
             for (var i = 0; i < lastDeterministicStateCount; i++)
             {
-                var deterministicState = lastFrameSet.States[i];
+                var deterministicState = lastDeterministicSet.States[i];
                 var originIsFirstEarleySet = deterministicState.Origin == 0;
                 if (!originIsFirstEarleySet)
                     continue;
@@ -203,8 +203,8 @@ namespace Pliant.Runtime
             {
                 for (var i = 0; i < deterministicSet.States.Count; i++)
                 {
-                    var stateFrame = deterministicSet.States[i];
-                    EarleyReductionOperation(iLoc, stateFrame, lhsSym);
+                    var deterministicState = deterministicSet.States[i];
+                    EarleyReductionOperation(iLoc, deterministicState, lhsSym);
                 }
             }
         }
@@ -216,7 +216,7 @@ namespace Pliant.Runtime
         {
             var deterministicSet = Chart.Sets[iLoc];
             // leo eligibility needs to be cached before creating the cached transition
-            // if the size of the list is != 1, do not enter the cached frame transition
+            // if the size of the list is != 1, do not enter the cached set transition
             _cachedCount ??= new Dictionary<ISymbol, int>();
             _cachedTransitions ??= new Dictionary<ISymbol, CachedDottedRuleSetTransition>();
 
@@ -255,7 +255,7 @@ namespace Pliant.Runtime
                 }
             }
 
-            // add all memoized leo items to the frameSet
+            // add all memoized leo items to the deterministic set
             foreach (var symbol in _cachedCount.Keys)
             {
                 var count = _cachedCount[symbol];
@@ -269,16 +269,16 @@ namespace Pliant.Runtime
         }
 
         private CachedDottedRuleSetTransition CreateTopCachedItem(
-            DeterministicState stateFrame, 
+            DeterministicState deterministicState, 
             ISymbol postDotSymbol)
         {
-            var origin = stateFrame.Origin;
+            var origin = deterministicState.Origin;
             CachedDottedRuleSetTransition topCacheItem = null;
             // search for the top item in the leo chain
             while (true)
             {
-                var originFrameSet = Chart.Sets[stateFrame.Origin];
-                var nextCachedItem = originFrameSet.FindCachedDottedRuleSetTransition(postDotSymbol);
+                var originDeterministicSet = Chart.Sets[deterministicState.Origin];
+                var nextCachedItem = originDeterministicSet.FindCachedDottedRuleSetTransition(postDotSymbol);
                 if (nextCachedItem is null)
                     break;
                 topCacheItem = nextCachedItem;
@@ -289,8 +289,8 @@ namespace Pliant.Runtime
 
             return new CachedDottedRuleSetTransition(
                 postDotSymbol,
-                stateFrame.DottedRuleSet,
-                topCacheItem is null ? stateFrame.Origin : origin);
+                deterministicState.DottedRuleSet,
+                topCacheItem is null ? deterministicState.Origin : origin);
         }
 
         private void EarleyReductionOperation(int iLoc, DeterministicState fromEim, ISymbol transSym)

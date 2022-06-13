@@ -138,12 +138,12 @@ namespace Pliant.Runtime
             {
                 var state = set.States[f];
                 var parent = state.Origin;
-                var frame = state.DottedRuleSet;
+                var dottedRuleSet = state.DottedRuleSet;
 
                 if (parent == i)
                     continue;
 
-                ReduceDottedRuleSet(i, parent, frame);
+                ReduceDottedRuleSet(i, parent, dottedRuleSet);
             }
         }
 
@@ -229,10 +229,10 @@ namespace Pliant.Runtime
 
         public IReadOnlyList<ILexerRule> GetExpectedLexerRules()
         {
-            var frameSets = _chart.Sets;
-            var frameSetCount = frameSets.Count;
+            var deterministicSets = _chart.Sets;
+            var deterministicSetCount = deterministicSets.Count;
 
-            if (frameSetCount == 0)
+            if (deterministicSetCount == 0)
                 return EmptyLexerRules;
 
             if (_expectedLexerRules is null)
@@ -240,13 +240,13 @@ namespace Pliant.Runtime
             else
                 _expectedLexerRules.Clear();
 
-            var frameSet = frameSets[frameSets.Count - 1];
-            for (var i = 0; i < frameSet.States.Count; i++)
+            var deterministicSet = deterministicSets[deterministicSets.Count - 1];
+            for (var i = 0; i < deterministicSet.States.Count; i++)
             {
-                var stateFrame = frameSet.States[i];
-                for (int j = 0; j < stateFrame.DottedRuleSet.ScanKeys.Count; j++)
+                var deterministicState = deterministicSet.States[i];
+                for (int j = 0; j < deterministicState.DottedRuleSet.ScanKeys.Count; j++)
                 {
-                    var lexerRule = stateFrame.DottedRuleSet.ScanKeys[j];
+                    var lexerRule = deterministicState.DottedRuleSet.ScanKeys[j];
                     var index = Grammar.GetLexerRuleIndex(lexerRule);
                     if (index < 0)
                         continue;

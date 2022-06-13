@@ -4,59 +4,59 @@ namespace Pliant.Forest
 {
     public abstract class InternalForestNode : ForestNodeBase, IInternalForestNode
     {
-        protected readonly List<IAndForestNode> _children;
-        public virtual IReadOnlyList<IAndForestNode> Children { get { return _children; } }
+        protected readonly List<IPackedForestNode> _children;
+        public virtual IReadOnlyList<IPackedForestNode> Children { get { return _children; } }
 
         protected InternalForestNode(int origin, int location)
             : base(origin, location)
         {
-            _children = new List<IAndForestNode>();
+            _children = new List<IPackedForestNode>();
         }
 
         public void AddUniqueFamily(IForestNode trigger)
         {
-            AddUniqueAndNode(trigger);
+            AddUniquePackedNode(trigger);
         }
 
         public void AddUniqueFamily(IForestNode source, IForestNode trigger)
         {
             if(source == this)
                 source = Children[0].Children[0];
-            AddUniqueAndNode(source, trigger);
+            AddUniquePackedNode(source, trigger);
         }        
 
-        private void AddUniqueAndNode(IForestNode child)
+        private void AddUniquePackedNode(IForestNode child)
         {
-            AddUniqueAndNode(child, null);
+            AddUniquePackedNode(child, null);
         }
 
-        private void AddUniqueAndNode(IForestNode firstChild, IForestNode secondChild)
+        private void AddUniquePackedNode(IForestNode firstChild, IForestNode secondChild)
         {
             var childCount = 1 + ((secondChild is null) ? 0 : 1);
 
             for (var c = 0; c < _children.Count; c++)
             {
-                var andNode = _children[c];
+                var packedNode = _children[c];
 
-                if (andNode.Children.Count != childCount)
+                if (packedNode.Children.Count != childCount)
                     continue;
 
-                if (IsMatchedSubTree(firstChild, secondChild, andNode))
+                if (IsMatchedSubTree(firstChild, secondChild, packedNode))
                     return;
             }
 
             // not found so return new and node
-            var newAndNode = new AndForestNode();
-            newAndNode.AddChild(firstChild);
+            var newPackedNode = new PackedForestNode();
+            newPackedNode.AddChild(firstChild);
             if (childCount > 1)
-                newAndNode.AddChild(secondChild);
+                newPackedNode.AddChild(secondChild);
 
-            _children.Add(newAndNode);
+            _children.Add(newPackedNode);
         }
 
-        private static bool IsMatchedSubTree(IForestNode firstChild, IForestNode secondChild, IAndForestNode andNode)
+        private static bool IsMatchedSubTree(IForestNode firstChild, IForestNode secondChild, IPackedForestNode packedNode)
         {
-            var firstCompareNode = andNode.Children[0];
+            var firstCompareNode = packedNode.Children[0];
 
             // if first child matches the compare node, continue
             // otherwise return false
@@ -66,7 +66,7 @@ namespace Pliant.Forest
             if (secondChild is null)
                 return true;
 
-            var secondCompareNode = andNode.Children[1];
+            var secondCompareNode = packedNode.Children[1];
 
             // return true if the second child matches
             // otherwise return false

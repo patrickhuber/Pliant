@@ -2,7 +2,7 @@
 
 namespace Pliant.Forest
 {
-    public interface IAndForestNode
+    public interface IPackedForestNode
     {
         IReadOnlyList<IForestNode> Children { get; }
     }

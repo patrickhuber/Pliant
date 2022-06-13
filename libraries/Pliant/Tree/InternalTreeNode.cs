@@ -53,25 +53,25 @@ namespace Pliant.Tree
             {
                 if (ShouldLoadChildren())
                 {
-                    var andNode = _disambiguationAlgorithm.GetCurrentAndNode(_internalNode);
-                    LazyLoadChildren(andNode);
+                    var packedNode = _disambiguationAlgorithm.GetCurrentPackedNode(_internalNode);
+                    LazyLoadChildren(packedNode);
                 }
                 return _children;
             }
         }
 
-        private void LazyLoadChildren(IAndForestNode andNode)
+        private void LazyLoadChildren(IPackedForestNode packedNode)
         {
-            for (int c = 0; c < andNode.Children.Count; c++)
+            for (int c = 0; c < packedNode.Children.Count; c++)
             {
-                var child = andNode.Children[c];
+                var child = packedNode.Children[c];
                 switch (child.NodeType)
                 {
                     // skip intermediate nodes by enumerating children only
                     case ForestNodeType.Intermediate:
                         var intermediateNode = child as IIntermediateForestNode;
-                        var currentAndNode = _disambiguationAlgorithm.GetCurrentAndNode(intermediateNode);
-                        LazyLoadChildren(currentAndNode);
+                        var currentPackedNode = _disambiguationAlgorithm.GetCurrentPackedNode(intermediateNode);
+                        LazyLoadChildren(currentPackedNode);
                         break;
 
                     // create a internal tree node for symbol forest nodes

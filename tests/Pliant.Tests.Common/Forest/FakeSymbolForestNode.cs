@@ -5,13 +5,13 @@ namespace Pliant.Tests.Common.Forest
 {
     public class FakeSymbolForestNode : FakeInternalForestNode, ISymbolForestNode
     {
-        public FakeSymbolForestNode(ISymbol symbol, int origin, int location, params IAndForestNode[] children) 
+        public FakeSymbolForestNode(ISymbol symbol, int origin, int location, params IPackedForestNode[] children) 
             : base(origin, location, children)
         {
             Symbol = symbol;
         }
 
-        public FakeSymbolForestNode(string symbol, int origin, int location, params IAndForestNode[] children)
+        public FakeSymbolForestNode(string symbol, int origin, int location, params IPackedForestNode[] children)
             : this(new NonTerminal(symbol), origin, location, children)
         {
         }

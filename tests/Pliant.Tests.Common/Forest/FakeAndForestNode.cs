@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Pliant.Tests.Common.Forest
 {
-    public class FakeAndForestNode : IAndForestNode
+    public class FakeAndForestNode : IPackedForestNode
     {
         private List<IForestNode> _children;
 

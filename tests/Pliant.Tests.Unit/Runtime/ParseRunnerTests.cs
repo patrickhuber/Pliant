@@ -324,8 +324,8 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsNotNull(onlyCompletion);
 
             var parseNode = onlyCompletion.ParseNode as IInternalForestNode;
-            var parseNodeAndNode = parseNode.Children[0];
-            var tokenParseNode = parseNodeAndNode.Children[0] as ITokenForestNode;
+            var parseNodePackedNode = parseNode.Children[0];
+            var tokenParseNode = parseNodePackedNode.Children[0] as ITokenForestNode;
             var token = tokenParseNode.Token;
             Assert.AreEqual(PdlGrammar.TokenTypes.Identifier, token.TokenType);
             Assert.AreEqual("ows", token.Capture.ToString());
@@ -521,16 +521,16 @@ namespace Pliant.Tests.Unit.Runtime
             var parseForestRoot = parseTester.ParseEngine.GetParseForestRootNode();
 
             var firstTokenForestNode = parseForestRoot
-                .AssertInBoundsAndNavigate(andNode => andNode.Children, 0)
+                .AssertInBoundsAndNavigate(packedNode => packedNode.Children, 0)
                 .AssertInBoundsAndNavigate(forestNode => forestNode.Children, 0)
                 .AssertIsInstanceOfTypeAndCast<ITokenForestNode>();
 
             var secondTokenForestNode = parseForestRoot
-                .AssertInBoundsAndNavigate(andNode => andNode.Children, 0)
+                .AssertInBoundsAndNavigate(packedNode => packedNode.Children, 0)
                 .AssertInBoundsAndNavigate(forestNode => forestNode.Children, 1)
                 .AssertIsInstanceOfTypeAndCast<IInternalForestNode>()
                 .AssertInBoundsAndNavigate(internalForestNode => internalForestNode.Children, 0)
-                .AssertInBoundsAndNavigate(andNode => andNode.Children, 0)
+                .AssertInBoundsAndNavigate(packedNode => packedNode.Children, 0)
                 .AssertIsInstanceOfTypeAndCast<ITokenForestNode>();
 
             return new Tuple<IToken, IToken>(firstTokenForestNode.Token, secondTokenForestNode.Token);

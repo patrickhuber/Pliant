@@ -22,9 +22,9 @@ namespace Pliant.Charts
             Location = location;
         }
 
-        internal bool Enqueue(DeterministicState frame)
+        internal bool Enqueue(DeterministicState deterministicState)
         {
-            var hasEnqueued = _states.AddUnique(frame);
+            var hasEnqueued = _states.AddUnique(deterministicState);
             return hasEnqueued;
         }
 

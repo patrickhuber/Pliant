@@ -70,15 +70,7 @@ namespace Pliant.Runtime
             RegisterDefaultLexemeFactories(_lexemeFactoryRegistry);
             Position = -1;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>
-        /// <see cref="ReadStatus.Success"/> if the operation succeeds
-        /// <see cref="ReadStatus.Failure"/> if trying to read past the end of the stream or the operation could not recover
-        /// <see cref="ReadStatus.Recovery"/> if the operation failed but was recovered
-        /// </returns>
+                
         public bool Read()
         {
             if (EndOfStream())
@@ -309,27 +301,28 @@ namespace Pliant.Runtime
 
         private bool TryParseExistingToken()
         {
-            var anyLexemes = _tokenLexemes.Count > 0;
+            var size = _tokenLexemes.Count;
+            var anyLexemes = size > 0;
             if (!anyLexemes)
                 return false;
 
             var i = 0;
-            var size = _tokenLexemes.Count;
 
             while (i < size)
             {
                 var lexeme = _tokenLexemes[i];
                 if (lexeme.IsAccepted())
-                    i++;
-                else
                 {
-                    if (i < size - 1)
-                    {
-                        _tokenLexemes[i] = _tokenLexemes[size - 1];
-                        _tokenLexemes[size - 1] = lexeme;
-                    }
-                    size--;
+                    i++;
+                    continue;
+                }                    
+                
+                if (i < size - 1)
+                {
+                    _tokenLexemes[i] = _tokenLexemes[size - 1];
+                    _tokenLexemes[size - 1] = lexeme;
                 }
+                size--;                
             }
 
             var anyMatches = size > 0;
@@ -426,16 +419,16 @@ namespace Pliant.Runtime
             {
                 var lexeme = lexemes[i];
                 if (lexeme.Scan())
-                    i++;
-                else
                 {
-                    if (i < size - 1)
-                    {
-                        lexemes[i] = lexemes[size - 1];
-                        lexemes[size - 1] = lexeme;
-                    }
-                    size--;
+                    i++;
+                    continue;
                 }
+                if (i < size - 1)
+                {
+                    lexemes[i] = lexemes[size - 1];
+                    lexemes[size - 1] = lexeme;
+                }
+                size--;
             }
 
             var anyMatches = size > 0;
@@ -465,16 +458,17 @@ namespace Pliant.Runtime
             {
                 var lexeme = lexemes[i];
                 if (!lexeme.IsAccepted() && lexeme.Scan())
+                { 
                     i++;
-                else
-                {
-                    if (i < size - 1)
-                    {
-                        lexemes[i] = lexemes[size - 1];
-                        lexemes[size - 1] = lexeme;
-                    }
-                    size--;
+                    continue;
                 }
+                
+                if (i < size - 1)
+                {
+                    lexemes[i] = lexemes[size - 1];
+                    lexemes[size - 1] = lexeme;
+                }
+                size--;                
             }
 
             var anyMatches = size > 0;

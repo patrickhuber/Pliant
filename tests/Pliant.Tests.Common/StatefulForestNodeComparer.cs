@@ -53,7 +53,7 @@ namespace Pliant.Tests.Common
 
             for (int i = 0; i < firstInternalForestNode.Children.Count; i++)
             {
-                if (!AreAndNodesEqual(
+                if (!ArePackedNodesEqual(
                     firstInternalForestNode.Children[i],
                     secondInternalForestNode.Children[i]))
                     return false;
@@ -61,16 +61,16 @@ namespace Pliant.Tests.Common
             return true;
         }
 
-        bool AreAndNodesEqual(IAndForestNode firstAndNode, IAndForestNode secondAndNode)
+        bool ArePackedNodesEqual(IPackedForestNode firstPackedNode, IPackedForestNode secondPackedNode)
         {
-            if (firstAndNode.Children.Count != secondAndNode.Children.Count)
+            if (firstPackedNode.Children.Count != secondPackedNode.Children.Count)
                 return false;
 
-            for (int i = 0; i < firstAndNode.Children.Count; i++)
+            for (int i = 0; i < firstPackedNode.Children.Count; i++)
             {
                 if (!Equals(
-                    firstAndNode.Children[i],
-                    secondAndNode.Children[i]))
+                    firstPackedNode.Children[i],
+                    secondPackedNode.Children[i]))
                     return false;
             }
             return true;

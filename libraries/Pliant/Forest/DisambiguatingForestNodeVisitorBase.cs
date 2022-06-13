@@ -11,8 +11,8 @@
 
         public override void Visit(IIntermediateForestNode intermediateNode)
         {
-            var currentAndNode = ForestDisambiguationAlgorithm.GetCurrentAndNode(intermediateNode);
-            Visit(currentAndNode);
+            var currentPackedNode = ForestDisambiguationAlgorithm.GetCurrentPackedNode(intermediateNode);
+            Visit(currentPackedNode);
         }
 
         public override void Visit(ITokenForestNode tokenNode)
@@ -20,8 +20,8 @@
 
         public override void Visit(ISymbolForestNode symbolNode)
         {
-            var currentAndNode = ForestDisambiguationAlgorithm.GetCurrentAndNode(symbolNode);
-            Visit(currentAndNode);
+            var currentPackedNode = ForestDisambiguationAlgorithm.GetCurrentPackedNode(symbolNode);
+            Visit(currentPackedNode);
         }
 
         public override void Visit(ITerminalForestNode terminalNode)

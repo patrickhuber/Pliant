@@ -2,6 +2,6 @@
 {
     public interface IForestDisambiguationAlgorithm
     {
-        IAndForestNode GetCurrentAndNode(IInternalForestNode internalNode);
+        IPackedForestNode GetCurrentPackedNode(IInternalForestNode internalNode);
     }
 }

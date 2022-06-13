@@ -42,9 +42,9 @@ namespace Pliant.Tests.Unit.Runtime
             VisitLog.Add(terminalNode.ToString());
         }
 
-        public override void Visit(IAndForestNode andNode)
+        public override void Visit(IPackedForestNode packedNode)
         {
-            foreach (var child in andNode.Children)
+            foreach (var child in packedNode.Children)
                 child.Accept(this);
         }
     }

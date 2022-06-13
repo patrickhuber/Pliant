@@ -5,11 +5,11 @@
 
         public abstract void Visit(IIntermediateForestNode intermediateNode);
 
-        public virtual void Visit(IAndForestNode andNode)
+        public virtual void Visit(IPackedForestNode packedNode)
         {
-            for (var c = 0; c < andNode.Children.Count; c++)
+            for (var c = 0; c < packedNode.Children.Count; c++)
             {
-                var child = andNode.Children[c];
+                var child = packedNode.Children[c];
                 child.Accept(this);
             }
         }

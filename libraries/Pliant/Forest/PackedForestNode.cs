@@ -2,13 +2,13 @@
 
 namespace Pliant.Forest
 {
-    public class AndForestNode : IAndForestNode
+    public class PackedForestNode : IPackedForestNode
     {
         public IReadOnlyList<IForestNode> Children { get { return _children; } }
 
         private readonly List<IForestNode> _children;
 
-        public AndForestNode()
+        public PackedForestNode()
         {
             _children = new List<IForestNode>();
         }

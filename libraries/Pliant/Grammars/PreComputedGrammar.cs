@@ -42,7 +42,7 @@ namespace Pliant.Grammars
                     continue;
 
                 // assign the null transition
-                // only process symbols on the null frame if it is new
+                // only process symbols on the null dotted rule set if it is new
                 if (!TryGetOrCreateDottedRuleSet(predictedStates, out DottedRuleSet nullDottedRuleSet))
                     ProcessSymbolTransitions(nullDottedRuleSet);
 
@@ -112,16 +112,16 @@ namespace Pliant.Grammars
             return closure;
         }
 
-        private SortedSet<IDottedRule> GetPredictedStates(DottedRuleSet frame)
+        private SortedSet<IDottedRule> GetPredictedStates(DottedRuleSet dottedRuleSet)
         {
             var pool = SharedPools.Default<Queue<IDottedRule>>();
 
             var queue = pool.AllocateAndClear();
             var closure = new SortedSet<IDottedRule>();
 
-            for (int i = 0; i < frame.Data.Count; i++)
+            for (int i = 0; i < dottedRuleSet.Data.Count; i++)
             {
-                var state = frame.Data[i];
+                var state = dottedRuleSet.Data[i];
                 if (!IsComplete(state))
                     queue.Enqueue(state);
             }
@@ -140,7 +140,7 @@ namespace Pliant.Grammars
                 if (Grammar.IsTransativeNullable(nonTerminalPostDotSymbol))
                 {
                     var preComputedState = GetPreComputedState(state.Production, state.Position + 1);
-                    if (!frame.Contains(preComputedState))
+                    if (!dottedRuleSet.Contains(preComputedState))
                         if (closure.Add(preComputedState))
                             if (!IsComplete(preComputedState))
                                 queue.Enqueue(preComputedState);
@@ -151,7 +151,7 @@ namespace Pliant.Grammars
                 {
                     var prediction = predictions[p];
                     var preComputedState = GetPreComputedState(prediction, 0);
-                    if (frame.Contains(preComputedState))
+                    if (dottedRuleSet.Contains(preComputedState))
                         continue;
                     if (!closure.Add(preComputedState))
                         continue;

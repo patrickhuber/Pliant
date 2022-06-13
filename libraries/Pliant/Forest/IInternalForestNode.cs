@@ -3,11 +3,11 @@
 namespace Pliant.Forest
 {
     /// <summary>
-    /// Represents a Disjuncion of IAndNodes
+    /// Represents a Disjuncion of IPackedNodes
     /// </summary>
     public interface IInternalForestNode : IForestNode
     {
-        IReadOnlyList<IAndForestNode> Children { get; }
+        IReadOnlyList<IPackedForestNode> Children { get; }
 
         void AddUniqueFamily(IForestNode trigger);
 

@@ -6,16 +6,16 @@ namespace Pliant.Tests.Common.Forest
 {
     public abstract class FakeInternalForestNode : IInternalForestNode
     {
-        private List<IAndForestNode> _children;
+        private List<IPackedForestNode> _children;
 
-        protected FakeInternalForestNode(int origin, int location, params IAndForestNode[] children)
+        protected FakeInternalForestNode(int origin, int location, params IPackedForestNode[] children)
         {
             Origin = origin;
             Location = location;
-            _children = new List<IAndForestNode>(children);
+            _children = new List<IPackedForestNode>(children);
         }
 
-        public IReadOnlyList<IAndForestNode> Children
+        public IReadOnlyList<IPackedForestNode> Children
         {
             get { return _children; }
         }

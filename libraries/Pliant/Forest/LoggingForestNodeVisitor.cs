@@ -22,11 +22,11 @@ namespace Pliant.Forest
             return;
         }
 
-        public void Visit(IAndForestNode andNode)
+        public void Visit(IPackedForestNode packedNode)
         {
-            for (var i = 0; i < andNode.Children.Count; i++)
+            for (var i = 0; i < packedNode.Children.Count; i++)
             {
-                var child = andNode.Children[i];
+                var child = packedNode.Children[i];
                 child.Accept(this);
             }
         }
@@ -52,10 +52,10 @@ namespace Pliant.Forest
             {
                 PrintNode(node);
                 _writer.Write(" ->");
-                var andNode = node.Children[a];
-                for (var c = 0; c < andNode.Children.Count; c++)
+                var packedNode = node.Children[a];
+                for (var c = 0; c < packedNode.Children.Count; c++)
                 {
-                    var child = andNode.Children[c];
+                    var child = packedNode.Children[c];
                     PrintNode(child);
                 }
                 _writer.WriteLine();
@@ -111,10 +111,10 @@ namespace Pliant.Forest
             var children = new List<IForestNode>();
             for (var a = 0; a < intermediate.Children.Count; a++)
             {
-                var andNode = intermediate.Children[a];
-                for (var c = 0; c < andNode.Children.Count; c++)
+                var packedNode = intermediate.Children[a];
+                for (var c = 0; c < packedNode.Children.Count; c++)
                 {
-                    var child = andNode.Children[c];
+                    var child = packedNode.Children[c];
                     switch (child.NodeType)
                     {
                         case ForestNodeType.Intermediate:
