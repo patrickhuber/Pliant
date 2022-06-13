@@ -36,7 +36,7 @@ jobs:
             fi            
         fi
         echo "VERSION=${VERSION}" >> $GITHUB_ENV
-        echo $VERSION > VERSION # echo to text file to share with other job
+        echo ${VERSION} > VERSION # echo to text file to share with other job
 
     # no need to run `dotnet pack` as the auto package flag is set
     - name: build
@@ -50,7 +50,7 @@ jobs:
       with: 
         name: build
         path: |
-          libraries/Pliant/bin/Release/Pliant.${VERSION}.nupkg
+          libraries/Pliant/bin/Release/Pliant.${ env.VERSION }.nupkg
           VERSION
 
   release:
