@@ -426,62 +426,43 @@ namespace Pliant.Runtime
                     Log(CompleteLogName, k, nextState);
             }
         }
-             
-        IDictionary<ISymbol, IState> _cachedTransitions;
-        IDictionary<ISymbol, int> _cachedCount;
 
         private void Memoize(int k)
         {
             var set = _chart.EarleySets[k];
-            _cachedCount ??= new Dictionary<ISymbol, int>();
-            _cachedTransitions ??=new Dictionary<ISymbol, IState>();
 
-            // loop through all items in the set looking for items 
-            // that are right recursive and quasi complete
-            for (var s = 0; s < set.Scans.Count; s++) 
+            // loop through all completed items and memoize each        
+            for (var c = 0; c < set.Completions.Count; c++)
             {
-                MemoizeOne(set.Scans[s], k);
-            }
-            for (var p = 0; p < set.Predictions.Count; p++) 
-            {
-                MemoizeOne(set.Predictions[p], k);
-            }
+                var completion = set.Completions[c];
+                var symbol = completion.DottedRule.Production.LeftHandSide;
+                if (!Grammar.IsRightRecursive(symbol))
+                    return;
 
-            // loop through all the cached counts processing only unique symbols
-            foreach(var symbol in _cachedCount.Keys)
-            {
-                // contains exactly one item of the form B -> a*AB, k
-                var count = _cachedCount[symbol];
-                if (count != 1)
+                var prediction = set.FindSourceState(symbol);
+                if (prediction == null)
                     continue;
-                
-                var state = _cachedTransitions[symbol];
 
-                // and B -> aA*B, k is quasi complete
-                var next = _dottedRuleRegistry.GetNext(state.DottedRule);
+                var next = _dottedRuleRegistry.GetNext(prediction.DottedRule);
                 if (!IsQuasiComplete(next))
                     continue;
 
-                var topMostCacheItem = FindTopMostTransition(state, symbol);
-                var reduction = FindReduction(state, k);
+                var topMostCacheItem = FindTopMostTransition(prediction, symbol);
                 var origin = topMostCacheItem is null
                             ? k
                             : topMostCacheItem.Origin;
 
-                var transition = new TransitionState(symbol, reduction, origin);
+                var transition = new TransitionState(symbol, completion, origin);
 
                 // create a link between the previous transition item and the current transition item
                 // this link is used during virtual parse node expansion
-                var previous = FindTransition(state.Origin, symbol);
-                if(previous != null)
+                var previous = FindTransition(prediction.Origin, symbol);
+                if (previous != null)
                     previous.NextTransition = transition;
 
                 if (_chart.Enqueue(k, transition))
                     Log(TransitionLogName, k, transition);
             }
-
-            _cachedTransitions.Clear();
-            _cachedCount.Clear();
         }
 
         /// <summary>
@@ -511,48 +492,6 @@ namespace Pliant.Runtime
                 origin = topMostCacheItem.Origin;
             }
             return topMostCacheItem;
-        }
-
-        private IState FindReduction(IState prediction, int origin)
-        {            
-            var set = _chart.EarleySets[origin];
-            for (var c = 0; c < set.Completions.Count; c++)
-            {
-                var completion = set.Completions[c];
-                if (prediction.DottedRule.PostDotSymbol == completion.DottedRule.Production.LeftHandSide)
-                    return completion;
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Checks to see if the item is right recursive and caches for leo eligibility check
-        /// </summary>
-        /// <param name="state"></param>
-        /// <param name="k"></param>
-        private void MemoizeOne(IState state, int k)
-        {
-            var dottedRule = state.DottedRule;
-            if (dottedRule.IsComplete)
-                return;
-
-            var postDotSymbol = state.DottedRule.PostDotSymbol;
-
-            if (postDotSymbol.SymbolType != SymbolType.NonTerminal)
-                return;
-
-            if (!Grammar.IsRightRecursive(postDotSymbol))
-                return;
-                        
-            if (_cachedCount.TryGetValue(postDotSymbol, out var count))
-            {
-                _cachedCount[postDotSymbol] = count + 1;
-            }
-            else 
-            {
-                _cachedCount[postDotSymbol] = 1;
-                _cachedTransitions[postDotSymbol] = state;
-            }
         }
 
         /// <summary>
