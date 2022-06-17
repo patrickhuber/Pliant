@@ -210,7 +210,7 @@ namespace Pliant.Runtime
         }
 
         private Dictionary<ISymbol, int> _cachedCount;
-        private Dictionary<ISymbol, CachedDottedRuleSetTransition> _cachedTransitions;
+        private Dictionary<ISymbol, DeterministicState> _cachedTransitions;
 
         private void MemoizeTransitions(int iLoc)
         {
@@ -218,7 +218,7 @@ namespace Pliant.Runtime
             // leo eligibility needs to be cached before creating the cached transition
             // if the size of the list is != 1, do not enter the cached set transition
             _cachedCount ??= new Dictionary<ISymbol, int>();
-            _cachedTransitions ??= new Dictionary<ISymbol, CachedDottedRuleSetTransition>();
+            _cachedTransitions ??= new Dictionary<ISymbol, DeterministicState>();
 
             for (var i = 0; i < deterministicSet.States.Count; i++)
             {
@@ -229,24 +229,24 @@ namespace Pliant.Runtime
 
                 for (var j = 0; j < dottedRuleSetDataCount; j++)
                 {
-                    var preComputedState = dottedRuleSetData[j];
-                    if (preComputedState.IsComplete)
+                    var dottedRule = dottedRuleSetData[j];
+                    if (dottedRule.IsComplete)
                         continue;
 
-                    var postDotSymbol = preComputedState.PostDotSymbol;
+                    var postDotSymbol = dottedRule.PostDotSymbol;
                     if (postDotSymbol.SymbolType != SymbolType.NonTerminal)
                         continue;
 
                     // leo eligibile items are right recursive directly or indirectly                    
                     if (!_preComputedGrammar.Grammar.IsRightRecursive(
-                        preComputedState.Production.LeftHandSide))
+                        dottedRule.Production.LeftHandSide))
                         continue;
 
                     // to determine if the item is leo unique, cache it here
                     if (!_cachedCount.TryGetValue(postDotSymbol, out int count))
                     {
                         _cachedCount[postDotSymbol] = 1;
-                        _cachedTransitions[postDotSymbol] = CreateTopCachedItem(deterministicState, postDotSymbol);
+                        _cachedTransitions[postDotSymbol] = deterministicState;
                     }
                     else
                     {
@@ -255,13 +255,15 @@ namespace Pliant.Runtime
                 }
             }
 
+            
             // add all memoized leo items to the deterministic set
             foreach (var symbol in _cachedCount.Keys)
             {
                 var count = _cachedCount[symbol];
                 if (count != 1)
                     continue;
-                deterministicSet.AddCachedTransition(_cachedTransitions[symbol]);
+                var topCachedItem = CreateTopCachedItem(_cachedTransitions[symbol], symbol);
+                deterministicSet.AddCachedTransition(topCachedItem);
             }
 
             _cachedTransitions.Clear();
@@ -277,7 +279,7 @@ namespace Pliant.Runtime
             // search for the top item in the leo chain
             while (true)
             {
-                var originDeterministicSet = Chart.Sets[deterministicState.Origin];
+                var originDeterministicSet = Chart.Sets[origin];
                 var nextCachedItem = originDeterministicSet.FindCachedDottedRuleSetTransition(postDotSymbol);
                 if (nextCachedItem is null)
                     break;

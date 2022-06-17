@@ -28,8 +28,9 @@ namespace Pliant.Tests.Unit.Tree
                 Assert.AreEqual(TreeNodeType.Internal, child.NodeType);
                 var internalChild = child as IInternalTreeNode;
                 var grandChildCount = 0;
-                foreach (var grandChild in internalChild.Children)
+                for (int i = 0; i < internalChild.Children.Count; i++)
                 {
+                    ITreeNode grandChild = internalChild.Children[i];
                     grandChildCount++;
                     Assert.AreEqual(TreeNodeType.Token, grandChild.NodeType);
                 }

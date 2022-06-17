@@ -6,11 +6,9 @@ namespace Pliant.Charts
     {
         ISymbol Recognized { get; }
 
-        INormalState Reduction { get; }
+        IState Reduction { get; }
 
         ITransitionState NextTransition { get; set; }
-
-        int Index { get; }
 
         IState GetTargetState();
     }

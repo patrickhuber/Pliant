@@ -7,22 +7,18 @@ namespace Pliant.Charts
     {
         public ISymbol Recognized { get; private set; }
 
-        public INormalState Reduction { get; private set; }
-
-        public int Index { get; private set; }
+        public IState Reduction { get; set; }
 
         public ITransitionState NextTransition { get; set; }
                 
         public TransitionState(
             ISymbol recognized,
-            IState transition,
-            INormalState reduction,
-            int index)
-            : base(transition.DottedRule, transition.Origin)
+            IState reduction,
+            int origin)
+            : base(reduction.DottedRule, origin)
         {
             Reduction = reduction;
             Recognized = recognized;
-            Index = index;
             _hashCode = ComputeHashCode();
         }
 
@@ -34,8 +30,7 @@ namespace Pliant.Charts
                 return false;
 
             return GetHashCode() == transitionState.GetHashCode()
-                && Recognized.Equals(transitionState.Recognized)
-                && Index == transitionState.Index;
+                && Recognized.Equals(transitionState.Recognized);
         }
         
         private readonly int _hashCode;
@@ -45,9 +40,7 @@ namespace Pliant.Charts
             return HashCode.Compute(
                 DottedRule.GetHashCode(),
                 Origin.GetHashCode(),
-                Recognized.GetHashCode(),
-                Reduction.GetHashCode(),
-                Index.GetHashCode());
+                Recognized.GetHashCode());
         }
 
         public override int GetHashCode()
@@ -57,7 +50,7 @@ namespace Pliant.Charts
 
         public override string ToString()
         {
-            return $"{Recognized} : {Reduction}";
+            return $"{Recognized} : {Reduction.DottedRule}\t\t({Origin})";
         }
 
         public override StateType StateType { get { return StateType.Transitive; } }

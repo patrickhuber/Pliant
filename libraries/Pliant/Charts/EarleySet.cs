@@ -157,10 +157,15 @@ namespace Pliant.Charts
             return null;
         }
 
-        public INormalState FindSourceState(ISymbol searchSymbol)
+        /// <summary>
+        /// Finds a prediction where the post dot symbol is the search symbol
+        /// </summary>
+        /// <param name="searchSymbol"></param>
+        /// <returns></returns>
+        public IState FindSourceState(ISymbol searchSymbol)
         {
             var sourceItemCount = 0;
-            INormalState sourceItem = null;
+            IState sourceItem = null;
 
             for (int s = 0; s < Predictions.Count; s++)
             {

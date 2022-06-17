@@ -21,8 +21,11 @@ namespace Pliant.Tests.Unit.Runtime
         public override void Visit(IIntermediateForestNode intermediateNode)
         {
             VisitLog.Add(intermediateNode.ToString());
-            foreach (var child in intermediateNode.Children)
+            for (int i = 0; i < intermediateNode.Children.Count; i++)
+            {
+                IPackedForestNode child = intermediateNode.Children[i];
                 Visit(child);
+            }
         }
 
         public override void Visit(ITokenForestNode tokenNode)
@@ -33,8 +36,11 @@ namespace Pliant.Tests.Unit.Runtime
         public override void Visit(ISymbolForestNode symbolNode)
         {
             VisitLog.Add(symbolNode.ToString());
-            foreach (var child in symbolNode.Children)
+            for (int i = 0; i < symbolNode.Children.Count; i++)
+            {
+                IPackedForestNode child = symbolNode.Children[i];
                 Visit(child);
+            }
         }
 
         public override void Visit(ITerminalForestNode terminalNode)
@@ -44,8 +50,11 @@ namespace Pliant.Tests.Unit.Runtime
 
         public override void Visit(IPackedForestNode packedNode)
         {
-            foreach (var child in packedNode.Children)
+            for (int i = 0; i < packedNode.Children.Count; i++)
+            {
+                IForestNode child = packedNode.Children[i];
                 child.Accept(this);
+            }
         }
     }
 }

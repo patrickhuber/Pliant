@@ -20,9 +20,20 @@ namespace Pliant.Tests.Common.Forest
             }
         }
 
+        public void Accept(IForestNodeVisitor visitor)
+        {
+            for (int i = 0; i < Children.Count; i++)
+            {
+                var child = Children[i];
+                child.Accept(visitor);
+            }
+        }
+
         public void Add(IForestNode child)
         {
             _children.Add(child);
         }
+
+
     }
 }

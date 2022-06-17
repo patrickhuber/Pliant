@@ -280,6 +280,9 @@ namespace Pliant.Runtime
                 else
                     resume = false;
             }
+
+            if(Options.OptimizeRightRecursion)
+                Memoize(location);
         }
 
         private void Predict(INormalState evidence, int j)
@@ -296,7 +299,7 @@ namespace Pliant.Runtime
                 PredictProduction(j, production);
             }
 
-            var isNullable = Grammar.IsTransativeNullable(nonTerminal);
+            var isNullable = Grammar.IsNullable(nonTerminal);
             if (isNullable)
                 PredictAycockHorspool(evidence, j);
         }
@@ -307,7 +310,6 @@ namespace Pliant.Runtime
             if (_chart.Contains(j, StateType.Normal, dottedRule, j))
                 return;
 
-            // TODO: Pre-Compute Leo Items. If item is 1 step from being complete, add a transition item
             var predictedState = StateFactory.NewState(dottedRule, j);
             if (_chart.Enqueue(j, predictedState))
                 Log(PredictionLogName, j, predictedState);
@@ -357,9 +359,6 @@ namespace Pliant.Runtime
             var earleySet = _chart.EarleySets[completed.Origin];
             var searchSymbol = completed.DottedRule.Production.LeftHandSide;
 
-            if (Options.OptimizeRightRecursion)
-                OptimizeReductionPath(searchSymbol, completed.Origin);
-
             var transitionState = earleySet.FindTransitionState(searchSymbol);
             if (transitionState != null)
             {
@@ -373,19 +372,22 @@ namespace Pliant.Runtime
 
         private void LeoComplete(ITransitionState transitionState, IState completed, int k)
         {
-            var earleySet = _chart.EarleySets[transitionState.Index];
-            var rootTransitionState = earleySet.FindTransitionState(
-                transitionState.DottedRule.PreDotSymbol);
+            // jump to the earley set of the transition
+            var earleySet = _chart.EarleySets[transitionState.Origin];
 
-            if (rootTransitionState is null)
-                rootTransitionState = transitionState;
+            // look for another transition item here, this one will point to the correct reduction 
+            ITransitionState topMost = earleySet.FindTransitionState(transitionState.Recognized);
+            if (topMost == null)
+                topMost = transitionState;
+            
+            var dottedRule = topMost.DottedRule;
+            var origin = topMost.Reduction.Origin;
 
-            var virtualParseNode = CreateVirtualParseNode(completed, k, rootTransitionState);
+            var virtualParseNode = CreateVirtualParseNode(completed, k, topMost);
 
-            var dottedRule = transitionState.DottedRule;
             var topmostItem = StateFactory.NewState(
                 dottedRule,
-                transitionState.Origin,
+                origin,
                 virtualParseNode);
 
             if (_chart.Enqueue(k, topmostItem))
@@ -424,113 +426,157 @@ namespace Pliant.Runtime
                     Log(CompleteLogName, k, nextState);
             }
         }
+             
+        IDictionary<ISymbol, IState> _cachedTransitions;
+        IDictionary<ISymbol, int> _cachedCount;
 
-        private void OptimizeReductionPath(ISymbol searchSymbol, int k)
+        private void Memoize(int k)
         {
-            IState t_rule = null;
-            ITransitionState previousTransitionState = null;
+            var set = _chart.EarleySets[k];
+            _cachedCount ??= new Dictionary<ISymbol, int>();
+            _cachedTransitions ??=new Dictionary<ISymbol, IState>();
 
-            var visited = SharedPools.Default<HashSet<IState>>().AllocateAndClear();
-            OptimizeReductionPathRecursive(searchSymbol, k, ref t_rule, ref previousTransitionState, visited);
-            SharedPools.Default<HashSet<IState>>().ClearAndFree(visited);
-        }
-
-        private void OptimizeReductionPathRecursive(
-            ISymbol searchSymbol,
-            int k,
-            ref IState t_rule,
-            ref ITransitionState previousTransitionState,
-            HashSet<IState> visited)
-        {
-            var earleySet = _chart.EarleySets[k];
-
-            // if Ii contains a transitive item of the for [B -> b., A, k]
-            var transitionState = earleySet.FindTransitionState(searchSymbol);
-            if (transitionState != null)
+            // loop through all items in the set looking for items 
+            // that are right recursive and quasi complete
+            for (var s = 0; s < set.Scans.Count; s++) 
             {
-                // then t_rule := B-> b.; t_pos = k;
-                previousTransitionState = transitionState;
-                t_rule = transitionState;
-                return;
+                MemoizeOne(set.Scans[s], k);
+            }
+            for (var p = 0; p < set.Predictions.Count; p++) 
+            {
+                MemoizeOne(set.Predictions[p], k);
             }
 
-            // else if Ii contains exactly one item of the form [B -> a.Ab, k]
-            var sourceState = earleySet.FindSourceState(searchSymbol);
-            if (sourceState is null)
-                return;
-
-            if (!visited.Add(sourceState))
-                return;
-
-            // and [B-> aA.b, k] is quasi complete (is b null)
-            if (!IsNextStateQuasiComplete(sourceState))
-                return;
-
-            // then t_rule := [B->aAb.]; t_pos=k;
-            t_rule = StateFactory.NextState(sourceState);
-
-            if (sourceState.Origin != k)
-                visited.Clear();
-
-            // T_Update(I0...Ik, B);
-            OptimizeReductionPathRecursive(
-                sourceState.DottedRule.Production.LeftHandSide,
-                sourceState.Origin,
-                ref t_rule,
-                ref previousTransitionState,
-                visited);
-
-            if (t_rule is null)
-                return;
-
-            ITransitionState currentTransitionState;
-            if (previousTransitionState != null)
+            // loop through all the cached counts processing only unique symbols
+            foreach(var symbol in _cachedCount.Keys)
             {
-                currentTransitionState = new TransitionState(
-                  searchSymbol,
-                  t_rule,
-                  sourceState,
-                  previousTransitionState.Index);
+                // contains exactly one item of the form B -> a*AB, k
+                var count = _cachedCount[symbol];
+                if (count != 1)
+                    continue;
+                
+                var state = _cachedTransitions[symbol];
 
-                previousTransitionState.NextTransition = currentTransitionState;
-            }
-            else
-                currentTransitionState = new TransitionState(
-                  searchSymbol,
-                  t_rule,
-                  sourceState,
-                  k);
+                // and B -> aA*B, k is quasi complete
+                var next = _dottedRuleRegistry.GetNext(state.DottedRule);
+                if (!IsQuasiComplete(next))
+                    continue;
 
-            if (_chart.Enqueue(k, currentTransitionState))
-            {
-                Log(TransitionLogName, k, currentTransitionState);
+                var topMostCacheItem = FindTopMostTransition(state, symbol);
+                var reduction = FindReduction(state, k);
+                var origin = topMostCacheItem is null
+                            ? k
+                            : topMostCacheItem.Origin;
+
+                var transition = new TransitionState(symbol, reduction, origin);
+
+                // create a link between the previous transition item and the current transition item
+                // this link is used during virtual parse node expansion
+                var previous = FindTransition(state.Origin, symbol);
+                if(previous != null)
+                    previous.NextTransition = transition;
+
+                if (_chart.Enqueue(k, transition))
+                    Log(TransitionLogName, k, transition);
             }
 
-            previousTransitionState = currentTransitionState;
+            _cachedTransitions.Clear();
+            _cachedCount.Clear();
         }
 
         /// <summary>
-        /// Implements a check for leo quasi complete items
+        /// Finds the transition for the given state origin and symbol
         /// </summary>
-        /// <param name="state">the state to check for quasi completeness</param>
-        /// <returns>true if quasi complete, false otherwise</returns>
-        private bool IsNextStateQuasiComplete(IState state)
+        /// <param name="state"></param>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
+        private ITransitionState FindTransition(int origin, ISymbol symbol)
+        {   
+            var set = _chart.EarleySets[origin];
+            return set.FindTransitionState(symbol);
+        }
+
+        private ITransitionState FindTopMostTransition(IState state, ISymbol symbol)
         {
-            var ruleCount = state.DottedRule.Production.RightHandSide.Count;
-            if (ruleCount == 0)
-                return true;
-
-            var nextStatePosition = state.DottedRule.Position + 1;
-            var isComplete = nextStatePosition == state.DottedRule.Production.RightHandSide.Count;
-            if (isComplete)
-                return true;
-
-            // if all subsequent symbols are nullable
-            for (int i = nextStatePosition; i < state.DottedRule.Production.RightHandSide.Count; i++)
+            ITransitionState topMostCacheItem = null;
+            var origin = state.Origin;            
+            while (true)
             {
-                var nextSymbol = state.DottedRule.Production.RightHandSide[nextStatePosition];
-                var isSymbolNullable = IsSymbolNullable(nextSymbol);
-                if (!isSymbolNullable)
+                var next = FindTransition(origin, symbol);
+                if (next == null)
+                    break;
+                topMostCacheItem = next;
+                if (origin == next.Origin)
+                    break;
+                origin = topMostCacheItem.Origin;
+            }
+            return topMostCacheItem;
+        }
+
+        private IState FindReduction(IState prediction, int origin)
+        {            
+            var set = _chart.EarleySets[origin];
+            for (var c = 0; c < set.Completions.Count; c++)
+            {
+                var completion = set.Completions[c];
+                if (prediction.DottedRule.PostDotSymbol == completion.DottedRule.Production.LeftHandSide)
+                    return completion;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Checks to see if the item is right recursive and caches for leo eligibility check
+        /// </summary>
+        /// <param name="state"></param>
+        /// <param name="k"></param>
+        private void MemoizeOne(IState state, int k)
+        {
+            var dottedRule = state.DottedRule;
+            if (dottedRule.IsComplete)
+                return;
+
+            var postDotSymbol = state.DottedRule.PostDotSymbol;
+
+            if (postDotSymbol.SymbolType != SymbolType.NonTerminal)
+                return;
+
+            if (!Grammar.IsRightRecursive(postDotSymbol))
+                return;
+                        
+            if (_cachedCount.TryGetValue(postDotSymbol, out var count))
+            {
+                _cachedCount[postDotSymbol] = count + 1;
+            }
+            else 
+            {
+                _cachedCount[postDotSymbol] = 1;
+                _cachedTransitions[postDotSymbol] = state;
+            }
+        }
+
+        /// <summary>
+        /// This should be pushed into the grammar analysis
+        /// </summary>
+        /// <param name="dottedRule"></param>
+        /// <returns></returns>
+        private bool IsQuasiComplete(IDottedRule dottedRule)
+        {
+            if (dottedRule.IsComplete)
+                return true;
+
+            // all postdot symbols are nullable
+            for (var s = dottedRule.Position; s < dottedRule.Production.RightHandSide.Count; s++) 
+            {
+                var symbol = dottedRule.Production.RightHandSide[s];
+                if (symbol.SymbolType != SymbolType.NonTerminal)
+                    return false;
+
+                var nonTerminal = symbol as INonTerminal;
+                if (Grammar.RulesFor(nonTerminal).Count > 1)
+                    return false;
+
+                if (!Grammar.IsNullable(nonTerminal))
                     return false;
 
                 // From Page 4 of Leo's paper:
@@ -543,11 +589,11 @@ namespace Pliant.Runtime
                 //
                 // to fix this, check if S can derive S. Basically if we are in the Start state
                 // and the Start state is found and is nullable, exit with false
-                if (state.DottedRule.Production.LeftHandSide == Grammar.Start &&
-                    nextSymbol == Grammar.Start)
+                if (dottedRule.Production.LeftHandSide == Grammar.Start
+                    && dottedRule.PostDotSymbol == Grammar.Start)
                     return false;
-            }
 
+            }
             return true;
         }
 
@@ -631,16 +677,6 @@ namespace Pliant.Runtime
             return virtualParseNode;
         }
 
-        private bool IsSymbolNullable(ISymbol symbol)
-        {
-            if (symbol is null)
-                return true;
-            if (symbol.SymbolType != SymbolType.NonTerminal)
-                return false;
-            var nonTerminal = symbol as INonTerminal;
-            return Grammar.IsNullable(nonTerminal);
-        }
-
         private bool IsSymbolTransativeNullable(ISymbol symbol)
         {
             if (symbol is null)
@@ -648,7 +684,7 @@ namespace Pliant.Runtime
             if (symbol.SymbolType != SymbolType.NonTerminal)
                 return false;
             var nonTerminal = symbol as INonTerminal;
-            return Grammar.IsTransativeNullable(nonTerminal);
+            return Grammar.IsNullable(nonTerminal);
         }
 
         public void Reset()

@@ -371,7 +371,6 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "Unit test is not performance critical code")]
         public void ParseEngineShouldParseMidGrammarRightRecursionAndHandleNullRootTransitionItem()
         {
             ProductionExpression S = "S", A = "A", B = "B", C = "C";
@@ -382,7 +381,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var grammar = new GrammarExpression(S, new[] { S, A, B, C }).ToGrammar();
             var tokens = Tokenize(".+");
-            var parseEngine = new ParseEngine(grammar);
+            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(true, true));
             ParseInput(parseEngine, tokens);
 
             var parseForestRoot = parseEngine.GetParseForestRootNode();
@@ -434,7 +433,6 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "unit test is not critical code")]
         public void ParseEngineShouldParseSimpleSubstitutionGrammar()
         {
             ProductionExpression A = "A", B = "B", C = "C";
@@ -518,9 +516,6 @@ namespace Pliant.Tests.Unit.Runtime
         [TestMethod]
         public void ParseEngineRightRecursionShouldNotBeCubicComplexity()
         {
-            var a = new TerminalLexerRule(
-                new CharacterTerminal('a'),
-                new TokenType("a"));
             ProductionExpression A = "A";
             A.Rule =
                 'a' + A
@@ -530,7 +525,7 @@ namespace Pliant.Tests.Unit.Runtime
                 .ToGrammar();
             
             var input = Tokenize("aaaaa");
-            var recognizer = new ParseEngine(grammar);
+            var recognizer = new ParseEngine(grammar, new ParseEngineOptions(loggingEnabled: true));
             ParseInput(recognizer, input);
 
             var chart = GetChartFromParseEngine(recognizer);
@@ -544,12 +539,13 @@ namespace Pliant.Tests.Unit.Runtime
             // n	A ->.a A		(n)	 # Predict
             // n	A ->.			(n)	 # Predict
             // n	A -> a A.		(n)	 # Predict
-            // n	A : A -> a A.	(0)	 # Transition
+            // n	A : A -> a A.	(1)	 # Transition
             // n	A -> a A.		(0)	 # Complete
             Assert.AreEqual(input.Count() + 1, chart.Count);
             var lastEarleySet = chart.EarleySets[chart.EarleySets.Count - 1];
             Assert.AreEqual(3, lastEarleySet.Completions.Count);
             Assert.AreEqual(1, lastEarleySet.Transitions.Count);
+            Assert.AreEqual(1, lastEarleySet.Transitions[0].Origin);
             Assert.AreEqual(1, lastEarleySet.Predictions.Count);
             Assert.AreEqual(1, lastEarleySet.Scans.Count);
         }
@@ -582,7 +578,7 @@ namespace Pliant.Tests.Unit.Runtime
             B.Rule = A | 'b';
             var grammar = new GrammarExpression(S, new[] { S, A, B }).ToGrammar();
             var input = Tokenize("aaab");
-            var parseEngine = new ParseEngine(grammar);
+            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(true, true));
             ParseInput(parseEngine, input);
         }
 
@@ -785,6 +781,16 @@ namespace Pliant.Tests.Unit.Runtime
                 new[] { S, A, B, C, X, Y, Z })
                 .ToGrammar();
             AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
+        }
+
+        [TestMethod]
+        public void ShouldParseSimpleExpression()
+        {
+            var parser = new ParseEngine(new SimpleExpressionGrammar(), new ParseEngineOptions(true, true));
+            var tester = new ParseTester(parser);
+            tester.RunParse("0+1*2+30");            
+            var root = parser.GetParseForestRootNode();
+            Assert.IsNotNull(root);
         }
 
         [TestMethod]

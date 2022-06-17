@@ -19,6 +19,6 @@ namespace Pliant.Charts
 
         ITransitionState FindTransitionState(ISymbol searchSymbol);
         
-        INormalState FindSourceState(ISymbol searchSymbol);
+        IState FindSourceState(ISymbol searchSymbol);
     }
 }

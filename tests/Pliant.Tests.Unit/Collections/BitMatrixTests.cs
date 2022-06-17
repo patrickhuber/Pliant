@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Pliant.Collections;
+using System.Collections.Generic;
 
 namespace Pliant.Tests.Unit.Collections
 {
@@ -129,6 +130,36 @@ namespace Pliant.Tests.Unit.Collections
 
             var transitiveClosure = bitMatrix.TransitiveClosure();
 
+        }
+
+        [TestMethod]
+        public void BitMatrixShouldComputeTransitiveClosureWithNegativeCycle()
+        {
+            //   0   1   2
+            // 0     *   *
+            // 1
+            // 2 *
+            var bitMatrix = new BitMatrix(3);
+            bitMatrix[0][1] = true;
+            bitMatrix[0][2] = true;
+            bitMatrix[2][0] = true;
+
+            //   0   1   2
+            // 0 *   *   *
+            // 1     *
+            // 2 *   *   *
+            var transitiveClosure = bitMatrix.TransitiveClosure();
+            var edges = new List<(int, int)> 
+            { 
+                (0,0),
+                (0,1),
+                (0,2),                
+                (2,0),
+                (2,1),
+                (2,2)
+            };
+            foreach(var edge in edges)
+                Assert.IsTrue(transitiveClosure[edge.Item1][edge.Item2], $"edge ({edge.Item1}, {edge.Item2}) is not set");
         }
     }
 }

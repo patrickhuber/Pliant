@@ -24,8 +24,18 @@ namespace Pliant.Grammars
 
         IReadOnlyList<IProduction> StartProductions();
 
+        /// <summary>
+        /// Checks if a symbol is directly nullable.
+        /// </summary>
+        /// <param name="nonTerminal"></param>
+        /// <returns></returns>
         bool IsNullable(INonTerminal nonTerminal);
 
+        /// <summary>
+        /// Checks if a symbol is nullable through transative nullablitity. There is a path of derivation where the symbol can be replaced with null.
+        /// </summary>
+        /// <param name="nonTerminal"></param>
+        /// <returns></returns>
         bool IsTransativeNullable(INonTerminal nonTerminal);
 
         bool IsRightRecursive(ISymbol symbol);

@@ -100,7 +100,7 @@ namespace Pliant.Grammars
                         break;
 
                     var nonTerminalPostDotSymbol = postDotSymbol as INonTerminal;
-                    if (!Grammar.IsTransativeNullable(nonTerminalPostDotSymbol))
+                    if (!Grammar.IsNullable(nonTerminalPostDotSymbol))
                         break;
 
                     var preComputedState = GetPreComputedState(production, s + 1);
@@ -137,7 +137,7 @@ namespace Pliant.Grammars
                     continue;
 
                 var nonTerminalPostDotSymbol = postDotSymbol as INonTerminal;
-                if (Grammar.IsTransativeNullable(nonTerminalPostDotSymbol))
+                if (Grammar.IsNullable(nonTerminalPostDotSymbol))
                 {
                     var preComputedState = GetPreComputedState(state.Production, state.Position + 1);
                     if (!dottedRuleSet.Contains(preComputedState))

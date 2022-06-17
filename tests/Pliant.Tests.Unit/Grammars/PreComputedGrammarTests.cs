@@ -42,7 +42,7 @@ namespace Pliant.Tests.Unit.Grammars
         [TestMethod]
         public void PreComputedGrammarIsRightRecursiveShouldFindSimpleRecursion()
         {
-            var preComputedGrammar = new PreComputedGrammar(new RightRecursionGrammar());
+            var preComputedGrammar = new PreComputedGrammar(new RightRecursionGrammar());            
         }
 
         [TestMethod]
@@ -51,7 +51,6 @@ namespace Pliant.Tests.Unit.Grammars
             var grammar = new HiddenRightRecursionGrammar();
             var preComputedGrammar = new PreComputedGrammar(grammar);
 
-            var leftHandSides = new UniqueList<INonTerminal>();
             for (var p = 0; p < grammar.Productions.Count; p++)
             {
                 var production = grammar.Productions[p];

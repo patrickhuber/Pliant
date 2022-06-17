@@ -5,5 +5,5 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "<Pending>", Scope = "member", Target = "~M:Pliant.Tests.Unit.Runtime.MarpaParseEngineTests.MarpaParseEngineShouldNotMemoizeRuleWhenSiblingIsRightRecursiveAndCurrentRuleIsNot")]
-[assembly: SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "<Pending>", Scope = "member", Target = "~M:Pliant.Tests.Unit.Languages.Bnf.BnfTests.BnfShouldProduceParseChartForTextGrammar")]
+[assembly: SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "Unit tests are not performance critical code", Scope = "module")]
+[assembly: SuppressMessage("Performance", "HAA0502:Explicit new reference type allocation", Justification = "Unit tests are not performance critical code", Scope = "module")]
