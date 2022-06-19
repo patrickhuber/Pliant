@@ -14,8 +14,8 @@ namespace Pliant.Grammars
         protected readonly IndexedList<ILexerRule> _trivia;
         protected readonly IndexedList<ILexerRule> _lexerRules;
         protected readonly IndexedList<IProduction> _productions;
-        
-        private readonly HashSet<ISymbol> _rightRecursive;
+                
+        private readonly HashSet<IProduction> _rightRecursiveRule;
         private readonly Dictionary<INonTerminal, List<IProduction>> _leftHandSideToProductions;        
         private readonly Dictionary<INonTerminal, UniqueList<IProduction>> _symbolsReverseLookup;
         private readonly IDottedRuleRegistry _dottedRuleRegistry;        
@@ -52,8 +52,8 @@ namespace Pliant.Grammars
             _dottedRuleRegistry = new DottedRuleRegistry();
 
             _nullable = new HashSet<ISymbol>();
-            _transativeNullable = new HashSet<ISymbol>();
-            _rightRecursive = new HashSet<ISymbol>();
+            _transativeNullable = new HashSet<ISymbol>();            
+            _rightRecursiveRule = new HashSet<IProduction>();
 
             Start = start;
             AddProductions(productions ?? EmptyProductionArray);
@@ -145,7 +145,7 @@ namespace Pliant.Grammars
 
         private void IdentifyRightRecursiveSymbols()
         {
-            var work = SharedPools.Default<List<IDottedRule>>().AllocateAndClear();            
+            var rules = SharedPools.Default<IndexedList<IDottedRule>>().AllocateAndClear();            
 
             for (var p = 0; p < _productions.Count; p++)
             {
@@ -158,69 +158,34 @@ namespace Pliant.Grammars
                     if (predotSymbol.SymbolType != SymbolType.NonTerminal)
                         break;
 
-                    work.Add(dottedRule);
-
-                    // direct right recursion
-                    if (production.LeftHandSide == predotSymbol)
-                        _rightRecursive.Add(predotSymbol);
+                    rules.Add(dottedRule);
 
                     if (!IsNullable(predotSymbol as INonTerminal))
                         break;                    
                 }
             }
 
-            // no additional items are needed in the work set
-            // collect the symbols into a vector
-            var symbols = new IndexedList<ISymbol>();            
-            for(var d =0; d< work.Count; d++)
-            {
-                var dottedRule = work[d];
-                var lhs = dottedRule.Production.LeftHandSide;
-                var pre = dottedRule.PreDotSymbol;
-
-                if (!symbols.Contains(lhs))                
-                    symbols.Add(lhs);
-                if (!symbols.Contains(pre))
-                    symbols.Add(pre);
-            }
-
             // fill out the adjacency matrix
-            var adjacency = new BitMatrix(symbols.Count);
-            for (var d = 0; d < work.Count; d++)
+            var adjacency = new BitMatrix(rules.Count);
+            for (var row = 0; row < rules.Count; row++)
             {
-                var dottedRule = work[d];
-                var lhs = dottedRule.Production.LeftHandSide;
-                var pre = dottedRule.PreDotSymbol;
-                adjacency[symbols.IndexOf(lhs)][symbols.IndexOf(pre)] = true;
+                var left = rules[row];
+                for (var col = 0; col < rules.Count; col++)
+                {
+                    var right = rules[col];
+                    if(left.Production.LeftHandSide == right.PreDotSymbol)
+                        adjacency[row][col] = true;
+                }
             }
 
-            // compute the transitive closure to detect any cycles
-            var closure = adjacency.TransitiveClosure();
-
-            // look for negative edges
-            //
-            // no cycles
-            //   0 1 2
-            // 0 * *
-            // 1   * *
-            // 2     *
-            // 
-            // cycles
-            //   0 1 2
-            // 0 * * *
-            // 1   *
-            // 2 * * *
-            for (var d = 0; d < work.Count; d++)
+            var reachibility = adjacency.TransitiveClosure();
+            for (var row = 0; row < rules.Count; row++)
             {
-                var dottedRule = work[d];
-                var lhs = dottedRule.Production.LeftHandSide;
-                var pre = dottedRule.PreDotSymbol;
-
-                // swap the lookup order because we are looking for back cycles
-                if (closure[symbols.IndexOf(pre)][symbols.IndexOf(lhs)])
-                    _rightRecursive.Add(lhs);
+                if (reachibility[row][row])
+                    _rightRecursiveRule.Add(rules[row].Production);
             }
-            SharedPools.Default<List<IDottedRule>>().Free(work);
+
+            SharedPools.Default<IndexedList<IDottedRule>>().Free(rules);
         }
 
         public int GetLexerRuleIndex(ILexerRule lexerRule)
@@ -334,9 +299,9 @@ namespace Pliant.Grammars
             return RulesFor(Start);
         }
 
-        public bool IsRightRecursive(ISymbol symbol)
+        public bool IsRightRecursive(IProduction production)
         {
-            return _rightRecursive.Contains(symbol);
+            return _rightRecursiveRule.Contains(production);
         }
     }
 }

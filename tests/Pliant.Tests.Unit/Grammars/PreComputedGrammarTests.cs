@@ -54,44 +54,10 @@ namespace Pliant.Tests.Unit.Grammars
             for (var p = 0; p < grammar.Productions.Count; p++)
             {
                 var production = grammar.Productions[p];
-                Assert.IsTrue(preComputedGrammar.Grammar.IsRightRecursive(production.LeftHandSide));
+                Assert.IsTrue(preComputedGrammar.Grammar.IsRightRecursive(production));
             }
         }
-
-        [TestMethod]
-        public void PreComputedGrammarIsRightRecursiveShouldNotContainSymbolsWithoutCycles()
-        {
-            ProductionExpression
-                A = "A",
-                B = "B",
-                C = "C",
-                D = "D",
-                E = "E";
-            A.Rule = B + C;
-            B.Rule = 'b';
-            C.Rule = A | D;
-            D.Rule = E + D | 'd';
-            E.Rule = 'e';
-
-            var grammar = new GrammarExpression(A).ToGrammar();
-            var preComputedGrammar = new PreComputedGrammar(grammar);
-
-            var rightRecursiveRules = new[] { A, C, D };
-            var notRightRecursiveRules = new[] { B, E };
-
-            foreach(var rightRecursiveRule in rightRecursiveRules)
-            {
-                var leftHandSide = rightRecursiveRule.ProductionModel.LeftHandSide.NonTerminal;
-                Assert.IsTrue(preComputedGrammar.Grammar.IsRightRecursive(leftHandSide));
-            }
-
-            foreach (var notRightRecursiveRule in notRightRecursiveRules)
-            {
-                var leftHandSide = notRightRecursiveRule.ProductionModel.LeftHandSide.NonTerminal;
-                Assert.IsFalse(preComputedGrammar.Grammar.IsRightRecursive(leftHandSide));
-            }
-        }
-        
+                
         private static IGrammar GetJsonGrammar()
         {
             ProductionExpression

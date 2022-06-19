@@ -427,6 +427,23 @@ namespace Pliant.Runtime
             }
         }
 
+        private bool RuleIsRightRecursive(IDottedRule rule)
+        {
+            for (var s = rule.Production.RightHandSide.Count -1; s >= 0; s--)
+            { 
+                var symbol = rule.Production.RightHandSide[s];
+                if (symbol.SymbolType != SymbolType.NonTerminal)
+                    return false;
+                if (symbol == rule.Production.LeftHandSide)
+                    return true;
+                if (Grammar.IsTransativeNullable(symbol as INonTerminal))
+                    continue;
+
+                // need to update grammar for IsRightRecursive(IDottedRule)
+            }
+            return false;
+        }
+
         private void Memoize(int k)
         {
             var set = _chart.EarleySets[k];
@@ -436,8 +453,9 @@ namespace Pliant.Runtime
             {
                 var completion = set.Completions[c];
                 var symbol = completion.DottedRule.Production.LeftHandSide;
-                if (!Grammar.IsRightRecursive(symbol))
-                    return;
+
+                if (!RuleIsRightRecursive(completion.DottedRule))
+                    continue;
 
                 var prediction = set.FindSourceState(symbol);
                 if (prediction == null)
@@ -452,6 +470,7 @@ namespace Pliant.Runtime
                             ? k
                             : topMostCacheItem.Origin;
 
+                // this shouldn't be any completion, just the one that matches the leo constraints
                 var transition = new TransitionState(symbol, completion, origin);
 
                 // create a link between the previous transition item and the current transition item

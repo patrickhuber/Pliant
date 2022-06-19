@@ -239,7 +239,7 @@ namespace Pliant.Runtime
 
                     // leo eligibile items are right recursive directly or indirectly                    
                     if (!_preComputedGrammar.Grammar.IsRightRecursive(
-                        dottedRule.Production.LeftHandSide))
+                        dottedRule.Production))
                         continue;
 
                     // to determine if the item is leo unique, cache it here

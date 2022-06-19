@@ -38,6 +38,12 @@ namespace Pliant.Grammars
         /// <returns></returns>
         bool IsTransativeNullable(INonTerminal nonTerminal);
 
-        bool IsRightRecursive(ISymbol symbol);
+
+        /// <summary>
+        /// Determines if the given production is right recursive
+        /// </summary>
+        /// <param name="production"></param>
+        /// <returns></returns>
+        bool IsRightRecursive(IProduction production);
     }
 }
