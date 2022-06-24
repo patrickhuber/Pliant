@@ -7,18 +7,18 @@ namespace Pliant.Charts
     public class DeterministicSet
     {
         private readonly UniqueList<DeterministicState> _states;
-        private readonly Dictionary<ISymbol, CachedDottedRuleSetTransition> _transitions;
+        private readonly Dictionary<ISymbol, DottedRuleSetTransition> _transitions;
 
         public IReadOnlyList<DeterministicState> States { get { return _states; } }
 
-        public IReadOnlyDictionary<ISymbol, CachedDottedRuleSetTransition> CachedTransitions { get { return _transitions; } }
+        public IReadOnlyDictionary<ISymbol, DottedRuleSetTransition> Transitions { get { return _transitions; } }
         
         public int Location { get; private set; }
 
         public DeterministicSet(int location)
         {
             _states = new UniqueList<DeterministicState>();
-            _transitions = new Dictionary<ISymbol, CachedDottedRuleSetTransition>();
+            _transitions = new Dictionary<ISymbol, DottedRuleSetTransition>();
             Location = location;
         }
 
@@ -30,15 +30,22 @@ namespace Pliant.Charts
 
         public bool IsLeoUnique(ISymbol symbol)
         {
-            return !CachedTransitions.ContainsKey(symbol);
+            return !Transitions.ContainsKey(symbol);
         }
 
-        public CachedDottedRuleSetTransition FindCachedDottedRuleSetTransition(ISymbol searchSymbol)
+        /// <summary>
+        /// Transitions are a table of symbols to a set of states.
+        /// 
+        /// The state set is either a single leo item or one or more earley items
+        /// </summary>
+        /// <param name="searchSymbol">the key for the transition</param>
+        /// <returns></returns>
+        public DottedRuleSetTransition FindTransition(ISymbol searchSymbol)
         {
-            return _transitions.TryGetValue(searchSymbol, out CachedDottedRuleSetTransition transition) ? transition : null;
+            return _transitions.TryGetValue(searchSymbol, out DottedRuleSetTransition transition) ? transition : null;
         }
 
-        public void AddCachedTransition(CachedDottedRuleSetTransition cachedDottedRuleSetTransition)
+        public void AddTransition(DottedRuleSetTransition cachedDottedRuleSetTransition)
         {
             _transitions.Add(cachedDottedRuleSetTransition.Symbol, cachedDottedRuleSetTransition);
         }

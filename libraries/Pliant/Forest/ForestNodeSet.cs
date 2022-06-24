@@ -21,6 +21,16 @@ namespace Pliant.Forest
             _tokenNodes = new Dictionary<IToken, ITokenForestNode>();
         }
 
+        public bool TryGetExistingSymbolForestNode(ISymbol symbol, int origin, int location, out ISymbolForestNode node)
+        {
+            var hash = ComputeHashCode(symbol, origin, location);
+            node = null;
+            if (!_symbolNodes.TryGetValue(hash, out ISymbolForestNode symbolNode))
+                return false;
+            node = symbolNode;
+            return true;
+        }
+
         public ISymbolForestNode AddOrGetExistingSymbolNode(ISymbol symbol, int origin, int location)
         {
             var hash = ComputeHashCode(symbol, origin, location);
@@ -39,6 +49,16 @@ namespace Pliant.Forest
                 symbol.GetHashCode(), 
                 origin.GetHashCode(), 
                 location.GetHashCode());
+        }
+
+        public bool TryGetExistingIntermediateNode(IDottedRule dottedRule, int origin, int location, out IIntermediateForestNode node)
+        {
+            int hash = ComputeHashCode(dottedRule, origin, location);
+            node = null;
+            if (!_intermediateNodes.TryGetValue(hash, out IIntermediateForestNode intermediateNode))
+                return false;
+            node = intermediateNode;
+            return true;
         }
 
         public IIntermediateForestNode AddOrGetExistingIntermediateNode(IDottedRule dottedRule, int origin, int location)
@@ -82,11 +102,11 @@ namespace Pliant.Forest
 
         public bool TryGetExistingVirtualNode(
             int location,
-            ITransitionState transitionState,
+            ISymbol searchSymbol,
+            int origin,
             out VirtualForestNode node)
         {
-            var targetState = transitionState.GetTargetState();
-            var hash = ComputeHashCode(targetState.DottedRule.Production.LeftHandSide, targetState.Origin, location);
+            var hash = ComputeHashCode(searchSymbol, origin, location);
             return _virtualNodes.TryGetValue(hash, out node);
         }
 

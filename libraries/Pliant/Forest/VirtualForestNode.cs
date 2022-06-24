@@ -86,8 +86,8 @@ namespace Pliant.Forest
             var transitionState = path.TransitionState;
             var completedParseNode = path.ForestNode;
 
-            return transitionState.Reduction.ParseNode != null
-            && completedParseNode == transitionState.Reduction.ParseNode
+            return transitionState.Top.ParseNode != null
+            && completedParseNode == transitionState.Top.ParseNode
             && (completedParseNode.NodeType == ForestNodeType.Intermediate
                 || completedParseNode.NodeType == ForestNodeType.Symbol);
         }
@@ -122,18 +122,18 @@ namespace Pliant.Forest
         {
             var transitionState = path.TransitionState;
             var completedParseNode = path.ForestNode;
-            if (transitionState.NextTransition != null)
+            if (transitionState.Next != null)
             {
-                var virtualNode = new VirtualForestNode(Location, transitionState.NextTransition, completedParseNode);
+                var virtualNode = new VirtualForestNode(Location, transitionState.Next, completedParseNode);
 
-                if (transitionState.Reduction.ParseNode is null)
+                if (transitionState.Top.ParseNode is null)
                     AddUniqueFamily(virtualNode);
                 else
-                    AddUniqueFamily(transitionState.Reduction.ParseNode, virtualNode);
+                    AddUniqueFamily(transitionState.Top.ParseNode, virtualNode);
             }
-            else if (!(transitionState.Reduction.ParseNode is null))
+            else if (!(transitionState.Top.ParseNode is null))
             {
-                AddUniqueFamily(transitionState.Reduction.ParseNode, completedParseNode);
+                AddUniqueFamily(transitionState.Top.ParseNode, completedParseNode);
             }
             else
             {

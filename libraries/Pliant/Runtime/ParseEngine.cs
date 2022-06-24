@@ -23,8 +23,10 @@ namespace Pliant.Runtime
         public IStateFactory StateFactory { get; private set; }
 
         private const string PredictionLogName = "Predict";
+        private const string PredictionAycockHorspoolLogName = "PredictAH";
         private const string StartLogName = "Start";
         private const string CompleteLogName = "Complete";
+        private const string LeoCompleteLogName = "LeoComplete";
         private const string TransitionLogName = "Transition";
 
         private Chart _chart;
@@ -86,39 +88,31 @@ namespace Pliant.Runtime
 
         public IInternalForestNode GetParseForestRootNode()
         {
-            if (!IsAccepted())
-                throw new Exception("Unable to parse expression.");
+            var acceptedCompletion = FindAcceptedCompletion(_chart.Count - 1);
+            if (acceptedCompletion == null)
+                new Exception("Unable to parse expression.");
+            return acceptedCompletion.ParseNode as IInternalForestNode;
+        }
 
-            var lastSet = _chart.EarleySets[_chart.Count - 1];
+        private INormalState FindAcceptedCompletion(int location)
+        {
+            var set = _chart.EarleySets[location];
             var start = Grammar.Start;
-
-            // PERF: Avoid Linq expressions due to lambda allocation
-            for (int c = 0; c < lastSet.Completions.Count; c++)
+            for (var c = 0; c < set.Completions.Count; c++)
             {
-                var completion = lastSet.Completions[c];
-                if (completion.DottedRule.Production.LeftHandSide.Equals(start) && completion.Origin == 0)
-                {
-                    return completion.ParseNode as IInternalForestNode;
-                }
+                var completion = set.Completions[c];
+                if (completion.Origin == 0
+                    && completion.DottedRule.Production.LeftHandSide.Value.Equals(start.Value))
+                    return completion;
+
             }
             return null;
         }
 
-
         public bool IsAccepted()
         {
-            var lastEarleySet = _chart.EarleySets[_chart.Count - 1];
-            var startStateSymbol = Grammar.Start;
-
-            // PERF: Avoid LINQ Any due to lambda allocation
-            for (var c = 0; c < lastEarleySet.Completions.Count; c++)
-            {
-                var completion = lastEarleySet.Completions[c];
-                if (completion.Origin == 0
-                    && completion.DottedRule.Production.LeftHandSide.Value == startStateSymbol.Value)
-                    return true;
-            }
-            return false;
+            var acceptedCompletion = FindAcceptedCompletion(_chart.Count - 1);
+            return !(acceptedCompletion is null);
         }
 
         private void Initialize()
@@ -299,7 +293,7 @@ namespace Pliant.Runtime
                 PredictProduction(j, production);
             }
 
-            var isNullable = Grammar.IsNullable(nonTerminal);
+            var isNullable = Grammar.IsTransativeNullable(nonTerminal);
             if (isNullable)
                 PredictAycockHorspool(evidence, j);
         }
@@ -348,57 +342,67 @@ namespace Pliant.Runtime
 
             var aycockHorspoolState = StateFactory.NewState(dottedRule, evidence.Origin, parseNode);
             if (_chart.Enqueue(j, aycockHorspoolState))
-                Log(PredictionLogName, j, aycockHorspoolState);
+                Log(PredictionAycockHorspoolLogName, j, aycockHorspoolState);
         }
 
         private void Complete(INormalState completed, int k)
         {
-            if (completed.ParseNode is null)
-                completed.ParseNode = CreateNullParseNode(completed.DottedRule.Production.LeftHandSide, k);
-
-            var earleySet = _chart.EarleySets[completed.Origin];
+            var set = _chart.EarleySets[completed.Origin];
             var searchSymbol = completed.DottedRule.Production.LeftHandSide;
 
-            var transitionState = earleySet.FindTransitionState(searchSymbol);
+            // Find a transition state in the current set
+            var transitionState = set.FindTransitionState(searchSymbol);
             if (transitionState != null)
             {
                 LeoComplete(transitionState, completed, k);
             }
             else
-            {
+            {                
                 EarleyComplete(completed, k);
             }
         }
 
         private void LeoComplete(ITransitionState transitionState, IState completed, int k)
         {
-            // jump to the earley set of the transition
-            var earleySet = _chart.EarleySets[transitionState.Origin];
+            // jump to the earley set of the completed state
+            var earleySet = _chart.EarleySets[completed.Origin];
 
-            // look for another transition item here, this one will point to the correct reduction 
-            ITransitionState topMost = earleySet.FindTransitionState(transitionState.Recognized);
-            if (topMost == null)
-                topMost = transitionState;
+            // look for the most recent transition item, this is used for parse node creation
+            var originTransition = earleySet.FindTransitionState(transitionState.Recognized);
+
+            // if we don't find another root transition, we are at it
+            if (originTransition == null)
+                originTransition = transitionState;
             
-            var dottedRule = topMost.DottedRule;
-            var origin = topMost.Reduction.Origin;
+            var dottedRule = originTransition.DottedRule;
+            var origin = originTransition.Top.Origin;
 
-            var virtualParseNode = CreateVirtualParseNode(completed, k, topMost);
+            if (_chart.Contains(k, StateType.Normal, dottedRule, origin))
+                return;
+
+
+            var parseNode = new DynamicForestNode(
+                new DynamicForestNodeLinkAdapter(transitionState.First), Location);
 
             var topmostItem = StateFactory.NewState(
                 dottedRule,
                 origin,
-                virtualParseNode);
+                parseNode);
 
             if (_chart.Enqueue(k, topmostItem))
-                Log(CompleteLogName, k, topmostItem);
+                Log(LeoCompleteLogName, k, topmostItem);
         }
 
         private void EarleyComplete(INormalState completed, int k)
         {
+            // TODO: check if this is needed. Should only be a factor in aycock horspool completions
+            if (completed.ParseNode is null)
+                completed.ParseNode = CreateNullParseNode(completed.DottedRule.Production.LeftHandSide, k);
+
             var j = completed.Origin;
             var sourceEarleySet = _chart.EarleySets[j];
 
+            // Instead of scanning the set of states, we could use a transition table
             var predictionCount = sourceEarleySet.Predictions.Count;
             for (int p = 0; p < predictionCount; p++)
             {
@@ -427,90 +431,169 @@ namespace Pliant.Runtime
             }
         }
 
-        private bool RuleIsRightRecursive(IDottedRule rule)
+        private void Memoize(int location)
         {
-            for (var s = rule.Production.RightHandSide.Count -1; s >= 0; s--)
-            { 
-                var symbol = rule.Production.RightHandSide[s];
-                if (symbol.SymbolType != SymbolType.NonTerminal)
-                    return false;
-                if (symbol == rule.Production.LeftHandSide)
-                    return true;
-                if (Grammar.IsTransativeNullable(symbol as INonTerminal))
-                    continue;
+            var set = _chart.EarleySets[location];
+            var counts = new Dictionary<ISymbol, int>();
+            var rules = new Dictionary<ISymbol, INormalState>();
 
-                // need to update grammar for IsRightRecursive(IDottedRule)
-            }
-            return false;
-        }
-
-        private void Memoize(int k)
-        {
-            var set = _chart.EarleySets[k];
-
-            // loop through all completed items and memoize each        
-            for (var c = 0; c < set.Completions.Count; c++)
+            // for every postdot symbol in iES do
+            for (var p = 0; p < set.Predictions.Count; p++)
             {
-                var completion = set.Completions[c];
-                var symbol = completion.DottedRule.Production.LeftHandSide;
+                // LeoEligible(rule.PostDotSymbol) = LeoUnique(rule.PostDotSybol) AND RightRecursive(rule)
+                var rule = set.Predictions[p];
 
-                if (!RuleIsRightRecursive(completion.DottedRule))
+                if (counts.TryGetValue(rule.DottedRule.PostDotSymbol, out var count))
+                {
+                    counts[rule.DottedRule.PostDotSymbol] = count + 1;
+                    continue;
+                }
+
+                rules[rule.DottedRule.PostDotSymbol] = rule;
+                counts[rule.DottedRule.PostDotSymbol] = 1;
+            }
+
+            foreach (var postDotSymbol in counts.Keys)
+            {
+                var count = counts[postDotSymbol];
+
+                // LeoUnique(rule.PostDotSybol)
+                if (count != 1)
                     continue;
 
-                var prediction = set.FindSourceState(symbol);
-                if (prediction == null)
+                var prediction = rules[postDotSymbol];
+                if (!Grammar.IsRightRecursive(prediction.DottedRule.Production))
                     continue;
 
                 var next = _dottedRuleRegistry.GetNext(prediction.DottedRule);
                 if (!IsQuasiComplete(next))
                     continue;
 
-                var topMostCacheItem = FindTopMostTransition(prediction, symbol);
-                var origin = topMostCacheItem is null
-                            ? k
-                            : topMostCacheItem.Origin;
+                // top and bottom represent the top and bottom of the reduction path
+                // for leo items, there should only be one or two
+                // it is possible for top and bottom to point to the same state
+                var top = FindReduction(location, prediction);
+                if(top is null)
+                    continue;
 
-                // this shouldn't be any completion, just the one that matches the leo constraints
-                var transition = new TransitionState(symbol, completion, origin);
-
-                // create a link between the previous transition item and the current transition item
-                // this link is used during virtual parse node expansion
-                var previous = FindTransition(prediction.Origin, symbol);
-                if (previous != null)
-                    previous.NextTransition = transition;
-
-                if (_chart.Enqueue(k, transition))
-                    Log(TransitionLogName, k, transition);
+                var transition = CreateTopTransition(top, prediction, postDotSymbol);
+                if (set.Enqueue(transition))
+                    Log(TransitionLogName, location, transition);                              
             }
+        }
+
+        private ITransitionState CreateTopTransition(IState top, IState bottom, ISymbol symbol)
+        {
+            var origin = top.Origin;
+            ITransitionState topTransition = null;
+            while (true)
+            {
+                var set = Chart.EarleySets[origin];
+                var nextTransition = set.FindTransitionState(symbol);
+
+                if (nextTransition == null)
+                    break;
+
+                topTransition = nextTransition;
+                if (origin == nextTransition.Origin)
+                    break;
+
+                origin = topTransition.Origin;
+            }
+            
+            var transition = new TransitionState(symbol, top, bottom, topTransition == null ? top.Origin : origin);
+
+            // link to previous transition to assist with parse forest generation            
+            var bottomSet = Chart.EarleySets[bottom.Origin];
+            var previousTransition = bottomSet.FindTransitionState(symbol);
+            if (!(previousTransition is null))
+            {
+                previousTransition.Next = transition;
+                transition.First = previousTransition.First;
+            }
+            else
+            {
+                // link to self if no previous transition
+                transition.First = transition;
+            }
+
+            // does prediction contain the parse node I need?
+            return transition;
+        }
+
+        private INormalState FindReduction(int location, INormalState prediction)
+        {
+            var set = _chart.EarleySets[location];
+            INormalState reduction = null;
+
+            for (var c = 0; c < set.Completions.Count; c++)
+            {
+                var completion = set.Completions[c];
+                if (!prediction.IsSource(completion.DottedRule.Production.LeftHandSide))
+                    continue;
+
+                // from leo's paper:
+                // if set contains one (B -> a*AB, k) and (B -> aA*B, k) is quasi complete
+                // then add (B -> aAB*, k) 
+                if (completion.DottedRule.Production != prediction.DottedRule.Production)
+                    continue;
+
+                if (reduction is null)
+                {
+                    reduction = completion;
+                    continue;
+                }
+
+                // top will always be the stat with the smallest origin
+                if (completion.Origin < reduction.Origin)
+                    reduction = completion;
+            }
+            return reduction;
         }
 
         /// <summary>
-        /// Finds the transition for the given state origin and symbol
+        /// attempts to find the top and bottom of the reduction path for the given prediction
+        /// the reduction path will have the same dotted rule as the preduction
         /// </summary>
-        /// <param name="state"></param>
-        /// <param name="symbol"></param>
+        /// <param name="location"></param>
+        /// <param name="prediction"></param>
+        /// <param name="top"></param>
+        /// <param name="bottom"></param>
         /// <returns></returns>
-        private ITransitionState FindTransition(int origin, ISymbol symbol)
-        {   
-            var set = _chart.EarleySets[origin];
-            return set.FindTransitionState(symbol);
-        }
-
-        private ITransitionState FindTopMostTransition(IState state, ISymbol symbol)
+        private bool TryFindReductions(int location, INormalState prediction, out INormalState top, out INormalState bottom)
         {
-            ITransitionState topMostCacheItem = null;
-            var origin = state.Origin;            
-            while (true)
+            var set = _chart.EarleySets[location];
+            bottom = top = null;
+
+            for (var c = 0; c < set.Completions.Count; c++)
             {
-                var next = FindTransition(origin, symbol);
-                if (next == null)
-                    break;
-                topMostCacheItem = next;
-                if (origin == next.Origin)
-                    break;
-                origin = topMostCacheItem.Origin;
+                var completion = set.Completions[c];
+                if (!prediction.IsSource(completion.DottedRule.Production.LeftHandSide))
+                    continue;
+
+                // from leo's paper:
+                // if set contains one (B -> a*AB, k) and (B -> aA*B, k) is quasi complete
+                // then add (B -> aAB*, k) 
+                if (completion.DottedRule.Production != prediction.DottedRule.Production)
+                    continue;
+
+                if (top is null)
+                {
+                    top = completion;
+                    bottom = completion;
+                    continue;
+                }
+
+                // bottom will always be the state with the largest origin                
+                if (completion.Origin > bottom.Origin)
+                    bottom = completion;
+
+                // top will always be the stat with the smallest origin
+                if (completion.Origin < top.Origin)
+                    top = completion;
             }
-            return topMostCacheItem;
+
+            return !(top is null);
         }
 
         /// <summary>
@@ -607,7 +690,7 @@ namespace Pliant.Runtime
 
             // if w = null and y doesn't have a family of children (v)
             if (w is null)
-                internalNode.AddUniqueFamily(v);
+                    internalNode.AddUniqueFamily(v);
 
             // if w != null and y doesn't have a family of children (w, v)            
             else
@@ -617,17 +700,19 @@ namespace Pliant.Runtime
         }
 
         private VirtualForestNode CreateVirtualParseNode(IState completed, int k, ITransitionState rootTransitionState)
-        {            
+        {
+            var targetState = rootTransitionState.GetTargetState();
             if (_nodeSet.TryGetExistingVirtualNode(
                 k,
-                rootTransitionState,
+                targetState.DottedRule.Production.LeftHandSide,
+                targetState.Origin,
                 out VirtualForestNode virtualParseNode))
             {
                 virtualParseNode.AddUniquePath(
                     new VirtualForestNodePath(rootTransitionState, completed.ParseNode));                
             }
             else
-            {
+            {                
                 virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
                 _nodeSet.AddNewVirtualNode(virtualParseNode);
             }

@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".documentation", ".documentation", "{026B4A97-0C94-4C41-A869-433989C12BE7}"
 	ProjectSection(SolutionItems) = preProject
 		documentation\grammars.md = documentation\grammars.md
+		documentation\leo-parse-tree.md = documentation\leo-parse-tree.md
 		LICENSE.md = LICENSE.md
 		documentation\morse-code-grammar.md = documentation\morse-code-grammar.md
 		documentation\pdl.md = documentation\pdl.md
