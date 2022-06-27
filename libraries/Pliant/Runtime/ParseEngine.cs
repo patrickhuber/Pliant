@@ -631,7 +631,7 @@ namespace Pliant.Runtime
                 // to fix this, check if S can derive S. Basically if we are in the Start state
                 // and the Start state is found and is nullable, exit with false
                 if (dottedRule.Production.LeftHandSide == Grammar.Start
-                    && dottedRule.PostDotSymbol == Grammar.Start)
+                    && symbol == Grammar.Start)
                     return false;
 
             }
