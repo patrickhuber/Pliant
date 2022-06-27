@@ -527,17 +527,18 @@ namespace Pliant.Runtime
             var set = _chart.EarleySets[location];
             INormalState reduction = null;
 
-            for (var c = 0; c < set.Completions.Count; c++)
+            var reductions = set.FindReductions(prediction.DottedRule.PostDotSymbol);
+            var reductionCount = reductions.Count;
+
+            for (var c = 0; c < reductionCount; c++)
             {
-                var completion = set.Completions[c];
-                if (!prediction.IsSource(completion.DottedRule.Production.LeftHandSide))
-                    continue;
+                var completion = reductions[c];
 
                 // from leo's paper:
                 // if set contains one (B -> a*AB, k) and (B -> aA*B, k) is quasi complete
                 // then add (B -> aAB*, k) 
-                if (completion.DottedRule.Production != prediction.DottedRule.Production)
-                    continue;
+                //if (completion.DottedRule.Production != prediction.DottedRule.Production)
+                //    continue;
 
                 if (reduction is null)
                 {

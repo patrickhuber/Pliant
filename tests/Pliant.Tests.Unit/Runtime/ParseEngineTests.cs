@@ -624,8 +624,8 @@ namespace Pliant.Tests.Unit.Runtime
             AssertNodeProperties(F_1_2, "F", 1, 2);
             var T_2_4 = GetAndCastChildAtIndex<ISymbolForestNode>(T_1_4, 1);
             AssertNodeProperties(T_2_4, "T", 2, 4);
-            var F_2_4 = GetAndCastChildAtIndex<ISymbolForestNode>(T_2_4, 0);
-            AssertNodeProperties(F_2_4, "F", 2, 3);
+            var F_2_3 = GetAndCastChildAtIndex<ISymbolForestNode>(T_2_4, 0);
+            AssertNodeProperties(F_2_3, "F", 2, 3);
             var T_3_4 = GetAndCastChildAtIndex<ISymbolForestNode>(T_2_4, 1);
             AssertNodeProperties(T_3_4, "T", 3, 4);
             var F_3_4 = GetAndCastChildAtIndex<ISymbolForestNode>(T_3_4, 0);

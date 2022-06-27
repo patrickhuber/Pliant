@@ -97,11 +97,11 @@ namespace Pliant.Forest
         private void LazyLoadChildren()
         {
             var next = Link.Next;
-            // need to think about better exit criteriaf
-            IForestNode rightSubTree = next?.Next is null 
-                ? next.Bottom
-                : new DynamicForestNode(next, Location);
-            AddUniqueFamily(Link.Bottom, rightSubTree);
+
+            if (next is null)
+                AddUniqueFamily(Link.Bottom);
+            else
+                AddUniqueFamily(Link.Bottom, new DynamicForestNode(next, Location));
         }
 
         public override void Accept(IForestNodeVisitor visitor)
