@@ -98,9 +98,11 @@ namespace Pliant.Runtime
         {
             var set = _chart.EarleySets[location];
             var start = Grammar.Start;
-            for (var c = 0; c < set.Completions.Count; c++)
+            var reductions = set.FindReductions(start);
+            var reductionCount = reductions.Count;
+            for (var c = 0; c < reductionCount; c++)
             {
-                var completion = set.Completions[c];
+                var completion = reductions[c];
                 if (completion.Origin == 0
                     && completion.DottedRule.Production.LeftHandSide.Value.Equals(start.Value))
                     return completion;
