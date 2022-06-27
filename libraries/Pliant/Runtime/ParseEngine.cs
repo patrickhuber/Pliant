@@ -400,15 +400,14 @@ namespace Pliant.Runtime
                 completed.ParseNode = CreateNullParseNode(completed.DottedRule.Production.LeftHandSide, k);
 
             var j = completed.Origin;
-            var sourceEarleySet = _chart.EarleySets[j];
+            var set = _chart.EarleySets[j];
 
-            // Instead of scanning the set of states, we could use a transition table
-            var predictionCount = sourceEarleySet.Predictions.Count;
-            for (int p = 0; p < predictionCount; p++)
+            var sources = set.FindSourceStates(completed.DottedRule.Production.LeftHandSide);
+            var predictionCount = sources.Count;
+
+            for (var p = 0; p < predictionCount; p++)
             {
-                var prediction = sourceEarleySet.Predictions[p];
-                if (!prediction.IsSource(completed.DottedRule.Production.LeftHandSide))
-                    continue;
+                var prediction = sources[p];
 
                 var dottedRule = _dottedRuleRegistry.GetNext(prediction.DottedRule);
                 var origin = prediction.Origin;
