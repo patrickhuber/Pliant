@@ -607,16 +607,14 @@ namespace Pliant.Runtime
                 return true;
 
             // all postdot symbols are nullable
-            for (var s = dottedRule.Position; s < dottedRule.Production.RightHandSide.Count; s++) 
+            var rightHandSideCount = dottedRule.Production.RightHandSide.Count;
+            for (var s = dottedRule.Position; s < rightHandSideCount; s++) 
             {
                 var symbol = dottedRule.Production.RightHandSide[s];
                 if (symbol.SymbolType != SymbolType.NonTerminal)
                     return false;
 
                 var nonTerminal = symbol as INonTerminal;
-                if (Grammar.RulesFor(nonTerminal).Count > 1)
-                    return false;
-
                 if (!Grammar.IsNullable(nonTerminal))
                     return false;
 
