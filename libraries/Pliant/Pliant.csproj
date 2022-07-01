@@ -11,7 +11,7 @@
     <PackageLicenseUrl>https://raw.githubusercontent.com/patrickhuber/Pliant/master/LICENSE.md</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/patrickhuber/Pliant</PackageProjectUrl>
     <RepositoryUrl>https://github.com/patrickhuber/Pliant</RepositoryUrl>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
