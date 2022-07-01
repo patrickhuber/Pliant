@@ -2,6 +2,6 @@
 {
     public interface IDynamicForestNode : ISymbolForestNode
     {
-        IDynamicForestNodeLink Link { get; }
+        IDynamicForestNodeLink Current { get; }
     }
 }

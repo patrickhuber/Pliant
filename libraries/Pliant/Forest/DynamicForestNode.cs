@@ -11,10 +11,15 @@ namespace Pliant.Forest
         public ISymbol Symbol { get; private set; }
 
         /// <summary>
-        /// Previous is the previous root node. Can be null.
+        /// Start of the reduction path
         /// </summary>
-        public IDynamicForestNodeLink Link { get; private set; }
-        
+        public IDynamicForestNodeLink Current { get; private set; }
+                
+        /// <summary>
+        /// The node that was completed to create this reduction path
+        /// </summary>
+        public IForestNode Completed { get; private set; }
+
         public override ForestNodeType NodeType => ForestNodeType.Symbol;
 
         /// <summary>
@@ -74,11 +79,12 @@ namespace Pliant.Forest
         /// <param name="top">The top of the parse reduction chain.</param>
         /// <param name="bottom">The bottom of the parse reudction chain.</param>
         /// <param name="previous">the previous root node</param>
-        public DynamicForestNode(IDynamicForestNodeLink link, int location)
-            : base(link.Bottom.Origin, location)
+        public DynamicForestNode(IDynamicForestNodeLink start, IForestNode completed, int location)
+            : base(start.Bottom.Origin, location)
         {
-            Link = link;
-            Symbol = link.Symbol;
+            Current = start;
+            Symbol = start.Symbol;
+            Completed = completed;
             _hashCode = ComputeHashCode();
         }
 
@@ -96,12 +102,13 @@ namespace Pliant.Forest
 
         private void LazyLoadChildren()
         {
-            var next = Link.Next;
-
-            if (next is null)
-                AddUniqueFamily(Link.Bottom);
+            var next = Current.Next;
+            if (Current.Next is null)
+                AddUniqueFamily(Current.Bottom);
+            else if (Completed.Origin == next.Bottom.Origin && Completed.Location == next.Bottom.Location)
+                AddUniqueFamily(Current.Bottom, Completed);
             else
-                AddUniqueFamily(Link.Bottom, new DynamicForestNode(next, Location));
+                AddUniqueFamily(Current.Bottom, new DynamicForestNode(next, Completed, Location));
         }
 
         public override void Accept(IForestNodeVisitor visitor)
@@ -113,7 +120,7 @@ namespace Pliant.Forest
         {
             if (obj is null)
                 return false;
-            if (!(obj is ISymbolForestNode symbolNode))
+            if (obj is not ISymbolForestNode symbolNode)
                 return false;
 
             return Location == symbolNode.Location

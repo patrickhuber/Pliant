@@ -6,14 +6,10 @@ namespace Pliant.Charts
     {
         ISymbol Recognized { get; }
 
-        IState Top { get; }
-
         IState Bottom { get; }
 
         ITransitionState Next { get; set; }
 
         ITransitionState First { get; set; }
-
-        IState GetTargetState();
     }
 }

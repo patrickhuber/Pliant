@@ -8,11 +8,8 @@ namespace Pliant.Charts
     {
         readonly ITransitionState _transitionState;
         IDynamicForestNodeLink _next;
-        IDynamicForestNodeLink _first;
 
         public IForestNode Bottom => _transitionState?.Bottom?.ParseNode;
-
-        public IForestNode Top => _transitionState?.Top?.ParseNode;
 
         public IDynamicForestNodeLink First { get; private set; }
 
@@ -20,15 +17,15 @@ namespace Pliant.Charts
         {
             get
             {
-                if (!(_next is null))
+                if (_next is not null)
                     return _next;
 
                 if (_transitionState?.Next is null)
                     return null;
 
                 var next = new DynamicForestNodeLinkAdapter(_transitionState.Next);
-                if (!(_first is null))
-                    next._first = _first;
+                if (First is not null)
+                    next.First = First;
                 _next = next;
                 return _next;
             }
@@ -42,15 +39,13 @@ namespace Pliant.Charts
 
             // is this the first transition state in the chain? if so, set the link to the first node
             if (ReferenceEquals(_transitionState.First, _transitionState))
-                _first = this;
+                First = this;
         }
     }
     
     public class TransitionState : StateBase, ITransitionState
     {
         public ISymbol Recognized { get; private set; }
-
-        public IState Top { get; private set; }
 
         public IState Bottom { get; private set; }
 
@@ -63,12 +58,11 @@ namespace Pliant.Charts
                 
         public TransitionState(
             ISymbol recognized,
-            IState top,
+            IDottedRule dottedRule,
             IState bottom,
             int origin)
-            : base(top.DottedRule, origin)
+            : base(dottedRule, origin)
         {
-            Top = top;
             Bottom = bottom;
 
             Recognized = recognized;
@@ -79,7 +73,7 @@ namespace Pliant.Charts
         {
             if (obj is null)
                 return false;
-            if (!(obj is TransitionState transitionState))
+            if (obj is not TransitionState transitionState)
                 return false;
 
             return GetHashCode() == transitionState.GetHashCode()
@@ -103,17 +97,9 @@ namespace Pliant.Charts
 
         public override string ToString()
         {
-            return $"{Recognized} : {Top.DottedRule}\t\t({Origin})";
+            return $"{Recognized} : {DottedRule}\t\t({Origin})";
         }
 
         public override StateType StateType { get { return StateType.Transitive; } }
-
-        public IState GetTargetState()
-        {
-            var parameterTransitionStateHasNoParseNode = ParseNode is null;
-            if (parameterTransitionStateHasNoParseNode)
-                return Top;
-            return this;
-        }
     }
 }

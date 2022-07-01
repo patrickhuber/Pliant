@@ -366,26 +366,14 @@ namespace Pliant.Runtime
 
         private void LeoComplete(ITransitionState transitionState, IState completed, int k)
         {
-            // jump to the earley set of the completed state
-            var earleySet = _chart.EarleySets[completed.Origin];
-
-            // look for the most recent transition item, this is used for parse node creation
-            var originTransition = earleySet.FindTransitionState(transitionState.Recognized);
-
-            // if we don't find another root transition, we are at it
-            if (originTransition == null)
-                originTransition = transitionState;
-            
-            var dottedRule = originTransition.DottedRule;
-            var origin = originTransition.Top.Origin;
+            var dottedRule = transitionState.DottedRule;
+            var origin = transitionState.Origin;
 
             if (_chart.Contains(k, StateType.Normal, dottedRule, origin))
                 return;
-
-
-            var parseNode = new DynamicForestNode(
-                new DynamicForestNodeLinkAdapter(transitionState.First), Location);
-
+            
+            var parseNode = CreateDynamicParseNode(completed, k, transitionState);
+            
             var topmostItem = StateFactory.NewState(
                 dottedRule,
                 origin,
@@ -476,7 +464,6 @@ namespace Pliant.Runtime
                 var top = FindReduction(location, prediction);
                 if(top is null)
                     continue;
-
                 var transition = CreateTopTransition(top, prediction, postDotSymbol);
                 if (set.Enqueue(transition))
                     Log(TransitionLogName, location, transition);                              
@@ -502,12 +489,12 @@ namespace Pliant.Runtime
                 origin = topTransition.Origin;
             }
             
-            var transition = new TransitionState(symbol, top, bottom, topTransition == null ? top.Origin : origin);
+            var transition = new TransitionState(symbol, top.DottedRule, bottom, topTransition == null ? top.Origin : origin);
 
             // link to previous transition to assist with parse forest generation            
             var bottomSet = Chart.EarleySets[bottom.Origin];
             var previousTransition = bottomSet.FindTransitionState(symbol);
-            if (!(previousTransition is null))
+            if (previousTransition is not null)
             {
                 previousTransition.Next = transition;
                 transition.First = previousTransition.First;
@@ -551,51 +538,6 @@ namespace Pliant.Runtime
                     reduction = completion;
             }
             return reduction;
-        }
-
-        /// <summary>
-        /// attempts to find the top and bottom of the reduction path for the given prediction
-        /// the reduction path will have the same dotted rule as the preduction
-        /// </summary>
-        /// <param name="location"></param>
-        /// <param name="prediction"></param>
-        /// <param name="top"></param>
-        /// <param name="bottom"></param>
-        /// <returns></returns>
-        private bool TryFindReductions(int location, INormalState prediction, out INormalState top, out INormalState bottom)
-        {
-            var set = _chart.EarleySets[location];
-            bottom = top = null;
-
-            for (var c = 0; c < set.Completions.Count; c++)
-            {
-                var completion = set.Completions[c];
-                if (!prediction.IsSource(completion.DottedRule.Production.LeftHandSide))
-                    continue;
-
-                // from leo's paper:
-                // if set contains one (B -> a*AB, k) and (B -> aA*B, k) is quasi complete
-                // then add (B -> aAB*, k) 
-                if (completion.DottedRule.Production != prediction.DottedRule.Production)
-                    continue;
-
-                if (top is null)
-                {
-                    top = completion;
-                    bottom = completion;
-                    continue;
-                }
-
-                // bottom will always be the state with the largest origin                
-                if (completion.Origin > bottom.Origin)
-                    bottom = completion;
-
-                // top will always be the stat with the smallest origin
-                if (completion.Origin < top.Origin)
-                    top = completion;
-            }
-
-            return !(top is null);
         }
 
         /// <summary>
@@ -699,25 +641,16 @@ namespace Pliant.Runtime
             return internalNode;
         }
 
-        private VirtualForestNode CreateVirtualParseNode(IState completed, int k, ITransitionState rootTransitionState)
+        private DynamicForestNode CreateDynamicParseNode(IState completed, int k, ITransitionState transition)
         {
-            var targetState = rootTransitionState.GetTargetState();
-            if (_nodeSet.TryGetExistingVirtualNode(
-                k,
-                targetState.DottedRule.Production.LeftHandSide,
-                targetState.Origin,
-                out VirtualForestNode virtualParseNode))
-            {
-                virtualParseNode.AddUniquePath(
-                    new VirtualForestNodePath(rootTransitionState, completed.ParseNode));                
-            }
-            else
-            {                
-                virtualParseNode = new VirtualForestNode(k, rootTransitionState, completed.ParseNode);
-                _nodeSet.AddNewVirtualNode(virtualParseNode);
-            }
-
-            return virtualParseNode;
+            if (_nodeSet.TryGetExistingDynamicNode(k, transition.Recognized, transition.Origin, out var node))
+                return node;
+            var parseNode = new DynamicForestNode(
+                new DynamicForestNodeLinkAdapter(transition.First),
+                completed.ParseNode,
+                Location);
+            _nodeSet.AddNewDynamicNode(parseNode);
+            return parseNode;
         }
 
         private bool IsSymbolTransativeNullable(ISymbol symbol)

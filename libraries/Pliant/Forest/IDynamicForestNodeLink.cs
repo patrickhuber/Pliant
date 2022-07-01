@@ -18,12 +18,7 @@ namespace Pliant.Forest
         /// Returns the bottom node of the reduction path
         /// </summary>
         IForestNode Bottom { get; }
-
-        /// <summary>
-        /// Returns the top node of the reduction path
-        /// </summary>
-        IForestNode Top { get; }
-        
+                
         ISymbol Symbol { get; }
     }
 }
