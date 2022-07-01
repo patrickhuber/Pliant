@@ -49,12 +49,14 @@ namespace Pliant.Tests.Unit.Grammars
         public void PreComputedGrammarIsRightRecursiveShouldFindCyclicRecursion()
         {
             var grammar = new HiddenRightRecursionGrammar();
-            var preComputedGrammar = new PreComputedGrammar(grammar);
-
             for (var p = 0; p < grammar.Productions.Count; p++)
             {
                 var production = grammar.Productions[p];
-                Assert.IsTrue(preComputedGrammar.Grammar.IsRightRecursive(production));
+                if (production.IsEmpty)
+                    continue;
+                if (production.RightHandSide[production.RightHandSide.Count - 1].SymbolType != SymbolType.NonTerminal)
+                    continue;
+                Assert.IsTrue(grammar.IsRightRecursive(production), $"expected {production} to be right recursive");
             }
         }
                 
