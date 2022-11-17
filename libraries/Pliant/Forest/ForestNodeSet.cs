@@ -80,11 +80,11 @@ namespace Pliant.Forest
                 location.GetHashCode());
         }
 
-        public ITokenForestNode AddOrGetExistingTokenNode(IToken token)
+        public ITokenForestNode AddOrGetExistingTokenNode(IToken token, int location)
         {
             if (_tokenNodes.TryGetValue(token, out ITokenForestNode tokenNode))
                 return tokenNode;
-            tokenNode = new TokenForestNode(token, token.Position, token.Capture.Count);
+            tokenNode = new TokenForestNode(token, token.Position, location);
             _tokenNodes.Add(token, tokenNode);
             return tokenNode;
         }

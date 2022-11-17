@@ -72,6 +72,16 @@ namespace Pliant.Forest
             // return true if the second child matches
             // otherwise return false
             return secondChild.Equals(secondCompareNode);
-        }              
+        }
+
+        public override void Accept(IForestNodeVisitor visitor)
+        {
+            var childrenCount = 0;
+            for (var i = 0; i < _children.Count; i++)
+            {
+                var child = _children[i];
+                child.Accept(visitor);
+            }
+        }
     }
 }

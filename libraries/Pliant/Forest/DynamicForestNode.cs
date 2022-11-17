@@ -103,7 +103,7 @@ namespace Pliant.Forest
         private void LazyLoadChildren()
         {
             var next = Current.Next;
-            if (Current.Next is null)
+            if (next is null)
                 AddUniqueFamily(Current.Bottom);
             else if (Completed.Origin == next.Bottom.Origin && Completed.Location == next.Bottom.Location)
                 AddUniqueFamily(Current.Bottom, Completed);
@@ -113,6 +113,7 @@ namespace Pliant.Forest
 
         public override void Accept(IForestNodeVisitor visitor)
         {
+            base.Accept(visitor);
             visitor.Visit(this);
         }
 

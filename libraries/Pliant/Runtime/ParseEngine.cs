@@ -231,7 +231,7 @@ namespace Pliant.Runtime
             if (_chart.Contains(j + 1, StateType.Normal, dottedRule, i))            
                 return;
             
-            var tokenNode = _nodeSet.AddOrGetExistingTokenNode(token);
+            var tokenNode = _nodeSet.AddOrGetExistingTokenNode(token, j+ 1);
             var parseNode = CreateParseNode(
                 dottedRule,
                 scan.Origin,
@@ -457,7 +457,7 @@ namespace Pliant.Runtime
                 var next = _dottedRuleRegistry.GetNext(prediction.DottedRule);
                 if (!IsQuasiComplete(next))
                     continue;
-
+                
                 // top and bottom represent the top and bottom of the reduction path
                 // for leo items, there should only be one or two
                 // it is possible for top and bottom to point to the same state

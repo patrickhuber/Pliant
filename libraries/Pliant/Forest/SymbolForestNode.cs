@@ -28,6 +28,7 @@ namespace Pliant.Forest
         public override void Accept(IForestNodeVisitor visitor)
         {
             visitor.Visit(this);
+            base.Accept(visitor);
         }
 
         public override bool Equals(object obj)

@@ -10,7 +10,7 @@ namespace Pliant.Languages.Regex
         public RegexDefinition Parse(string regularExpression)
         {
             var grammar = new RegexGrammar();
-            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
+            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true, loggingEnabled: true));
             var parseRunner = new ParseRunner(parseEngine, regularExpression);
             while (!parseRunner.EndOfStream())
             {
