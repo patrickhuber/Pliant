@@ -420,11 +420,14 @@ namespace Pliant.Runtime
             }
         }
 
+        IDictionary<ISymbol, INormalState> memoizeRules;
+        IDictionary<ISymbol, int> memoizeCounts;
+
         private void Memoize(int location)
         {
             var set = _chart.EarleySets[location];
-            var counts = new Dictionary<ISymbol, int>();
-            var rules = new Dictionary<ISymbol, INormalState>();
+            memoizeCounts ??= new Dictionary<ISymbol, int>();
+            memoizeRules ??= new Dictionary<ISymbol, INormalState>();
 
             // for every postdot symbol in iES do
             for (var p = 0; p < set.Predictions.Count; p++)
@@ -432,25 +435,25 @@ namespace Pliant.Runtime
                 // LeoEligible(rule.PostDotSymbol) = LeoUnique(rule.PostDotSybol) AND RightRecursive(rule)
                 var rule = set.Predictions[p];
 
-                if (counts.TryGetValue(rule.DottedRule.PostDotSymbol, out var count))
+                if (memoizeCounts.TryGetValue(rule.DottedRule.PostDotSymbol, out var count))
                 {
-                    counts[rule.DottedRule.PostDotSymbol] = count + 1;
+                    memoizeCounts[rule.DottedRule.PostDotSymbol] = count + 1;
                     continue;
                 }
 
-                rules[rule.DottedRule.PostDotSymbol] = rule;
-                counts[rule.DottedRule.PostDotSymbol] = 1;
+                this.memoizeRules[rule.DottedRule.PostDotSymbol] = rule;
+                memoizeCounts[rule.DottedRule.PostDotSymbol] = 1;
             }
 
-            foreach (var postDotSymbol in counts.Keys)
+            foreach (var postDotSymbol in memoizeCounts.Keys)
             {
-                var count = counts[postDotSymbol];
+                var count = memoizeCounts[postDotSymbol];
 
                 // LeoUnique(rule.PostDotSybol)
                 if (count != 1)
                     continue;
 
-                var prediction = rules[postDotSymbol];
+                var prediction = memoizeRules[postDotSymbol];
                 if (!Grammar.IsRightRecursive(prediction.DottedRule.Production))
                     continue;
 
@@ -468,6 +471,8 @@ namespace Pliant.Runtime
                 if (set.Enqueue(transition))
                     Log(TransitionLogName, location, transition);                              
             }
+            memoizeCounts.Clear();
+            memoizeRules.Clear();
         }
 
         private ITransitionState CreateTopTransition(IState top, IState bottom, ISymbol symbol)
