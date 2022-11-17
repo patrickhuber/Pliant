@@ -441,7 +441,7 @@ namespace Pliant.Runtime
                     continue;
                 }
 
-                this.memoizeRules[rule.DottedRule.PostDotSymbol] = rule;
+                memoizeRules[rule.DottedRule.PostDotSymbol] = rule;
                 memoizeCounts[rule.DottedRule.PostDotSymbol] = 1;
             }
 
