@@ -54,6 +54,18 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
+        public void ParseScottSection4Example2()
+        {
+            var tokens = Tokenize("bbb");
+            ProductionExpression S = "S";
+            S.Rule = S + S | 'b';
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
+            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false, loggingEnabled: true));
+            ParseInput(parseEngine, tokens);
+            var root = parseEngine.GetParseForestRootNode();
+        }
+
+        [TestMethod]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "Unit test is not performance critical code")]
         public void ParseEngineGivenAmbiguousGrammarShouldCreateMulipleParsePaths()
         {
@@ -73,6 +85,35 @@ namespace Pliant.Tests.Unit.Runtime
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
+            /*
+			(S,0,4) ->
+				(S->a*T,0,1) (T,1,4)
+			|	(S->A*T,0,1) (T,1,4)
+
+			(S->a*T,0,1) ->
+				(a,0,1)
+
+			(T,1,4) ->
+				(T->bb*b,1,3) (b,3,4)
+
+			(T->bb*b,1,3) ->
+				(T->b*bb,1,2) (b,2,3)
+
+			(T->b*bb,1,2) ->
+				(b,1,2)
+
+			(S->A*T,0,1) ->
+				(A,0,1)
+
+			(A,0,1) ->
+				(a,0,1)
+			|	(A->B*A,0,0) (A,0,1)
+
+			(A->B*A,0,0) ->
+				(B,0,0)
+
+			(B,0,0)->
+		    */
             var S_0_4 = parseEngine.GetParseForestRootNode() as ISymbolForestNode;
             Assert.IsNotNull(S_0_4);
             AssertNodeProperties(S_0_4, nameof(S), 0, 4);
@@ -638,7 +679,7 @@ namespace Pliant.Tests.Unit.Runtime
             var grammar = CreateRegularExpressionStubGrammar();
             // var input = Tokenize("aaa");
 
-            AssertLeoAndClassicParseAlgorithmsCreateSameForest("aaa", grammar);
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest("aaaa", grammar);
 
 
             //var parseEngine = new ParseEngine(grammar , new ParseEngineOptions(true, true));

@@ -10,34 +10,13 @@ namespace Pliant.Forest
     {
         private readonly Dictionary<int, ISymbolForestNode> _symbolNodes;
         private readonly Dictionary<int, IIntermediateForestNode> _intermediateNodes;
-        private readonly Dictionary<int, DynamicForestNode> _dynamicNodes;
         private readonly Dictionary<IToken, ITokenForestNode> _tokenNodes;
 
         public ForestNodeSet()
         {
             _symbolNodes = new Dictionary<int, ISymbolForestNode>();
-            _intermediateNodes = new Dictionary<int, IIntermediateForestNode>();
-            _dynamicNodes = new Dictionary<int, DynamicForestNode>();
+            _intermediateNodes = new Dictionary<int, IIntermediateForestNode>();         
             _tokenNodes = new Dictionary<IToken, ITokenForestNode>();
-        }
-        public void AddNewDynamicNode(
-            DynamicForestNode dynamicNode)
-        {
-            var hash = ComputeHashCode(
-                dynamicNode.Symbol,
-                dynamicNode.Origin,
-                dynamicNode.Location);
-            _dynamicNodes.Add(hash, dynamicNode);
-        }
-
-        public bool TryGetExistingDynamicNode(
-            int location,
-            ISymbol searchSymbol,
-            int origin,
-            out DynamicForestNode node)
-        {
-            var hash = ComputeHashCode(searchSymbol, origin, location);
-            return _dynamicNodes.TryGetValue(hash, out node);
         }
 
         public ISymbolForestNode AddOrGetExistingSymbolNode(ISymbol symbol, int origin, int location)
@@ -93,7 +72,6 @@ namespace Pliant.Forest
         {
             _symbolNodes.Clear();
             _intermediateNodes.Clear();
-            _dynamicNodes.Clear();
             _tokenNodes.Clear();
         }
     }

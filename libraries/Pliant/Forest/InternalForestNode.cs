@@ -76,8 +76,8 @@ namespace Pliant.Forest
 
         public override void Accept(IForestNodeVisitor visitor)
         {
-            var childrenCount = 0;
-            for (var i = 0; i < _children.Count; i++)
+            var childrenCount = _children.Count;
+            for (var i = 0; i < childrenCount; i++)
             {
                 var child = _children[i];
                 child.Accept(visitor);

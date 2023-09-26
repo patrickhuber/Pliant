@@ -166,14 +166,12 @@ namespace Pliant.Charts
 
         private bool EnqueueTransition(ITransitionState transitionState)
         {
-            if (_transitions is null)
-                _transitions = new UniqueList<ITransitionState>();
-
+            _transitions ??= new UniqueList<ITransitionState>();
             if (!_transitions.AddUnique(transitionState))
                 return false;
 
             _cached ??= new Dictionary<ISymbol, ITransitionState>();
-            _cached[transitionState.Recognized] = transitionState;
+            _cached[transitionState.Symbol] = transitionState;
             return true;
         }
 

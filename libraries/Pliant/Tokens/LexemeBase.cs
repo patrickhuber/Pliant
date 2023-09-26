@@ -11,6 +11,7 @@ namespace Pliant.Tokens
         private static readonly ITrivia[] EmptyTriviaArray = { };
         private List<ITrivia> _leadingTrivia;
         private List<ITrivia> _trailingTrivia;
+        private int _offset;
 
         protected TLexerRule ConcreteLexerRule { get; private set; }
 
@@ -38,7 +39,7 @@ namespace Pliant.Tokens
                 
         public ICapture<char> Capture { get; private set; }
         
-        public int Position => Capture.Offset;
+        public int Position => _offset; // TODO: is this right?
 
         public TokenType TokenType
         {
@@ -49,6 +50,7 @@ namespace Pliant.Tokens
         {
             ConcreteLexerRule = lexerRule;
             Capture = parentSegment.Slice(offset, 0);
+            _offset = offset;
         }
         
         public abstract bool IsAccepted();
