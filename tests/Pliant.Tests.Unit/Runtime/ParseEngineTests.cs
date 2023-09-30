@@ -328,87 +328,32 @@ namespace Pliant.Tests.Unit.Runtime
             ParseInput(parseEngine, tokens);
 
             /*  S_0_4 -> A_0_4
-             *  A_0_4 -> 'a' B_1_4
-             *  B_1_4 -> A_1_4
-             *  A_1_4 -> 'a' B_2_4
-             *  B_2_4 -> A_2_4
-             *  A_2_4 -> 'a' B_3_4
-             *  B_3_4 -> 'b'
+             *  A_0_4 -> ('a',0,1) A_1_4
+             *  A_1_4 -> ('a',1,2) A_2_4
+             *  A_2_4 -> ('a',2,3) B_3_4
+             *  B_3_4 -> ('b',3,4)
              */
             var parseForestRoot = parseEngine.GetParseForestRootNode();
             var root = parseForestRoot;
 
-            var S_0_4 = root as ISymbolForestNode;
-            Assert.IsNotNull(S_0_4);
-            Assert.AreEqual(1, S_0_4.Children.Count);
+            var S_0_4 = new SymbolForestNode(S.ProductionModel.LeftHandSide.NonTerminal, 0, 4);
+            var A_0_4 = new SymbolForestNode(A.ProductionModel.LeftHandSide.NonTerminal, 0, 4);
+            var A_1_4 = new SymbolForestNode(A.ProductionModel.LeftHandSide.NonTerminal, 1, 4);
+            var A_2_4 = new SymbolForestNode(A.ProductionModel.LeftHandSide.NonTerminal, 2, 4);
+            var B_3_4 = new SymbolForestNode(B.ProductionModel.LeftHandSide.NonTerminal, 3, 4);
 
-            var S_0_4_1 = S_0_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(S_0_4_1);
-            Assert.AreEqual(1, S_0_4_1.Children.Count);
+            var a_0_1 = new TokenForestNode(tokens[0], 0, 1);
+            var a_1_2 = new TokenForestNode(tokens[1], 1, 2);
+            var a_2_3 = new TokenForestNode(tokens[2], 2, 3);
+            var b_3_4 = new TokenForestNode(tokens[3], 3, 4);
 
-            var A_0_4 = S_0_4_1.Children[0] as ISymbolForestNode;
-            Assert.IsNotNull(A_0_4);
-            Assert.AreEqual(1, A_0_4.Children.Count);
+            S_0_4.AddUniqueFamily(A_0_4);
+            A_0_4.AddUniqueFamily(a_0_1, A_1_4);
+            A_1_4.AddUniqueFamily(a_1_2, A_2_4);
+            A_2_4.AddUniqueFamily(a_2_3, B_3_4);
+            B_3_4.AddUniqueFamily(b_3_4);
 
-            var A_0_4_1 = A_0_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(A_0_4_1);
-            Assert.AreEqual(2, A_0_4_1.Children.Count);
-
-            var a_0_1 = A_0_4_1.Children[0] as ITokenForestNode;
-            Assert.IsNotNull(a_0_1);
-            Assert.AreEqual("a", a_0_1.Token.Capture.ToString());
-
-            var B_1_4 = A_0_4_1.Children[1] as ISymbolForestNode;
-            Assert.IsNotNull(B_1_4);
-            Assert.AreEqual(1, B_1_4.Children.Count);
-
-            var B_1_4_1 = B_1_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(B_1_4_1);
-            Assert.AreEqual(1, B_1_4_1.Children.Count);
-
-            var A_1_4 = B_1_4_1.Children[0] as ISymbolForestNode;
-            Assert.IsNotNull(A_1_4);
-            Assert.AreEqual(1, A_1_4.Children.Count);
-
-            var A_1_4_1 = A_1_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(A_1_4_1);
-            Assert.AreEqual(2, A_1_4_1.Children.Count);
-
-            var a_1_2 = A_1_4_1.Children[0] as ITokenForestNode;
-            Assert.IsNotNull(a_1_2);
-            Assert.AreEqual("a", a_1_2.Token.Capture.ToString());
-
-            var B_2_4 = A_1_4_1.Children[1] as ISymbolForestNode;
-            Assert.IsNotNull(B_2_4);
-            Assert.AreEqual(1, B_2_4.Children.Count);
-
-            var B_2_4_1 = B_2_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(B_2_4_1);
-            Assert.AreEqual(1, B_2_4_1.Children.Count);
-
-            var A_2_4 = B_2_4_1.Children[0] as ISymbolForestNode;
-            Assert.IsNotNull(A_2_4);
-            Assert.AreEqual(1, A_2_4.Children.Count);
-
-            var A_2_4_1 = A_2_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(A_2_4_1);
-            Assert.AreEqual(2, A_2_4_1.Children.Count);
-
-            var a_2_3 = A_2_4_1.Children[0] as ITokenForestNode;
-            Assert.IsNotNull(a_2_3);
-            Assert.AreEqual("a", a_2_3.Token.Capture.ToString());
-
-            var B_3_4 = A_2_4_1.Children[1] as ISymbolForestNode;
-            Assert.IsNotNull(B_3_4);
-            Assert.AreEqual(1, B_3_4.Children.Count);
-
-            var B_3_4_1 = B_3_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(B_3_4_1);
-            Assert.AreEqual(1, B_3_4_1.Children.Count);
-
-            var b_3_4 = B_3_4_1.Children[0] as ITokenForestNode;
-            Assert.IsNotNull(b_3_4);
-            Assert.AreEqual("b", b_3_4.Token.Capture.ToString());
+            Assert.AreEqual(S_0_4, root);
         }
 
         [TestMethod]
