@@ -1,5 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Pliant.Forest;
 using Pliant.Languages.Regex;
+using Pliant.Runtime;
+using System.IO;
 
 namespace Pliant.Tests.Unit.Languages.Regex
 {
@@ -67,6 +70,35 @@ namespace Pliant.Tests.Unit.Languages.Regex
                 false);
 
             Assert.AreEqual(expected, actual);
+        }
+
+        [TestMethod]
+        public void DELETEME()
+        {
+            var pattern = "[a-zA-Z0-9]";
+
+            var grammar = new RegexGrammar();
+            var parser = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion :false));
+            var lexer = new ParseRunner(parser, pattern);
+
+            var leoParser = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
+            var leoLexer = new ParseRunner(leoParser, pattern);
+
+            lexer.RunToEnd();
+            leoLexer.RunToEnd();
+
+            var textWriter = new StringWriter();
+            var leoTextWriter = new StringWriter();
+
+            var visitor = new LoggingForestNodeVisitor(textWriter);
+            var leoVisitor = new LoggingForestNodeVisitor(leoTextWriter);
+
+            parser.GetParseForestRootNode().Accept(visitor);
+            leoParser.GetParseForestRootNode().Accept(leoVisitor);
+
+            var str = textWriter.ToString();
+            var leoStr = leoTextWriter.ToString();
+            Assert.IsTrue(true);
         }
 
         [TestMethod]

@@ -1,28 +1,24 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Forest;
+using Pliant.Grammars;
 using Pliant.Utilities;
 
 namespace Pliant.Charts
-{
+{    
     public class TransitionState : StateBase, ITransitionState
     {
-        public ISymbol Recognized { get; private set; }
-
-        public INormalState Reduction { get; private set; }
-
-        public int Index { get; private set; }
+        public ISymbol Symbol { get; private set; }
 
         public ITransitionState NextTransition { get; set; }
-                
+
+        public int Root { get; set; }
+                        
         public TransitionState(
             ISymbol recognized,
-            IState transition,
-            INormalState reduction,
-            int index)
-            : base(transition.DottedRule, transition.Origin)
+            IDottedRule dottedRule,
+            int origin)
+            : base(dottedRule, origin)
         {
-            Reduction = reduction;
-            Recognized = recognized;
-            Index = index;
+            Symbol = recognized;
             _hashCode = ComputeHashCode();
         }
 
@@ -30,12 +26,11 @@ namespace Pliant.Charts
         {
             if (obj is null)
                 return false;
-            if (!(obj is TransitionState transitionState))
+            if (obj is not TransitionState transitionState)
                 return false;
 
             return GetHashCode() == transitionState.GetHashCode()
-                && Recognized.Equals(transitionState.Recognized)
-                && Index == transitionState.Index;
+                && Symbol.Equals(transitionState.Symbol);
         }
         
         private readonly int _hashCode;
@@ -45,9 +40,7 @@ namespace Pliant.Charts
             return HashCode.Compute(
                 DottedRule.GetHashCode(),
                 Origin.GetHashCode(),
-                Recognized.GetHashCode(),
-                Reduction.GetHashCode(),
-                Index.GetHashCode());
+                Symbol.GetHashCode());
         }
 
         public override int GetHashCode()
@@ -57,17 +50,19 @@ namespace Pliant.Charts
 
         public override string ToString()
         {
-            return $"{Recognized} : {Reduction}";
+            return $"{Symbol} : {DottedRule}\t\t({Origin})";
+        }
+
+        public IDynamicForestNodePath Next()
+        {
+            return NextTransition;
+        }
+
+        public IForestNode Node()
+        {
+            return ParseNode;
         }
 
         public override StateType StateType { get { return StateType.Transitive; } }
-
-        public IState GetTargetState()
-        {
-            var parameterTransitionStateHasNoParseNode = ParseNode is null;
-            if (parameterTransitionStateHasNoParseNode)
-                return Reduction;
-            return this;
-        }
     }
 }

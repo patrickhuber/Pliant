@@ -20,7 +20,7 @@ namespace Pliant.Samples.WithPdl
 
         private Calculator VisitCalculatorNode(IInternalTreeNode node)
         {
-            Calculator calculator = new Calculator();
+            Calculator calculator = new();
             if (node.Children.Count == 1)
                 calculator.Expression = VisitExpressionNode(node.Children[0] as IInternalTreeNode);
             return calculator;

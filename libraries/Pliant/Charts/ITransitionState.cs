@@ -1,17 +1,14 @@
-﻿using Pliant.Grammars;
+﻿using Pliant.Forest;
+using Pliant.Grammars;
 
 namespace Pliant.Charts
 {
-    public interface ITransitionState : IState
+    public interface ITransitionState : IState, IDynamicForestNodePath
     {
-        ISymbol Recognized { get; }
-
-        INormalState Reduction { get; }
+        ISymbol Symbol { get; }
 
         ITransitionState NextTransition { get; set; }
 
-        int Index { get; }
-
-        IState GetTargetState();
+        int Root { get; set; }
     }
 }

@@ -160,6 +160,7 @@ namespace Pliant.Runtime
                 var toAH = Goto(fromAH, token);
                 if (toAH is null)
                     continue;
+
                 AddEimPair(iLoc + 1, toAH, origLoc);
             }
         }
@@ -196,7 +197,7 @@ namespace Pliant.Runtime
         private void ReduceOneLeftHandSide(int iLoc, int origLoc, INonTerminal lhsSym)
         {
             var deterministicSet = Chart.Sets[origLoc];
-            var transitionItem = deterministicSet.FindCachedDottedRuleSetTransition(lhsSym);
+            var transitionItem = deterministicSet.FindTransition(lhsSym);
             if (transitionItem != null)
                 LeoReductionOperation(iLoc, transitionItem);
             else
@@ -210,7 +211,7 @@ namespace Pliant.Runtime
         }
 
         private Dictionary<ISymbol, int> _cachedCount;
-        private Dictionary<ISymbol, CachedDottedRuleSetTransition> _cachedTransitions;
+        private Dictionary<ISymbol, DeterministicState> _cachedTransitions;
 
         private void MemoizeTransitions(int iLoc)
         {
@@ -218,7 +219,7 @@ namespace Pliant.Runtime
             // leo eligibility needs to be cached before creating the cached transition
             // if the size of the list is != 1, do not enter the cached set transition
             _cachedCount ??= new Dictionary<ISymbol, int>();
-            _cachedTransitions ??= new Dictionary<ISymbol, CachedDottedRuleSetTransition>();
+            _cachedTransitions ??= new Dictionary<ISymbol, DeterministicState>();
 
             for (var i = 0; i < deterministicSet.States.Count; i++)
             {
@@ -229,24 +230,24 @@ namespace Pliant.Runtime
 
                 for (var j = 0; j < dottedRuleSetDataCount; j++)
                 {
-                    var preComputedState = dottedRuleSetData[j];
-                    if (preComputedState.IsComplete)
+                    var dottedRule = dottedRuleSetData[j];
+                    if (dottedRule.IsComplete)
                         continue;
 
-                    var postDotSymbol = preComputedState.PostDotSymbol;
+                    var postDotSymbol = dottedRule.PostDotSymbol;
                     if (postDotSymbol.SymbolType != SymbolType.NonTerminal)
                         continue;
 
                     // leo eligibile items are right recursive directly or indirectly                    
                     if (!_preComputedGrammar.Grammar.IsRightRecursive(
-                        preComputedState.Production.LeftHandSide))
+                        dottedRule.Production))
                         continue;
 
                     // to determine if the item is leo unique, cache it here
                     if (!_cachedCount.TryGetValue(postDotSymbol, out int count))
                     {
                         _cachedCount[postDotSymbol] = 1;
-                        _cachedTransitions[postDotSymbol] = CreateTopCachedItem(deterministicState, postDotSymbol);
+                        _cachedTransitions[postDotSymbol] = deterministicState;
                     }
                     else
                     {
@@ -254,43 +255,44 @@ namespace Pliant.Runtime
                     }
                 }
             }
-
+            
             // add all memoized leo items to the deterministic set
             foreach (var symbol in _cachedCount.Keys)
             {
                 var count = _cachedCount[symbol];
                 if (count != 1)
                     continue;
-                deterministicSet.AddCachedTransition(_cachedTransitions[symbol]);
+                var topCachedItem = CreateTopTransition(_cachedTransitions[symbol], symbol);
+                deterministicSet.AddTransition(topCachedItem);
             }
 
             _cachedTransitions.Clear();
             _cachedCount.Clear();
         }
 
-        private CachedDottedRuleSetTransition CreateTopCachedItem(
+        private DottedRuleSetTransition CreateTopTransition(
             DeterministicState deterministicState, 
             ISymbol postDotSymbol)
         {
             var origin = deterministicState.Origin;
-            CachedDottedRuleSetTransition topCacheItem = null;
+            DottedRuleSetTransition topTransition = null;
             // search for the top item in the leo chain
             while (true)
             {
-                var originDeterministicSet = Chart.Sets[deterministicState.Origin];
-                var nextCachedItem = originDeterministicSet.FindCachedDottedRuleSetTransition(postDotSymbol);
-                if (nextCachedItem is null)
+                var originDeterministicSet = Chart.Sets[origin];
+                var nextTransition = originDeterministicSet.FindTransition(postDotSymbol);
+                if (nextTransition is null)
                     break;
-                topCacheItem = nextCachedItem;
-                if (origin == nextCachedItem.Origin)
+                topTransition = nextTransition;
+                if (origin == nextTransition.Origin)
                     break;
-                origin = topCacheItem.Origin;
+                origin = topTransition.Origin;
             }
 
-            return new CachedDottedRuleSetTransition(
+            return new DottedRuleSetTransition(
                 postDotSymbol,
                 deterministicState.DottedRuleSet,
-                topCacheItem is null ? deterministicState.Origin : origin);
+                topTransition is null ? deterministicState.Origin : origin);
         }
 
         private void EarleyReductionOperation(int iLoc, DeterministicState fromEim, ISymbol transSym)
@@ -305,7 +307,7 @@ namespace Pliant.Runtime
             AddEimPair(iLoc, toAH, originLoc);
         }
 
-        private void LeoReductionOperation(int iLoc, CachedDottedRuleSetTransition fromLim)
+        private void LeoReductionOperation(int iLoc, DottedRuleSetTransition fromLim)
         {
             var fromAH = fromLim.DottedRuleSet;
             var transSym = fromLim.Symbol;

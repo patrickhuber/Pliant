@@ -17,5 +17,14 @@ namespace Pliant.Forest
         {
             _children.Add(orNode);
         }
+
+        public void Accept(IForestNodeVisitor visitor)
+        {
+            for (var i = 0; i < _children.Count; i++)
+            { 
+                var child = _children[i];
+                child.Accept(visitor);
+            }
+        }
     }
 }

@@ -95,7 +95,7 @@ namespace Pliant.Languages.Regex
         {
             return new TerminalLexerRule(
                 new NegationTerminal(
-                    new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\', '/')),
+                    new SetTerminal('.', '^', '$', '(', ')', '[', ']', '+', '*', '?', '\\', '/', '|')),
                 "NotMeta");
         }
 

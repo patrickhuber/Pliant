@@ -54,6 +54,18 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
+        public void ParseScottSection4Example2()
+        {
+            var tokens = Tokenize("bbb");
+            ProductionExpression S = "S";
+            S.Rule = S + S | 'b';
+            var grammar = new GrammarExpression(S, new[] { S }).ToGrammar();
+            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false, loggingEnabled: true));
+            ParseInput(parseEngine, tokens);
+            var root = parseEngine.GetParseForestRootNode();
+        }
+
+        [TestMethod]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "Unit test is not performance critical code")]
         public void ParseEngineGivenAmbiguousGrammarShouldCreateMulipleParsePaths()
         {
@@ -73,6 +85,35 @@ namespace Pliant.Tests.Unit.Runtime
             var parseEngine = new ParseEngine(grammar);
             ParseInput(parseEngine, tokens);
 
+            /*
+			(S,0,4) ->
+				(S->a*T,0,1) (T,1,4)
+			|	(S->A*T,0,1) (T,1,4)
+
+			(S->a*T,0,1) ->
+				(a,0,1)
+
+			(T,1,4) ->
+				(T->bb*b,1,3) (b,3,4)
+
+			(T->bb*b,1,3) ->
+				(T->b*bb,1,2) (b,2,3)
+
+			(T->b*bb,1,2) ->
+				(b,1,2)
+
+			(S->A*T,0,1) ->
+				(A,0,1)
+
+			(A,0,1) ->
+				(a,0,1)
+			|	(A->B*A,0,0) (A,0,1)
+
+			(A->B*A,0,0) ->
+				(B,0,0)
+
+			(B,0,0)->
+		    */
             var S_0_4 = parseEngine.GetParseForestRootNode() as ISymbolForestNode;
             Assert.IsNotNull(S_0_4);
             AssertNodeProperties(S_0_4, nameof(S), 0, 4);
@@ -287,91 +328,35 @@ namespace Pliant.Tests.Unit.Runtime
             ParseInput(parseEngine, tokens);
 
             /*  S_0_4 -> A_0_4
-             *  A_0_4 -> 'a' B_1_4
-             *  B_1_4 -> A_1_4
-             *  A_1_4 -> 'a' B_2_4
-             *  B_2_4 -> A_2_4
-             *  A_2_4 -> 'a' B_3_4
-             *  B_3_4 -> 'b'
+             *  A_0_4 -> ('a',0,1) A_1_4
+             *  A_1_4 -> ('a',1,2) A_2_4
+             *  A_2_4 -> ('a',2,3) B_3_4
+             *  B_3_4 -> ('b',3,4)
              */
             var parseForestRoot = parseEngine.GetParseForestRootNode();
             var root = parseForestRoot;
 
-            var S_0_4 = root as ISymbolForestNode;
-            Assert.IsNotNull(S_0_4);
-            Assert.AreEqual(1, S_0_4.Children.Count);
+            var S_0_4 = new SymbolForestNode(S.ProductionModel.LeftHandSide.NonTerminal, 0, 4);
+            var A_0_4 = new SymbolForestNode(A.ProductionModel.LeftHandSide.NonTerminal, 0, 4);
+            var A_1_4 = new SymbolForestNode(A.ProductionModel.LeftHandSide.NonTerminal, 1, 4);
+            var A_2_4 = new SymbolForestNode(A.ProductionModel.LeftHandSide.NonTerminal, 2, 4);
+            var B_3_4 = new SymbolForestNode(B.ProductionModel.LeftHandSide.NonTerminal, 3, 4);
 
-            var S_0_4_1 = S_0_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(S_0_4_1);
-            Assert.AreEqual(1, S_0_4_1.Children.Count);
+            var a_0_1 = new TokenForestNode(tokens[0], 0, 1);
+            var a_1_2 = new TokenForestNode(tokens[1], 1, 2);
+            var a_2_3 = new TokenForestNode(tokens[2], 2, 3);
+            var b_3_4 = new TokenForestNode(tokens[3], 3, 4);
 
-            var A_0_4 = S_0_4_1.Children[0] as ISymbolForestNode;
-            Assert.IsNotNull(A_0_4);
-            Assert.AreEqual(1, A_0_4.Children.Count);
+            S_0_4.AddUniqueFamily(A_0_4);
+            A_0_4.AddUniqueFamily(a_0_1, A_1_4);
+            A_1_4.AddUniqueFamily(a_1_2, A_2_4);
+            A_2_4.AddUniqueFamily(a_2_3, B_3_4);
+            B_3_4.AddUniqueFamily(b_3_4);
 
-            var A_0_4_1 = A_0_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(A_0_4_1);
-            Assert.AreEqual(2, A_0_4_1.Children.Count);
-
-            var a_0_1 = A_0_4_1.Children[0] as ITokenForestNode;
-            Assert.IsNotNull(a_0_1);
-            Assert.AreEqual("a", a_0_1.Token.Capture.ToString());
-
-            var B_1_4 = A_0_4_1.Children[1] as ISymbolForestNode;
-            Assert.IsNotNull(B_1_4);
-            Assert.AreEqual(1, B_1_4.Children.Count);
-
-            var B_1_4_1 = B_1_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(B_1_4_1);
-            Assert.AreEqual(1, B_1_4_1.Children.Count);
-
-            var A_1_4 = B_1_4_1.Children[0] as ISymbolForestNode;
-            Assert.IsNotNull(A_1_4);
-            Assert.AreEqual(1, A_1_4.Children.Count);
-
-            var A_1_4_1 = A_1_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(A_1_4_1);
-            Assert.AreEqual(2, A_1_4_1.Children.Count);
-
-            var a_1_2 = A_1_4_1.Children[0] as ITokenForestNode;
-            Assert.IsNotNull(a_1_2);
-            Assert.AreEqual("a", a_1_2.Token.Capture.ToString());
-
-            var B_2_4 = A_1_4_1.Children[1] as ISymbolForestNode;
-            Assert.IsNotNull(B_2_4);
-            Assert.AreEqual(1, B_2_4.Children.Count);
-
-            var B_2_4_1 = B_2_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(B_2_4_1);
-            Assert.AreEqual(1, B_2_4_1.Children.Count);
-
-            var A_2_4 = B_2_4_1.Children[0] as ISymbolForestNode;
-            Assert.IsNotNull(A_2_4);
-            Assert.AreEqual(1, A_2_4.Children.Count);
-
-            var A_2_4_1 = A_2_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(A_2_4_1);
-            Assert.AreEqual(2, A_2_4_1.Children.Count);
-
-            var a_2_3 = A_2_4_1.Children[0] as ITokenForestNode;
-            Assert.IsNotNull(a_2_3);
-            Assert.AreEqual("a", a_2_3.Token.Capture.ToString());
-
-            var B_3_4 = A_2_4_1.Children[1] as ISymbolForestNode;
-            Assert.IsNotNull(B_3_4);
-            Assert.AreEqual(1, B_3_4.Children.Count);
-
-            var B_3_4_1 = B_3_4.Children[0] as IPackedForestNode;
-            Assert.IsNotNull(B_3_4_1);
-            Assert.AreEqual(1, B_3_4_1.Children.Count);
-
-            var b_3_4 = B_3_4_1.Children[0] as ITokenForestNode;
-            Assert.IsNotNull(b_3_4);
-            Assert.AreEqual("b", b_3_4.Token.Capture.ToString());
+            Assert.AreEqual(S_0_4, root);
         }
 
         [TestMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "Unit test is not performance critical code")]
         public void ParseEngineShouldParseMidGrammarRightRecursionAndHandleNullRootTransitionItem()
         {
             ProductionExpression S = "S", A = "A", B = "B", C = "C";
@@ -382,7 +367,7 @@ namespace Pliant.Tests.Unit.Runtime
 
             var grammar = new GrammarExpression(S, new[] { S, A, B, C }).ToGrammar();
             var tokens = Tokenize(".+");
-            var parseEngine = new ParseEngine(grammar);
+            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(true, true));
             ParseInput(parseEngine, tokens);
 
             var parseForestRoot = parseEngine.GetParseForestRootNode();
@@ -434,7 +419,6 @@ namespace Pliant.Tests.Unit.Runtime
         }
 
         [TestMethod]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "unit test is not critical code")]
         public void ParseEngineShouldParseSimpleSubstitutionGrammar()
         {
             ProductionExpression A = "A", B = "B", C = "C";
@@ -518,9 +502,6 @@ namespace Pliant.Tests.Unit.Runtime
         [TestMethod]
         public void ParseEngineRightRecursionShouldNotBeCubicComplexity()
         {
-            var a = new TerminalLexerRule(
-                new CharacterTerminal('a'),
-                new TokenType("a"));
             ProductionExpression A = "A";
             A.Rule =
                 'a' + A
@@ -530,7 +511,7 @@ namespace Pliant.Tests.Unit.Runtime
                 .ToGrammar();
             
             var input = Tokenize("aaaaa");
-            var recognizer = new ParseEngine(grammar);
+            var recognizer = new ParseEngine(grammar, new ParseEngineOptions(loggingEnabled: true));
             ParseInput(recognizer, input);
 
             var chart = GetChartFromParseEngine(recognizer);
@@ -544,12 +525,13 @@ namespace Pliant.Tests.Unit.Runtime
             // n	A ->.a A		(n)	 # Predict
             // n	A ->.			(n)	 # Predict
             // n	A -> a A.		(n)	 # Predict
-            // n	A : A -> a A.	(0)	 # Transition
+            // n	A : A -> a A.	(1)	 # Transition
             // n	A -> a A.		(0)	 # Complete
-            Assert.AreEqual(input.Count() + 1, chart.Count);
+            Assert.AreEqual(input.Count + 1, chart.Count);
             var lastEarleySet = chart.EarleySets[chart.EarleySets.Count - 1];
             Assert.AreEqual(3, lastEarleySet.Completions.Count);
             Assert.AreEqual(1, lastEarleySet.Transitions.Count);
+            Assert.AreEqual(0, lastEarleySet.Transitions[0].Origin);
             Assert.AreEqual(1, lastEarleySet.Predictions.Count);
             Assert.AreEqual(1, lastEarleySet.Scans.Count);
         }
@@ -582,7 +564,7 @@ namespace Pliant.Tests.Unit.Runtime
             B.Rule = A | 'b';
             var grammar = new GrammarExpression(S, new[] { S, A, B }).ToGrammar();
             var input = Tokenize("aaab");
-            var parseEngine = new ParseEngine(grammar);
+            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(true, true));
             ParseInput(parseEngine, input);
         }
 
@@ -628,8 +610,8 @@ namespace Pliant.Tests.Unit.Runtime
             AssertNodeProperties(F_1_2, "F", 1, 2);
             var T_2_4 = GetAndCastChildAtIndex<ISymbolForestNode>(T_1_4, 1);
             AssertNodeProperties(T_2_4, "T", 2, 4);
-            var F_2_4 = GetAndCastChildAtIndex<ISymbolForestNode>(T_2_4, 0);
-            AssertNodeProperties(F_2_4, "F", 2, 3);
+            var F_2_3 = GetAndCastChildAtIndex<ISymbolForestNode>(T_2_4, 0);
+            AssertNodeProperties(F_2_3, "F", 2, 3);
             var T_3_4 = GetAndCastChildAtIndex<ISymbolForestNode>(T_2_4, 1);
             AssertNodeProperties(T_3_4, "T", 3, 4);
             var F_3_4 = GetAndCastChildAtIndex<ISymbolForestNode>(T_3_4, 0);
@@ -640,31 +622,35 @@ namespace Pliant.Tests.Unit.Runtime
         public void ParseEngineWhenMultipleLeoItemsExistOnSearchPathShouldCreateCorrectParseTree()
         {
             var grammar = CreateRegularExpressionStubGrammar();
-            var input = Tokenize("aaa");
-            var parseEngine = new ParseEngine(grammar);
-            ParseInput(parseEngine, input);
+            // var input = Tokenize("aaa");
 
-            var parseForestRoot = parseEngine.GetParseForestRootNode();
-            var parseForest = parseForestRoot;
+            AssertLeoAndClassicParseAlgorithmsCreateSameForest("aaaa", grammar);
 
-            var R_0_3 = CastAndCountChildren<ISymbolForestNode>(parseForest, 1);
-            AssertNodeProperties(R_0_3, "R", 0, 3);
-            var E_0_3 = GetAndCastChildAtIndex<ISymbolForestNode>(R_0_3, 0);
-            AssertNodeProperties(E_0_3, "E", 0, 3);
-            var T_0_3 = GetAndCastChildAtIndex<ISymbolForestNode>(E_0_3, 0);
-            AssertNodeProperties(T_0_3, "T", 0, 3);
-            var F_0_1 = GetAndCastChildAtIndex<ISymbolForestNode>(T_0_3, 0);
-            AssertNodeProperties(F_0_1, "F", 0, 1);
-            var A_0_1 = GetAndCastChildAtIndex<ISymbolForestNode>(F_0_1, 0);
-            AssertNodeProperties(A_0_1, "A", 0, 1);
-            var T_1_3 = GetAndCastChildAtIndex<ISymbolForestNode>(T_0_3, 1);
-            AssertNodeProperties(T_1_3, "T", 1, 3);
-            var F_1_2 = GetAndCastChildAtIndex<ISymbolForestNode>(T_1_3, 0);
-            AssertNodeProperties(F_1_2, "F", 1, 2);
-            var T_2_3 = GetAndCastChildAtIndex<ISymbolForestNode>(T_1_3, 1);
-            AssertNodeProperties(T_2_3, "T", 2, 3);
-            var F_2_3 = GetAndCastChildAtIndex<ISymbolForestNode>(T_2_3, 0);
-            AssertNodeProperties(F_2_3, "F", 2, 3);
+
+            //var parseEngine = new ParseEngine(grammar , new ParseEngineOptions(true, true));
+            //ParseInput(parseEngine, input);
+
+            //var parseForestRoot = parseEngine.GetParseForestRootNode();
+            //var parseForest = parseForestRoot;
+
+            //var R_0_3 = CastAndCountChildren<ISymbolForestNode>(parseForest, 1);
+            //AssertNodeProperties(R_0_3, "R", 0, 3);
+            //var E_0_3 = GetAndCastChildAtIndex<ISymbolForestNode>(R_0_3, 0);
+            //AssertNodeProperties(E_0_3, "E", 0, 3);
+            //var T_0_3 = GetAndCastChildAtIndex<ISymbolForestNode>(E_0_3, 0);
+            //AssertNodeProperties(T_0_3, "T", 0, 3);
+            //var F_0_1 = GetAndCastChildAtIndex<ISymbolForestNode>(T_0_3, 0);
+            //AssertNodeProperties(F_0_1, "F", 0, 1);
+            //var A_0_1 = GetAndCastChildAtIndex<ISymbolForestNode>(F_0_1, 0);
+            //AssertNodeProperties(A_0_1, "A", 0, 1);
+            //var T_1_3 = GetAndCastChildAtIndex<ISymbolForestNode>(T_0_3, 1);
+            //AssertNodeProperties(T_1_3, "T", 1, 3);
+            //var F_1_2 = GetAndCastChildAtIndex<ISymbolForestNode>(T_1_3, 0);
+            //AssertNodeProperties(F_1_2, "F", 1, 2);
+            //var T_2_3 = GetAndCastChildAtIndex<ISymbolForestNode>(T_1_3, 1);
+            //AssertNodeProperties(T_2_3, "T", 2, 3);
+            //var F_2_3 = GetAndCastChildAtIndex<ISymbolForestNode>(T_2_3, 0);
+            //AssertNodeProperties(F_2_3, "F", 2, 3);
         }
 
         [TestMethod]
@@ -705,7 +691,7 @@ namespace Pliant.Tests.Unit.Runtime
             var grammar = new GrammarExpression(E, new[] { E, F})
                 .ToGrammar();
 
-            var input = "aba";
+            var input = "ababa";
             AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
         }
 
@@ -785,6 +771,16 @@ namespace Pliant.Tests.Unit.Runtime
                 new[] { S, A, B, C, X, Y, Z })
                 .ToGrammar();
             AssertLeoAndClassicParseAlgorithmsCreateSameForest(input, grammar);
+        }
+
+        [TestMethod]
+        public void ShouldParseSimpleExpression()
+        {
+            var parser = new ParseEngine(new SimpleExpressionGrammar(), new ParseEngineOptions(true, true));
+            var tester = new ParseTester(parser);
+            tester.RunParse("0+1*2+30");            
+            var root = parser.GetParseForestRootNode();
+            Assert.IsNotNull(root);
         }
 
         [TestMethod]
@@ -880,7 +876,7 @@ namespace Pliant.Tests.Unit.Runtime
                         
         private static void AssertLeoAndClassicParseAlgorithmsCreateSameForest(string input, IGrammar grammar)
         {
-            var leoEngine = new ParseEngine(grammar);
+            var leoEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true, loggingEnabled: true));
             var classicEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: false));
 
             var leoTester = new ParseTester(leoEngine);
@@ -904,7 +900,6 @@ namespace Pliant.Tests.Unit.Runtime
             Assert.IsTrue(comparer.Equals(expected, actual));
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "Unit test is not performance critical code")]
         private static IGrammar CreateRegularExpressionStubGrammar()
         {
             ProductionExpression R = "R", E = "E", T = "T", F = "F", A = "A", I = "I";

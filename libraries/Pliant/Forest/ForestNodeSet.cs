@@ -10,14 +10,12 @@ namespace Pliant.Forest
     {
         private readonly Dictionary<int, ISymbolForestNode> _symbolNodes;
         private readonly Dictionary<int, IIntermediateForestNode> _intermediateNodes;
-        private readonly Dictionary<int, VirtualForestNode> _virtualNodes;
         private readonly Dictionary<IToken, ITokenForestNode> _tokenNodes;
 
         public ForestNodeSet()
         {
             _symbolNodes = new Dictionary<int, ISymbolForestNode>();
-            _intermediateNodes = new Dictionary<int, IIntermediateForestNode>();
-            _virtualNodes = new Dictionary<int, VirtualForestNode>();
+            _intermediateNodes = new Dictionary<int, IIntermediateForestNode>();         
             _tokenNodes = new Dictionary<IToken, ITokenForestNode>();
         }
 
@@ -61,40 +59,19 @@ namespace Pliant.Forest
                 location.GetHashCode());
         }
 
-        public ITokenForestNode AddOrGetExistingTokenNode(IToken token)
+        public ITokenForestNode AddOrGetExistingTokenNode(IToken token, int location)
         {
             if (_tokenNodes.TryGetValue(token, out ITokenForestNode tokenNode))
                 return tokenNode;
-            tokenNode = new TokenForestNode(token, token.Position, token.Capture.Count);
+            tokenNode = new TokenForestNode(token, token.Position, location);
             _tokenNodes.Add(token, tokenNode);
             return tokenNode;
-        }
-
-        public void AddNewVirtualNode(
-            VirtualForestNode virtualNode)
-        {
-            var hash = ComputeHashCode(
-                virtualNode.Symbol, 
-                virtualNode.Origin, 
-                virtualNode.Location);
-            _virtualNodes.Add(hash, virtualNode);
-        }
-
-        public bool TryGetExistingVirtualNode(
-            int location,
-            ITransitionState transitionState,
-            out VirtualForestNode node)
-        {
-            var targetState = transitionState.GetTargetState();
-            var hash = ComputeHashCode(targetState.DottedRule.Production.LeftHandSide, targetState.Origin, location);
-            return _virtualNodes.TryGetValue(hash, out node);
         }
 
         public void Clear()
         {
             _symbolNodes.Clear();
             _intermediateNodes.Clear();
-            _virtualNodes.Clear();
             _tokenNodes.Clear();
         }
     }

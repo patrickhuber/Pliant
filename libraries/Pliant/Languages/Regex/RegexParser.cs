@@ -10,7 +10,7 @@ namespace Pliant.Languages.Regex
         public RegexDefinition Parse(string regularExpression)
         {
             var grammar = new RegexGrammar();
-            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true));
+            var parseEngine = new ParseEngine(grammar, new ParseEngineOptions(optimizeRightRecursion: true, loggingEnabled: true));
             var parseRunner = new ParseRunner(parseEngine, regularExpression);
             while (!parseRunner.EndOfStream())
             {
@@ -22,8 +22,7 @@ namespace Pliant.Languages.Regex
                 throw new Exception(
                     $"Error parsing regular expression. Error at position {parseRunner.Position}");
             
-            var parseForest = parseEngine.GetParseForestRootNode();
-
+            var parseForest = parseEngine.GetParseForestRootNode();            
             var parseTree = new InternalTreeNode(
                     parseForest as IInternalForestNode,
                     new SelectFirstChildDisambiguationAlgorithm());

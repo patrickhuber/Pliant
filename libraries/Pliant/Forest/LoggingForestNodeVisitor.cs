@@ -18,16 +18,18 @@ namespace Pliant.Forest
 
         public void Visit(ITokenForestNode tokenNode)
         {
-            _visited.Add(tokenNode);
-            return;
         }
 
-        public void Visit(IPackedForestNode packedNode)
+        /// <summary>
+        /// Visits each option 
+        /// </summary>
+        /// <param name="packedNode"></param>
+        public void Visit(IPackedForestNode node)
         {
-            for (var i = 0; i < packedNode.Children.Count; i++)
+            for (var i = 0; i < node.Children.Count; i++)
             {
-                var child = packedNode.Children[i];
-                child.Accept(this);
+                var child = node.Children[i];
+                PrintNode(child);
             }
         }
 
@@ -35,99 +37,86 @@ namespace Pliant.Forest
         {
             if (!_visited.Add(node))
                 return;
-
+            PrintNode(node);
             for (var i = 0; i < node.Children.Count; i++)
             {
-                var child = node.Children[i];
-                Visit(child);
+                if (i > 0)
+                {
+                    _writer.WriteLine();
+                    _writer.Write("\t|");
+                }
+                Visit(node.Children[i]);
             }
+            _writer.WriteLine();
         }
 
         public void Visit(ISymbolForestNode node)
         {
             if (!_visited.Add(node))
                 return;
-            
-            for (var a = 0; a < node.Children.Count; a++)
-            {
-                PrintNode(node);
-                _writer.Write(" ->");
-                var packedNode = node.Children[a];
-                for (var c = 0; c < packedNode.Children.Count; c++)
-                {
-                    var child = packedNode.Children[c];
-                    PrintNode(child);
-                }
-                _writer.WriteLine();
-            }
-
+            PrintNode(node);
+            _writer.Write(" -> ");
             for (var i = 0; i < node.Children.Count; i++)
             {
-                var child = node.Children[i];
-                Visit(child);
+                if (i > 0)
+                {
+                    _writer.WriteLine();
+                    _writer.Write("\t|");                    
+                }                
+                Visit(node.Children[i]);
             }
+            _writer.WriteLine();
         }
 
         public void Visit(ITerminalForestNode node)
         {
-            PrintNode(node);
         }
 
         private void PrintNode(IForestNode node)
         {
             switch (node.NodeType)
             {
-                case ForestNodeType.Intermediate:
-                    var intermediate = node as IIntermediateForestNode;
-                    if (intermediate.Children.Count > 1)
-                        throw new Exception("Intermediate node has more children than expected. ");
-                    var flatList = GetFlattenedList(intermediate);
-                    for (var i = 0; i < flatList.Count; i++)
-                    {
-                        _writer.Write(" ");
-                        PrintNode(flatList[i]);
-                    }
-                    break;
-
                 case ForestNodeType.Symbol:
-                    var symbolForestNode = node as ISymbolForestNode;
-                    var symbolForestNodeString = GetSymbolNodeString(symbolForestNode);
-                    _writer.Write(" ");
-                    _writer.Write(symbolForestNodeString);
+                    PrintNode(node as ISymbolForestNode);
                     break;
-                    
+                case ForestNodeType.Intermediate:
+                    PrintNode(node as IIntermediateForestNode);
+                    break;
+                case ForestNodeType.Terminal:
+                    PrintNode(node as ITerminalForestNode);
+                    break;
                 case ForestNodeType.Token:
-                    var tokenForestNode = node as ITokenForestNode;
-                    var tokenForestNodeString = GetTokenNodeString(tokenForestNode);
-                    _writer.Write(" ");
-                    _writer.Write(tokenForestNodeString);
+                    PrintNode(node as ITokenForestNode);
                     break;
             }
         }
-    
 
-        private static IList<IForestNode> GetFlattenedList(IIntermediateForestNode intermediate)
+        private void PrintNode(IIntermediateForestNode node)
         {
-            var children = new List<IForestNode>();
-            for (var a = 0; a < intermediate.Children.Count; a++)
-            {
-                var packedNode = intermediate.Children[a];
-                for (var c = 0; c < packedNode.Children.Count; c++)
-                {
-                    var child = packedNode.Children[c];
-                    switch (child.NodeType)
-                    {
-                        case ForestNodeType.Intermediate:
-                            var childList = GetFlattenedList(child as IIntermediateForestNode);
-                            children.AddRange(childList);
-                            break;
-                        default:
-                            children.Add(child);
-                            break;
-                    }
-                }
-            }
-            return children;
+            var intermediateForestNodeString = GetIntermediateNodeString(node);
+            _writer.Write(" ");
+            _writer.Write(intermediateForestNodeString);
+        }
+
+        private void PrintNode(ISymbolForestNode node)
+        {
+            var symbolForestNodeString = GetSymbolNodeString(node);
+            _writer.Write(" ");
+            _writer.Write(symbolForestNodeString);
+        }
+
+        private void PrintNode(ITokenForestNode node)
+        {
+            var tokenForestNodeString = GetTokenNodeString(node);
+            _writer.Write(" ");
+            _writer.Write(tokenForestNodeString);
+        }
+
+        private void PrintNode(ITerminalForestNode node)
+        {
+            var terminalNodeString = GetTerminalNodeString(node);
+            _writer.Write(" ");
+            _writer.Write(terminalNodeString);
         }
 
         private static string GetSymbolNodeString(ISymbolForestNode node)
@@ -143,6 +132,11 @@ namespace Pliant.Forest
         private static string GetTokenNodeString(ITokenForestNode node)
         {
             return $"('{node.Token.Capture}', {node.Origin}, {node.Location})";
+        }
+
+        private static string GetTerminalNodeString(ITerminalForestNode node)
+        {
+            return $"('{node.Capture}', {node.Origin}, {node.Location})";
         }
         
     }

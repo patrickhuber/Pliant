@@ -30,19 +30,12 @@ namespace Pliant.Collections
 
         public BitMatrix TransitiveClosure()
         {
-            var transitiveClosure = Clone();
-            for (int k = 0; k < transitiveClosure.Length; k++)
-            {
-                for (int i = 0; i < transitiveClosure.Length; i++)
-                {
-                    for (int j = 0; j < transitiveClosure.Length; j++)
-                    {
-                        transitiveClosure[i][j] = transitiveClosure[i][j]
-                            || (transitiveClosure[i][k] && transitiveClosure[k][j]);
-                    }
-                }
-            }
-            return transitiveClosure;
+            var clone = Clone();
+            for (var k = 0; k < clone.Length; k++)
+                for (var j = 0; j < clone.Length; j++)
+                    for (var i = 0; i < clone.Length; i++)
+                        clone[i][j] = clone[i][j] || (clone[i][k] && clone[k][j]);
+            return clone; 
         }
 
         public BitMatrix Clone()

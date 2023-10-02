@@ -71,9 +71,9 @@ namespace Pliant.Grammars
             return _innerGrammar.RulesContainingSymbol(nonTerminal);
         }
 
-        public bool IsRightRecursive(ISymbol symbol)
+        public bool IsRightRecursive(IProduction production)
         {
-            return _innerGrammar.IsRightRecursive(symbol);
+            return _innerGrammar.IsRightRecursive(production);
         }
     }
 }

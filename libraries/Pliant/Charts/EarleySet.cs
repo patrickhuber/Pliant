@@ -12,6 +12,9 @@ namespace Pliant.Charts
         private UniqueList<INormalState> _scans;
         private UniqueList<INormalState> _completions;
         private UniqueList<ITransitionState> _transitions;
+        private Dictionary<ISymbol, List<INormalState>> _sources;
+        private Dictionary<ISymbol, ITransitionState> _cached;
+        private Dictionary<ISymbol, List<INormalState>> _reductions;
 
         public IReadOnlyList<INormalState> Predictions
         {
@@ -120,9 +123,19 @@ namespace Pliant.Charts
 
         private bool AddUniqueCompletion(INormalState normalState)
         {
-            if (_completions is null)
-                _completions = new UniqueList<INormalState>();
-            return _completions.AddUnique(normalState);
+            _completions ??= new UniqueList<INormalState>();
+            if (!_completions.AddUnique(normalState))
+                return false;
+
+            var symbol = normalState.DottedRule.Production.LeftHandSide;
+
+            _reductions ??= new Dictionary<ISymbol, List<INormalState>>();
+            if (!_reductions.TryGetValue(symbol, out var list))
+                list = _reductions[symbol] = new List<INormalState>();
+
+            list.Add(normalState);
+
+            return true;
         }
 
         private bool AddUniqueScan(INormalState normalState)
@@ -134,47 +147,73 @@ namespace Pliant.Charts
 
         private bool AddUniquePrediction(INormalState normalState)
         {
-            if (_predictions is null)
-                _predictions = new UniqueList<INormalState>();
-            return _predictions.AddUnique(normalState);
+            _predictions ??= new UniqueList<INormalState>();
+            if (!_predictions.AddUnique(normalState))
+                return false;
+
+            // skip any null states
+            if (normalState.DottedRule.Production.RightHandSide.Count == 0)
+                return true;
+
+            // cache the prediction
+            _sources ??= new Dictionary<ISymbol, List<INormalState>>();
+            if (!_sources.TryGetValue(normalState.DottedRule.PostDotSymbol, out List<INormalState> predictions))
+                predictions = _sources[normalState.DottedRule.PostDotSymbol] = new List<INormalState>();
+
+            predictions.Add(normalState);
+            return true;
         }
 
         private bool EnqueueTransition(ITransitionState transitionState)
         {
-            if (_transitions is null)
-                _transitions = new UniqueList<ITransitionState>();
-            return _transitions.AddUnique(transitionState);
+            _transitions ??= new UniqueList<ITransitionState>();
+            if (!_transitions.AddUnique(transitionState))
+                return false;
+
+            _cached ??= new Dictionary<ISymbol, ITransitionState>();
+            _cached[transitionState.Symbol] = transitionState;
+            return true;
         }
 
         public ITransitionState FindTransitionState(ISymbol searchSymbol)
         {
-            for (int t = 0; t < Transitions.Count; t++)
-            {
-                var transitionState = Transitions[t] as TransitionState;
-                if (transitionState.Recognized.Equals(searchSymbol))
-                    return transitionState;
-            }
+            if (_cached is null)
+                return null;
+            if (_cached.TryGetValue(searchSymbol, out var transitionState))
+                return transitionState;
             return null;
         }
 
-        public INormalState FindSourceState(ISymbol searchSymbol)
+        /// <summary>
+        /// Finds a prediction where the post dot symbol is the search symbol
+        /// </summary>
+        /// <param name="searchSymbol"></param>
+        /// <returns></returns>
+        public IReadOnlyList<INormalState> FindSourceStates(ISymbol searchSymbol)
         {
-            var sourceItemCount = 0;
-            INormalState sourceItem = null;
+            if (searchSymbol is null)
+                return EmptyNormalStates;
 
-            for (int s = 0; s < Predictions.Count; s++)
-            {
-                var state = Predictions[s];
-                if (state.IsSource(searchSymbol))
-                {
-                    var moreThanOneSourceItemExists = sourceItemCount > 0;
-                    if (moreThanOneSourceItemExists)
-                        return null;
-                    sourceItemCount++;
-                    sourceItem = state;
-                }
-            }
-            return sourceItem;
-        }        
+            if (_sources is null)
+                return EmptyNormalStates;
+
+            if (!_sources.TryGetValue(searchSymbol, out var list))
+                return EmptyNormalStates;
+
+            return list;
+        }
+
+        public IReadOnlyList<INormalState> FindReductions(ISymbol symbol)
+        {
+            if (symbol is null)
+                return EmptyNormalStates;
+
+            if (_reductions is null)
+                return EmptyNormalStates;
+
+            if (!_reductions.TryGetValue(symbol, out var list))
+                return EmptyNormalStates;
+            return list;
+        }
     }
 }

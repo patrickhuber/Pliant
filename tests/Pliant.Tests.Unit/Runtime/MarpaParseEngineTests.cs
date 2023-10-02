@@ -7,6 +7,7 @@ using Pliant.Runtime;
 using Pliant.Tests.Common.Grammars;
 using Pliant.Tokens;
 using System.Linq;
+using Pliant.Tests.Common;
 
 namespace Pliant.Tests.Unit.Runtime
 {
@@ -149,6 +150,14 @@ namespace Pliant.Tests.Unit.Runtime
             var accepted = marpaParseEngine.IsAccepted();
             if (!accepted)
                 Assert.Fail($"Input was not accepted.");
-        }     
+        }
+
+        [TestMethod]
+        public void ShouldParseSimpleExpression()
+        {
+            var engine = new MarpaParseEngine(new SimpleExpressionGrammar());
+            var tester = new ParseTester(engine);
+            tester.RunParse("0+1*2+30");
+        }
     }
 }

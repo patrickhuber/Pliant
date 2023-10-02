@@ -1,6 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Pliant.Forest;
 using Pliant.Grammars;
 using Pliant.Languages.Regex;
+using Pliant.Runtime;
+using System;
 
 namespace Pliant.Tests.Unit.Languages.Regex
 {
@@ -105,6 +108,17 @@ namespace Pliant.Tests.Unit.Languages.Regex
         {
             var input = "[\\]]";
             ParseAndAcceptInput(input);
+        }
+
+        [TestMethod]
+        public void RegexLeoAndClassicTreesShouldMatch()
+        {
+            var input = "[a-zA-Z0-9]";
+            var parser = new ParseEngine(_regexGrammar, new ParseEngineOptions(optimizeRightRecursion: true));
+            var scanner = new ParseRunner(parser, input);
+            Assert.IsTrue(scanner.RunToEnd());
+            var forest = parser.GetParseForestRootNode();
+            forest.Accept(new LoggingForestNodeVisitor(Console.Out));
         }
         
     }

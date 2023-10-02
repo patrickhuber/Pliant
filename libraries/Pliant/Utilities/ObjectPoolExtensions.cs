@@ -68,7 +68,6 @@ namespace Pliant.Utilities
 
         #endregion HashSet<T>
 
-
         #region SortedSet<T>
 
         internal static SortedSet<TValue> AllocateAndClear<TValue>(this ObjectPool<SortedSet<TValue>> pool)
@@ -144,5 +143,26 @@ namespace Pliant.Utilities
         }
 
         #endregion StringBuilder
+
+        #region IndexedList<T>
+
+        internal static IndexedList<T> AllocateAndClear<T>(this ObjectPool<IndexedList<T>> pool)
+        {
+            var builder = pool.Allocate();
+            builder.Clear();
+            return builder;
+        }
+
+        internal static void ClearAndFree<T>(this ObjectPool<IndexedList<T>> pool, IndexedList<T> builder)
+        {
+            if (pool is null)
+                return;
+            if (builder is null)
+                return;
+            builder.Clear();
+            pool.Free(builder);
+        }
+
+        #endregion IndexedList<T>
     }
 }

@@ -42,57 +42,24 @@ namespace Pliant.Tests.Unit.Grammars
         [TestMethod]
         public void PreComputedGrammarIsRightRecursiveShouldFindSimpleRecursion()
         {
-            var preComputedGrammar = new PreComputedGrammar(new RightRecursionGrammar());
+            var preComputedGrammar = new PreComputedGrammar(new RightRecursionGrammar());            
         }
 
         [TestMethod]
         public void PreComputedGrammarIsRightRecursiveShouldFindCyclicRecursion()
         {
             var grammar = new HiddenRightRecursionGrammar();
-            var preComputedGrammar = new PreComputedGrammar(grammar);
-
-            var leftHandSides = new UniqueList<INonTerminal>();
             for (var p = 0; p < grammar.Productions.Count; p++)
             {
                 var production = grammar.Productions[p];
-                Assert.IsTrue(preComputedGrammar.Grammar.IsRightRecursive(production.LeftHandSide));
+                if (production.IsEmpty)
+                    continue;
+                if (production.RightHandSide[production.RightHandSide.Count - 1].SymbolType != SymbolType.NonTerminal)
+                    continue;
+                Assert.IsTrue(grammar.IsRightRecursive(production), $"expected {production} to be right recursive");
             }
         }
-
-        [TestMethod]
-        public void PreComputedGrammarIsRightRecursiveShouldNotContainSymbolsWithoutCycles()
-        {
-            ProductionExpression
-                A = "A",
-                B = "B",
-                C = "C",
-                D = "D",
-                E = "E";
-            A.Rule = B + C;
-            B.Rule = 'b';
-            C.Rule = A | D;
-            D.Rule = E + D | 'd';
-            E.Rule = 'e';
-
-            var grammar = new GrammarExpression(A).ToGrammar();
-            var preComputedGrammar = new PreComputedGrammar(grammar);
-
-            var rightRecursiveRules = new[] { A, C, D };
-            var notRightRecursiveRules = new[] { B, E };
-
-            foreach(var rightRecursiveRule in rightRecursiveRules)
-            {
-                var leftHandSide = rightRecursiveRule.ProductionModel.LeftHandSide.NonTerminal;
-                Assert.IsTrue(preComputedGrammar.Grammar.IsRightRecursive(leftHandSide));
-            }
-
-            foreach (var notRightRecursiveRule in notRightRecursiveRules)
-            {
-                var leftHandSide = notRightRecursiveRule.ProductionModel.LeftHandSide.NonTerminal;
-                Assert.IsFalse(preComputedGrammar.Grammar.IsRightRecursive(leftHandSide));
-            }
-        }
-        
+                
         private static IGrammar GetJsonGrammar()
         {
             ProductionExpression

@@ -5,6 +5,7 @@ namespace Pliant.Forest
     public abstract class InternalForestNode : ForestNodeBase, IInternalForestNode
     {
         protected readonly List<IPackedForestNode> _children;
+
         public virtual IReadOnlyList<IPackedForestNode> Children { get { return _children; } }
 
         protected InternalForestNode(int origin, int location)
@@ -71,6 +72,16 @@ namespace Pliant.Forest
             // return true if the second child matches
             // otherwise return false
             return secondChild.Equals(secondCompareNode);
-        }              
+        }
+
+        public override void Accept(IForestNodeVisitor visitor)
+        {
+            var childrenCount = _children.Count;
+            for (var i = 0; i < childrenCount; i++)
+            {
+                var child = _children[i];
+                child.Accept(visitor);
+            }
+        }
     }
 }

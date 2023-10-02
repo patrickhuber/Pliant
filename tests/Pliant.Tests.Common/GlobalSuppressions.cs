@@ -6,5 +6,3 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Performance", "HAA0601:Value type to reference type conversion causing boxing allocation", Justification = "Unit tests are not performance critical code", Scope = "module")]
-[assembly: SuppressMessage("Performance", "HAA0502:Explicit new reference type allocation", Justification = "Unit tests are not performance critical code", Scope = "module")]
-[assembly: SuppressMessage("Performance", "HAA0504:Implicit new array creation allocation", Justification = "Unit tests are not performance critical code", Scope = "module" )]

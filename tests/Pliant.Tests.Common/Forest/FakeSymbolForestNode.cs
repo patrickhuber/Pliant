@@ -22,5 +22,9 @@ namespace Pliant.Tests.Common.Forest
         }
 
         public ISymbol Symbol { get; private set; }
+
+        public void AddPath(IDynamicForestNodePath path, IForestNode node)
+        {
+        }
     }
 }
