@@ -33,6 +33,8 @@ namespace Pliant.Forest
         public override void Accept(IForestNodeVisitor visitor)
         {
             visitor.Visit(this);
+            // load the children 
+            _ = Children;
             base.Accept(visitor);
         }
 
@@ -41,7 +43,7 @@ namespace Pliant.Forest
             if (obj is null)
                 return false;
 
-            if (!(obj is ISymbolForestNode symbolNode))
+            if (obj is not ISymbolForestNode symbolNode)
                 return false;
 
             return Location == symbolNode.Location
