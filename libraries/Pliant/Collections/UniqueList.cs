@@ -8,8 +8,6 @@ namespace Pliant.Collections
         private HashSet<int> _index;
         private readonly List<T> _innerList;
 
-        private const int Threshold = 10;
-
         public int Count { get { return _innerList.Count; } }
 
         public bool IsReadOnly { get { return false; } }
@@ -23,18 +21,23 @@ namespace Pliant.Collections
         public UniqueList()
         {
             _innerList = new List<T>();
+            _index = new HashSet<int>();
         }
 
         public UniqueList(int capacity)
         {
             _innerList = new List<T>(capacity);
+            _index = new HashSet<int>();
         }
 
         public UniqueList(IEnumerable<T> list)
         {
             _innerList = new List<T>(list);
-            if (HashSetIsMoreEfficient())
-                AllocateAndPopulateHashSet();
+            for(int i = 0; i < _innerList.Count; i++)
+            {
+                var item = _innerList[i];
+                _index.Add(item.GetHashCode());
+            }
         }
 
         public int IndexOf(T item)
@@ -49,49 +52,17 @@ namespace Pliant.Collections
 
         public bool InsertUnique(int index, T item)
         {
-            if (HashSetIsMoreEfficient())
-                return InsertUniqueUsingHashSet(index, item);
-
-            return InsertUniqueUsingList(index, item);
-        }
-
-        private bool InsertUniqueUsingHashSet(int index, T item)
-        {
             if (!_index.Add(item.GetHashCode()))
                 return false;
-
-            _innerList.Insert(index, item);
-            return false;
-        }
-
-        private bool InsertUniqueUsingList(int index, T item)
-        {
-            if (_innerList.Count == 0)
-            {
-                _innerList.Insert(index, item);
-                return true;
-            }
             
-            var hashCode = item.GetHashCode();
-            for (int i = 0; i < _innerList.Count; i++)
-            {
-                var listItem = _innerList[i];
-                if (hashCode.Equals(listItem.GetHashCode()))
-                    return false;                
-            }
             _innerList.Insert(index, item);
-            if (HashSetIsMoreEfficient())
-                AllocateAndPopulateHashSet();
             return true;
         }
 
         public void RemoveAt(int index)
         {
-            if (HashSetIsMoreEfficient())
-            {
-                var item = _innerList[index];
-                _index.Remove(item.GetHashCode());
-            }
+            var item = _innerList[index];
+            _index.Remove(item.GetHashCode());
             _innerList.RemoveAt(index);
         }
 
@@ -102,76 +73,27 @@ namespace Pliant.Collections
 
         public bool AddUnique(T item)
         {
-            if (HashSetIsMoreEfficient())
-                return AddUniqueUsingHashSet(item);
-            return AddUniqueUsingList(item);
-        }
-
-        private bool AddUniqueUsingHashSet(T item)
-        {
             if (!_index.Add(item.GetHashCode()))
                 return false;
+
             _innerList.Add(item);
             return true;
-        }
-
-        private bool AddUniqueUsingList(T item)
-        {
-            if (_innerList.Count == 0)
-            {                
-                _innerList.Add(item);
-                return true;
-            }
-            var hashCode = item.GetHashCode();
-            for(int i=0;i<_innerList.Count;i++)
-            {
-                var listItem = _innerList[i];
-                if (hashCode.Equals(listItem.GetHashCode()))
-                    return false;
-            }
-            _innerList.Add(item);
-            if (HashSetIsMoreEfficient())
-                AllocateAndPopulateHashSet();
-            return true;
-        }
-
-        private void AllocateAndPopulateHashSet()
-        {
-            if (_index is null)
-                _index = new HashSet<int>();
-
-            if (_index.Count == _innerList.Count)
-                return;
-
-            for (int i = 0; i < _innerList.Count; i++)
-                _index.Add(_innerList[i].GetHashCode());
         }
 
         public void Clear()
         {
             _innerList.Clear();
-            if(!(_index is null))
-                _index.Clear();
+            _index.Clear();
         }
 
         public bool ContainsHash(int hashcode)
         {
-            if (HashSetIsMoreEfficient())
-                return _index.Contains(hashcode);
-            for (var i = 0; i < _innerList.Count; i++)
-            {
-                var item = _innerList[i];
-                if (item.GetHashCode() == hashcode)
-                    return true;
-            }
-            return false;
+            return _index.Contains(hashcode);
         }
 
         public bool Contains(T item)
-        {
-            if (HashSetIsMoreEfficient())
-                return _index.Contains(item.GetHashCode());
-            return _innerList.Contains(item);
+        {            
+            return _index.Contains(item.GetHashCode());
         }
 
         public void CopyTo(T[] array, int arrayIndex)
@@ -181,10 +103,7 @@ namespace Pliant.Collections
 
         public bool Remove(T item)
         {
-            if (HashSetIsMoreEfficient())
-            {
-                _index.Remove(item.GetHashCode());
-            }
+            _index.Remove(item.GetHashCode());            
             return _innerList.Remove(item);
         }
 
@@ -196,11 +115,6 @@ namespace Pliant.Collections
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _innerList.GetEnumerator();
-        }
-
-        private bool HashSetIsMoreEfficient()
-        {
-            return _innerList.Count >= Threshold;
         }
 
         public override int GetHashCode()
