@@ -27,6 +27,9 @@ namespace Pliant.Charts
 
         public bool Contains(int index, StateType stateType, IDottedRule dottedRule, int origin)
         {
+            if(_earleySets.Count <= index)            
+                return false;
+            
             var earleySet = GetEarleySet(index);
             return earleySet.Contains(stateType, dottedRule, origin);
         }
